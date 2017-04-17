@@ -1,0 +1,15 @@
+<IfModule mod_rewrite.c>
+
+    RewriteEngine on
+
+    # Change to match your URL base:
+    RewriteBase /
+
+    # If a directory or a file exists, use the request directly:
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+    # Otherwise forward the request to index.php:
+    RewriteRule . index.php
+
+</IfModule>

@@ -1,0 +1,51 @@
+{
+    "name": "yiisoft/yii2-app-advanced",
+    "description": "Yii 2 Advanced Project Template",
+    "keywords": ["yii2", "framework", "advanced", "project template"],
+    "homepage": "http://www.yiiframework.com/",
+    "type": "project",
+    "license": "BSD-3-Clause",
+    "support": {
+        "issues": "https://github.com/yiisoft/yii2/issues?state=open",
+        "forum": "http://www.yiiframework.com/forum/",
+        "wiki": "http://www.yiiframework.com/wiki/",
+        "irc": "irc://irc.freenode.net/yii",
+        "source": "https://github.com/yiisoft/yii2"
+    },
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.4.0",
+        "fxp/composer-asset-plugin": "*",
+        "yiisoft/yii2": ">=2.0.6",
+        "yiisoft/yii2-bootstrap": "*",
+        "yiisoft/yii2-swiftmailer": "*",
+        "sammaye/yii2-solr": "^1.1",
+        "solarium/solarium": "^3.5",
+        "sadovojav/yii2-image-cutter": "dev-master",
+        "kartik-v/yii2-widget-select2": "@dev",
+        "kartik-v/yii2-markdown": "dev-master",
+        "michelf/php-smartypants": "dev-lib",
+        "johnitvn/yii2-rbac-plus": "*",
+        "borales/yii2-phone-input": "=0.0.5",
+        "ruskid/yii2-csv-importer": "dev-master",
+        "tugmaks/yii2-google-maps": "dev-master",
+        "kartik-v/yii2-label-inplace": "*",
+        "yiisoft/yii2-jui": "~2.0.0",
+        "xj/yii2-sitemap": "~2.0",
+        "richardfan1126/yii2-js-register": "*",
+        "fedemotta/yii2-cronjob": "*",
+        "kartik-v/yii2-checkbox-x": "*"
+    },
+    "config": {
+        "process-timeout": 1800
+    },
+    "extra": {
+        "asset-installer-paths": {
+            "npm-asset-library": "vendor/npm",
+            "bower-asset-library": "vendor/bower"
+        }
+    },
+    "scripts": {
+        "post-install-cmd": "php init --env=Development --overwrite=n"
+    }
+}

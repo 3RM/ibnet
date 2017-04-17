@@ -1,0 +1,60 @@
+<?php
+
+use common\models\profile\Profile;
+use kartik\select2\Select2;
+use yii\bootstrap\Html;
+use yii\widgets\ActiveForm;
+
+/* @var $this yii\web\View */
+/* @var $model app\models\Profile */
+/* @var $form yii\widgets\ActiveForm */
+$this->title = 'Missionary Housing';
+?>
+
+<div class="wrap profile-form">
+
+    <?= $this->render('_profileFormHeader', ['profile' => $profile, 'pp' => $pp]) ?>
+
+    <div class="container-form">
+
+        <?php $form = ActiveForm::begin(); ?>
+
+        <div class="row">
+            <div class="col-md-8">
+                <?= $form->field($missHousing, 'description')->textArea(['maxlength' => true, 'rows' => 2]) ?>
+                <?= $form->field($missHousing, 'contact')->textInput(['maxlength' => true]) ?>
+            </div>
+        </div>
+    
+        <br>
+
+        <h4>Determine who can have access</h4>
+        <p>
+            Missionary housing is only visible to missionaries who have registered with IBNet.
+            It will not be accessible through the public directory.  You may further limit which missionaries will have
+            access.  Choose one or more acceptable distincitves from the list below.  Only missionaries with the matching 
+            distinctives that you choose will be able to view the listing.
+        </p>
+        <div class="row">
+            <div class="col-md-8">
+                <?= $form->field($missHousing, 'select')->widget(Select2::classname(), [                 // see customization options here: http://demos.krajee.com/widget-details/select2
+                    'data' => $list,
+                    'language' => 'en',
+                    'theme' => 'krajee',
+                    'options' => [
+                        'placeholder' => 'Select criteria to match against missionary profiles ...',
+                        ['Bible', 'Worship Style', 'Church Government'],
+                        'multiple' => true,
+                    ],
+                    'pluginOptions' => ['allowClear' => true],
+                ])->label(''); ?>
+            </div>
+        </div>
+
+        <?= $this->render('_profileFormFooter', ['profile' => $profile, 'e' => $e]) ?>
+
+        <?php ActiveForm::end(); ?>
+
+    </div>
+
+</div>
