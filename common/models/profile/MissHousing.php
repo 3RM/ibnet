@@ -35,7 +35,7 @@ class missHousing extends \yii\db\ActiveRecord
             ['description', 'string', 'max' => 1000],
             ['contact', 'string', 'max' => 300],
             [['description', 'contact'], 'filter', 'filter' => 'strip_tags'],
-            ['select', 'safe'],
+            [['select', 'trailer', 'water', 'electric', 'sewage'], 'safe'],
         ];
     }
 
@@ -47,6 +47,10 @@ class missHousing extends \yii\db\ActiveRecord
         return [
             'description' => 'Description',
             'contact' => 'Contact Instructions',
+            'trailer' => 'Parking',
+            'water' => 'Water Hookup',
+            'electric' => 'Electric Hookup',
+            'sewage' => 'Sewage Hookup',
         ];
     }
 

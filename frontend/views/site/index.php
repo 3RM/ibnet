@@ -10,7 +10,6 @@ use yii\widgets\ActiveForm;
 $session = Yii::$app->session;
 $count = $session->get('count');
 $this->title = '';
-AjaxAsset::register($this);
 ?>
 
 <div class="wrap search">
@@ -43,7 +42,18 @@ AjaxAsset::register($this);
     <div class="container">
         <div class="site-index">
             <div class="row">
-              <div class="col-sm-6 col-md-4">
+              <div class="col-sm-10 col-md-6 main responsive center">
+                  <?= Html::img('@web/images/main.jpg') ?>
+              </div>
+              <div class="col-sm-10 col-md-6">
+                  <h3>What is IBNet?</h3>
+                  <p>IBNet is a growing online community of independent Baptists.  It is a church-finder.  It helps you identify IB ministries.  It aids you in connecting with others of like faith and practice.  It gives you a place to highlight your ministry.  It catalogs ministry connections, making it easier than ever to discern the lay of the land among your ministry partners.  It keeps you informed of what is happening among independent Baptists elsewhere.   It is a platform for promoting a Baptist worldview.    In short, IBNet is everything you need and expect in an online community of Baptists.</p>
+                  <p class="line-height-sm"><?= Html::a('Register &#187', ['/site/register']) ?></p>
+                  <p class="line-height-sm"><?= Html::a('How-to-videos &#187', ['/site/how-to']) ?></p>
+              </div>
+            </div>
+            <div class="row top-margin-md">
+              <div class="col-sm-10 col-md-4">
                 <div class="thumbnail">
                   <?= Html::a(Html::img('@web/images/' . 'blog-coming-soon.jpg', ['class' => 'img-thumbnail']), ['/site/blog']) ?>
                   <div class="caption">
@@ -53,7 +63,7 @@ AjaxAsset::register($this);
                   </div>
                 </div>
               </div>
-              <div class="col-sm-6 col-md-4">
+              <div class="col-sm-10 col-md-4">
                 <div class="thumbnail">
                   <?= Html::a(Html::img('@web/images/' . 'grand-opening.jpg', ['class' => 'img-thumbnail']), ['/site/grand-opening']) ?>
                   <div class="caption">
@@ -63,7 +73,7 @@ AjaxAsset::register($this);
                   </div>
                 </div>
               </div>
-              <div class="col-sm-6 col-md-4">
+              <div class="col-sm-10 col-md-4">
                 <div class="thumbnail">
                     <div id="box3Content"><?= $box3Content ?></div>
                     <?php if ($count) { ?>

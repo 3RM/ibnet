@@ -454,6 +454,13 @@ nav.shrink .navbar-toggle {
   * Pages 
   *-----------------------------*/
 
+/*
+  * Index
+  *-----------------------------*/
+.responsive img {
+  max-width: 100%;
+}
+
 
 /*
   * Browse
@@ -498,6 +505,33 @@ nav.shrink .navbar-toggle {
 .left-block { margin-bottom: 20px;}
 .states a {width: 50px;display: inline-block;}
 .states a.nowidth {width: auto;}
+
+.Browse, .my-settings p, .profile-form, .profile-form label {
+  color: #6c8296;
+}
+.Browse b {
+  color: #4c4c4c;
+}
+.Browse h4 {
+  margin-bottom: 1px;
+}
+.Browse h4 a {
+  color: #dc9f27;
+}
+.Browse h4 a:hover {
+  color: #2a4b6d;
+}
+.Browse .container .row {
+  margin-bottom: 15px;
+}
+.Browse .pagination > li > a, .pagination > li > span {
+  border: 0px solid #fff;
+}
+.Browse .pagination > .active > a {
+   -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  border-radius: 10px;
+}
 
 
 /*
@@ -734,36 +768,6 @@ margin: 0;
 }
 
 /*
-  * Browse
-  *-----------------------------*/
-.Browse, .my-settings p, .profile-form, .profile-form label {
-  color: #6c8296;
-}
-.Browse b {
-  color: #4c4c4c;
-}
-.Browse h4 {
-  margin-bottom: 1px;
-}
-.Browse h4 a {
-  color: #dc9f27;
-}
-.Browse h4 a:hover {
-  color: #2a4b6d;
-}
-.Browse .container .row {
-  margin-bottom: 15px;
-}
-.Browse .pagination > li > a, .pagination > li > span {
-  border: 0px solid #fff;
-}
-.Browse .pagination > .active > a {
-   -webkit-border-radius: 10px;
-  -moz-border-radius: 10px;
-  border-radius: 10px;
-}
-
-/*
  * Profiles
  *------------------------------*/
 .profile-header {
@@ -852,6 +856,9 @@ margin: 0;
  }
  .small {
    font-size: .7em;
+ }
+ .line-height-sm {
+  line-height: 60%;
  }
 .site-login {
   margin-bottom: 40px;

@@ -720,7 +720,7 @@ class Profile extends \yii\db\ActiveRecord
 
     // ma-church: Mission Agencies - Church ('select', 'missHousing', 'packet')
             case 'ma-church':
-            return ['missHousing' => 'Does the church have mission housing?'];
+            return ['missHousing' => 'Does the church have mission housing or motorhome/trailer parking?'];
             break;
 
     // di: Distinctives ('bible', 'worship_style', 'polity')
@@ -926,16 +926,18 @@ class Profile extends \yii\db\ActiveRecord
                 $this->ind_loc = $result['lat'] . ',' . $result['lng'];
 
                 if ($this->ind_country == 'United States') {                                        // Convert US states to abbreviations
-                    $this->ind_st_prov_reg = State::find()
-                        ->select('abbreviation')
+                    $state = State::find()
                         ->where(['state' => $this->ind_st_prov_reg])
-                        ->scalar();
+                        ->one();
+                    $this->ind_st_prov_reg = $state->abbreviation;
+                    $this->ind_state_long = $state->long;
                 }
                 if ($this->ind_po_country == 'United States') {
-                    $this->ind_po_st_prov_reg = State::find()
-                        ->select('abbreviation')
+                    $po_state = State::find()
                         ->where(['state' => $this->ind_po_st_prov_reg])
-                        ->scalar();
+                        ->one();
+                    $this->ind_po_st_prov_reg = $state->abbreviation;
+                    $this->ind_po_state_long = $state->long;
                 }
 
     // ************************* USA Address - Org ******************************
@@ -959,16 +961,18 @@ class Profile extends \yii\db\ActiveRecord
                 $this->org_loc = $result['lat'] . ',' . $result['lng'];
             
                 if ($this->org_country == 'United States') {                                        // Convert US states to abbreviations
-                    $this->org_st_prov_reg = State::find()
-                        ->select('abbreviation')
+                    $state = State::find()
                         ->where(['state' => $this->org_st_prov_reg])
-                        ->scalar();
+                        ->one();
+                    $this->org_st_prov_reg = $state->abbreviation;
+                    $this->org_state_long = $state->long;
                 }
                 if ($this->org_po_country == 'United States') {
-                    $this->org_po_st_prov_reg = State::find()
-                        ->select('abbreviation')
+                    $po_state = State::find()
                         ->where(['state' => $this->org_po_st_prov_reg])
-                        ->scalar();
+                        ->one();
+                    $this->org_po_st_prov_reg = $po_state->abbreviation;
+                    $this->org_po_state_long = $po_state->long;
                 }
             }
              
