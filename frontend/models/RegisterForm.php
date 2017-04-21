@@ -1,7 +1,6 @@
 <?php
 namespace frontend\models;
 
-//use johnitvn\rbacplus\Module;
 use common\models\User;
 use yii;
 use yii\base\Model;

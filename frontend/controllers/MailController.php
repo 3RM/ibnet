@@ -56,7 +56,7 @@ class MailController extends Controller
             }
 
         } else {
-            $mail->sendLink($linkingProfile, $profile, $profileOwner, $lType, $dir);                // profile is active, send notificaiton
+            Mail::sendLink($linkingProfile, $profile, $profileOwner, $lType, $dir);                 // profile is active, send notificaiton
         }
 
         return true;

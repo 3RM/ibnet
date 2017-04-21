@@ -75,12 +75,18 @@ class SiteController extends Controller
         }
 
         $model = new LoginForm();
-        if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            return $this->goBack();
+        if ($model->load(Yii::$app->request->post())) {
+            $user = $model->user;
+            if (isset($user) && $model->isAdmin() && $model->login()) {
+                    return $this->goHome();
+
+            } else {        // Incorrect loginId
+                Yii::$app->session->setFlash('error', 'Your password or username/email is incorrect.');
+                return $this->render('login', ['model' => $model]);
+            }
         } else {
-            return $this->render('login', [
-                'model' => $model,
-            ]);
+            $this->layout = '//main-login';
+            return $this->render('login', ['model' => $model]);
         }
     }
 

@@ -33,7 +33,7 @@ class Module extends BaseModule {
      * @var string $userModelLoginField the login field name of user model.
      * Default is username
      */
-    public $userModelLoginField = 'username';
+    public $userModelLoginField = 'loginId';
 
     /**
      *

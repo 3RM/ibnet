@@ -273,16 +273,16 @@ class SiteController extends Controller
                         'username' => $user->username]));
                     Yii::$app->session->setFlash('error', 'Your email is not verified.  Find the 
                         verification email we sent and follow the link to complete your 
-                        registration. ' . $link);
+                        registration. Be sure to check your spam folder.<br>' . $link);
                     return $this->render('login', ['model' => $model]);
 
                 } else {        // incorrect password
-                    Yii::$app->session->setFlash('error', 'Your password or username is incorrect.');
+                    Yii::$app->session->setFlash('error', 'Your password or username/email is incorrect.');
                     return $this->render('login', ['model' => $model]);
                 } 
 
-            } else {        // Incorrect username
-                Yii::$app->session->setFlash('error', 'Your password or username is incorrect.');
+            } else {        // Incorrect username  or email
+                Yii::$app->session->setFlash('error', 'Your password or username/email is incorrect.');
                 return $this->render('login', ['model' => $model]);
             }
         } else {

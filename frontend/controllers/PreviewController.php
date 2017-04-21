@@ -50,6 +50,9 @@ class PreviewController extends ProfileFormController
         if (!$profile = $this->findProfile($id)) {
             throw new NotFoundHttpException;
         }
+        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
+            throw new NotFoundHttpException;
+        }
         $previewPage = 'preview-' . ProfileController::$profilePageArray[$profile->type];                                     // Handle all other profile types
         
         return $this->redirect([$previewPage, 'id' => $profile->id, 'city' => $city, 'name' => $name]);
@@ -62,6 +65,9 @@ class PreviewController extends ProfileFormController
     public function actionPreviewAssociation($id)
     {
         if (!$profile = $this->findProfile($id)) {
+            throw new NotFoundHttpException;
+        }
+        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
             throw new NotFoundHttpException;
         }
         if ($profile->type == 'Association') {
@@ -108,6 +114,9 @@ class PreviewController extends ProfileFormController
         if (!$profile = $this->findProfile($id)) {
             throw new NotFoundHttpException;
         }
+        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
+            throw new NotFoundHttpException;
+        }
         if ($profile->type == 'Fellowship') {
 
             if (isset($_POST['activate'])) {
@@ -149,6 +158,9 @@ class PreviewController extends ProfileFormController
     public function actionPreviewCamp($id)
     {
         if (!$profile = $this->findProfile($id)) {
+            throw new NotFoundHttpException;
+        }
+        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
             throw new NotFoundHttpException;
         }
         if ($profile->type == 'Camp') {
@@ -204,6 +216,9 @@ class PreviewController extends ProfileFormController
     public function actionPreviewChaplain($id)
     {
         if (!$profile = $this->findProfile($id)) {
+            throw new NotFoundHttpException;
+        }
+        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
             throw new NotFoundHttpException;
         }
         if ($profile->type == 'Chaplain') {
@@ -272,6 +287,9 @@ class PreviewController extends ProfileFormController
     public function actionPreviewChurch($id)
     {
         if (!$profile = $this->findProfile($id)) {
+            throw new NotFoundHttpException;
+        }
+        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
             throw new NotFoundHttpException;
         }
         if ($profile->type == 'Church') {
@@ -350,6 +368,9 @@ class PreviewController extends ProfileFormController
     public function actionPreviewEvangelist($id)
     {
         if (!$profile = $this->findProfile($id)) {
+            throw new NotFoundHttpException;
+        }
+        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
             throw new NotFoundHttpException;
         }
         if ($profile->type == 'Evangelist') {
@@ -440,6 +461,9 @@ class PreviewController extends ProfileFormController
         if (!$profile = $this->findProfile($id)) {
             throw new NotFoundHttpException;
         }
+        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
+            throw new NotFoundHttpException;
+        }
         if ($profile->type == 'Mission Agency') {
 
             if (isset($_POST['activate'])) {
@@ -498,6 +522,9 @@ class PreviewController extends ProfileFormController
     public function actionPreviewMissionary($id)
     {
         if (!$profile = $this->findProfile($id)) {
+            throw new NotFoundHttpException;
+        }
+        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
             throw new NotFoundHttpException;
         }
         if (!$missionary = $profile->missionary) {
@@ -589,6 +616,9 @@ class PreviewController extends ProfileFormController
         if (!$profile = $this->findProfile($id)) {
             throw new NotFoundHttpException;
         }
+        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
+            throw new NotFoundHttpException;
+        }
         if ($profile->type == 'Music Ministry') {
 
             if (isset($_POST['activate'])) {
@@ -644,6 +674,9 @@ class PreviewController extends ProfileFormController
         if (!$profile = $this->findProfile($id)) {
             throw new NotFoundHttpException;
         }
+        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
+            throw new NotFoundHttpException;
+        }
         if ($profile->type == 'Special') {
 
             if (isset($_POST['activate'])) {
@@ -697,6 +730,9 @@ class PreviewController extends ProfileFormController
     public function actionPreviewPastor($id)
     {
         if (!$profile = $this->findProfile($id)) {
+            throw new NotFoundHttpException;
+        }
+        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
             throw new NotFoundHttpException;
         }
         if ($profile->type == 'Pastor') {
@@ -767,6 +803,9 @@ class PreviewController extends ProfileFormController
         if (!$profile = $this->findProfile($id)) {
             throw new NotFoundHttpException;
         }
+        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
+            throw new NotFoundHttpException;
+        }
         if ($profile->type == 'Print Ministry') {
 
             if (isset($_POST['activate'])) {
@@ -820,6 +859,9 @@ class PreviewController extends ProfileFormController
     public function actionPreviewSchool($id)
     {
         if (!$profile = $this->findProfile($id)) {
+            throw new NotFoundHttpException;
+        }
+        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
             throw new NotFoundHttpException;
         }
         if ($profile->type == 'School') {
@@ -886,6 +928,9 @@ class PreviewController extends ProfileFormController
         if (!$profile = $this->findProfile($id)) {
             throw new NotFoundHttpException;
         }
+        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
+            throw new NotFoundHttpException;
+        }
         if ($profile->type == 'Special Ministry') {
 
             if (isset($_POST['activate'])) {
@@ -939,6 +984,9 @@ class PreviewController extends ProfileFormController
     public function actionPreviewStaff($id)
     {
         if (!$profile = $this->findProfile($id)) {
+            throw new NotFoundHttpException;
+        }
+        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
             throw new NotFoundHttpException;
         }
         if ($profile->type == 'Staff') {

@@ -15,7 +15,7 @@ $this->title = 'Complete Registration';
 	<div class="container registration-complete">
 	    <h2>Almost There! We sent a registration link to your email.</h2>
 
-	    <?= HTML::a('Roger that', ['site/index', 'class' => 'btn-link']) ?>
+	    <?= HTML::a('Roger that', 'index', ['class' => 'btn-link']) ?>
 	</div>
 
 </div>
