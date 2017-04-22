@@ -92,6 +92,9 @@ class PreviewController extends ProfileFormController
 
             $typeMask = ProfileFormController::$formArray[$profile->type];
             $profile->status == Profile::STATUS_ACTIVE ? $activate = NULL : $activate = 1;
+            if ($profile->status != 10) {
+                 $profile->updateAttributes(['edit' => 10]);
+            }
 
             return $this->render('previewFlwshpAss', [
                 'profile' => $profile,
@@ -138,6 +141,9 @@ class PreviewController extends ProfileFormController
                 $loc = NULL;
             }
             $profile->status == Profile::STATUS_ACTIVE ? $activate = NULL : $activate = 1;
+            if ($profile->status != 10) {
+                 $profile->updateAttributes(['edit' => 10]);
+            }
 
             return $this->render('previewFlwshpAss', [
                 'profile' => $profile,
@@ -194,6 +200,9 @@ class PreviewController extends ProfileFormController
 
             $typeMask = ProfileFormController::$formArray[$profile->type];
             $profile->status == Profile::STATUS_ACTIVE ? $activate = NULL : $activate = 1;
+            if ($profile->status != 10) {
+                 $profile->updateAttributes(['edit' => 10]);
+            }
 
             return $this->render('previewOrg', [
                 'profile' => $profile,
@@ -262,6 +271,9 @@ class PreviewController extends ProfileFormController
 
             $typeMask = ProfileFormController::$formArray[$profile->type];
             $profile->status == Profile::STATUS_ACTIVE ? $activate = NULL : $activate = 1;
+            if ($profile->status != 10) {
+                 $profile->updateAttributes(['edit' => 10]);
+            }
 
             return $this->render('previewEvangelist', [
                 'profile' => $profile,
@@ -341,6 +353,9 @@ class PreviewController extends ProfileFormController
 
             $typeMask = ProfileFormController::$formArray[$profile->type];
             $profile->status == Profile::STATUS_ACTIVE ? $activate = NULL : $activate = 1;
+            if ($profile->status != 10) {
+                 $profile->updateAttributes(['edit' => 10]);
+            }
 
             return $this->render('previewChurch', [
                 'profile' => $profile,
@@ -432,6 +447,9 @@ class PreviewController extends ProfileFormController
 
             $typeMask = ProfileFormController::$formArray[$profile->type];
             $profile->status == Profile::STATUS_ACTIVE ? $activate = NULL : $activate = 1;
+            if ($profile->status != 10) {
+                 $profile->updateAttributes(['edit' => 10]);
+            }
 
             return $this->render('previewEvangelist', [
                 'profile' => $profile,
@@ -500,6 +518,9 @@ class PreviewController extends ProfileFormController
 
             $typeMask = ProfileFormController::$formArray[$profile->type];
             $profile->status == Profile::STATUS_ACTIVE ? $activate = NULL : $activate = 1;
+            if ($profile->status != 10) {
+                 $profile->updateAttributes(['edit' => 10]);
+            }
 
             return $this->render('previewOrg', [
                 'profile' => $profile,
@@ -585,6 +606,9 @@ class PreviewController extends ProfileFormController
 
             $typeMask = ProfileFormController::$formArray[$profile->type];
             $profile->status == Profile::STATUS_ACTIVE ? $activate = NULL : $activate = 1;
+            if ($profile->status != 10) {
+                 $profile->updateAttributes(['edit' => 10]);
+            }
 
             return $this->render('previewMissionary', [
                 'profile' => $profile,
@@ -650,6 +674,9 @@ class PreviewController extends ProfileFormController
 
             $typeMask = ProfileFormController::$formArray[$profile->type];
             $profile->status == Profile::STATUS_ACTIVE ? $activate = NULL : $activate = 1;
+            if ($profile->status != 10) {
+                 $profile->updateAttributes(['edit' => 10]);
+            }
 
             return $this->render('previewOrg', [
                 'profile' => $profile,
@@ -708,6 +735,7 @@ class PreviewController extends ProfileFormController
 
             $typeMask = ProfileFormController::$formArray[$profile->type];
             $profile->status == Profile::STATUS_ACTIVE ? $activate = NULL : $activate = 1;
+            $profile->updateAttributes(['edit' => 10]);
 
             return $this->render('previewOrg', [
                 'profile' => $profile,
@@ -776,6 +804,9 @@ class PreviewController extends ProfileFormController
 
             $typeMask = ProfileFormController::$formArray[$profile->type];
             $profile->status == Profile::STATUS_ACTIVE ? $activate = NULL : $activate = 1;
+            if ($profile->status != 10) {
+                 $profile->updateAttributes(['edit' => 10]);
+            }
 
             return $this->render('previewPastor', [
                 'profile' => $profile,
@@ -837,6 +868,9 @@ class PreviewController extends ProfileFormController
 
             $typeMask = ProfileFormController::$formArray[$profile->type];
             $profile->status == Profile::STATUS_ACTIVE ? $activate = NULL : $activate = 1;
+            if ($profile->status != 10) {
+                 $profile->updateAttributes(['edit' => 10]);
+            }
 
             return $this->render('previewOrg', [
                 'profile' => $profile,
@@ -902,6 +936,9 @@ class PreviewController extends ProfileFormController
 
             $typeMask = ProfileFormController::$formArray[$profile->type];
             $profile->status == Profile::STATUS_ACTIVE ? $activate = NULL : $activate = 1;
+            if ($profile->status != 10) {
+                 $profile->updateAttributes(['edit' => 10]);
+            }
 
             return $this->render('previewSchool', [
                 'profile' => $profile, 
@@ -962,6 +999,9 @@ class PreviewController extends ProfileFormController
 
             $typeMask = ProfileFormController::$formArray[$profile->type];
             $profile->status == Profile::STATUS_ACTIVE ? $activate = NULL : $activate = 1;
+            if ($profile->status != 10) {
+                 $profile->updateAttributes(['edit' => 10]);
+            }
 
             return $this->render('previewOrg', [
                 'profile' => $profile,
@@ -1040,6 +1080,9 @@ class PreviewController extends ProfileFormController
 
             $typeMask = ProfileFormController::$formArray[$profile->type];
             $profile->status == Profile::STATUS_ACTIVE ? $activate = NULL : $activate = 1;
+            if ($profile->status != 10) {
+                 $profile->updateAttributes(['edit' => 10]);
+            }
 
             return $this->render('previewStaff', [
                 'profile' => $profile,

@@ -9,10 +9,30 @@ use yii\base\Model;
  */
 class LoginForm extends Model
 {
+    /**
+     *
+     * @var string $loginId username or email to compare against user model.
+     */
     public $loginId;
+
+    /**
+     *
+     * @var string $password the password to compare against user model.2
+     */
     public $password;
+
+    /**
+     *
+     * @var boolean $rememberMe stores user selection at login.
+     * Default is true
+     */
     public $rememberMe = true;
 
+    /**
+     *
+     * @var string $_user current user model.
+     * Default is id
+     */
     private $_user;
 
 

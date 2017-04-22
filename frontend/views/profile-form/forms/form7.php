@@ -50,7 +50,7 @@ $this->title = 'Missionary Field';
             </div>
         </div>
 
-        <?= $this->render('_profileFormFooter', ['profile' => $profile, 'e' => $e]) ?>
+        <?= $this->render('_profileFormFooter', ['profile' => $profile]) ?>
     
         <?php ActiveForm::end(); ?>
 

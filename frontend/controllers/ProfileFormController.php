@@ -150,7 +150,7 @@ class ProfileFormController extends ProfileController
      *
      * @return mixed
      */
-    public function actionFormRoute($type, $fmNum, $id, $e=0)
+    public function actionFormRoute($type, $fmNum, $id)
     {
         $value = 0;                                                                                 // Initialize $value
         while ($value == 0) {                                                                       // Find next '1' (i.e. required form) in row
@@ -162,7 +162,7 @@ class ProfileFormController extends ProfileController
         }
         $action = 'form' . $fmNum;
         
-        return $this->redirect([$action, 'id' => $id, 'e' => $e]);
+        return $this->redirect([$action, 'id' => $id]);
     }
 
 
@@ -190,7 +190,7 @@ class ProfileFormController extends ProfileController
      *
      * @return mixed
      */
-    public function actionForm0($id, $e=0)
+    public function actionForm0($id)
     {
         $fmNum = Self::$form['nd'];
         $fm = 'forms/form' . $fmNum;
@@ -211,7 +211,7 @@ class ProfileFormController extends ProfileController
             throw new NotFoundHttpException;
         }
         if (!self::$formArray[$profile->type][$fmNum]) {
-            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id, 'e' => $e]);
+            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
         }
 
         if (isset($_POST['cancel'])) {
@@ -227,7 +227,7 @@ class ProfileFormController extends ProfileController
 
             return isset($_POST['save']) ?
                 $this->redirect(['/preview/view-preview', 'id' => $id]) :
-                $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id, 'e' => $e]);
+                $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
 
         } else {
             $toolbar = $this->getMarkdownToolbar();
@@ -261,8 +261,7 @@ class ProfileFormController extends ProfileController
                         'list' => $list,
                         'toggle' => $toggle,
                         'toolbar' => $toolbar, 
-                        'pp' => $progressPercent, 
-                        'e' => $e]);
+                        'pp' => $progressPercent]);
                     break;
 
         // *********************** Fellowship *********************************
@@ -289,8 +288,7 @@ class ProfileFormController extends ProfileController
                         'profile' => $profile, 
                         'list' => $list,
                         'toolbar' => $toolbar, 
-                        'pp' => $progressPercent, 
-                        'e' => $e]);
+                        'pp' => $progressPercent]);
                     break;
 
         // *********************** Mission Agency *********************************
@@ -315,8 +313,7 @@ class ProfileFormController extends ProfileController
                         'toggle' => $toggle,
                         'toolbar' => $toolbar, 
                         'list' => $list,
-                        'pp' => $progressPercent, 
-                        'e' => $e]);
+                        'pp' => $progressPercent]);
                     break;
 
         // *********************** School *********************************
@@ -354,8 +351,7 @@ class ProfileFormController extends ProfileController
                         'toggle' => $toggle,
                         'toolbar' => $toolbar,
                         'list' => $list,
-                        'pp' => $progressPercent,
-                        'e' => $e]);
+                        'pp' => $progressPercent]);
                     break;  
 
         // *********************** All Others *********************************  
@@ -365,13 +361,11 @@ class ProfileFormController extends ProfileController
                         $this->render($fm . '-org', [
                             'profile' => $profile, 
                             'toolbar' => $toolbar, 
-                            'pp' => $progressPercent,
-                            'e' => $e]) :
+                            'pp' => $progressPercent]) :
                         $this->render($fm . '-ind', [
                             'profile' => $profile,
                             'toolbar' => $toolbar, 
-                            'pp' => $progressPercent,
-                            'e' => $e]);
+                            'pp' => $progressPercent]);
                     break;
             }
         }
@@ -383,7 +377,7 @@ class ProfileFormController extends ProfileController
      *
      * @return mixed
      */
-    public function actionForm1($id, $e=0)
+    public function actionForm1($id)
     {
         $fmNum = Self::$form['i1'];
         $fm = 'forms/form' . $fmNum;
@@ -394,7 +388,7 @@ class ProfileFormController extends ProfileController
             throw new NotFoundHttpException;
         }
         if (!self::$formArray[$profile->type][$fmNum]) {
-            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id, 'e' => $e]);
+            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
         }
 
         if (isset($_POST['cancel'])) {
@@ -409,14 +403,14 @@ class ProfileFormController extends ProfileController
             $profile->setProgress($fmNum)) {
             return isset($_POST['save']) ?
                 $this->redirect(['/preview/view-preview', 'id' => $id]) :
-                $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id, 'e' => $e]);   
+                $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);   
 
         } else {   
             $profile->status != Profile::STATUS_ACTIVE ?
                 $progressPercent = $profile->getProgressPercent(self::$formArray[$profile->type]) :
                 $progressPercent = NULL;      
 
-            return $this->render($fm, ['profile' => $profile, 'pp' => $progressPercent, 'e' => $e]);
+            return $this->render($fm, ['profile' => $profile, 'pp' => $progressPercent]);
         }
     }
 
@@ -426,7 +420,7 @@ class ProfileFormController extends ProfileController
      *
      * @return mixed
      */
-    public function actionForm2($id, $e=0)
+    public function actionForm2($id)
     {
         $fmNum = Self::$form['i2'];
         $fm = 'forms/form' . $fmNum;
@@ -437,16 +431,16 @@ class ProfileFormController extends ProfileController
             throw new NotFoundHttpException;
         }
         if (!self::$formArray[$profile->type][$fmNum]) {
-            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id, 'e' => $e]);
+            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
         }
 
         if ($profile->type == 'Church') {                                                           // Handle linked image on church profile
             if (isset($_POST['remove'])) {                                                          // User selected to remove linked image
                 $profile->updateAttributes(['image2' => NULL]);
-                return $this->redirect(['form' . $fmNum, 'id' => $id, 'e' => $e]);
+                return $this->redirect(['form' . $fmNum, 'id' => $id]);
             } elseif (isset($_POST['use'])) {                                                       // User selected to use pastor image for church profile
                 $profile->updateAttributes(['image2' => $_POST['use']]);
-                return $this->redirect(['form' . $fmNum, 'id' => $id, 'e' => $e]);
+                return $this->redirect(['form' . $fmNum, 'id' => $id]);
             }        
         }
         if (isset($_POST['cancel'])) {
@@ -461,7 +455,7 @@ class ProfileFormController extends ProfileController
             $profile->setProgress($fmNum)) {
             return isset($_POST['save']) ?
                 $this->redirect(['/preview/view-preview', 'id' => $id]) :
-                $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id, 'e' => $e]); // Give option to share linked pastor image with church profile
+                $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]); // Give option to share linked pastor image with church profile
 
         } else {
             $imageLink = NULL;
@@ -477,8 +471,7 @@ class ProfileFormController extends ProfileController
             return $this->render($fm, [
                 'profile' => $profile, 
                 'imageLink' => $imageLink, 
-                'pp' => $progressPercent, 
-                'e' => $e]);
+                'pp' => $progressPercent]);
         } 
     }
 
@@ -490,7 +483,7 @@ class ProfileFormController extends ProfileController
      *
      * @return mixed
      */
-    public function actionForm3($id, $e=0)
+    public function actionForm3($id)
     {
         $fmNum = Self::$form['lo'];
         $fm = 'forms/form' . $fmNum;
@@ -503,7 +496,7 @@ class ProfileFormController extends ProfileController
             throw new NotFoundHttpException;
         }
         if (!self::$formArray[$profile->type][$fmNum]) {
-            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id, 'e' => $e]);
+            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
         }
 
         if (isset($_POST['cancel'])) {
@@ -518,7 +511,7 @@ class ProfileFormController extends ProfileController
             $profile->setProgress($fmNum)) {
             return isset($_POST['save']) ?
                 $this->redirect(['/preview/view-preview', 'id' => $id]) :
-                $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id, 'e' => $e]); 
+                $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]); 
 
         } else {
             $profile->status != Profile::STATUS_ACTIVE ?
@@ -538,8 +531,7 @@ class ProfileFormController extends ProfileController
                     'profile' => $profile, 
                     'title' => $title, 
                     'list' => $list,
-                    'pp' => $progressPercent,
-                    'e' => $e]);
+                    'pp' => $progressPercent]);
             } else {
                 $profile->type == 'Special Ministry' ?
                     $title = 'Minsitry Address' :
@@ -550,8 +542,7 @@ class ProfileFormController extends ProfileController
                     'profile' => $profile, 
                     'title' => $title, 
                     'list' => $list,
-                    'pp' => $progressPercent,
-                    'e' => $e]);
+                    'pp' => $progressPercent]);
             }
         } 
     }
@@ -562,7 +553,7 @@ class ProfileFormController extends ProfileController
      *
      * @return mixed
      */
-    public function actionForm4($id, $e=0)
+    public function actionForm4($id)
     {
         $fmNum = Self::$form['co'];
         $fm = 'forms/form' . $fmNum;
@@ -573,7 +564,7 @@ class ProfileFormController extends ProfileController
             throw new NotFoundHttpException;
         }
         if (!self::$formArray[$profile->type][$fmNum]) {
-            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id, 'e' => $e]);
+            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
         }
 
         if (!$social = $profile->social) {
@@ -592,7 +583,7 @@ class ProfileFormController extends ProfileController
             $profile->setProgress($fmNum)) {
             return isset($_POST['save']) ?
                 $this->redirect(['/preview/view-preview', 'id' => $id]) :
-                $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id, 'e' => $e]);
+                $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
 
         } else {
             empty($profile->org_country) ?
@@ -621,8 +612,7 @@ class ProfileFormController extends ProfileController
                 'social' => $social, 
                 'preferred' => $preferred, 
                 'ibnetEmail' => $ibnetEmail,
-                'pp' => $progressPercent,
-                'e' => $e]);
+                'pp' => $progressPercent]);
         }
     }
 
@@ -632,7 +622,7 @@ class ProfileFormController extends ProfileController
      *
      * @return mixed
      */
-    public function actionForm5($id, $e=0)
+    public function actionForm5($id)
     {
         $fmNum = Self::$form['sf'];
         $fm = 'forms/form' . $fmNum;
@@ -645,7 +635,7 @@ class ProfileFormController extends ProfileController
             throw new NotFoundHttpException;
         }
         if (!self::$formArray[$profile->type][$fmNum]) {
-            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id, 'e' => $e]);
+            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
         }
 
     // *********************** Add Staff *********************************
@@ -658,7 +648,7 @@ class ProfileFormController extends ProfileController
                 MailController::initSendLink($profile, $staffProfile, $staffProfileOwner, 'SF', 'L');   // Notify staff profile owner of unconfirmed status
             
             }
-            return $this->redirect(['form' . $fmNum, 'id' => $profile->id, 'e' => $e]);             // Refresh page
+            return $this->redirect(['form' . $fmNum, 'id' => $profile->id]);                        // Refresh page
     
     // *********************** Remove Staff *********************************    
         } elseif (isset($_POST['remove'])) {
@@ -670,19 +660,19 @@ class ProfileFormController extends ProfileController
                 MailController::initSendLink($profile, $staffProfile, $staffProfileOwner, 'SF', 'UL'); // Notify staff profile owner of unconfirmed status
 
             }
-            return $this->redirect(['form' . $fmNum, 'id' => $profile->id, 'e' => $e]);             // Refresh page
+            return $this->redirect(['form' . $fmNum, 'id' => $profile->id]);                        // Refresh page
 
     // *********************** Add Sr Pastor ******************************
         } elseif (isset($_POST['senior']) && $profile->handleFormSFSA($profile)) {
-            return $this->redirect(['form' . $fmNum, 'id' => $profile->id, 'e' => $e]);             // Refresh page
+            return $this->redirect(['form' . $fmNum, 'id' => $profile->id]);                        // Refresh page
     
     // *********************** Remove Sr Pastor ******************************     
         } elseif (isset($_POST['clear']) && $profile->handleFormSFSR($profile)) {
-            return $this->redirect(['form' . $fmNum, 'id' => $profile->id, 'e' => $e]);             // Refresh page
+            return $this->redirect(['form' . $fmNum, 'id' => $profile->id]);                        // Refresh page
         
         } elseif (isset($_POST['continue-org'])) {                                                  // Post coming from Org Staff page
             $profile->setProgress($fmNum);
-            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $profile->id, 'e' => $e]);
+            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $profile->id]);
         
         } elseif (isset($_POST['exit-org'])) {
             $profile->setProgress($fmNum);
@@ -698,7 +688,7 @@ class ProfileFormController extends ProfileController
             $profile->save() && $profile->setUpdateDate() && $profile->setProgress($fmNum)) {
             return isset($_POST['save']) ?
                 $this->redirect(['/preview/view-preview', 'id' => $id]) :
-                $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id, 'e' => $e]);      
+                $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);      
         
         } else {
             $profile->getFormattedNames();
@@ -745,14 +735,12 @@ class ProfileFormController extends ProfileController
                     'profile' => $profile, 
                     'srPastor' => $srPastor,
                     'staffArray' => $staffArray,
-                    'pp' => $progressPercent,
-                    'e' => $e]) :
+                    'pp' => $progressPercent]) :
                 $this->render($fm . '-org', [
                     'profile' => $profile, 
                     'staffArray' => $staffArray, 
                     'fmNum' => $fmNum, 
-                    'pp' => $progressPercent,
-                    'e' => $e]);
+                    'pp' => $progressPercent]);
         }
     }
 
@@ -762,7 +750,7 @@ class ProfileFormController extends ProfileController
      *
      * @return mixed
      */
-    public function actionForm6($id, $e=0)
+    public function actionForm6($id)
     {
         $fmNum = Self::$form['st'];
         $fm = 'forms/form' . $fmNum;
@@ -773,7 +761,7 @@ class ProfileFormController extends ProfileController
             throw new NotFoundHttpException;
         }
         if (!self::$formArray[$profile->type][$fmNum]) {
-            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id, 'e' => $e]);
+            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
         }
 
         if($profile->service_time_id != NULL) {                                                     // Load previously saved service times
@@ -795,7 +783,7 @@ class ProfileFormController extends ProfileController
             $profile->setProgress($fmNum)) {    
             return isset($_POST['save']) ?
                 $this->redirect(['/preview/view-preview', 'id' => $id]) :
-                $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id, 'e' => $e]);
+                $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
 
         } else {
             $profile->status != Profile::STATUS_ACTIVE ?
@@ -845,8 +833,7 @@ class ProfileFormController extends ProfileController
                 'days' => $days,
                 'hours' => $hours,
                 'minutes' => $minutes,
-                'pp' => $progressPercent,
-                'e' => $e]);
+                'pp' => $progressPercent]);
         }
     }
 
@@ -856,7 +843,7 @@ class ProfileFormController extends ProfileController
      *
      * @return mixed
      */
-    public function actionForm7($id, $e=0)
+    public function actionForm7($id)
     {
         $fmNum = Self::$form['fi'];
         $fm = 'forms/form' . $fmNum;
@@ -871,7 +858,7 @@ class ProfileFormController extends ProfileController
             throw new NotFoundHttpException;
         }
         if (!self::$formArray[$profile->type][$fmNum]) {
-            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id, 'e' => $e]);
+            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
         }
 
         if (isset($_POST['cancel'])) {
@@ -889,7 +876,7 @@ class ProfileFormController extends ProfileController
             }
             return isset($_POST['save']) ?
                 $this->redirect(['/preview/view-preview', 'id' => $id]) :
-                $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id, 'e' => $e]);     
+                $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);     
         }
         $profile->status != Profile::STATUS_ACTIVE ?
             $progressPercent = $profile->getProgressPercent(self::$formArray[$profile->type]) :
@@ -898,8 +885,7 @@ class ProfileFormController extends ProfileController
         return $this->render($fm, [
             'profile' => $profile, 
             'missionary' => $missionary, 
-            'pp' => $progressPercent,
-            'e' => $e]);
+            'pp' => $progressPercent]);
     }
 
     /**
@@ -908,7 +894,7 @@ class ProfileFormController extends ProfileController
      *
      * @return mixed
      */
-    public function actionForm8($id, $e=0)
+    public function actionForm8($id)
     {
         $fmNum = Self::$form['hc'];
         $fm = 'forms/form' . $fmNum;
@@ -920,7 +906,7 @@ class ProfileFormController extends ProfileController
             throw new NotFoundHttpException;
         }
         if (!self::$formArray[$profile->type][$fmNum]) {
-            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id, 'e' => $e]);
+            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
         }
         $profile->status != Profile::STATUS_ACTIVE ?
             $progressPercent = $profile->getProgressPercent(self::$formArray[$profile->type]) :
@@ -930,8 +916,7 @@ class ProfileFormController extends ProfileController
             return $this->render($fm, [
                 'profile' => $profile,
                 'churchLink' => $churchLink,
-                'pp' => $progressPercent,
-                'e' => $e]);
+                'pp' => $progressPercent]);
 
         } elseif (isset($_POST['cancel'])) {
             return $this->redirect(['/preview/view-preview', 'id' => $id]); 
@@ -944,7 +929,7 @@ class ProfileFormController extends ProfileController
             $profile->setProgress($fmNum)) {
             return isset($_POST['save']) ?
                 $this->redirect(['/preview/view-preview', 'id' => $id]) :
-                $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id, 'e' => $e]);    
+                $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);    
 
         } else {
             $churchLabel = $profile->getChurchLabel($profile->type, $profile->sub_type);
@@ -969,8 +954,7 @@ class ProfileFormController extends ProfileController
                 'profile' => $profile,
                 'churchLink' => $churchLink,
                 'churchLabel' => $churchLabel,
-                'pp' => $progressPercent,
-                'e' => $e]);
+                'pp' => $progressPercent]);
         }
     }
 
@@ -980,7 +964,7 @@ class ProfileFormController extends ProfileController
      *
      * @return mixed
      */
-    public function actionForm9($id, $e=0)
+    public function actionForm9($id)
     {
         $fmNum = Self::$form['cp'];
         $fm = 'forms/form' . $fmNum;
@@ -995,14 +979,14 @@ class ProfileFormController extends ProfileController
             throw new NotFoundHttpException;
         }
         if (!self::$formArray[$profile->type][$fmNum]) {
-            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id, 'e' => $e]);
+            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
         }
         if ($profile->sub_type != 'Church Planter') {
-             return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id, 'e' => $e]);
+             return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
         }
 
         if (isset($_POST['remove']) && $missionary->handleFormCPR($profile)) {
-            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum-1, 'id' => $id, 'e' => $e]);
+            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum-1, 'id' => $id]);
         
         } elseif (isset($_POST['cancel'])) {
             return $this->redirect(['/preview/view-preview', 'id' => $id]); 
@@ -1015,7 +999,7 @@ class ProfileFormController extends ProfileController
             $profile->setProgress($fmNum)) {
             return isset($_POST['save']) ?
                 $this->redirect(['/preview/view-preview', 'id' => $id]) :
-                $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id, 'e' => $e]);
+                $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
 
         } else {
             $profile->show_map == NULL ?
@@ -1046,8 +1030,7 @@ class ProfileFormController extends ProfileController
                 'missionary' => $missionary,
                 'ministryLink' => $ministryLink,
                 'msg' => $msg,
-                'pp' => $progressPercent,
-                'e' => $e]);
+                'pp' => $progressPercent]);
         }
     }
 
@@ -1057,7 +1040,7 @@ class ProfileFormController extends ProfileController
      *
      * @return mixed
      */
-    public function actionForm10($id, $e=0)
+    public function actionForm10($id)
     { 
         $fmNum = Self::$form['pm'];
         $fm = 'forms/form' . $fmNum;
@@ -1075,7 +1058,7 @@ class ProfileFormController extends ProfileController
         }
 
         if (!self::$formArray[$profile->type][$fmNum]) {
-            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id, 'e' => $e]);
+            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
         }
 
         $ministryLink = NULL;
@@ -1133,17 +1116,17 @@ class ProfileFormController extends ProfileController
             MailController::initSendLink($profile, $ministryProfile, $ministryProfileOwner, 'PM', 'UL');    // Notify ministry profile owner of unlink
             
             $staff->delete();
-            return $this->redirect(['form' . $fmNum, 'id' => $profile->id, 'e' => $e]);             // Refresh page
+            return $this->redirect(['form' . $fmNum, 'id' => $profile->id]);                        // Refresh page
 
         } elseif (isset($_POST['submit']) && 
             $profile->load(Yii::$app->request->Post()) &&
             $profile->handleFormPM()) {
-            return $this->redirect(['form' . $fmNum, 'id' => $profile->id, 'e' => $e]);             // Save select and refresh page
+            return $this->redirect(['form' . $fmNum, 'id' => $profile->id]);                        // Save select and refresh page
 
          } elseif (isset($_POST['submitM']) &&
             $profile->load(Yii::$app->request->Post()) &&
             $profile->handleFormPMM()) {
-            return $this->redirect(['form' . $fmNum, 'id' => $profile->id, 'e' => $e]);             // Save select and refresh page
+            return $this->redirect(['form' . $fmNum, 'id' => $profile->id]);                        // Save select and refresh page
 
         } elseif (isset($_POST['cancel'])) {
             return $this->redirect(['/preview/view-preview', 'id' => $id]); 
@@ -1157,7 +1140,7 @@ class ProfileFormController extends ProfileController
             $profile->handleFormPMM()) { 
             return isset($_POST['save']) ?
                 $this->redirect(['/preview/view-preview', 'id' => $id]) :
-                $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id, 'e' => $e]);
+                $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
         }
 
         $ministryM = Staff::find()                                                                  // Find all "other" staff
@@ -1173,21 +1156,18 @@ class ProfileFormController extends ProfileController
                     'ministryLabel' => $ministryLabel,
                     'ministryM' => $ministryM,
                     'more' => $more,
-                    'pp' => $progressPercent,
-                    'e' => $e]) :
+                    'pp' => $progressPercent]) :
                 $this->render($fm . '-other', [
                     'profile' => $profile,
                     'ministryM' => $ministryM,
                     'more' => $more,
-                    'pp' => $progressPercent,
-                    'e' => $e]);
+                    'pp' => $progressPercent]);
         } else {
             return $this->render($fm . '-org', [
                 'profile' => $profile,
                 'ministryLink' => $ministryLink,
                 'ministryLabel' => $ministryLabel,
-                'pp' => $progressPercent,
-                'e' => $e]);
+                'pp' => $progressPercent]);
         }
     }
 
@@ -1197,7 +1177,7 @@ class ProfileFormController extends ProfileController
      *
      * @return mixed
      */
-    public function actionForm11($id, $e=0)
+    public function actionForm11($id)
     { 
         $fmNum = Self::$form['pg'];
         $fm = 'forms/form' . $fmNum;
@@ -1209,7 +1189,7 @@ class ProfileFormController extends ProfileController
         }
 
         if (!self::$formArray[$profile->type][$fmNum]) {
-            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id, 'e' => $e]);
+            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
         }
 
         $profile->status != Profile::STATUS_ACTIVE ?
@@ -1220,7 +1200,7 @@ class ProfileFormController extends ProfileController
             return $this->redirect(['/preview/view-preview', 'id' => $id]);
 
         } elseif (isset($_POST['continue']) && $profile->setProgress($fmNum)) {
-            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id, 'e' => $e]);
+            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
 
         } elseif ($profile->load(Yii::$app->request->Post())) {
             $profile->handleFormPG();
@@ -1232,8 +1212,7 @@ class ProfileFormController extends ProfileController
         return $this->render($fm, [
             'profile' => $profile,
             'programs' => $programs,
-            'pp' => $progressPercent,
-            'e' => $e]);
+            'pp' => $progressPercent]);
     }
 
     /**
@@ -1242,7 +1221,7 @@ class ProfileFormController extends ProfileController
      *
      * @return mixed
      */
-    public function actionForm12($id, $e=0)
+    public function actionForm12($id)
     {
         $fmNum = Self::$form['sa'];
         $fm = 'forms/form' . $fmNum;
@@ -1253,7 +1232,7 @@ class ProfileFormController extends ProfileController
             throw new NotFoundHttpException;
         }
         if (!self::$formArray[$profile->type][$fmNum]) {
-            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id, 'e' => $e]);
+            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
         }
 
         if (isset($_POST['cancel'])) {
@@ -1267,7 +1246,7 @@ class ProfileFormController extends ProfileController
             $profile->setProgress($fmNum)) {
             return isset($_POST['save']) ?
                 $this->redirect(['/preview/view-preview', 'id' => $id]) :
-                $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id, 'e' => $e]); 
+                $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]); 
 
         } else {  
             $profile->status != Profile::STATUS_ACTIVE ?
@@ -1291,8 +1270,7 @@ class ProfileFormController extends ProfileController
             return $this->render($fm, [
                 'profile' => $profile,
                 'list' => $list, 
-                'pp' => $progressPercent,
-                'e' => $e]);
+                'pp' => $progressPercent]);
         }
     }
 
@@ -1302,7 +1280,7 @@ class ProfileFormController extends ProfileController
      *
      * @return mixed
      */
-    public function actionForm13($id, $e=0)
+    public function actionForm13($id)
     {
         $fmNum = Self::$form['sl'];
         $fm = 'forms/form' . $fmNum;
@@ -1313,7 +1291,7 @@ class ProfileFormController extends ProfileController
             throw new NotFoundHttpException;
         }
         if (!self::$formArray[$profile->type][$fmNum]) {
-            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id, 'e' => $e]);
+            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
         }
 
         if (isset($_POST['cancel'])) {
@@ -1327,7 +1305,7 @@ class ProfileFormController extends ProfileController
             $profile->setProgress($fmNum)) {
             return isset($_POST['save']) ?
                 $this->redirect(['/preview/view-preview', 'id' => $id]) :
-                $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id, 'e' => $e]); 
+                $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]); 
 
         } else {
             $profile->status != Profile::STATUS_ACTIVE ?
@@ -1337,8 +1315,7 @@ class ProfileFormController extends ProfileController
             
             return $this->render($fm, [
                 'profile' => $profile, 
-                'pp' => $progressPercent,
-                'e' => $e]);
+                'pp' => $progressPercent]);
         }
     }
 
@@ -1348,7 +1325,7 @@ class ProfileFormController extends ProfileController
      *
      * @return mixed
      */
-    public function actionForm14($id, $e=0)
+    public function actionForm14($id)
     {
         $fmNum = Self::$form['di'];
         $fm = 'forms/form' . $fmNum;
@@ -1359,7 +1336,7 @@ class ProfileFormController extends ProfileController
             throw new NotFoundHttpException;
         }
         if (!self::$formArray[$profile->type][$fmNum]) {
-            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id, 'e' => $e]);
+            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
         }
 
         if (isset($_POST['cancel'])) {
@@ -1374,7 +1351,7 @@ class ProfileFormController extends ProfileController
             $profile->setProgress($fmNum)) {
             return isset($_POST['save']) ?
                 $this->redirect(['/preview/view-preview', 'id' => $id]) :
-                $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id, 'e' => $e]);  
+                $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);  
 
         } else {
             $profile->status != Profile::STATUS_ACTIVE ?
@@ -1383,8 +1360,7 @@ class ProfileFormController extends ProfileController
 
             return $this->render($fm, [
                 'profile' => $profile, 
-                'pp' => $progressPercent,
-                'e' => $e]);
+                'pp' => $progressPercent]);
         }
     }
 
@@ -1396,7 +1372,7 @@ class ProfileFormController extends ProfileController
      *
      * @return mixed
      */
-    public function actionForm15($id, $e=0)
+    public function actionForm15($id)
     {
         $fmNum = Self::$form['ma'];
         $fm = 'forms/form' . $fmNum;
@@ -1407,7 +1383,7 @@ class ProfileFormController extends ProfileController
             throw new NotFoundHttpException;
         }
         if (!self::$formArray[$profile->type][$fmNum]) {
-            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id, 'e' => $e]);
+            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
         }
 
         if ($profile->type == 'Missionary') {
@@ -1422,7 +1398,7 @@ class ProfileFormController extends ProfileController
             $profile->type == 'Church' ?
                 $profile->updateAttributes(['packet' => NULL]) :
                 $missionary->updateAttributes(['packet' => NULL]);
-            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum-1, 'id' => $id, 'e' => $e]); 
+            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum-1, 'id' => $id]); 
 
         } elseif (isset($_POST['cancel'])) {
             return $this->redirect(['/preview/view-preview', 'id' => $id]); 
@@ -1437,14 +1413,14 @@ class ProfileFormController extends ProfileController
             $profile->setProgress($fmNum)) {
 
             if ($_POST['Profile']['missHousing'] == 'Y') {
-                return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id, 'e' => $e]);
+                return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
 
             } else {
                 $fmNum++;
                 $profile->setProgress($fmNum);                                                      // Set form complete for missionary housing
                 return isset($_POST['save']) ?
                     $this->redirect(['/preview/view-preview', 'id' => $id]) :
-                    $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id, 'e' => $e]); 
+                    $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]); 
             } 
 
     // ************************** Missionary POST *******************************    
@@ -1454,7 +1430,7 @@ class ProfileFormController extends ProfileController
             $profile->setProgress($fmNum)) { 
             return isset($_POST['save']) ?
                 $this->redirect(['/preview/view-preview', 'id' => $id]) :
-                $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => ($fmNum + 1), 'id' => $id, 'e' => $e]);    // Skip Missionary Housing if checkbox is not checked
+                $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => ($fmNum + 1), 'id' => $id]);    // Skip Missionary Housing if checkbox is not checked
             
         } else {
             $profile->status != Profile::STATUS_ACTIVE ?
@@ -1473,8 +1449,7 @@ class ProfileFormController extends ProfileController
                 return $this->render($fm . '-church', [
                     'profile' => $profile,
                     'list' => $list,
-                    'pp' => $progressPercent,
-                    'e' => $e]);
+                    'pp' => $progressPercent]);
             } else {
 
     // ************************** Missionary Render *******************************
@@ -1485,8 +1460,7 @@ class ProfileFormController extends ProfileController
                     'profile' => $profile, 
                     'missionary' => $missionary, 
                     'list' => $list,
-                    'pp' => $progressPercent,
-                    'e' => $e]);  
+                    'pp' => $progressPercent]);  
             }
         }
     }
@@ -1497,7 +1471,7 @@ class ProfileFormController extends ProfileController
      *
      * @return mixed
      */
-    public function actionForm16($id, $e=0)
+    public function actionForm16($id)
     {
         $fmNum = Self::$form['mh'];
         $fm = 'forms/form' . $fmNum;
@@ -1508,7 +1482,7 @@ class ProfileFormController extends ProfileController
             throw new NotFoundHttpException;
         }
         if (!self::$formArray[$profile->type][$fmNum]) {
-            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id, 'e' => $e]);
+            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
         }
 
         if (isset($profile->miss_housing_id) &&
@@ -1530,7 +1504,7 @@ class ProfileFormController extends ProfileController
             $profile->setProgress($fmNum)) {
             return isset($_POST['save']) ?
                 $this->redirect(['/preview/view-preview', 'id' => $id]) :
-                $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id, 'e' => $e]); 
+                $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]); 
 
         } else {
             $list = ArrayHelper::map(MissHousingVisibility::find()->all(), 'id', 'approved', 'distinctive');
@@ -1542,8 +1516,7 @@ class ProfileFormController extends ProfileController
                 'profile' => $profile,
                 'missHousing' => $missHousing,
                 'list' => $list, 
-                'pp' => $progressPercent,
-                'e' => $e]);
+                'pp' => $progressPercent]);
         }
     }
 
@@ -1556,7 +1529,7 @@ class ProfileFormController extends ProfileController
      *
      * @return mixed
      */
-    public function actionForm17($id, $e=0)
+    public function actionForm17($id)
     {
         $fmNum = Self::$form['as'];
         $fm = 'forms/form' . $fmNum;
@@ -1574,7 +1547,7 @@ class ProfileFormController extends ProfileController
             throw new NotFoundHttpException;
         }
         if (!self::$formArray[$profile->type][$fmNum]) {
-            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id, 'e' => $e]);
+            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
         }
 
         if (isset($_POST['cancel'])) {
@@ -1588,7 +1561,7 @@ class ProfileFormController extends ProfileController
             $profile->setProgress($fmNum)) {
             return isset($_POST['save']) ?
                 $this->redirect(['/preview/view-preview', 'id' => $id]) :
-                $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id, 'e' => $e]);  
+                $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);  
 
         } else {
             $profile->status != Profile::STATUS_ACTIVE ?
@@ -1599,19 +1572,16 @@ class ProfileFormController extends ProfileController
                 $profile->select = $profile->accreditation;                                         // DB relation via junction table
                 return $this->render($fm . '-school', [
                     'profile' => $profile, 
-                    'pp' => $progressPercent,
-                    'e' => $e]);
+                    'pp' => $progressPercent]);
             }
 
             return $profile->isIndividual($profile->type) ?
                 $this->render($fm . '-ind', [
                     'profile' => $profile, 
-                    'pp' => $progressPercent,
-                    'e' => $e]) :
+                    'pp' => $progressPercent]) :
                 $this->render($fm . '-church', [
                     'profile' => $profile, 
-                    'pp' => $progressPercent,
-                    'e' => $e]);
+                    'pp' => $progressPercent]);
         }
     }
 
@@ -1621,7 +1591,7 @@ class ProfileFormController extends ProfileController
      *
      * @return mixed
      */
-    public function actionForm18($id, $e=0)
+    public function actionForm18($id)
     {
         $fmNum = Self::$form['ta'];
         $fm = 'forms/form' . $fmNum;
@@ -1632,7 +1602,7 @@ class ProfileFormController extends ProfileController
             throw new NotFoundHttpException;
         }
         if (!self::$formArray[$profile->type][$fmNum]) {
-            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id, 'e' => $e]);
+            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
         }
 
         if (isset($_POST['cancel'])) {
@@ -1646,7 +1616,7 @@ class ProfileFormController extends ProfileController
             $profile->setProgress($fmNum)) {
             return isset($_POST['save']) ?
                 $this->redirect(['/preview/view-preview', 'id' => $id]) :
-                $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id, 'e' => $e]);  
+                $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);  
 
         } else {
             $profile->select = $profile->tag;
@@ -1656,8 +1626,7 @@ class ProfileFormController extends ProfileController
 
             return $this->render($fm, [
                 'profile' => $profile, 
-                'pp' => $progressPercent,
-                'e' => $e]);
+                'pp' => $progressPercent]);
         }
     }
 
@@ -1860,7 +1829,7 @@ class ProfileFormController extends ProfileController
                 You may proceed with creating or updating your profile.');
         }
 
-        return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum-1, 'id' => $id, 'e' => $e]);
+        return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum-1, 'id' => $id]);
     }
 
     /**

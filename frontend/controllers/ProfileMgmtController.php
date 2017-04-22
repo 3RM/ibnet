@@ -81,7 +81,10 @@ class ProfileMgmtController extends ProfileController
             $profile->profileCreate() &&
             $profile->createProgress($profile->id)) {
 
-            return $this->redirect(['profile-form/form-route', 'type' => $profile->type, 'fmNum' => -1, 'id' => $profile->id]);
+            return $this->redirect(['profile-form/form-route', 
+                'type' => $profile->type, 
+                'fmNum' => -1, 
+                'id' => $profile->id]);
 
         } else {
             $types = ArrayHelper::map(Type::find()->all(),                      //add ->where(['active' => 1])
@@ -150,7 +153,10 @@ class ProfileMgmtController extends ProfileController
                 return $this->redirect(['profile-form/forms-menu', 'id' => $id]);
             }
         }
-        return $this->redirect(['profile-form/form-route', 'type' => $profile->type, 'fmNum' => -1, 'id' => $profile->id]);                                
+        return $this->redirect(['profile-form/form-route', 
+            'type' => $profile->type, 
+            'fmNum' => -1, 
+            'id' => $profile->id]);                                
     }
 
     /**

@@ -1,10 +1,12 @@
 <?php
-use yii\helpers\Html;
-use yii\bootstrap\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $form yii\bootstrap\ActiveForm */
 /* @var $model \common\models\LoginForm */
+
+use common\widgets\Alert;
+use yii\helpers\Html;
+use yii\bootstrap\ActiveForm;
 
 $this->title = 'Sign In';
 
@@ -19,6 +21,7 @@ $fieldOptions2 = [
     'inputTemplate' => "{input}<span class='glyphicon glyphicon-lock form-control-feedback'></span>"
 ];
 ?>
+<?= Alert::widget() ?>
 
 <div class="login-box">
     <div class="login-logo">

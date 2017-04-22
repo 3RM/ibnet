@@ -238,7 +238,7 @@ $this->title = 'Church Service Times';
             </div>
         </div>
 
-        <?= $this->render('_profileFormFooter', ['profile' => $profile, 'e' => $e]) ?>
+        <?= $this->render('_profileFormFooter', ['profile' => $profile]) ?>
 
         <?php ActiveForm::end(); ?>
 

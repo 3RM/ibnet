@@ -52,7 +52,7 @@ $this->title = $profile->org_name;
         while ($i < count(ProfileFormController::$form)) {
             if ($typeMask[$i] == 1) {  
             	echo $formList[$i] == 'Skip' ? NULL :
-            	'<li>' . Html::a(ProfileFormController::$formList[$i], ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => $i-1, 'id' => $profile->id, 'e' => 1]) . '</li>';
+            	'<li>' . Html::a(ProfileFormController::$formList[$i], ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => $i-1, 'id' => $profile->id]) . '</li>';
             }
             $i++;
         } ?>
@@ -69,7 +69,7 @@ $this->title = $profile->org_name;
            		</div>
            		<div class="col-md-10">
                		<h1><?= $this->title ?></h1>
-               		<span class="tagline"><?= empty($profile->tagline) ? NULL : $profile->tagline ?></span> <?= '<span  class="edit">' . Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['nd']-1, 'id' => $profile->id, 'e' => 1]) . '</span>' ?>
+               		<span class="tagline"><?= empty($profile->tagline) ? NULL : $profile->tagline ?></span> <?= '<span  class="edit">' . Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['nd']-1, 'id' => $profile->id]) . '</span>' ?>
                	</div>
             </div>
         </div>
@@ -77,24 +77,24 @@ $this->title = $profile->org_name;
 	<div class="container">
 		<div class="row">
 			<div class="col-md-12">
-				<?= '<span  class="edit" style="padding:10px; position:absolute;">' . Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['i1']-1, 'id' => $profile->id, 'e' => 1]) . '</span>' ?><?= empty($profile->image1) ? Html::img('@web/images/Profile_Image_3.jpg', ['alt' => 'My logo']) : Html::img($profile->image1) ?>
+				<?= '<span  class="edit" style="padding:10px; position:absolute;">' . Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['i1']-1, 'id' => $profile->id]) . '</span>' ?><?= empty($profile->image1) ? Html::img('@web/images/Profile_Image_3.jpg', ['alt' => 'My logo']) : Html::img($profile->image1) ?>
 			</div>
 		</div>
 		<div class="row description">
 			<div class="col-md-4">
-				<?= '<span  class="edit" style="padding:15px; position:absolute;">' . Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['i2']-1, 'id' => $profile->id, 'e' => 1]) . '</span>' ?><?= empty($profile->image2) ? Html::img('@web/images/Profile_Image_4.jpg', ['alt' => 'My logo']) : Html::img($profile->image2) ?>
+				<?= '<span  class="edit" style="padding:15px; position:absolute;">' . Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['i2']-1, 'id' => $profile->id]) . '</span>' ?><?= empty($profile->image2) ? Html::img('@web/images/Profile_Image_4.jpg', ['alt' => 'My logo']) : Html::img($profile->image2) ?>
 			</div>
 			<div class="col-md-8">
 					<h2>About <?= $this->title ?></h2>
 					<!-- Begin Image & Description -->
-					<p><?= Markdown::convert($profile->description) . '<span  class="edit">' . Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['nd']-1, 'id' => $profile->id, 'e' => 1]) . '</span>' ?></p>							
+					<p><?= Markdown::convert($profile->description) . '<span  class="edit">' . Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['nd']-1, 'id' => $profile->id]) . '</span>' ?></p>							
 				 	<!-- End Image & Description -->
 			</div>
 		</div>
 		<div class="row">
             <div class="col-md-4 profile-thirds">
             	<!-- Begin Contact Information (Box 1) -->
-            	<span  class="pull-right edit"><?= Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['lo']-1, 'id' => $profile->id, 'e' => 1]) ?></span>
+            	<span  class="pull-right edit"><?= Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['lo']-1, 'id' => $profile->id]) ?></span>
 				<?php if ($profile->org_address1 && $profile->org_city && $profile->org_st_prov_reg && $profile->org_country) { ?>
 					<?= Html::icon('map-marker') . ' ' . $profile->org_address1 . ', ' ?>
 					<?= empty($profile->org_address2) ? NULL : $profile->org_address2 . ', ' ?>
@@ -113,7 +113,7 @@ $this->title = $profile->org_name;
 					<?= $profile->org_po_country == 'United States' ? NULL : $profile->org_po_country ?>
 					<?= '<br>' ?>
 				<?php } ?>
-				<?= Html::icon('phone') . ' ' . $profile->phone ?><span  class="pull-right edit"><?= Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['co']-1, 'id' => $profile->id, 'e' => 1]) ?></span><br>
+				<?= Html::icon('phone') . ' ' . $profile->phone ?><span  class="pull-right edit"><?= Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['co']-1, 'id' => $profile->id]) ?></span><br>
 				<?= empty($profile->website) ? NULL : Html::icon('globe') . ' ' . HTML::a($profile->website, $profile->website, ['target' => 'blank']) . '<br>' ?>
 				<?php if ($profile->email_pvt && $profile->email_pvt_status != PROFILE::PRIVATE_EMAIL_ACTIVE) {
 					echo Html::icon('send') . ' <em>Pending</em><br><br>';
@@ -136,7 +136,7 @@ $this->title = $profile->org_name;
 			</div>
 			<div class="col-md-4 profile-thirds">
 				<!-- Begin Social (Box 2) -->
-				<strong>Social Media: </strong><span  class="pull-right edit"><?= Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['co']-1, 'id' => $profile->id, 'e' => 1]) ?></span><br>
+				<strong>Social Media: </strong><span  class="pull-right edit"><?= Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['co']-1, 'id' => $profile->id]) ?></span><br>
 				<?php if (isset($social)) { ?>
 					<?= empty($social->sermonaudio) ? NULL : HTML::a('SermonAudio', $social->sermonaudio, ['target' => '_blank']) . '<br>' ?>
 					<?= empty($social->facebook) ? NULL : HTML::a('Facebook', $social->facebook, ['target' => '_blank']) . '<br>' ?>
@@ -155,14 +155,14 @@ $this->title = $profile->org_name;
 				<!-- Εnd Social -->
 			</div>
 			<div class="col-md-4 profile-thirds">
-				<strong>Parent Ministry:</strong><span  class="pull-right edit"><?= Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['pm']-1, 'id' => $profile->id, 'e' => 1]) ?></span><br>
+				<strong>Parent Ministry:</strong><span  class="pull-right edit"><?= Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['pm']-1, 'id' => $profile->id]) ?></span><br>
 				<!-- Begin linked Church (Box 3) -->
 				<?= (empty($church) || empty($churchLink)) ? NULL : $profile->org_name . ' is a ministry of ' . HTML::a($churchLink, ['profile/church', 'id' => $church->id, 'city' => $church->url_city, 'name' => $church->url_name], ['target' => '_blank']) . '<br>' ?>
 				<!-- End linked Church -->
 				<br>
 				<!-- Begin profile tags (Box 3) -->
 				<?php if (!empty($tags = $profile->tag)) {
-					echo 'Tags: <span  class="pull-right edit">' . Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['ta']-1, 'id' => $profile->id, 'e' => 1]) . '</span><br>';
+					echo 'Tags: <span  class="pull-right edit">' . Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['ta']-1, 'id' => $profile->id]) . '</span><br>';
 					foreach ($tags as $tag) {
 						echo $tag->tag . '<br>';
 					}

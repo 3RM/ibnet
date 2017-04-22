@@ -77,7 +77,7 @@ $this->title = 'Staff';
 
         <br>
 
-        <?= $this->render('_profileFormFooter', ['profile' => $profile, 'e' => $e]) ?>
+        <?= $this->render('_profileFormFooter', ['profile' => $profile]) ?>
 
         <?php ActiveForm::end(); ?>
 

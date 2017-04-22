@@ -765,6 +765,7 @@ class Profile extends \yii\db\ActiveRecord
     {
         $this->status = self::STATUS_NEW;
         $this->user_id = Yii::$app->user->identity->id;
+        $this->edit = 0;
         if ($this->type == 'Pastor') {
             $this->sub_type = $this->ptype;
         } elseif ($this->type == 'Missionary') {
@@ -1674,7 +1675,7 @@ class Profile extends \yii\db\ActiveRecord
             $progress->delete();
         }
         if ($this->setUpdateDate() && 
-            $this->updateAttributes(['status' => Profile::STATUS_INACTIVE, 'renewal_date' => NULL])) {
+            $this->updateAttributes(['status' => Profile::STATUS_INACTIVE, 'renewal_date' => NULL, 'edit' => 0])) {
             return true;
         }
         return false;

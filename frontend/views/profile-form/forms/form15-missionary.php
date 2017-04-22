@@ -71,7 +71,7 @@ $this->title = 'Mission Agency & Packet';
         <br>
         <br>
 
-        <?= $this->render('_profileFormFooter', ['profile' => $profile, 'e' => $e]) ?>
+        <?= $this->render('_profileFormFooter', ['profile' => $profile]) ?>
 
         <?php ActiveForm::end(); ?>
 

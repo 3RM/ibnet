@@ -6,6 +6,7 @@ use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use common\models\LoginForm;
+use common\models\Utility;
 
 /**
  * Site controller
@@ -76,12 +77,13 @@ class SiteController extends Controller
 
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post())) {
-            $user = $model->user;
-            if (isset($user) && $model->isAdmin() && $model->login()) {
-                    return $this->goHome();
-
-            } else {        // Incorrect loginId
-                Yii::$app->session->setFlash('error', 'Your password or username/email is incorrect.');
+            
+            $user = $model->user; //tility::pp(\Yii::$app->authManager);
+            if (isset($user) && Yii::$app->user->can('adminPanel') && $model->login()) {
+                return $this->goHome();
+            } else {        // Incorrect loginId or privileges
+                Yii::$app->session->setFlash('error', 'Your login ID or password is incorrect or you do not have administator privileges.');
+                $this->layout = '//main-login';
                 return $this->render('login', ['model' => $model]);
             }
         } else {

@@ -55,7 +55,7 @@ $this->title = isset($profile->spouse_first_name) ?
         while ($i < count(ProfileFormController::$form)) {
             if ($typeMask[$i] == 1) {  
             	echo $formList[$i] == 'Skip' ? NULL :
-            	'<li>' . Html::a(ProfileFormController::$formList[$i], ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => $i-1, 'id' => $profile->id, 'e' => 1]) . '</li>';
+            	'<li>' . Html::a(ProfileFormController::$formList[$i], ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => $i-1, 'id' => $profile->id]) . '</li>';
             }
             $i++;
         } ?>
@@ -72,7 +72,7 @@ $this->title = isset($profile->spouse_first_name) ?
            		</div>
            		<div class="col-md-10">
                		<h1><?= $this->title ?></h1>
-               		<span class="tagline"><?= empty($profile->tagline) ? NULL : $profile->tagline ?></span> <?= '<span  class="edit">' . Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['nd']-1, 'id' => $profile->id, 'e' => 1]) . '</span>' ?>
+               		<span class="tagline"><?= empty($profile->tagline) ? NULL : $profile->tagline ?></span> <?= '<span  class="edit">' . Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['nd']-1, 'id' => $profile->id]) . '</span>' ?>
                	</div>
             </div>
         </div>
@@ -80,25 +80,25 @@ $this->title = isset($profile->spouse_first_name) ?
 	<div class="container">
 		<div class="row">
 			<div class="col-md-12">
-				<?= '<span  class="edit" style="padding:10px; position:absolute;">' . Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['i1']-1, 'id' => $profile->id, 'e' => 1]) . '</span>' ?><?= empty($profile->image1) ? Html::img('@web/images/Profile_Image_3.jpg', ['alt' => 'My logo']) : Html::img($profile->image1) ?>
+				<?= '<span  class="edit" style="padding:10px; position:absolute;">' . Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['i1']-1, 'id' => $profile->id]) . '</span>' ?><?= empty($profile->image1) ? Html::img('@web/images/Profile_Image_3.jpg', ['alt' => 'My logo']) : Html::img($profile->image1) ?>
 			</div>
 		</div>
 		<div class="row description">
 			<div class="col-md-4">
-				<?= '<span  class="edit" style="padding:15px; position:absolute;">' . Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['i2']-1, 'id' => $profile->id, 'e' => 1]) . '</span>' ?><?= empty($profile->image2) ? Html::img('@web/images/Profile_Image_4.jpg', ['alt' => 'My logo']) : Html::img($profile->image2) ?>
+				<?= '<span  class="edit" style="padding:15px; position:absolute;">' . Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['i2']-1, 'id' => $profile->id]) . '</span>' ?><?= empty($profile->image2) ? Html::img('@web/images/Profile_Image_4.jpg', ['alt' => 'My logo']) : Html::img($profile->image2) ?>
 			</div>
 			<div class="col-md-8">
 					<h2>About <?= $this->title ?></h2>
 					<h4><?= $profile->title ?></h4>
 					<!-- Begin Image & Description -->
-					<p><?= Markdown::convert($profile->description) . '<span  class="edit">' . Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['nd']-1, 'id' => $profile->id, 'e' => 1]) . '</span>' ?></p>
+					<p><?= Markdown::convert($profile->description) . '<span  class="edit">' . Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['nd']-1, 'id' => $profile->id]) . '</span>' ?></p>
 				 	<!-- End Image & Description -->
 			</div>
 		</div>
 		<div class="row">
             <div class="col-md-4 profile-thirds">
             	<!-- Begin Contact Information (Box 1) -->
-            	<span  class="pull-right edit"><?= Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['lo']-1, 'id' => $profile->id, 'e' => 1]) ?></span>
+            	<span  class="pull-right edit"><?= Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['lo']-1, 'id' => $profile->id]) ?></span>
 				<?php if ($profile->ind_address1 && $profile->ind_city && $profile->ind_st_prov_reg && $profile->ind_country) { ?>
 					<?= Html::icon('map-marker') . ' ' . $profile->ind_address1 . ', ' ?>
 					<?= empty($profile->ind_address2) ? NULL : $profile->ind_address2 . ', ' ?>
@@ -117,7 +117,7 @@ $this->title = isset($profile->spouse_first_name) ?
 					<?= $profile->ind_po_country == 'United States' ? NULL : $profile->ind_po_country ?>
 					<?= '<br>' ?>
 				<?php } ?>
-				<?= Html::icon('phone') . ' ' . $profile->phone ?><span  class="pull-right edit"><?= Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['co']-1, 'id' => $profile->id, 'e' => 1]) ?></span><br>
+				<?= Html::icon('phone') . ' ' . $profile->phone ?><span  class="pull-right edit"><?= Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['co']-1, 'id' => $profile->id]) ?></span><br>
 				<?= empty($profile->website) ? NULL : Html::icon('globe') . ' ' . HTML::a($profile->website, $profile->website, ['target' => 'blank']) . '<br>' ?>
 				<?php if ($profile->email_pvt && $profile->email_pvt_status != PROFILE::PRIVATE_EMAIL_ACTIVE) {
 					echo Html::icon('send') . ' <em>Pending</em><br><br>';
@@ -140,7 +140,7 @@ $this->title = isset($profile->spouse_first_name) ?
 			</div>
 			<div class="col-md-4 profile-thirds">
 				<!-- Begin Schools Attended (Box 3) -->
-				<p><strong>Schools Attended: </strong><span  class="pull-right edit"><?= Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['sa']-1, 'id' => $profile->id, 'e' => 1]) ?></span><br>
+				<p><strong>Schools Attended: </strong><span  class="pull-right edit"><?= Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['sa']-1, 'id' => $profile->id]) ?></span><br>
 					<?php if (isset($schoolsAttended)) {
 					foreach ($schoolsAttended as $school) {
 						if ($s = $school->linkedProfile) {
@@ -153,7 +153,7 @@ $this->title = isset($profile->spouse_first_name) ?
 				<!-- End Schools Attended -->
 				<br>
 				<!-- Begin Social (Box 2) -->
-				<strong>Social Media: </strong><span  class="pull-right edit"><?= Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['co']-1, 'id' => $profile->id, 'e' => 1]) ?></span><br>
+				<strong>Social Media: </strong><span  class="pull-right edit"><?= Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['co']-1, 'id' => $profile->id]) ?></span><br>
 				<?php if (isset($social)) { ?>
 					<?= empty($social->sermonaudio) ? NULL : HTML::a('SermonAudio', $social->sermonaudio, ['target' => '_blank']) . '<br>' ?>
 					<?= empty($social->facebook) ? NULL : HTML::a('Facebook', $social->facebook, ['target' => '_blank']) . '<br>' ?>
@@ -173,14 +173,14 @@ $this->title = isset($profile->spouse_first_name) ?
 			</div>
 			<div class="col-md-4 profile-thirds">
 				<!-- Begin Linked Ministry (Box 3) -->
-				<strong>Serve as: </strong><?= '<span  class="pull-right edit">' . Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['pm']-1, 'id' => $profile->id, 'e' => 1]) . '</span>' ?><br>
+				<strong>Serve as: </strong><?= '<span  class="pull-right edit">' . Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['pm']-1, 'id' => $profile->id]) . '</span>' ?><br>
 					<?= $ministry ? 
 						'<strong>' . $profile->title . '</strong> at ' . HTML::a($ministryLink, ['profile/' . ProfileController::$profilePageArray[$ministry->type], 'id' => $ministry->id, 'city' => $ministry->url_city, 'name' => $ministry->url_name], ['target' => '_blank']) . '<br />' :
 						'<span style="color:red">' . HTML::icon('flag') . ' Update your church or ministsry</span><br>' ?>
 				<!-- End Linked Ministry -->
 				<br>
 				<!-- Begin Home Church (Box 3) -->
-				<strong>Home Church: </strong><?= '<span  class="pull-right edit">' . Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['hc']-1, 'id' => $profile->id, 'e' => 1]) . '</span>' ?><br>
+				<strong>Home Church: </strong><?= '<span  class="pull-right edit">' . Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['hc']-1, 'id' => $profile->id]) . '</span>' ?><br>
 				<?= $churchLink = NULL ? NULL : HTML::a($churchLink, ['profile/church', 'id' => $church->id, 'city' => $church->url_city, 'name' => $church->url_name], ['target' => '_blank']) ?><br>
 				<!-- End Linked Ministry -->
 				<br>

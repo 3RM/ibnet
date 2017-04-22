@@ -112,7 +112,7 @@ class AjaxController extends Controller
                     'success' => true,
                 ];
 
-            //return $this->redirect(['profile-form/form-route', 'type' => $profile->type, 'fmNum' => $fmNum-1, 'id' => $id, 'e' => $e]);
+            //return $this->redirect(['profile-form/form-route', 'type' => $profile->type, 'fmNum' => $fmNum-1, 'id' => $id]);
 
         }
     }

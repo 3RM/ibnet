@@ -79,7 +79,7 @@ $this->title = 'Contact Information';
                                         <?php isset($profile->email_pvt) ?
                                             $btn = 'Update ' . Html::icon('thumbs-up') :
                                             $btn = 'Set it Up ' . Html::icon('thumbs-up'); ?>
-                                        <?= Html::a($btn, ['ajax/forwarding', 'id' => $profile->id, 'e' => $e], [
+                                        <?= Html::a($btn, ['ajax/forwarding', 'id' => $profile->id], [
                                                 'id' => 'email-id',
                                                 'data-on-done' => 'emailDone',
                                                 'data-form-id' => 'link_form',
@@ -126,7 +126,7 @@ $this->title = 'Contact Information';
             </div>
         </div>
 
-        <?= $this->render('_profileFormFooter', ['profile' => $profile, 'e' => $e]) ?>
+        <?= $this->render('_profileFormFooter', ['profile' => $profile]) ?>
 
         <?php ActiveForm::end(); ?>
 
