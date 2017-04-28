@@ -1,11 +1,11 @@
 <?php
 
 use common\models\profile\Profile;
+use common\widgets\Alert;
 use frontend\controllers\ProfileController;
 use kartik\markdown\Markdown;
 use tugmaks\GoogleMaps\Map;
 use yii\base\Controller;
-use yii\bootstrap\Alert;
 use yii\bootstrap\Html;
 use yii\helpers\Url;
 use yii\web\View;
@@ -13,6 +13,7 @@ use yii\web\View;
 /* @var $this yii\web\View */
 $this->title = $profile->org_name;
 ?>
+<?= Alert::widget() ?>
 
 <div class="site-index profile-page">
 	

@@ -1,11 +1,11 @@
 <?php
 
 use common\models\profile\Profile;
+use common\widgets\Alert;
 use frontend\assets\AppAsset;
 use frontend\controllers\ProfileController;
 use kartik\markdown\Markdown;
 use tugmaks\GoogleMaps\Map;
-use yii\bootstrap\Alert;
 use yii\bootstrap\Modal;
 use yii\bootstrap\Html;
 use yii\helpers\Url;
@@ -16,6 +16,8 @@ $this->title = isset($profile->spouse_first_name) ?
 	($profile->ind_first_name . ' (& ' . $profile->spouse_first_name . ') ' . $profile->ind_last_name) :
 	($profile->ind_first_name . ' ' . $profile->ind_last_name);
 ?>
+<?= Alert::widget() ?>
+
 <div class="site-index profile-page">
 
     <div class="profile-header">

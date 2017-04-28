@@ -9,6 +9,7 @@ use common\models\profile\ProfileBrowse;
 use common\models\profile\ProfileSearch;
 use common\models\profile\Staff;
 use common\models\profile\Social;
+use common\models\Utility;
 use Yii;
 use yii\db\Query;
 use yii\filters\AccessControl;
@@ -185,7 +186,7 @@ class ProfileController extends Controller
      */
     public function actionViewProfile($id, $city=NULL, $name=NULL)
     {
-        if (!$profile = $this->findViewProfile($id)) {
+        if (!$profile = $this->findViewProfile($id, $city, $name)) { 
             $this->checkExpired($id);  
         }
         $profilePage = self::$profilePageArray[$profile->type];
@@ -1071,15 +1072,13 @@ class ProfileController extends Controller
     {
         if (Yii::$app->request->Post()) {
             $id = $_POST['flag'];
-            $profile = $this->findProfile($id);
-            if ($profile && $profile->inappropriate < 1) {
+            if (($profile = $this->findProfile($id)) && ($profile->inappropriate != NULL)) {
                 $profile->updateAttributes(['inappropriate' => 1]);                                     // Set inappropriate flag
-                $user = NULL;
-                
-                if (!Yii::$app->user->isGuest) {
-                    $user = Yii::$app->user->identity->id;
-                }
-                
+
+                !Yii::$app->user->isGuest ?
+                    $user = Yii::$app->user->identity->id :
+                    $user = NULL;
+        
                 $url = Url::base('http') . Url::toRoute(['/profile/view-profile-by-id', 'id' => $id]);
                 
                 Yii::$app

@@ -1,8 +1,8 @@
 <?php
 
+use common\widgets\Alert;
 use kartik\markdown\Markdown;
 use tugmaks\GoogleMaps\Map;
-use yii\bootstrap\Alert;
 use yii\bootstrap\Modal;
 use yii\helpers\ArrayHelper;
 use yii\bootstrap\Html;
@@ -12,6 +12,7 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 $this->title = $profile->org_name;
 ?>
+<?= Alert::widget() ?>
 
 <div class="site-index profile-page">
 
