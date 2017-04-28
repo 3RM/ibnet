@@ -79,7 +79,9 @@ class SiteController extends Controller
         if ($model->load(Yii::$app->request->post())) {
             
             $user = $model->user; //tility::pp(\Yii::$app->authManager);
-            if (isset($user) && Yii::$app->user->can('adminPanel') && $model->login()) {
+            if (isset($user) && 
+                //Yii::$app->user->can('adminPanel') && 
+                $model->login()) {
                 return $this->goHome();
             } else {        // Incorrect loginId or privileges
                 Yii::$app->session->setFlash('error', 'Your login ID or password is incorrect or you do not have administator privileges.');

@@ -10,8 +10,14 @@ return [
     'id' => 'app-backend',
     'basePath' => dirname(__DIR__),
     'controllerNamespace' => 'backend\controllers',
+    'name' => '',
     'bootstrap' => ['log'],
-    'modules' => [],
+    'modules' => [
+        'gridview'=> [
+            'class'=>'\kartik\grid\Module',
+            // other module settings
+        ],
+    ],
     'components' => [
         'request' => [
             'csrfParam' => '_csrf-backend',
@@ -36,6 +42,13 @@ return [
         ],
         'errorHandler' => [
             'errorAction' => 'site/error',
+        ],
+        'assetManager' => [
+            'bundles' => [
+                'dmstr\web\AdminLteAsset' => [
+                    'skin' => 'skin-yellow',
+                ],
+            ],
         ],
         /*
         'urlManager' => [

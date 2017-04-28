@@ -7,7 +7,7 @@ use yii\helpers\Html;
 
 <header class="main-header">
 
-    <?= Html::a('<span class="logo-mini">APP</span><span class="logo-lg">' . Yii::$app->name . '</span>', Yii::$app->homeUrl, ['class' => 'logo']) ?>
+    <?= Html::a('<span class="logo-mini">' . html::img('@web/images/ibnet-header-sm.png') . '</span><span class="logo-lg">' . html::img('@web/images/ibnet-header.png') . '</span>', Yii::$app->homeUrl, ['class' => 'logo']) ?>
 
     <nav class="navbar navbar-static-top" role="navigation">
 
@@ -229,18 +229,21 @@ use yii\helpers\Html;
 
                 <li class="dropdown user user-menu">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        <img src="<?= $directoryAsset ?>/img/user2-160x160.jpg" class="user-image" alt="User Image"/>
-                        <span class="hidden-xs">Alexander Pierce</span>
+                        <?= empty($user->image) ? 
+                                Html::img('@web/images/user.png', ['class' => 'user-image', 'alt' => 'User image']) : 
+                                Html::img($user->image, ['class' => 'user-image', 'alt' => 'User image']) ?>
+                        <span class="hidden-xs"><?= $user->first_name . ' ' . $user->last_name ?></span>
                     </a>
                     <ul class="dropdown-menu">
                         <!-- User image -->
                         <li class="user-header">
-                            <img src="<?= $directoryAsset ?>/img/user2-160x160.jpg" class="img-circle"
-                                 alt="User Image"/>
+                            <?= empty($user->image) ? 
+                                Html::img('@web/images/user.png', ['class' => 'img-circle', 'alt' => 'User image']) : 
+                                Html::img($user->image, ['class' => 'img-circle', 'alt' => 'User image']) ?>
 
                             <p>
-                                Alexander Pierce - Web Developer
-                                <small>Member since Nov. 2012</small>
+                                <?= $user->first_name . ' ' . $user->last_name . ' - Role' ?>
+                                <small>Member since <?= Yii::$app->formatter->asDate($user->created_at, 'php:F Y') ?></small>
                             </p>
                         </li>
                         <!-- Menu Body -->
