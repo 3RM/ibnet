@@ -38,12 +38,13 @@ class Mail extends \yii\db\ActiveRecord
      * @return boolean
      */
     public function sendForwardingEmailRqst($id, $email, $email_pvt)
-    {       
+    {  
+        $msg = 'New Forwarding Email Request:';
         Yii::$app
             ->mailer
             ->compose(
-                ['html' => 'forwarding-email-html'], 
-                ['id' => $id, 'email' => $email, 'email_pvt' => $email_pvt]
+                ['html' => 'system/forwarding-email-html'], 
+                ['email' => $email, 'email_pvt' => $email_pvt, 'id' => $id, 'msg' => $msg]
             )
             ->setFrom([\yii::$app->params['no-replyEmail']])
             ->setTo([\yii::$app->params['adminEmail']])

@@ -1,5 +1,6 @@
 <?php
 
+use frontend\controllers\ProfileFormController;
 use yii\bootstrap\Html;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
@@ -15,8 +16,13 @@ $this->title = 'Review Information';
 	<p>Oops! It appears that you haven't reviewed all of the data entry forms for your profile.  You may have missed some required fields.</p>
 
 	<br />
-	<?= Html::a('Review and Update &#187', ['form-route', 'type' => $profile->type, 'fmNum' => $fmNum-1, 'id' => $profile->id], ['class' => 'btn btn-danger']) ?>
 
-	<p>&nbsp;</p>
+	<?php 
+		$missingArray = json_decode($missing);
+		foreach ($missingArray as $key => $value) {
+		if ($key != ProfileFormController::$form['mh']) {		// Don't check for missions housing
+			echo '<p>' . Html::a('Review &#187', ['form-route', 'type' => $profile->type, 'fmNum' => $key-1, 'id' => $profile->id], ['class' => 'btn btn-sm btn-danger']) . ' ' . ProfileFormController::$formList[$key] . '</p>';
+		}
+	} ?>
 
 </div>

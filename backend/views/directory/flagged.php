@@ -7,8 +7,9 @@ use yii\bootstrap\Html;
 
 $this->title = 'Flagged Profiles';
 ?>
-<div class="site-index">
 
+<div class="site-index">
+	
 	<?= GridView::widget([
 	    'dataProvider'=>$dataProvider,
 	    'columns'=>$gridColumns,

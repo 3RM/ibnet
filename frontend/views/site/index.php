@@ -6,7 +6,7 @@ use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-//AjaxAsset::register($this);
+AjaxAsset::register($this);
 $session = Yii::$app->session;
 $count = $session->get('count');
 $this->title = '';

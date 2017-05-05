@@ -6,6 +6,7 @@ use common\models\profile\Association;
 use common\models\profile\Country;
 use common\models\profile\Fellowship;
 use common\models\profile\FormsCompleted;
+use common\models\Profile\Mail;
 use common\models\profile\MissHousing;
 use common\models\profile\MissHousingVisibility;
 use common\models\profile\MissionAgcy;
@@ -20,7 +21,6 @@ use common\models\profile\SubType;
 use common\models\profile\Type;
 use common\models\User;
 use common\models\Utility;
-use common\models\profile\Mail;
 use frontend\controllers\MailController;
 use kartik\markdown\MarkdownEditor;
 use Yii;
@@ -1644,19 +1644,19 @@ class ProfileFormController extends ProfileController
      * Renders missing-fields if required form data is missing from the profile
      * @param string $id
      * @param array $missing
-     * @return mixed
+     * @return string
      */
-    public function actionMissingForms($id, $fmNum) 
+    public function actionMissingForms($id, $missing) 
     {
         $profile = $this->findProfile($id);
-        return $this->render('missingFields', ['profile' => $profile, 'fmNum' => $fmNum]);                         
+        return $this->render('missingFields', ['profile' => $profile, 'missing' => $missing]);                         
     }
 
     /**
      * Renders duplicate-profile if a duplicate profile is found
      * @param string $id
      * @param array $missing
-     * @return mixed
+     * @return string
      */
     public function actionDuplicateProfile($id, $dupId) 
     {
@@ -1672,7 +1672,7 @@ class ProfileFormController extends ProfileController
      */
     public function isDuplicate($id) 
     {
-        $profile = $this->findProfile($id);
+        $profile = ProfileController::findProfile($id);
         if ($profile->isIndividual($profile->type)) {
             $duplicate = Profile::find()                                                            // Check to see if a duplicate profile exists
                 ->select('*')

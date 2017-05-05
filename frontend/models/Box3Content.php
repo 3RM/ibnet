@@ -26,6 +26,24 @@ class Box3Content extends Model
         $count = $session->get('count');
         $i = $session->get('i');
 
+        if (!($profiles && $count && $i)) {
+            $profiles = Profile::find()                                                             // Get new profiles for box 3 and add to session
+                ->select('*')
+                ->where(['status' => PROFILE::STATUS_ACTIVE])
+                ->andwhere('created_at>DATE_SUB(NOW(), INTERVAL 14 DAY)')
+                ->orderBy('created_at DESC')
+                ->all();
+            $count = count($profiles);
+            $i = 0;
+
+            $session->open('profiles');
+            $session->open('count');
+            $session->open('i');   
+            $session->set('profiles', $profiles);
+            $session->set('count', $count);
+            $session->set('i', $i);
+        }
+
         if ($count > 0) {    
 
             if ($i == ($count-1)) {

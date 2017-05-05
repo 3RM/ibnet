@@ -133,7 +133,7 @@ $this->title = $profile->org_name;
 			</div>
 			<div class="col-md-4 profile-thirds">
 				<!-- Begin Ministries (Box 3) -->
-				<? if ($ministries) {
+				<?php if ($ministries) {
 					echo '<strong>Ministries: </strong><br>';
 					foreach ($ministries as $ministry) {
 						echo HTML::a($ministry->org_name, ['profile/' . ProfileController::$profilePageArray[$ministry->type], 'id' => $ministry->id, 'city' => $ministry->url_city, 'name' => $ministry->url_name]) . '<br>';

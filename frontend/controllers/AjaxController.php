@@ -1,6 +1,7 @@
 <?php
 namespace frontend\controllers;
 
+use common\models\profile\Mail;
 use common\models\profile\Profile;
 use common\models\profile\Social;
 use common\models\Utility;
@@ -42,12 +43,12 @@ class AjaxController extends Controller
     /**
      * Process request for forwarding email on form4 modal
      */
-    public function actionForwarding($id, $e) 
+    public function actionForwarding($id) 
     { 
         if (Yii::$app->request->isAjax) {
             Yii::$app->response->format = Response::FORMAT_JSON;
             
-            $fmNum = ProfileFormController::$form['co'];
+            // $fmNum = ProfileFormController::$form['co'];
             $profile = ProfileFormController::findProfile($id);
             $profile->scenario = 'co-fe';
 
@@ -76,8 +77,13 @@ class AjaxController extends Controller
 
             if ($profile->email_pvt_status == Profile::PRIVATE_EMAIL_PENDING) {
 
+                Yii::$app->session->setFlash('success', 
+                    'Your new ibnet.org address has status <em>pending</em>.  Please allow 48 hours for it to become active.  
+                    Or '. Html::a('contact us', ['site/contact'], ['target' => '_blank']) . ' regarding any questions with 
+                    this form or your new email.');
+                
                 return [
-                    'body' => 'Your new ibnet.org address has status <em>pending</em>.  Please allow 48 hours for it to become active.  Or '. Html::a('contact us', ['site/contact'], ['target' => '_blank']) . ' regarding any questions with this form or your new email.',
+                    'body' => '',
                     'success' => true,
                 ];
             }
@@ -89,18 +95,9 @@ class AjaxController extends Controller
             $profile->email_pvt_status = Profile::PRIVATE_EMAIL_PENDING;
             $profile->save();
             
-            if ($profile->email_pvt) {
-                $msg = 'New Forwarding Email Request:';
-                Yii::$app
-                    ->mailer
-                    ->compose(
-                        ['html' => 'system/forwarding-email-html'], 
-                        ['email' => $profile->email, 'email_pvt' => $profile->email_pvt, 'id' => $id, 'msg' => $msg]
-                    )
-                    ->setFrom([\yii::$app->params['no-replyEmail']])
-                    ->setTo([\yii::$app->params['adminEmail']])
-                    ->setSubject('Forwarding Address Request')
-                    ->send();
+            if ($profile->email_pvt && 
+                $profile->email_pvt_status === Profile::PRIVATE_EMAIL_PENDING &&
+                Mail::sendForwardingEmailRqst($id, $profile->email, $profile->email_pvt)) {
     
                 Yii::$app->session->setFlash('success', 
                     'Your new email is pending and should be visible on your profile within 48 hours.  
@@ -111,8 +108,6 @@ class AjaxController extends Controller
                     'body' => '',
                     'success' => true,
                 ];
-
-            //return $this->redirect(['profile-form/form-route', 'type' => $profile->type, 'fmNum' => $fmNum-1, 'id' => $id]);
 
         }
     }

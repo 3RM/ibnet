@@ -66,7 +66,8 @@ return [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'enableStrictParsing' => false,
-            'rules' => ['' => 'site/index',
+            'rules' => [
+                '' => 'site/index',
                 'sitemap.xml' => 'sitemap/sitemap-google-index',
                 'sitemap.<p:\d+>.xml.gz' => 'sitemap/sitemap-google-urlset',
                 '<a

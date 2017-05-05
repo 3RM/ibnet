@@ -17,6 +17,9 @@ return [
             'class'=>'\kartik\grid\Module',
             // other module settings
         ],
+        'datecontrol' =>  [
+            'class' => '\kartik\datecontrol\Module',
+        ],
     ],
     'components' => [
         'request' => [
@@ -50,14 +53,16 @@ return [
                 ],
             ],
         ],
-        /*
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
+            'enableStrictParsing' => false,
             'rules' => [
+                '' => 'site/index',
+                '<controller:\w+>/<action:[A-Za-z\-]+>/<id:\d+>' => '<controller>/<action>',
+                '<controller:\w+>/<action:[A-Za-z\-]+>' => '<controller>/<action>',
             ],
         ],
-        */
     ],
     'params' => $params,
 ];

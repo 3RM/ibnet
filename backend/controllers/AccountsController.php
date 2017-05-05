@@ -57,7 +57,13 @@ class AccountsController extends Controller
                     return $model->reviewed === 1 ? '' : Html::a(Html::icon('check'), ['review', 'id' => $model->id]);
                 },
             ],
-            'id', 
+            [
+                //'class'=>'kartik\grid\EditableColumn',
+                'attribute' => 'id',
+                'hAlign'=>'center',
+                'vAlign' => 'middle',
+                'width'=>'1%',
+            ], 
             'first_name', 
             'last_name', 
             [
@@ -88,21 +94,16 @@ class AccountsController extends Controller
                 'value' => function ($model) {                      
                     return Yii::$app->formatter->asDate($model->created_at, 'php:Y-m-d');
                 },
+                'hAlign'=>'center',
+                'vAlign' => 'middle',
+                'width'=>'8%',
+                'headerOptions'=>['class'=>'kv-sticky-column'],
+                'contentOptions'=>['class'=>'kv-sticky-column'],
             ],
             'last_login',
             [
-                'attribute' => '',
-                'format' => 'raw',
-                'value' => function ($model) {                      
-                    return Html::icon('eye-open');
-                },
-            ],
-            [
-                'attribute' => '',
-                'format' => 'raw',
-                'value' => function ($model) {                      
-                    return Html::icon('edit');
-                },
+                'class' => 'yii\grid\ActionColumn',
+                'header' => 'Actions',
             ],
         ];
 
@@ -122,7 +123,72 @@ class AccountsController extends Controller
     {
         $user = User::findOne($id);
         $user->updateAttributes(['reviewed' => 1]);
-        return $this->redirect(['accounts']);
+        return $this->redirect(['users']);
+    }
+
+    /**
+     * Displays review user account
+     *
+     * @return string
+     */
+    public function actionView($id)
+    {
+        $model = User::findOne($id);
+        $attributes = [
+            'id',
+            'first_name',
+            'last_name',
+            'email',
+            'new_email',
+            'new_email_token',
+            'username',
+            'auth_key',
+            'password_reset_token',                                     
+            'created_at:date',
+            'updated_at:date',
+            'last_login',
+            [
+                'attribute' => 'status',
+                'format' => 'raw',
+                'value' => function ($model) {  
+                    if ($model->status == User::STATUS_DELETED) {
+                        return '<span style="color:orange">Deleted</span>';
+                    } elseif ($model->status == User::STATUS_ACTIVE) {
+                        return '<span style="color:green">Active</span>';
+                    } elseif ($model->status == User::STATUS_BANNED) {
+                        return '<span style="color:red">Banned</span>';  
+                    }             
+                },
+            ],
+            'emailPrefProfile',
+            'emailPrefLinks',
+            'emailPrefFeatures',
+        ];
+        
+        return $this->render('view', [
+            'model' => $model,
+            'attributes' => $attributes,
+        ]);
+    }
+
+    /**
+     * Displays Update user account
+     *
+     * @return string
+     */
+    public function actionUpdate()
+    {
+        return $this->render('update');
+    }
+
+    /**
+     * Displays delete user account
+     *
+     * @return string
+     */
+    public function actionDelete()
+    {
+        return $this->render('delete');
     }
 
     /**

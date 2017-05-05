@@ -42,7 +42,7 @@ $this->title = 'Distinctives';
                     'hideSearch' => true,
                     'options' => ['placeholder' => 'Select ...',],
                     'pluginOptions' => ['allowClear' => true],
-                ])->label('Worship Style'); ?>
+                ])->label('Worship'); ?>
                 <?= $form->field($profile, 'polity')->widget(Select2::classname(), [                 
                     'data' => ArrayHelper::map(Polity::find()->orderBy('id')->all(), 'polity', 'polity'),
                     'language' => 'en',

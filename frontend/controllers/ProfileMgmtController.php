@@ -117,20 +117,35 @@ class ProfileMgmtController extends ProfileController
         if (!$progress = FormsCompleted::findOne($id)) {                                            // Check if all required forms for this profile type have been completed
             $progress = $profile->createProgress($id);
         }
+        
         $completeArray = unserialize($progress->form_array);
         $typeArray = ProfileFormController::$formArray[$profile->type];
-        if (!$progress || $missing = array_diff_assoc($typeArray, $completeArray)) {                // $missing will contain any $fmNum => 1 pairs that are missing from $completeArray
-            if ($profile->type == 'Church' &&                                                       // Ignore skipped form (missions housing)
-                count($missing == 1) && 
-                isset($missing[self::$form['mh']]) &&
-                $missing[self::$form['mh']] == 1) {
+        $missingArray = array_diff_assoc($completeArray, $typeArray);                               // any $fmNum => 1 pairs that are missing from $completeArray  
+  
+        if (!$progress || !empty($missingArray)) {
 
-                return $this->redirect(['missing-forms', 
+            if ($profile->type == 'Church') {                                                       
+
+                if (!((count($missingArray) == 1) &&                                                // Ignore skipped form (church profile missions housing)
+                    isset($missingArray[ProfileFormController::$form['mh']]))) {
+                    
+                    $missing = json_encode($missingArray);
+                    return $this->redirect(['profile-form/missing-forms', 
+                        'id' => $profile->id, 
+                        'missing' => $missing,
+                    ]);
+                }
+            
+            } else {
+
+                $missing = json_encode($missing);
+                return $this->redirect(['profile-form/missing-forms', 
                     'id' => $profile->id, 
-                    'fmNum' => key($missing)
+                    'missing' => $missing,
                 ]);
+
             }
-        } 
+        }
 
         if ($progress->delete() && !ProfileFormController::isDuplicate($id) && $profile->activate()) {
             return $this->render('activationComplete', ['profile' => $profile]);

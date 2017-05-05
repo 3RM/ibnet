@@ -61,11 +61,19 @@ use yii\helpers\Html;
                         'url' => '#',
                         'items' => [
                             ['label' => 'Profiles', 'icon' => 'address-card', 'url' => ['/directory/profiles'],],
+                            ['label' => 'Private Emails', 'icon' => 'address-card', 'url' => ['/directory/profiles'],],
                             ['label' => 'Flagged', 'icon' => 'flag', 'url' => ['/directory/flagged'],],
                         ],
                     ],
                     ['label' => 'Database', 'icon' => 'database', 'url' => ['/debug']],
-                    ['label' => 'Server', 'icon' => 'server', 'url' => ['/debug']],
+                    [
+                        'label' => 'Server', 
+                        'icon' => 'server', 
+                        'url' => ['#'],
+                        'items' => [
+                            ['label' => 'Cron Jobs', 'icon' => 'clock-o', 'url' => ['/server/cron'],],
+                        ],
+                    ],
                     ['label' => 'Login', 'url' => ['site/login'], 'visible' => Yii::$app->user->isGuest],
                 ],
             ]

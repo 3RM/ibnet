@@ -105,7 +105,10 @@ EOD
                                 <td class="center"><?= $staff->{'profile'}->spouse_first_name ? $staff->{'profile'}->ind_first_name . ' (& ' . $staff->{'profile'}->spouse_first_name . ') ' . $staff->{'profile'}->ind_last_name : $staff->{'profile'}->ind_first_name . ' ' . $staff->ind_last_name; ?></td>
                                 <td class="center"><?= $staff->{'profile'}->ind_city . ', ' ?><?= $staff->{'profile'}->ind_st_prov_reg ? $staff->{'profile'}->ind_st_prov_reg : NULL ?></td>
                                 <td class="center"><?= $staff->confirmed == NULL ? 'Uncomfirmed' : 'Confirmed Staff' ?></td>
-                                <td class="center"><?php if ($staff->confirmed == NULL) { ?>
+                                
+
+                                <td class="center">
+                                    <?php if ($staff->confirmed == NULL) { ?>
                                         <?= Html::submitButton(HTML::icon('ok') . ' Add Staff', [
                                             'id' => 'add_submit',
                                             'method' => 'POST',
@@ -113,7 +116,9 @@ EOD
                                             'name' => 'add',
                                             'value' => $staff->id,
                                         ]) ?>
-                                        <?if ($staff['sr_pastor'] == NULL && 
+                                        
+
+                                        <?php if ($staff['sr_pastor'] == NULL && 
                                             ($staff->staff_title == 'Senior Pastor' || $staff->staff_title == 'Pastor' || 
                                             ($staff->staff_title == 'Church Planter' && $staff->prof_home_church != $profile->id))) { ?>
                                             <?= Html::submitButton(HTML::icon('ok') . ' Add Sr. Pastor', [
@@ -123,6 +128,8 @@ EOD
                                                 'value' => $staff->staff_id . '+' . $staff->id,
                                             ]) ?>
                                         <?php } ?>
+
+
                                     <?php } else { ?>
                                         <?= Html::submitButton(HTML::icon('remove') . ' Remove', [
                                             'method' => 'POST',
@@ -130,8 +137,9 @@ EOD
                                             'name' => 'remove',
                                             'value' => $staff->id,
                                         ]) ?>
-                                        <?php } ?>
+                                    <?php } ?>
                                 </td>
+                                
                             </tr>
                             <?php } ?>
                         </table>
