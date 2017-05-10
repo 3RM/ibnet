@@ -157,7 +157,7 @@ $this->title = $profile->org_name;
 				<br>
 				<!-- Begin Distinctives (Box 2) -->
 				<strong>Bible: </strong><?= $profile->bible ?><span  class="pull-right edit"><?= Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['sl']-1, 'id' => $profile->id]) ?></span><br>
-				<strong>Worship Style: </strong><?= $profile->worship_style ?><br>
+				<strong>Worship: </strong><?= $profile->worship_style ?><br>
 				<strong>Government: </strong><?= $profile->polity ?><br>
 				<!-- Εnd Distinctives -->
 				<br>

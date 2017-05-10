@@ -115,7 +115,7 @@ class AccountsController extends Controller
     }
 
     /**
-     * Displays Assignments.
+     * Mark a model as reviewed
      *
      * @return string
      */

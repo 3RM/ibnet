@@ -144,7 +144,14 @@ use yii\helpers\Html;
                         <li class="footer"><a href="#">View all</a></li>
                     </ul>
                 </li>
-                <!-- Tasks: style can be found in dropdown.less -->
+                <!-- Forwarding Email Request: style can be found in dropdown.less -->
+                <li class="dropdown tasks-menu">
+                    <?= Html::a(
+                        '<i class="glyphicon glyphicon-eye-close"></i>
+                        <span class="label label-info">' . Profile::find()->where('email_pvt != NULL')->andWhere(['email_pvt_status' => NULL])->count() . '</span>',
+                        '/directory/forwarding') ?>
+                </li>
+                <!-- Flagged Profiles: style can be found in dropdown.less -->
                 <li class="dropdown tasks-menu">
                     <?= Html::a(
                         '<i class="fa fa-flag-o"></i>

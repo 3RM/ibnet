@@ -61,7 +61,17 @@ use yii\helpers\Html;
                         'url' => '#',
                         'items' => [
                             ['label' => 'Profiles', 'icon' => 'address-card', 'url' => ['/directory/profiles'],],
-                            ['label' => 'Private Emails', 'icon' => 'address-card', 'url' => ['/directory/profiles'],],
+                            ['label' => 'Tables', 
+                                'icon' => 'table', 
+                                'items' => [
+                                    ['label' => 'Staff', 'icon' => 'sitemap', 'url' => ['/directory/staff'],],
+                                    ['label' => 'Missionary', 'icon' => 'sitemap', 'url' => ['/directory/missionary'],],
+                                    ['label' => 'Mission Housing', 'icon' => 'sitemap', 'url' => ['/directory/housing'],],
+                                    ['label' => 'Association', 'icon' => 'sitemap', 'url' => ['/directory/association'],],
+                                    ['label' => 'Fellowship', 'icon' => 'sitemap', 'url' => ['/directory/fellowship'],],
+                                ],
+                            ],
+                            ['label' => 'Forwarding Email Requests', 'icon' => 'send', 'url' => ['/directory/forwarding'],],
                             ['label' => 'Flagged', 'icon' => 'flag', 'url' => ['/directory/flagged'],],
                         ],
                     ],

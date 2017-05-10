@@ -108,7 +108,7 @@ $this->title = $profile->org_name;
 				<br>
 				<!-- Begin Distinctives (Box 1) -->
 				<strong>Bible: </strong><?= $profile->bible ?><br>
-				<strong>Worship Style: </strong><?= $profile->worship_style ?><br>
+				<strong>Worship: </strong><?= $profile->worship_style ?><br>
 				<strong>Government: </strong><?= $profile->polity ?><br>
 				<!-- Εnd Distinctives -->
 				<br>

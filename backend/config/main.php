@@ -61,6 +61,7 @@ return [
                 '' => 'site/index',
                 '<controller:\w+>/<action:[A-Za-z\-]+>/<id:\d+>' => '<controller>/<action>',
                 '<controller:\w+>/<action:[A-Za-z\-]+>' => '<controller>/<action>',
+                'https://ibnet.org/profile/view-profile-by-id' => 'frontend/profile/view-profile-by-id'
             ],
         ],
     ],

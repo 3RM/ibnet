@@ -26,7 +26,7 @@ class UserSearch extends \common\models\User
 
     public function search($params)
     {
-        $query = User::find();
+        $query = User::find()->orderBy(['id' => SORT_DESC]);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,

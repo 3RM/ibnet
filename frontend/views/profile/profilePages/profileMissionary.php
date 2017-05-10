@@ -103,7 +103,7 @@ $this->title = isset($profile->spouse_first_name) ?
 			<div class="col-md-4 profile-thirds">
 				<!-- Begin Distinctives (Box 2) -->
 				<strong>Bible: </strong><?= $profile->bible ?><br />
-				<strong>Worship Style: </strong><?= $profile->worship_style ?><br />
+				<strong>Worship: </strong><?= $profile->worship_style ?><br />
 				<strong>Government: </strong><?= $profile->polity ?><br />
 				<!-- Εnd Distinctives -->
 				<br />

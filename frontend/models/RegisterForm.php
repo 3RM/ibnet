@@ -61,7 +61,7 @@ class RegisterForm extends Model
      */
     public function register()
     {
-        if (!$this->validate() || $this->password_repeat != NULL) {
+        if (!$this->validate() || $this->password_repeat != NULL) {                                 // password_repeat is a hidden field used to detect bots
             return null;
         }
         

@@ -26,13 +26,13 @@ class ProfileSearch extends \common\models\profile\Profile
 
     public function search($params)
     {
-        $query = Profile::find();
+        $query = Profile::find()->orderBy(['id' => SORT_DESC]);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
-    		    'pageSize' => 10,
-    		],
+    		        'pageSize' => 10,
+    		    ],
         ]);
 
         // load the search form data and validate

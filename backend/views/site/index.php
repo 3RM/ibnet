@@ -2,7 +2,7 @@
 
 /* @var $this yii\web\View */
 
-$this->title = 'IBNet Administration Panel';
+$this->title = '';
 ?>
 <?php $this->registerJsFile("https://code.highcharts.com/highcharts.src.js"); ?>
 

@@ -906,6 +906,11 @@ class Profile extends \yii\db\ActiveRecord
     { 
         if ($this->validate()) {
 
+            $this->ind_city != NULL ? $this->ind_city = ucwords(strtolower($this->ind_city)) : NULL;
+            $this->ind_po_city != NULL ? $this->ind_po_city = ucwords(strtolower($this->ind_po_city)) : NULL;
+            $this->org_city != NULL ? $this->org_city = ucwords(strtolower($this->org_city)) : NULL;
+            $this->org_po_city != NULL ? $this->org_po_city = ucwords(strtolower($this->org_po_city)) : NULL;
+
     // ************************* Individual Address ******************************
             if ($this->isIndividual($this->type)) {
 

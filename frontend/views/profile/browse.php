@@ -411,9 +411,9 @@ $this->title = 'Browse';
                             } ?>
                         </div>
 
-                        <!-- =============================== Worship Style =============================== -->
+                        <!-- =============================== Worship =============================== -->
                         <div class="left-block">
-                            <h4>Worship Style</h4>
+                            <h4>Worship</h4>
                             <?php $worship_style = $resultSet->getFacetSet()->getFacet('worship_style');
                             $i = 0;
                             foreach ($worship_style as $value => $count) {

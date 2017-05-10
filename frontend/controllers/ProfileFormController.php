@@ -517,9 +517,6 @@ class ProfileFormController extends ProfileController
             $profile->status != Profile::STATUS_ACTIVE ?
                 $progressPercent = $profile->getProgressPercent(self::$formArray[$profile->type]) :
                 $progressPercent = NULL;
-            if ($profile->org_country === NULL) {
-                $profile->org_country = 'United States';                                            // Set default country to United States
-            }
             if ($profile->show_map == Profile::MAP_PRIMARY) {
                 $profile->map = 1;
             }
@@ -1785,7 +1782,7 @@ class ProfileFormController extends ProfileController
      * Process Ajax request from Parent Ministry search box for churches
      * Return a table of 10 or fewer results from db.
      */
-    public function actionChurchListAjax($q = NULL, $id = NULL) 
+    public function actionChurchListAjax($q=NULL, $id=NULL, $churchId=NULL) 
     {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $out = ['results' => ['id' => '', 'text' => '']];
@@ -1795,6 +1792,7 @@ class ProfileFormController extends ProfileController
                 ->from('profile')
                 ->where(['type' => 'Church'])
                 ->andWhere(['status' => Profile::STATUS_ACTIVE])
+                //->andWhere('id <> ' . $churchId)
                 ->andWhere('((`org_city` LIKE "%' . $q . '%") OR (`org_name` LIKE "%' . $q . '%"))')
                 ->limit(10);
             $command = $query->createCommand();

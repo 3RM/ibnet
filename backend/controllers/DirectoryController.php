@@ -2,8 +2,19 @@
 namespace backend\controllers;
 
 use backend\models\ProfileSearch;
+use backend\models\StaffSearch;
+use backend\models\MissionarySearch;
+use backend\models\HousingSearch;
+use backend\models\AssociationSearch;
+use backend\models\FellowshipSearch;
 use common\models\Utility;
+use common\models\profile\Association;
+use common\models\profile\Fellowship;
+use common\models\profile\Missionary;
+use common\models\profile\MissHousing;
 use common\models\profile\Profile;
+use common\models\profile\Staff;
+use frontend\controllers\ProfileController;
 use Yii;
 use yii\bootstrap\Html;
 use yii\data\ActiveDataProvider;
@@ -17,6 +28,13 @@ use yii\web\Controller;
  */
 class DirectoryController extends Controller
 {
+    const CLASS_PROFILE = 'profile';              // Used for dynamic classes
+    const CLASS_STAFF = 'staff';
+    const CLASS_MISSIONARY = 'missionary';
+    const CLASS_HOUSING = 'housing';
+    const CLASS_ASSOCIATION = 'association';
+    const CLASS_FELLOWSHIP = 'fellowship';
+
     /**
      * @inheritdoc
      */
@@ -42,6 +60,78 @@ class DirectoryController extends Controller
     }
 
     /**
+     * Mark a profile as reviewed
+     *
+     * @return string
+     */
+    public function actionReviewProfile($id)
+    {
+        $model = Profile::findOne($id);
+        $model->updateAttributes(['reviewed' => 1]);
+        return $this->redirect(['profiles']);
+    }
+
+    /**
+     * Mark staff as reviewed
+     *
+     * @return string
+     */
+    public function actionReviewStaff($id)
+    {
+        $model = Staff::findOne($id);
+        $model->updateAttributes(['reviewed' => 1]);
+        return $this->redirect(['staff']);
+    }
+
+    /**
+     * Mark missionary as reviewed
+     *
+     * @return string
+     */
+    public function actionReviewMiss($id)
+    {
+        $model = Missionary::findOne($id);
+        $model->updateAttributes(['reviewed' => 1]);
+        return $this->redirect(['missionary']);
+    }
+
+    /**
+     * Mark missionary housing as reviewed
+     *
+     * @return string
+     */
+    public function actionReviewHousing($id)
+    {
+        $model = MissHousing::findOne($id);
+        $model->updateAttributes(['reviewed' => 1]);
+        return $this->redirect(['housing']);
+    }
+
+    /**
+     * Mark association as reviewed
+     *
+     * @return string
+     */
+    public function actionReviewAss($id)
+    {
+        $model = association::findOne($id);
+        $model->updateAttributes(['reviewed' => 1]);
+        return $this->redirect(['association']);
+    }
+
+    /**
+     * Mark fellowship as reviewed
+     *
+     * @return string
+     */
+    public function actionReviewFlwship($id)
+    {
+        $model = fellowship::findOne($id);
+        $model->updateAttributes(['reviewed' => 1]);
+        return $this->redirect(['fellowship']);
+    }
+
+    /**
      * Displays Accounts.
      *
      * @return string
@@ -55,7 +145,16 @@ class DirectoryController extends Controller
                 'attribute' => '',
                 'format' => 'raw',
                 'value' => function ($model) {                      
-                    return $model->reviewed === 1 ? '' : Html::a(Html::icon('check'), ['review', 'id' => $model->id]);
+                    return $model->status === Profile::STATUS_ACTIVE ? 
+                        Html::a(Html::icon('new-window'), ['frontend/profile/view-profile-by-id', 'id' => $model->id], ['target' => '_blank']) :
+                        '';
+                },
+            ],
+            [
+                'attribute' => '',
+                'format' => 'raw',
+                'value' => function ($model) {                      
+                    return $model->reviewed === 1 ? '' : Html::a(Html::icon('check'), ['review-profile', 'id' => $model->id]);
                 },
             ],
             [
@@ -176,19 +275,8 @@ class DirectoryController extends Controller
             'searchModel' => $searchModel, 
             'dataProvider' => $dataProvider,
             'gridColumns' => $gridColumns,
+            'page' => $page,
         ]);
-    }
-
-    /**
-     * Displays Assignments.
-     *
-     * @return string
-     */
-    public function actionReview($id)
-    {
-        $user = Profile::findOne($id);
-        $user->updateAttributes(['reviewed' => 1]);
-        return $this->redirect(['profiles']);
     }
 
     /**
@@ -319,7 +407,180 @@ class DirectoryController extends Controller
     }
 
     /**
-     * Displays Assignments.
+     * Displays staff table
+     *
+     * @return string
+     */
+    public function actionStaff()
+    {
+        $searchModel = new StaffSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->get());
+        $gridColumns = [
+            [
+                'attribute' => '',
+                'format' => 'raw',
+                'value' => function ($model) {                      
+                    return $model->reviewed === 1 ? '' : Html::a(Html::icon('check'), ['review-staff', 'id' => $model->id]);
+                },
+                'hAlign'=>'center',
+                'vAlign' => 'middle',
+                'width'=>'1%',
+            ],
+            [
+                'attribute' => 'staff_id',
+                'format' => 'raw',
+                'value' => function ($model) {                      
+                     return Html::a($model->staff_id, ['view', 'id' => $model->staff_id]);
+                },
+                'hAlign'=>'center',
+                'vAlign' => 'middle',
+                //'width'=>'1%',
+            ],
+            'staff_type',
+            'staff_title',
+            [
+                'attribute' => 'ministry_id',
+                'format' => 'raw',
+                'value' => function ($model) {                      
+                     return Html::a($model->ministry_id, ['view', 'id' => $model->ministry_id]);
+                },
+                'hAlign'=>'center',
+                'vAlign' => 'middle',
+                //'width'=>'1%',
+            ],
+            'home_church', 
+            'church_pastor', 
+            'ministry_of', 
+            'sr_pastor', 
+            'confirmed',
+        ];
+
+        return $this->render('staff', [
+            'searchModel' => $searchModel, 
+            'dataProvider' => $dataProvider,
+            'gridColumns' => $gridColumns,
+        ]);
+    }
+
+    /**
+     * Displays missionary table
+     *
+     * @return string
+     */
+    public function actionMissionary()
+    {
+        $searchModel = new MissionarySearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->get());
+        $gridColumns = [
+            'id',
+            'mission_agcy_id',
+            'field',
+            'status',
+            'packet',
+            'cp_pastor_at',
+        ];
+
+        return $this->render('missionary', [
+            'searchModel' => $searchModel, 
+            'dataProvider' => $dataProvider,
+            'gridColumns' => $gridColumns,
+        ]);
+    }
+
+    /**
+     * Displays missions housing table
+     *
+     * @return string
+     */
+    public function actionHousing()
+    {
+        $searchModel = new HousingSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->get());
+        $gridColumns = [
+            'id',
+            'description',
+            'contact',
+            'trailer',
+            'water',
+            'electric',
+            'sewage',
+        ];
+
+        return $this->render('housing', [
+            'searchModel' => $searchModel, 
+            'dataProvider' => $dataProvider,
+            'gridColumns' => $gridColumns,
+        ]);
+    }
+
+    /**
+     * Displays associations table
+     *
+     * @return string
+     */
+    public function actionAssociation()
+    {
+        $searchModel = new AssociationSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->get());
+        $gridColumns = [
+            [
+                'attribute' => '',
+                'format' => 'raw',
+                'value' => function ($model) {                      
+                    return $model->reviewed === 1 ? '' : Html::a(Html::icon('check'), ['review-ass', 'id' => $model->id]);
+                },
+                'hAlign'=>'center',
+                'vAlign' => 'middle',
+                'width'=>'1%',
+            ],
+            'id',
+            'association',
+            'association_acronym',
+            'profile_id',
+        ];
+
+        return $this->render('association', [
+            'searchModel' => $searchModel, 
+            'dataProvider' => $dataProvider,
+            'gridColumns' => $gridColumns,
+        ]);
+    }
+
+    /**
+     * Displays fellowship table
+     *
+     * @return string
+     */
+    public function actionFellowship()
+    {
+        $searchModel = new FellowshipSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->get());
+        $gridColumns = [
+            [
+                'attribute' => '',
+                'format' => 'raw',
+                'value' => function ($model) {                      
+                    return $model->reviewed === 1 ? '' : Html::a(Html::icon('check'), ['review-flwship', 'id' => $model->id]);
+                },
+                'hAlign'=>'center',
+                'vAlign' => 'middle',
+                'width'=>'1%',
+            ],
+            'id',
+            'fellowship',
+            'fellowship_acronym',
+            'profile_id',
+        ];
+
+        return $this->render('fellowship', [
+            'searchModel' => $searchModel, 
+            'dataProvider' => $dataProvider,
+            'gridColumns' => $gridColumns,
+        ]);
+    }
+
+    /**
+     * Displays flagged profiles
      *
      * @return string
      */
@@ -370,6 +631,30 @@ class DirectoryController extends Controller
         ];
 
         return $this->render('flagged', [ 
+            'dataProvider' => $dataProvider,
+            'gridColumns' => $gridColumns,
+        ]);
+    }
+
+    /**
+     * Displays forwarding email requests
+     *
+     * @return string
+     */
+    public function actionForwarding()
+    {
+        $query = (new Query())->from('profile')->where('email_pvt != NULL')->andWhere(['email_pvt_status' => NULL]);
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+            'pagination' => [
+                'pageSize' => 10,
+            ],
+        ]);
+        $gridColumns = [
+            
+        ];
+
+        return $this->render('forwarding', [ 
             'dataProvider' => $dataProvider,
             'gridColumns' => $gridColumns,
         ]);

@@ -47,7 +47,7 @@ $this->title = 'Church Plant';
         <?php if (empty($ministryLink)) { ?>
 
             <div class="row">
-                <div class="col-md-8">
+                <div class="col-md-6">
                     <p><?= HTML::icon('info-sign') ?> A church or church plant must have a listing in this directory.</p>
                     <?php echo $form->field($missionary, 'ministrySelection')->widget(Select2::classname(), [ 
                         'options' => ['placeholder' => 'Search by name or city...'],
