@@ -49,10 +49,20 @@ class Association extends \yii\db\ActiveRecord
     }
 
     /**
-     * Links an association in the association table to its profile in the profile table
+     * Links a list of associations to individual profiles
      * @return \yii\db\ActiveQuery
      */
     public function getProfile()
+    {
+        return $this->hasMany(Profile::className(), ['id' => 'profile_id'])
+            ->viaTable('profile_has_association', ['ass_id' => 'id']);
+    }
+
+    /* 
+     * Links an association in the association table to its profile in the profile table
+     * @return \yii\db\ActiveQuery
+     */
+    public function getLinkedProfile()
     {
         return $this->hasOne(Profile::className(), ['id' => 'profile_id']);
     }

@@ -10,9 +10,7 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 /* @var $model app\models\Profile */
 /* @var $form yii\widgets\ActiveForm */
-$profile->type == 'Church' ? 
-    $this->title = 'Fellowship / Association' : 
-    $this->title = 'Fellowship';
+$this->title = 'Fellowship';
 ?>
 
 <div class="wrap profile-form">
@@ -27,14 +25,18 @@ $profile->type == 'Church' ?
             <div class="col-md-6">
                 <p>Do you belong to a fellowship?</p>
                 <p><?= HTML::icon('info-sign') ?> If your fellowship or association is not listed, consider listing it!</p>
-    
-                <?= $form->field($profile, 'flwship_id')->widget(Select2::classname(), [                            // see customization options here: http://demos.krajee.com/widget-details/select2
-                    'data' => ArrayHelper::map(Fellowship::find()->orderBy('id')->all(), 'id', 'fellowship'),
+
+                <?= $form->field($profile, 'select')->widget(Select2::classname(), [                 // see customization options here: http://demos.krajee.com/widget-details/select2
+                    'data' => ArrayHelper::map(Fellowship::find()->all(), 'id', 'fellowship'),
                     'language' => 'en',
                     'theme' => 'krajee',
-                    'options' => ['placeholder' => 'Select Fellowship ...'],
+                    'options' => [
+                        'placeholder' => 'Select Fellowship(s) ...', 
+                        'multiple' => true,
+                    ],
                     'pluginOptions' => ['allowClear' => true],
-                ])->label(''); ?>
+                ]) ?>
+    
             </div>
         </div>
         <div class="row">
@@ -46,7 +48,7 @@ $profile->type == 'Church' ?
             </div>
         </div>
 
-        <?= $this->render('_profileFormFooter', ['profile' => $profile]) ?>
+        <?= $this->render('_profileFormFooter', ['profile' => $profile, 'e' => $e]) ?>
     
         <?php ActiveForm::end(); ?>
 

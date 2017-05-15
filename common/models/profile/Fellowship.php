@@ -49,10 +49,20 @@ class Fellowship extends \yii\db\ActiveRecord
     }
 
     /**
-     * Links a fellowship in the fellowship table to its profile in the profile table
+     * Links a list of fellowships to individual profiles
      * @return \yii\db\ActiveQuery
      */
     public function getProfile()
+    {
+        return $this->hasMany(Profile::className(), ['id' => 'profile_id'])
+            ->viaTable('profile_has_fellowship', ['flwship_id' => 'id']);
+    }
+
+    /* 
+     * Links a fellowship in the fellowship table to its profile in the profile table
+     * @return \yii\db\ActiveQuery
+     */
+    public function getLinkedProfile()
     {
         return $this->hasOne(Profile::className(), ['id' => 'profile_id']);
     }

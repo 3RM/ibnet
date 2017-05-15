@@ -1,6 +1,7 @@
 <?php
 
 use common\models\profile\Profile;
+use frontend\controllers\ProfileController;
 use frontend\controllers\ProfileFormController;
 use kartik\markdown\Markdown;
 use tugmaks\GoogleMaps\Map;
@@ -184,14 +185,14 @@ $this->title = isset($profile->spouse_first_name) ?
 				<!-- End "Pastor at ... Baptist Church" -->
 				<br>
 				<!-- Begin Fellowship (Box 3) -->
-				<strong>Fellowship: </strong><span  class="pull-right edit"><?= Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['as']-1, 'id' => $profile->id]) ?></span><br>
-				<?php if ($profile->flwship_id) {
-					if (empty($flwshipLink)) {
-						echo $fellowship->fellowship;
-						echo empty($fellowship->fellowship_acronym) ? NULL : ' (' . $fellowship->fellowship_acronym . ')';
-						echo '<br>';
-					} else {
-						echo HTML::a($fellowship->fellowship, ['profile/fellowship', 'id' => $flwshipLink->id,  'city' => $flwshipLink->url_city, 'name' => $flwshipLink->url_name], ['target' => '_blank']). '<br>';
+				<strong>Fellowship:</strong><span  class="pull-right edit"><?= Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['as']-1, 'id' => $profile->id]) ?></span><br>
+				<?php if ($fellowships) {
+					foreach ($fellowships as $fellowship) {
+						if ($flwshipLink = ProfileController::findFellowship($fellowship->profile_id)) {
+							echo HTML::a($fellowship->fellowship, ['profile/fellowship', 'id' => $flwshipLink->id, 'city' => $flwshipLink->url_city, 'name' => $flwshipLink->url_name], ['title' => $fellowship->fellowship_acronym, 'target' => '_blank']) . '<br>';
+						} else {
+							echo Html::tag('span', $fellowship->fellowship, ['title' => $fellowship->fellowship_acronym]) . '<br>';
+						}
 					}
 				} ?>
 				<!-- End Fellowship -->

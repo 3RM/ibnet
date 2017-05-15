@@ -136,13 +136,14 @@ $this->title = isset($profile->spouse_first_name) ?
 				<!-- End "Pastor at ... Baptist Church" -->
 				<br>
 				<!-- Begin Fellowship (Box 3) -->
-				<?php if ($profile->flwship_id) {
-					if (!$flwshipLink) {
-						echo '<strong>Fellowship: </strong><br>' . $fellowship->fellowship;
-						echo empty($fellowship->fellowship_acronym) ? NULL : ' (' . $fellowship->fellowship_acronym . ')';
-						echo '<br>';
-					} else {
-						echo '<strong>Fellowship: </strong><br>' . HTML::a($fellowship->fellowship, ['profile/fellowship', 'id' => $flwshipLink->id,  'city' => $flwshipLink->url_city, 'name' => $flwshipLink->url_name]) . '<br>';
+				<strong>Fellowship:</strong><br>
+				<?php if ($fellowships) {
+					foreach ($fellowships as $fellowship) {
+						if ($flwshipLink = ProfileController::findFellowship($fellowship->profile_id)) {
+							echo HTML::a($fellowship->fellowship, ['profile/fellowship', 'id' => $flwshipLink->id, 'city' => $flwshipLink->url_city, 'name' => $flwshipLink->url_name], ['title' => $fellowship->fellowship_acronym, 'target' => '_blank']) . '<br>';
+						} else {
+							echo Html::tag('span', $fellowship->fellowship, ['title' => $fellowship->fellowship_acronym]) . '<br>';
+						}
 					}
 				} ?>
 				<!-- End Fellowship -->

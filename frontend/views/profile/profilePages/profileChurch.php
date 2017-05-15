@@ -151,24 +151,27 @@ $this->title = $profile->org_name;
 				} ?>
 				<!-- End Programs -->
 				 <!-- Begin Associations/Fellowships (Box 3) -->
-					<?php if ($profile->ass_id) {
-						if (empty($assLink)) {
-							echo '<strong>Association: </strong><br>' . $association->association;
-							empty($association->association_acronym) ? NULL :
-								print(' (' . $association->association_acronym . ')</p>');
+				<strong>Fellowship:</strong><br>
+				<?php if ($fellowships) {
+					foreach ($fellowships as $fellowship) {
+						if ($flwshipLink = ProfileController::findFellowship($fellowship->profile_id)) {
+							echo HTML::a($fellowship->fellowship, ['profile/fellowship', 'id' => $flwshipLink->id, 'city' => $flwshipLink->url_city, 'name' => $flwshipLink->url_name], ['title' => $fellowship->fellowship_acronym, 'target' => '_blank']) . '<br>';
 						} else {
-							echo '<strong>Association: </strong><br>' . HTML::a($association->association, ['association', 'id' => $assLink->id, 'city' => $assLink->url_city, 'name' => $assLink->url_name]) . '<br>';
+							echo Html::tag('span', $fellowship->fellowship, ['title' => $fellowship->fellowship_acronym]) . '<br>';
 						}
 					}
-					if ($profile->flwship_id) {
-						if (empty($flwshipLink)) {
-							echo '<strong>Fellowship: </strong><br>' . $fellowship->fellowship;
-							empty($fellowship->fellowship_acronym) ? NULL :
-								print(' (' . $fellowship->fellowship_acronym . ')<br />');
+				} ?>
+				<br>
+				<strong>Association:</strong><br>
+				<?php if ($associations) {
+					foreach ($associations as $association) {
+						if ($assLink = ProfileController::findAssociation($association->profile_id)) {
+							echo HTML::a($association->association, ['profile/association', 'id' => $assLink->id, 'city' => $assLink->url_city, 'name' => $assLink->url_name], ['title' => $association->association_acronym, 'target' => '_blank']) . '<br>';
 						} else {
-							echo '<strong>Fellowship: </strong><br>' . HTML::a($fellowship->fellowship, ['profile/fellowship', 'id' => $flwshipLink->id,  'city' => $flwshipLink->url_city, 'name' => $flwshipLink->url_name]) . '<br>';
+							echo Html::tag('span', $association->association, ['title' => $association->association_acronym]) . '<br>';
 						}
-					} ?>
+					}
+				} ?>
 				<!-- End Associations/Fellowships -->
 
 				<!-- Last Update -->

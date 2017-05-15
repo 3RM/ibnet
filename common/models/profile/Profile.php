@@ -197,9 +197,9 @@ class Profile extends \yii\db\ActiveRecord
     // as-school: Associations for school
             'as-school' => ['select'],
     // as-ind: Associations for individuals
-            'as-ind' => ['flwship_id', 'name', 'acronym'],
+            'as-ind' => ['select', 'name', 'acronym'],
     // as-church: Associations for churches
-            'as-church' => ['flwship_id', 'name', 'acronym', 'ass_id', 'aName', 'aAcronym'],
+            'as-church' => ['select', 'name', 'acronym', 'selectM', 'aName', 'aAcronym'],
     // ta: Tag
             'ta' => ['select'],
         ];
@@ -470,8 +470,9 @@ class Profile extends \yii\db\ActiveRecord
     // as-school: Associations - School ('select')
             ['select', 'safe', 'on' => 'as-school'],
 
-    // as-ind: Associations - Individual ('flwship_id', 'name', 'acronym')
-            [['flwship_id', 'name', 'acronym'], 'default', 'value' => NULL, 'on' => 'as-ind'],
+    // as-ind: Associations - Individual ('select', 'name', 'acronym')
+            ['select', 'safe', 'on' => 'as-ind'],
+            [['name', 'acronym'], 'default', 'value' => NULL, 'on' => 'as-ind'],
             ['name', 'string', 'max' => 60, 'on' => 'as-ind'],
             ['acronym', 'string', 'max' => 10, 'on' => 'as-ind'],
             [['name', 'acronym'], 'filter', 'filter' => 'strip_tags', 'on' => 'as-ind'],
@@ -479,8 +480,9 @@ class Profile extends \yii\db\ActiveRecord
             ['name', 'validateUniqueFellowship', 'on' => 'as-ind'],
             ['acronym', 'validateUniqueFlwshpAcronym', 'on' => 'as-ind'],
 
-    // as-church: Associations - Church ('flwship_id', 'name', 'acronym', 'ass_id', 'aName', 'aAcronym')
-            [['flwship_id', 'name', 'acronym', 'ass_id', 'aName', 'aAcronym'], 'default', 'value' => NULL, 'on' => 'as-church'],
+    // as-church: Associations - Church ('select', 'name', 'acronym', 'selectM', 'aName', 'aAcronym')
+            [['select', 'selectM'], 'safe', 'on' => 'as-church'],
+            [['name', 'acronym', 'ass_id', 'aName', 'aAcronym'], 'default', 'value' => NULL, 'on' => 'as-church'],
             [['name', 'aName'], 'string', 'max' => 60, 'on' => 'as-church'],
             [['acronym', 'aAcronym'], 'string', 'max' => 10, 'on' => 'as-church'],
             [['name', 'acronym', 'aName', 'aAcronym'], 'filter', 'filter' => 'strip_tags', 'on' => 'as-church'],
@@ -728,13 +730,19 @@ class Profile extends \yii\db\ActiveRecord
             return [
                 'bible' => 'Bible',
                 'worship_style' => 'Worship Style',
-                'polity' => 'Church Government'
+                'polity' => 'Church Government',
             ];
+            break;
+
+    // as-school: Associations - School ('select')
+            case 'as-school':
+            return ['select' => 'Acreditation or Association'];
             break;
 
     // as-ind: Associations - Individual ('select', 'name', 'acronym')
             case 'as-ind':
             return [
+                'select' => 'Fellowship(s)',
                 'name' => 'Or enter a new name here',
                 'acronym' => 'Acronym',
             ];
@@ -743,16 +751,13 @@ class Profile extends \yii\db\ActiveRecord
     // as-church: Associations - Church ('flwship_id', 'name', 'acronym', 'ass_id', 'aName', 'aAcronym')
             case 'as-church':
             return [
-                'aName' => 'Or enter a new name here',
-                'aAcronym' => 'Acronym',
+                'select' => 'Fellowship(s)',
                 'name' => 'Or a new name here',
                 'acronym' => 'Acronym',
+                'selectM' => 'Association(s)',
+                'aName' => 'Or enter a new name here',
+                'aAcronym' => 'Acronym',
             ];
-            break;
-
-    // as-school: Associations - School ('select')
-            case 'as-school':
-            return ['select' => 'Acreditation or Association'];
             break;
 
     // Default labels
@@ -765,7 +770,6 @@ class Profile extends \yii\db\ActiveRecord
     {
         $this->status = self::STATUS_NEW;
         $this->user_id = Yii::$app->user->identity->id;
-        $this->edit = 0;
         if ($this->type == 'Pastor') {
             $this->sub_type = $this->ptype;
         } elseif ($this->type == 'Missionary') {
@@ -905,11 +909,6 @@ class Profile extends \yii\db\ActiveRecord
     public function handleFormLO()
     { 
         if ($this->validate()) {
-
-            $this->ind_city != NULL ? $this->ind_city = ucwords(strtolower($this->ind_city)) : NULL;
-            $this->ind_po_city != NULL ? $this->ind_po_city = ucwords(strtolower($this->ind_po_city)) : NULL;
-            $this->org_city != NULL ? $this->org_city = ucwords(strtolower($this->org_city)) : NULL;
-            $this->org_po_city != NULL ? $this->org_po_city = ucwords(strtolower($this->org_po_city)) : NULL;
 
     // ************************* Individual Address ******************************
             if ($this->isIndividual($this->type)) {
@@ -1491,66 +1490,131 @@ class Profile extends \yii\db\ActiveRecord
             return $this;                                                                           // No need to save $profile model
         }
 
-    // ************************* Association ***********************************
-        if ($this->aName != NULL) {                                                                 // Give preference to text input if both associationSelect and associationName are populated (better to collect more data, can delete duplicate entries if need be; and mitigates accidental selection)
-            if ($this->validate()) {
-                $association = new Association();
-                $association->association = $this->aName;
-                $association->association_acronym = $this->aAcronym;
-                if ($association->save()) {
-                    $this->link('association', $association);
-                }
-            } else {
-                return false;                                                                       // Validation failed
-            }                                                  
-        }
-
-        if ($this->ass_id != $this->getOldAttribute('ass_id')) {
-            
-            $oldAss = Association::find()
-                ->where('profile_id IS NULL')
-                ->andWhere(['id' => $this->getOldAttribute('ass_id')])
-                ->one();
-            if ($oldAss && ($oldAssProfile = $oldAss->profile)) {
-                $oldAssProfileOwner = User::findOne($oldAssProfile->user_id);
-                MailController::initSendLink($this, $oldAssProfile, $oldAssProfileOwner, 'AS', 'UL');  // Notify old asscociation profile owner of unlink
-            }
-            
-            $ass = Association::findOne($this->ass_id);
-            if ($ass && ($assProfile = $ass->profile)) {
-                $assProfileOwner = User::findOne($assProfile->user_id);
-                MailController::initSendLink($this, $assProfile, $assProfileOwner, 'AS', 'L');      // Notify new asscociation profile owner of new link
-            }
-        }
-
     // ************************** Fellowship ***********************************
+        
+        $oldSelect = arrayHelper::map($this->fellowship, 'id', 'id');
+        if (empty($oldSelect) && ($select = $this->select) != NULL) {                               // handle case of new selection
+            foreach ($select as $value) {
+                $f = Fellowship::findOne($value);
+                $this->link('fellowship', $f);
+
+                if ($fProfile = $f->linkedProfile) {                                                // notify new fellowship profile owner of new link
+                    $fProfileOwner = User::findOne($fProfile->user_id);
+                    MailController::initSendLink($this, $fProfile, $fProfileOwner, 'AS', 'L');      
+                }
+
+            }
+        }
+        if (!empty($oldSelect) && empty($this->select))  {                                          // handle case of all unselected
+            $f = $this->fellowship;
+            foreach($f as $model) {
+                $model->unlink('profile', $this, $delete = TRUE);
+
+                if ($fProfile = $f->linkedProfile) {                                                // notify old fellowship profile owner of unlink
+                    $fProfileOwner = User::findOne($fProfile->user_id);
+                    MailController::initSendLink($this, $fProfile, $fProfileOwner, 'AS', 'UL');      
+                }
+            }
+        }
+        if (!empty($oldSelect) && ($select = $this->select) != NULL) {                              // handle all other cases of change in selection
+            foreach($select as $value) {                                                            // link any new selections
+                if(!in_array($value, $oldSelect)) {
+                    $f = Fellowship::findOne($value);
+                    $this->link('fellowship', $f);
+
+                    if ($fProfile = $f->linkedProfile) {                                            // notify new fellowship profile owner of new link
+                        $fProfileOwner = User::findOne($fProfile->user_id);
+                        MailController::initSendLink($this, $fProfile, $fProfileOwner, 'AS', 'L');      
+                    }
+                }
+            }
+            foreach($oldSelect as $value) {                                                         // unlink any selections that were removed
+                if(!in_array($value, $select)) {
+                    $f = Fellowship::findOne($value);
+                    $this->unlink('fellowship', $f, $delete = TRUE);
+
+                    if ($fProfile = $f->linkedProfile) {                                            // notify old fellowship profile owner of unlink
+                        $fProfileOwner = User::findOne($fProfile->user_id);
+                        MailController::initSendLink($this, $fProfile, $fProfileOwner, 'AS', 'UL');      
+                    }
+                }
+            }
+        }
+
         if ($this->name != NULL) {                                                                  // Give preference to text input if both fellowshipSelect and fellowshipName are populated (better to collect more data, can delete duplicate entries if need be; and mitigates accidental selection)
             if ($this->validate()) {
-                $fellowship = new Fellowship();
-                $fellowship->fellowship = $this->name;
-                $fellowship->fellowship_acronym = $this->acronym;
-                if ($fellowship->save()) {
-                    $this->link('fellowship', $fellowship);
+                $newF = new Fellowship();
+                $newF->fellowship = $this->name;
+                $newF->fellowship_acronym = $this->acronym;
+                if ($newF->save()) {
+                    $this->link('fellowship', $newF);
                 }
             } else {
                 return false;                                                                       // Validation failed
             }                                                          
         }
 
+    // ************************* Association ***********************************
+        $oldSelectM = arrayHelper::map($this->association, 'id', 'id');
+        if (empty($oldSelectM) && ($selectM = $this->selectM) != NULL) {                            // handle case of new selection
+            foreach ($selectM as $value) {
+                $a = Association::findOne($value);
+                $this->link('association', $a);
 
-        if ($this->flwship_id != $this->getOldAttribute('flwship_id')) {
-            
-            $oldFlwship = ProfileController::findFellowship($this->getOldAttribute('flwship_id'));
-            if ($oldFlwship && ($oldFlwshipProfile = $oldFlwship->profile)) {
-                $oldFlwshipProfileOwner = User::findOne($oldFlwshipProfile->user_id);
-                MailController::initSendLink($this, $oldFlwshipProfile, $oldFlwshipProfileOwner, 'AS', 'UL');   // Notify old fellowship profile owner of unlink
+                if ($aProfile = $a->linkedProfile) {                                                // notify new association profile owner of new link
+                    $aProfileOwner = User::findOne($aProfile->user_id);
+                    MailController::initSendLink($this, $aProfile, $aProfileOwner, 'AS', 'L');      
+                }
+
             }
-            
-            $flwship = ProfileController::findFellowship($this->flwship_id);
-            if ($flwship && ($flwshipProfile = $flwship->profile)) {
-                $flwshipProfileOwner = User::findOne($flwshipProfile->user_id);
-                MailController::initSendLink($this, $flwshipProfile, $flwshipProfileOwner, 'AS', 'L'); // Notify new fellowship profile owner of new link
+        }
+        if (!empty($oldSelectM) && empty($this->selectM))  {                                        // handle case of all unselected
+            $a = $this->association;
+            foreach($a as $model) {
+                $model->unlink('profile', $this, $delete = TRUE);
+
+                if ($aProfile = $a->linkedProfile) {                                                // notify old association profile owner of unlink
+                    $aProfileOwner = User::findOne($aProfile->user_id);
+                    MailController::initSendLink($this, $aProfile, $aProfileOwner, 'AS', 'UL');      
+                }
             }
+        }
+        if (!empty($oldSelectM) && ($selectM = $this->selectM) != NULL) {                           // handle all other cases of change in selection
+            foreach($selectM as $value) {                                                           // link any new selections
+                if(!in_array($value, $oldSelectM)) {
+                    $a = Association::findOne($value); var_dump($a); die;
+                    $this->link('association', $a);
+ 
+                    if ($aProfile =$a->linkedProfile) {                                            // notify new association profile owner of new link
+                        $aProfileOwner = User::findOne($aProfile->user_id);
+                        MailController::initSendLink($this, $aProfile, $aProfileOwner, 'AS', 'L');      
+                    }
+                }
+            }
+            foreach($oldSelectM as $value) {                                                        // unlink any selections that were removed
+                if(!in_array($value, $selectM)) {
+                    $a = Association::findOne($value);
+                    $this->unlink('association', $a, $delete = TRUE);
+
+                    if ($aProfile = $a->linkedProfile) {                                            // notify old association profile owner of unlink
+                        $aProfileOwner = User::findOne($aProfile->user_id);
+                        MailController::initSendLink($this, $aProfile, $aProfileOwner, 'AS', 'UL');      
+                    }
+                }
+            }
+        }
+
+        if ($this->aName != NULL) {                                                                 // Give preference to text input if both associationSelect and associationName are populated (better to collect more data, can delete duplicate entries if need be; and mitigates accidental selection)
+            if ($this->validate()) {
+                $newA = new Association();
+                $newA->association = $this->aName;
+                $newA->association_acronym = $this->aAcronym;
+                if ($newA->save()) {
+                    $this->link('association', $newA);
+                }
+            } else {
+                return false;                                                                       // Validation failed
+            }                                                  
         }
 
     // ***************************** Save **************************************
@@ -1683,7 +1747,7 @@ class Profile extends \yii\db\ActiveRecord
             $progress->delete();
         }
         if ($this->setUpdateDate() && 
-            $this->updateAttributes(['status' => Profile::STATUS_INACTIVE, 'renewal_date' => NULL, 'edit' => 0])) {
+            $this->updateAttributes(['status' => Profile::STATUS_INACTIVE, 'renewal_date' => NULL])) {
             return true;
         }
         return false;
@@ -1963,7 +2027,8 @@ class Profile extends \yii\db\ActiveRecord
      */
     public function getFellowship()
     {
-        return $this->hasOne(Fellowship::className(), ['id' => 'flwship_id']);
+        return $this->hasMany(Fellowship::className(), ['id' => 'flwship_id'])
+            ->viaTable('profile_has_fellowship', ['profile_id' => 'id']);
     }
 
     /**
@@ -1971,7 +2036,8 @@ class Profile extends \yii\db\ActiveRecord
      */
     public function getAssociation()
     {
-        return $this->hasOne(Association::className(), ['id' => 'ass_id']);
+        return $this->hasMany(Association::className(), ['id' => 'ass_id'])
+            ->viaTable('profile_has_association', ['profile_id' => 'id']);
     }
 
     /**

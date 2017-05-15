@@ -1114,9 +1114,9 @@ class ProfileFormController extends ProfileController
             
         } elseif (isset($_POST['removeM']) && $staff = Staff::findOne($_POST['removeM'])) {
             
-            $ministryProfile = $this->findProfile($staff->ministry_id);
-            $ministryProfileOwner = User::findOne($ministryProfile->user_id);
-            MailController::initSendLink($profile, $ministryProfile, $ministryProfileOwner, 'PM', 'UL');    // Notify ministry profile owner of unlink
+            $ministryProfile = $this->findProfile($staff->ministry_id);                             // Notify ministry profile owner of unlink
+            $ministryProfileOwner = User::findOne($ministryProfile->user_id);                               //
+            MailController::initSendLink($profile, $ministryProfile, $ministryProfileOwner, 'PM', 'UL');    //
             
             $staff->delete();
             return $this->redirect(['form' . $fmNum, 'id' => $profile->id]);                        // Refresh page
@@ -1539,7 +1539,6 @@ class ProfileFormController extends ProfileController
         $fmNum = Self::$form['as'];
         $fm = 'forms/form' . $fmNum;
         $profile = $this->findProfile($id);
-        $profile->scenario = 'as';
         if($profile->type == 'School') {
             $profile->scenario = 'as-school';
         } elseif ($profile->type == 'Church') {
@@ -1578,15 +1577,19 @@ class ProfileFormController extends ProfileController
                 return $this->render($fm . '-school', [
                     'profile' => $profile, 
                     'pp' => $progressPercent]);
-            }
-
-            return $profile->isIndividual($profile->type) ?
-                $this->render($fm . '-ind', [
-                    'profile' => $profile, 
-                    'pp' => $progressPercent]) :
-                $this->render($fm . '-church', [
+            } elseif ($profile->type == 'Church') {
+                $profile->select = $profile->fellowship;                                           // DB relation via junction table 
+                $profile->selectM = $profile->association;                                      
+                return $this->render($fm . '-church', [
                     'profile' => $profile, 
                     'pp' => $progressPercent]);
+            } else {
+                $profile->select = $profile->fellowship;                                            // DB relation via junction table
+                return $this->render($fm . '-ind', [
+                    'profile' => $profile, 
+                    'pp' => $progressPercent]);
+            }
+
         }
     }
 

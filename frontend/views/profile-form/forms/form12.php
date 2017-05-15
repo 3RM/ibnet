@@ -29,7 +29,7 @@ $this->title = 'School(s) Attended';
             school by IBNet.
         </p>
         <div class="row">
-            <div class="col-md-8">
+            <div class="col-md-6">
                 <?= $form->field($profile, 'select')->widget(Select2::classname(), [                 // see customization options here: http://demos.krajee.com/widget-details/select2
                     'data' => $list,
                     'language' => 'en',
@@ -45,7 +45,7 @@ $this->title = 'School(s) Attended';
             </div>
         </div>
 
-       <?= $this->render('_profileFormFooter', ['profile' => $profile]) ?>
+       <?= $this->render('_profileFormFooter', ['profile' => $profile, 'e' => $e]) ?>
 
         <?php ActiveForm::end(); ?>
 

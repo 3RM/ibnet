@@ -9,7 +9,6 @@ use common\models\profile\ProfileBrowse;
 use common\models\profile\ProfileSearch;
 use common\models\profile\Staff;
 use common\models\profile\Social;
-use common\models\Utility;
 use Yii;
 use yii\db\Query;
 use yii\filters\AccessControl;
@@ -186,7 +185,7 @@ class ProfileController extends Controller
      */
     public function actionViewProfile($id, $city=NULL, $name=NULL)
     {
-        if (!$profile = $this->findViewProfile($id, $city, $name)) { 
+        if (!$profile = $this->findViewProfile($id)) {
             $this->checkExpired($id);  
         }
         $profilePage = self::$profilePageArray[$profile->type];
@@ -410,14 +409,8 @@ class ProfileController extends Controller
                 ->all()) {
                 $ministries = NULL;
             }
-            if ($profile->ass_id) {                                                                 // Retrieve fellowship
-                $association = $this->findAssociation($profile->ass_id);
-                $assLink = $this->findActiveProfile($association->profile_id);                      // Only link to active profiles
-            }
-            if ($profile->flwship_id) {                                                             // Retrieve fellowship
-                $fellowship = $this->findFellowship($profile->flwship_id);                              
-                $flwshipLink = $this->findActiveProfile($fellowship->profile_id);                   // Only link to active profiles
-            }
+            $fellowships = $profile->fellowship;
+            $associations = $profile->association;
             
             if ($profile->org_loc && $profile->show_map == Profile::MAP_PRIMARY) {
                 $loc = explode(',', $profile->org_loc);
@@ -432,10 +425,8 @@ class ProfileController extends Controller
                 'pastorLink' => $pastorLink,
                 'ministries' => $ministries,
                 'programs' => $programs,
-                'association' => $association,
-                'assLink' => $assLink,
-                'fellowship' => $fellowship,
-                'flwshipLink' => $flwshipLink]);
+                'associations' => $associations,
+                'fellowships' => $fellowships]);
         } else {
             $this->redirect(['view-profile', 'id' => $id, 'city' => $city, 'name' => $name]);
         }
@@ -479,10 +470,7 @@ class ProfileController extends Controller
             if ($profile->social_id) {
                 $social = $profile->social;
             }
-            if ($profile->flwship_id) {                                                             // Retrieve fellowship
-                $fellowship = $this->findFellowship($profile->flwship_id);                              
-                $flwshipLink = $this->findActiveProfile($fellowship->profile_id);                   // Only link to active profiles
-            }
+            $fellowships = $profile->fellowship;
 
             if ($profile->org_loc && $profile->show_map == Profile::MAP_PRIMARY) {
                 $loc = explode(',', $profile->org_loc);
@@ -498,8 +486,7 @@ class ProfileController extends Controller
                 'profile' => $profile,
                 'loc' => $loc,
                 'social' => $social,
-                'fellowship' => $fellowship,
-                'flwshipLink' => $flwshipLink,
+                'fellowships' => $fellowships,
                 'church' => $church,
                 'churchLink' => $churchLink,
                 'ministry' => $ministry,
@@ -743,10 +730,7 @@ class ProfileController extends Controller
             if ($profile->social_id) {
                 $social = $profile->social;
             }
-            if ($profile->flwship_id) {                                                             // Retrieve fellowship
-                $fellowship = $this->findFellowship($profile->flwship_id);                              
-                $flwshipLink = $this->findActiveProfile($fellowship->profile_id);                   // Only link to active profiles
-            }
+            $fellowships = $profile->fellowship;
 
             if ($profile->org_loc && $profile->show_map == Profile::MAP_PRIMARY) {
                 $loc = explode(',', $profile->org_loc);
@@ -762,8 +746,7 @@ class ProfileController extends Controller
                 'churchLink' => $churchLink,
                 'church' => $church,
                 'social' => $social,
-                'fellowship' => $fellowship,
-                'flwshipLink' => $flwshipLink,
+                'fellowships' => $fellowships,
                 'schoolsAttended' => $schoolsAttended]);
         } else {
             $this->redirect(['view-profile', 'id' => $id, 'city' => $city, 'name' => $name]);
@@ -1072,13 +1055,15 @@ class ProfileController extends Controller
     {
         if (Yii::$app->request->Post()) {
             $id = $_POST['flag'];
-            if (($profile = $this->findProfile($id)) && ($profile->inappropriate != NULL)) {
+            $profile = $this->findProfile($id);
+            if ($profile && $profile->inappropriate < 1) {
                 $profile->updateAttributes(['inappropriate' => 1]);                                     // Set inappropriate flag
-
-                !Yii::$app->user->isGuest ?
-                    $user = Yii::$app->user->identity->id :
-                    $user = NULL;
-        
+                $user = NULL;
+                
+                if (!Yii::$app->user->isGuest) {
+                    $user = Yii::$app->user->identity->id;
+                }
+                
                 $url = Url::base('http') . Url::toRoute(['/profile/view-profile-by-id', 'id' => $id]);
                 
                 Yii::$app

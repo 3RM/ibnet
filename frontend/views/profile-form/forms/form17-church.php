@@ -12,9 +12,7 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 /* @var $model app\models\Profile */
 /* @var $form yii\widgets\ActiveForm */
-$profile->type == 'Church' ? 
-    $this->title = 'Fellowship / Association' : 
-    $this->title = 'Fellowship';
+$this->title = 'Fellowship / Association';
 ?>
 
 <div class="wrap profile-form">
@@ -31,13 +29,16 @@ $profile->type == 'Church' ?
                 <p><?= HTML::icon('info-sign') ?> If your fellowship or association is not listed, consider listing it!</p>
     
                 <h3>Fellowship</h3>
-                <?= $form->field($profile, 'flwship_id')->widget(Select2::classname(), [                         
-                    'data' => ArrayHelper::map(Fellowship::find()->orderBy('id')->all(), 'id', 'fellowship'),
+                <?= $form->field($profile, 'select')->widget(Select2::classname(), [                 // see customization options here: http://demos.krajee.com/widget-details/select2
+                    'data' => ArrayHelper::map(Fellowship::find()->all(), 'id', 'fellowship'),
                     'language' => 'en',
                     'theme' => 'krajee',
-                    'options' => ['placeholder' => 'Select Fellowship ...',],
+                    'options' => [
+                        'placeholder' => 'Select Fellowship(s) ...', 
+                        'multiple' => true,
+                    ],
                     'pluginOptions' => ['allowClear' => true],
-                ])->label(''); ?>
+                ]) ?>
             </div>
         </div>
         <div class="row">
@@ -52,13 +53,16 @@ $profile->type == 'Church' ?
         <div class="row top-margin">
             <div class="col-md-6">
                 <h3>Association</h3>
-                <?= $form->field($profile, 'ass_id')->widget(Select2::classname(), [                     
-                    'data' => ArrayHelper::map(Association::find()->orderBy('id')->all(), 'id', 'association'),
+                <?= $form->field($profile, 'selectM')->widget(Select2::classname(), [                 // see customization options here: http://demos.krajee.com/widget-details/select2
+                    'data' => ArrayHelper::map(Association::find()->all(), 'id', 'association'),
                     'language' => 'en',
                     'theme' => 'krajee',
-                    'options' => ['placeholder' => 'Select Association ...',],
+                    'options' => [
+                        'placeholder' => 'Select Association(s) ...', 
+                        'multiple' => true,
+                    ],
                     'pluginOptions' => ['allowClear' => true],
-                ])->label(''); ?>
+                ]) ?>
             </div>
         </div>
         <div class="row">    
@@ -70,7 +74,7 @@ $profile->type == 'Church' ?
             </div>
         </div>
 
-        <?= $this->render('_profileFormFooter', ['profile' => $profile]) ?>
+        <?= $this->render('_profileFormFooter', ['profile' => $profile, 'e' => $e]) ?>
 
         <?php ActiveForm::end(); ?>
 

@@ -1,6 +1,7 @@
 <?php
 
 use common\models\profile\Profile;
+use common\models\Utility;
 use frontend\controllers\ProfileController;
 use frontend\controllers\ProfileFormController;
 use kartik\markdown\Markdown;
@@ -200,27 +201,25 @@ $this->title = $profile->org_name;
 				<br>
 				<!-- End Programs -->
 				<!-- Begin Associations/Fellowships (Box 3) -->
-				<strong>Association: </strong>
-				<span  class="pull-right edit"><?= Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['as']-1, 'id' => $profile->id]) ?></span><br>
-				<?php if ($profile->ass_id) {
-					if (empty($assLink)) {
-						echo $association->association;
-						empty($association->association_acronym) ? NULL :
-							print(' (' . $association->association_acronym . ')</p>');
-					} else {
-						echo HTML::a($association->association, ['profile/association', 'id' => $assLink->id, 'city' => $assLink->url_city, 'name' => $assLink->url_name], ['target' => '_blank']) . '<br>';
+				<strong>Fellowship:</strong><span  class="pull-right edit"><?= Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['as']-1, 'id' => $profile->id]) ?></span><br>
+				<?php if ($fellowships) {
+					foreach ($fellowships as $fellowship) {
+						if ($flwshipLink = ProfileController::findFellowship($fellowship->profile_id)) {
+							echo HTML::a($fellowship->fellowship, ['profile/fellowship', 'id' => $flwshipLink->id, 'city' => $flwshipLink->url_city, 'name' => $flwshipLink->url_name], ['title' => $fellowship->fellowship_acronym, 'target' => '_blank']) . '<br>';
+						} else {
+							echo Html::tag('span', $fellowship->fellowship, ['title' => $fellowship->fellowship_acronym]) . '<br>';
+						}
 					}
 				} ?>
 				<br>
-				<strong>Fellowship: </strong>
-				<?php echo '<span  class="pull-right edit">' . Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['as']-1, 'id' => $profile->id]) . '</span><br />';
-				if ($profile->flwship_id) {
-					if (empty($flwshipLink)) {
-						echo $fellowship->fellowship;
-						empty($fellowship->fellowship_acronym) ? NULL :
-							print(' (' . $fellowship->fellowship_acronym . ')<br />');
-					} else {
-						echo HTML::a($fellowship->fellowship, ['profile/fellowship', 'id' => $flwshipLink->id,  'city' => $flwshipLink->url_city, 'name' => $flwshipLink->url_name], ['target' => '_blank']) . '<br>';
+				<strong>Association:</strong><span  class="pull-right edit"><?= Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['as']-1, 'id' => $profile->id]) ?></span><br>
+				<?php if ($associations) {
+					foreach ($associations as $association) {
+						if ($assLink = ProfileController::findAssociation($association->profile_id)) {
+							echo HTML::a($association->association, ['profile/association', 'id' => $assLink->id, 'city' => $assLink->url_city, 'name' => $assLink->url_name], ['title' => $association->association_acronym, 'target' => '_blank']) . '<br>';
+						} else {
+							echo Html::tag('span', $association->association, ['title' => $association->association_acronym]) . '<br>';
+						}
 					}
 				} ?>
 				<!-- End Associations/Fellowships -->

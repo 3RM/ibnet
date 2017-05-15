@@ -92,9 +92,6 @@ class PreviewController extends ProfileFormController
 
             $typeMask = ProfileFormController::$formArray[$profile->type];
             $profile->status == Profile::STATUS_ACTIVE ? $activate = NULL : $activate = 1;
-            if ($profile->status != 10) {
-                 $profile->updateAttributes(['edit' => 10]);
-            }
 
             return $this->render('previewFlwshpAss', [
                 'profile' => $profile,
@@ -141,9 +138,6 @@ class PreviewController extends ProfileFormController
                 $loc = NULL;
             }
             $profile->status == Profile::STATUS_ACTIVE ? $activate = NULL : $activate = 1;
-            if ($profile->status != 10) {
-                 $profile->updateAttributes(['edit' => 10]);
-            }
 
             return $this->render('previewFlwshpAss', [
                 'profile' => $profile,
@@ -200,9 +194,6 @@ class PreviewController extends ProfileFormController
 
             $typeMask = ProfileFormController::$formArray[$profile->type];
             $profile->status == Profile::STATUS_ACTIVE ? $activate = NULL : $activate = 1;
-            if ($profile->status != 10) {
-                 $profile->updateAttributes(['edit' => 10]);
-            }
 
             return $this->render('previewOrg', [
                 'profile' => $profile,
@@ -271,9 +262,6 @@ class PreviewController extends ProfileFormController
 
             $typeMask = ProfileFormController::$formArray[$profile->type];
             $profile->status == Profile::STATUS_ACTIVE ? $activate = NULL : $activate = 1;
-            if ($profile->status != 10) {
-                 $profile->updateAttributes(['edit' => 10]);
-            }
 
             return $this->render('previewEvangelist', [
                 'profile' => $profile,
@@ -317,10 +305,6 @@ class PreviewController extends ProfileFormController
             $pastorLink = NULL;
             $social = NULL;
             $programs = $profile->program;
-            $association = NULL;
-            $assLink = NULL;
-            $fellowship = NULL;
-            $flwshipLink = NULL;
             if ($staff = Staff::find()
                 ->where(['ministry_id' => $profile->id])
                 ->andWhere(['sr_pastor' => 1])
@@ -336,14 +320,9 @@ class PreviewController extends ProfileFormController
                 ->all()) {
                 $ministries = NULL;
             }
-            if ($profile->ass_id) {                                                                 // Retrieve fellowship
-                $association = $this->findAssociation($profile->ass_id);
-                $assLink = $this->findActiveProfile($association->profile_id);                      // Only link to active profiles
-            }
-            if ($profile->flwship_id) {                                                             // Retrieve fellowship
-                $fellowship = $this->findFellowship($profile->flwship_id);                              
-                $flwshipLink = $this->findActiveProfile($fellowship->profile_id);                   // Only link to active profiles
-            }
+            
+            $fellowships = $profile->fellowship;
+            $associations = $profile->association;
             
             if ($profile->org_loc && $profile->show_map == Profile::MAP_PRIMARY) {
                 $loc = explode(',', $profile->org_loc);
@@ -353,21 +332,16 @@ class PreviewController extends ProfileFormController
 
             $typeMask = ProfileFormController::$formArray[$profile->type];
             $profile->status == Profile::STATUS_ACTIVE ? $activate = NULL : $activate = 1;
-            if ($profile->status != 10) {
-                 $profile->updateAttributes(['edit' => 10]);
-            }
 
             return $this->render('previewChurch', [
                 'profile' => $profile,
                 'loc' => $loc,
                 'social' => $social,
                 'pastorLink' => $pastorLink,
-                'association' => $association,
-                'assLink' => $assLink,
                 'ministries' => $ministries,
                 'programs' => $programs,
-                'fellowship' => $fellowship,
-                'flwshipLink' => $flwshipLink,
+                'fellowships' => $fellowships,
+                'associations' => $associations,
                 'formList' => ProfileFormController::$formList,
                 'typeMask' => $typeMask,
                 'activate' => $activate]);
@@ -430,10 +404,7 @@ class PreviewController extends ProfileFormController
             if ($profile->social_id) {
                 $social = $profile->social;
             }
-            if ($profile->flwship_id) {                                                             // Retrieve fellowship
-                $fellowship = $this->findFellowship($profile->flwship_id);                              
-                $flwshipLink = $this->findActiveProfile($fellowship->profile_id);                   // Only link to active profiles
-            }
+            $fellowships = $profile->fellowship;
 
             if ($profile->ind_loc && $profile->show_map == Profile::MAP_PRIMARY) {
                 $loc = explode(',', $profile->ind_loc);
@@ -447,16 +418,12 @@ class PreviewController extends ProfileFormController
 
             $typeMask = ProfileFormController::$formArray[$profile->type];
             $profile->status == Profile::STATUS_ACTIVE ? $activate = NULL : $activate = 1;
-            if ($profile->status != 10) {
-                 $profile->updateAttributes(['edit' => 10]);
-            }
 
             return $this->render('previewEvangelist', [
                 'profile' => $profile,
                 'loc' => $loc,
                 'social' => $social,
-                'fellowship' => $fellowship,
-                'flwshipLink' => $flwshipLink,
+                'fellowships' => $fellowships,
                 'church' => $church,
                 'churchLink' => $churchLink,
                 'ministry' => $ministry,
@@ -518,9 +485,6 @@ class PreviewController extends ProfileFormController
 
             $typeMask = ProfileFormController::$formArray[$profile->type];
             $profile->status == Profile::STATUS_ACTIVE ? $activate = NULL : $activate = 1;
-            if ($profile->status != 10) {
-                 $profile->updateAttributes(['edit' => 10]);
-            }
 
             return $this->render('previewOrg', [
                 'profile' => $profile,
@@ -606,9 +570,6 @@ class PreviewController extends ProfileFormController
 
             $typeMask = ProfileFormController::$formArray[$profile->type];
             $profile->status == Profile::STATUS_ACTIVE ? $activate = NULL : $activate = 1;
-            if ($profile->status != 10) {
-                 $profile->updateAttributes(['edit' => 10]);
-            }
 
             return $this->render('previewMissionary', [
                 'profile' => $profile,
@@ -674,9 +635,6 @@ class PreviewController extends ProfileFormController
 
             $typeMask = ProfileFormController::$formArray[$profile->type];
             $profile->status == Profile::STATUS_ACTIVE ? $activate = NULL : $activate = 1;
-            if ($profile->status != 10) {
-                 $profile->updateAttributes(['edit' => 10]);
-            }
 
             return $this->render('previewOrg', [
                 'profile' => $profile,
@@ -735,7 +693,6 @@ class PreviewController extends ProfileFormController
 
             $typeMask = ProfileFormController::$formArray[$profile->type];
             $profile->status == Profile::STATUS_ACTIVE ? $activate = NULL : $activate = 1;
-            $profile->updateAttributes(['edit' => 10]);
 
             return $this->render('previewOrg', [
                 'profile' => $profile,
@@ -789,10 +746,7 @@ class PreviewController extends ProfileFormController
             if ($profile->social_id) {
                 $social = $profile->social;
             }
-            if ($profile->flwship_id) {                                                             // Retrieve fellowship
-                $fellowship = $this->findFellowship($profile->flwship_id);                              
-                $flwshipLink = $this->findActiveProfile($fellowship->profile_id);                   // Only link to active profiles
-            }
+            $fellowships = $profile->fellowship;
 
             if ($profile->ind_loc && $profile->show_map == Profile::MAP_PRIMARY) {
                 $loc = explode(',', $profile->ind_loc);
@@ -804,9 +758,6 @@ class PreviewController extends ProfileFormController
 
             $typeMask = ProfileFormController::$formArray[$profile->type];
             $profile->status == Profile::STATUS_ACTIVE ? $activate = NULL : $activate = 1;
-            if ($profile->status != 10) {
-                 $profile->updateAttributes(['edit' => 10]);
-            }
 
             return $this->render('previewPastor', [
                 'profile' => $profile,
@@ -814,8 +765,7 @@ class PreviewController extends ProfileFormController
                 'churchLink' => $churchLink,
                 'church' => $church,
                 'social' => $social,
-                'fellowship' => $fellowship,
-                'flwshipLink' => $flwshipLink,
+                'fellowships' => $fellowships,
                 'schoolsAttended' => $schoolsAttended,
                 'formList' => ProfileFormController::$formList,
                 'typeMask' => $typeMask,
@@ -868,9 +818,6 @@ class PreviewController extends ProfileFormController
 
             $typeMask = ProfileFormController::$formArray[$profile->type];
             $profile->status == Profile::STATUS_ACTIVE ? $activate = NULL : $activate = 1;
-            if ($profile->status != 10) {
-                 $profile->updateAttributes(['edit' => 10]);
-            }
 
             return $this->render('previewOrg', [
                 'profile' => $profile,
@@ -936,9 +883,6 @@ class PreviewController extends ProfileFormController
 
             $typeMask = ProfileFormController::$formArray[$profile->type];
             $profile->status == Profile::STATUS_ACTIVE ? $activate = NULL : $activate = 1;
-            if ($profile->status != 10) {
-                 $profile->updateAttributes(['edit' => 10]);
-            }
 
             return $this->render('previewSchool', [
                 'profile' => $profile, 
@@ -999,9 +943,6 @@ class PreviewController extends ProfileFormController
 
             $typeMask = ProfileFormController::$formArray[$profile->type];
             $profile->status == Profile::STATUS_ACTIVE ? $activate = NULL : $activate = 1;
-            if ($profile->status != 10) {
-                 $profile->updateAttributes(['edit' => 10]);
-            }
 
             return $this->render('previewOrg', [
                 'profile' => $profile,
@@ -1080,9 +1021,6 @@ class PreviewController extends ProfileFormController
 
             $typeMask = ProfileFormController::$formArray[$profile->type];
             $profile->status == Profile::STATUS_ACTIVE ? $activate = NULL : $activate = 1;
-            if ($profile->status != 10) {
-                 $profile->updateAttributes(['edit' => 10]);
-            }
 
             return $this->render('previewStaff', [
                 'profile' => $profile,

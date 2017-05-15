@@ -454,13 +454,6 @@ nav.shrink .navbar-toggle {
   * Pages 
   *-----------------------------*/
 
-/*
-  * Index
-  *-----------------------------*/
-.responsive img {
-  max-width: 100%;
-}
-
 
 /*
   * Browse
@@ -874,6 +867,9 @@ margin: 0;
 .top-margin {
   margin-top: 20px;
 }
+.top-margin-28 {
+    margin-top: 28px;
+  }
 .top-margin-40 {
   margin-top: 40px;
 }
