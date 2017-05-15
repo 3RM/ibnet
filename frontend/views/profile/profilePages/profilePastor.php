@@ -134,10 +134,9 @@ $this->title = isset($profile->spouse_first_name) ?
 			  	<!-- Begin "Pastor at ... Baptist Church" -->
 				<strong><?= $profile->sub_type ?></strong> at <?= $church ? HTML::a($churchLink, ['church', 'id' => $church->id, 'city' => $church->url_city, 'name' => $church->url_name]) . '<br>' : '<br>' ?>
 				<!-- End "Pastor at ... Baptist Church" -->
-				<br>
 				<!-- Begin Fellowship (Box 3) -->
-				<strong>Fellowship:</strong><br>
 				<?php if ($fellowships) {
+					echo '<br><strong>Fellowship:</strong><br>';
 					foreach ($fellowships as $fellowship) {
 						if ($flwshipLink = ProfileController::findFellowship($fellowship->profile_id)) {
 							echo HTML::a($fellowship->fellowship, ['profile/fellowship', 'id' => $flwshipLink->id, 'city' => $flwshipLink->url_city, 'name' => $flwshipLink->url_name], ['title' => $fellowship->fellowship_acronym, 'target' => '_blank']) . '<br>';

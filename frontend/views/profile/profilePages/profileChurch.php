@@ -151,8 +151,8 @@ $this->title = $profile->org_name;
 				} ?>
 				<!-- End Programs -->
 				 <!-- Begin Associations/Fellowships (Box 3) -->
-				<strong>Fellowship:</strong><br>
 				<?php if ($fellowships) {
+					echo '<strong>Fellowship:</strong><br>';
 					foreach ($fellowships as $fellowship) {
 						if ($flwshipLink = ProfileController::findFellowship($fellowship->profile_id)) {
 							echo HTML::a($fellowship->fellowship, ['profile/fellowship', 'id' => $flwshipLink->id, 'city' => $flwshipLink->url_city, 'name' => $flwshipLink->url_name], ['title' => $fellowship->fellowship_acronym, 'target' => '_blank']) . '<br>';
@@ -160,10 +160,10 @@ $this->title = $profile->org_name;
 							echo Html::tag('span', $fellowship->fellowship, ['title' => $fellowship->fellowship_acronym]) . '<br>';
 						}
 					}
+					echo '<br>';
 				} ?>
-				<br>
-				<strong>Association:</strong><br>
 				<?php if ($associations) {
+					echo '<strong>Association:</strong><br>';
 					foreach ($associations as $association) {
 						if ($assLink = ProfileController::findAssociation($association->profile_id)) {
 							echo HTML::a($association->association, ['profile/association', 'id' => $assLink->id, 'city' => $assLink->url_city, 'name' => $assLink->url_name], ['title' => $association->association_acronym, 'target' => '_blank']) . '<br>';
@@ -171,6 +171,7 @@ $this->title = $profile->org_name;
 							echo Html::tag('span', $association->association, ['title' => $association->association_acronym]) . '<br>';
 						}
 					}
+					echo '<br>';
 				} ?>
 				<!-- End Associations/Fellowships -->
 

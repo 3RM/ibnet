@@ -142,8 +142,8 @@ $this->title = isset($profile->spouse_first_name) ?
 				<?= $ministryLink ? '<strong>Serving with: </strong><br>' . HTML::a($ministryLink, ['church', 'id' => $ministry->id, 'city' => $ministry->url_city, 'name' => $ministry->url_name]) . '<br><br>' : '<br>' ?>
 				<!-- End Parent Ministry -->
 				<!-- Begin Fellowship (Box 3) -->
-				<strong>Fellowship:</strong><br>
 				<?php if ($fellowships) {
+					echo '<br><strong>Fellowship:</strong><br>';
 					foreach ($fellowships as $fellowship) {
 						if ($flwshipLink = ProfileController::findFellowship($fellowship->profile_id)) {
 							echo HTML::a($fellowship->fellowship, ['profile/fellowship', 'id' => $flwshipLink->id, 'city' => $flwshipLink->url_city, 'name' => $flwshipLink->url_name], ['title' => $fellowship->fellowship_acronym, 'target' => '_blank']) . '<br>';
