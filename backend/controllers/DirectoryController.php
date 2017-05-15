@@ -293,7 +293,7 @@ class DirectoryController extends Controller
                 'attribute' => 'user_id',
                 'format' => 'raw',
                 'value' => function ($model) {                      
-                     return Html::a($model->user_id, ['accounts/view', 'id' => $model->user_id]);
+                     return Html::a($model->user_id, ['accounts/view', 'id' => $model->user_id], ['target' => '_blank']);
                 },
             ],
             'transfer_token',
@@ -326,7 +326,13 @@ class DirectoryController extends Controller
             'title',
             'description',
             'ministry_of',
-            'home_church',
+            [
+                'attribute' => 'home_church',
+                'format' => 'raw',
+                'value' => function ($model) {                      
+                    return Html::a($model->home_church, ['view', 'id' => $model->home_church], ['target' => '_blank']);
+                }, 
+            ],
             'image1',
             'image2',
             'flwsp_ass_level',
@@ -450,7 +456,8 @@ class DirectoryController extends Controller
             ],
             'home_church', 
             'church_pastor', 
-            'ministry_of', 
+            'ministry_of',
+            'ministry_other', 
             'sr_pastor', 
             'confirmed',
         ];
@@ -643,7 +650,7 @@ class DirectoryController extends Controller
      */
     public function actionForwarding()
     {
-        $query = (new Query())->from('profile')->where('email_pvt != NULL')->andWhere(['email_pvt_status' => NULL]);
+        $query = (new Query())->from('profile')->where(['email_pvt_status' => Profile::PRIVATE_EMAIL_PENDING]);
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [

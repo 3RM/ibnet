@@ -943,6 +943,11 @@ class ProfileFormController extends ProfileController
                     }
                 }
             }
+
+            if ($miss = $profile->missionary) {                                                         // Exclude church plant church from home church search
+                $chId = $miss->cp_pastor_at;
+            }
+
             if ($profile->show_map == Profile::MAP_CHURCH) {
                 $profile->map = 1;
             }
@@ -951,7 +956,8 @@ class ProfileFormController extends ProfileController
                 'profile' => $profile,
                 'churchLink' => $churchLink,
                 'churchLabel' => $churchLabel,
-                'pp' => $progressPercent]);
+                'pp' => $progressPercent,
+                'chId' => $chId]);
         }
     }
 
@@ -1027,7 +1033,7 @@ class ProfileFormController extends ProfileController
                 'missionary' => $missionary,
                 'ministryLink' => $ministryLink,
                 'msg' => $msg,
-                'pp' => $progressPercent]);
+                'pp' => $progressPercent,]);
         }
     }
 
@@ -1251,7 +1257,9 @@ class ProfileFormController extends ProfileController
                 $progressPercent = NULL;
             $profile->select = $profile->school;                                                     // Array of previously selected schools
             
-            $schools = School::find()->orderBy('id')->all();
+            $first = School::find()->where('id <= 2')->orderBy('id')->all();
+            $second = School::find()->where('id > 2')->orderBy('school')->all();
+            $schools = array_merge($first, $second);
             $i=0;
             foreach ($schools as $school) {
                 if ($i > 1) {
@@ -1782,7 +1790,7 @@ class ProfileFormController extends ProfileController
      * Process Ajax request from Parent Ministry search box for churches
      * Return a table of 10 or fewer results from db.
      */
-    public function actionChurchListAjax($q=NULL, $id=NULL, $churchId=NULL) 
+    public function actionChurchListAjax($q=NULL, $id=NULL, $chId=NULL) 
     {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $out = ['results' => ['id' => '', 'text' => '']];
@@ -1791,9 +1799,9 @@ class ProfileFormController extends ProfileController
             $query->select('id, type, status, org_name AS text, org_city, org_st_prov_reg')
                 ->from('profile')
                 ->where(['type' => 'Church'])
-                ->andWhere(['status' => Profile::STATUS_ACTIVE])
-                //->andWhere('id <> ' . $churchId)
-                ->andWhere('((`org_city` LIKE "%' . $q . '%") OR (`org_name` LIKE "%' . $q . '%"))')
+                ->andWhere(['status' => Profile::STATUS_ACTIVE]);
+            $chId == NULL ? NULL : $query->andWhere('id <> ' . $chId);                              // Do not allow home church and church plant to be the same
+            $query->andWhere('((`org_city` LIKE "%' . $q . '%") OR (`org_name` LIKE "%' . $q . '%"))')
                 ->limit(10);
             $command = $query->createCommand();
             $data = $command->queryAll();

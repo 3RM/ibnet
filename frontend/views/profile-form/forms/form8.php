@@ -40,7 +40,7 @@ $profile->type == 'Missionary' ?
                                 'errorLoading' => new JsExpression("function () { return 'Waiting for results...'; }"),
                             ],
                             'ajax' => [
-                                'url' => Url::to(['church-list-ajax']),
+                                'url' => Url::to(['church-list-ajax', 'chId' => $chId]),
                                 'dataType' => 'json',
                                 'data' => new JsExpression('function(params) { return {q:params.term}; }')
                             ],

@@ -1,4 +1,5 @@
 <?php
+use common\models\Utility;
 use common\models\profile\Profile;
 use yii\helpers\Html;
 
@@ -146,17 +147,15 @@ use yii\helpers\Html;
                 </li>
                 <!-- Forwarding Email Request: style can be found in dropdown.less -->
                 <li class="dropdown tasks-menu">
-                    <?= Html::a(
-                        '<i class="glyphicon glyphicon-eye-close"></i>
-                        <span class="label label-info">' . Profile::find()->where('email_pvt != NULL')->andWhere(['email_pvt_status' => NULL])->count() . '</span>',
-                        '/directory/forwarding') ?>
+                    <?= ($cntH = Profile::find()->where(['email_pvt_status' => Profile::PRIVATE_EMAIL_PENDING])->count()) ?
+                        Html::a('<i class="glyphicon glyphicon-eye-close"></i><span class="label label-info">' . $cntH . '</span>', '/directory/forwarding') :
+                        Html::a('<i class="glyphicon glyphicon-eye-close"></i>', '/directory/forwarding') ?>
                 </li>
                 <!-- Flagged Profiles: style can be found in dropdown.less -->
                 <li class="dropdown tasks-menu">
-                    <?= Html::a(
-                        '<i class="fa fa-flag-o"></i>
-                        <span class="label label-danger">' . Profile::find()->where(['inappropriate' => 1])->count() . '</span>',
-                        '/directory/flagged') ?>
+                    <?= ($cntF = Profile::find()->where(['inappropriate' => 1])->count()) ?
+                        Html::a('<i class="fa fa-flag-o"></i><span class="label label-danger">' . $cntF . '</span>', '/directory/flagged') :
+                        Html::a('<i class="fa fa-flag-o"></i>', '/directory/flagged') ?>
                 </li>
                 <!-- User Account: style can be found in dropdown.less -->
 

@@ -49,7 +49,7 @@ $this->title = 'Church Plant';
             <div class="row">
                 <div class="col-md-6">
                     <p><?= HTML::icon('info-sign') ?> A church or church plant must have a listing in this directory.</p>
-                    <?php echo $form->field($missionary, 'ministrySelection')->widget(Select2::classname(), [ 
+                    <?php echo $form->field($missionary, 'select')->widget(Select2::classname(), [ 
                         'options' => ['placeholder' => 'Search by name or city...'],
                         'initValueText' => 'Search ...', 
                         'pluginOptions' => [
@@ -59,7 +59,7 @@ $this->title = 'Church Plant';
                                 'errorLoading' => new JsExpression("function () { return 'Waiting for results...'; }"),
                             ],
                             'ajax' => [
-                                'url' => Url::to(['church-list-ajax']),
+                                'url' => Url::to(['church-list-ajax', 'chId' => $profile->home_church]),
                                 'dataType' => 'json',
                                 'data' => new JsExpression('function(params) { return {q:params.term}; }')
                             ],
@@ -86,7 +86,7 @@ $this->title = 'Church Plant';
         <?php } else { ?>
 
             <div class="row">
-                <div class="col-md-10">
+                <div class="col-md-8">
                     <div class="panel panel-default">
                         <div class="panel-heading">Church Plant</div>
                         <table class="table table-hover">
@@ -103,7 +103,7 @@ $this->title = 'Church Plant';
                                 ]) ?>
                             </td>
                         </table>
-                        <?= Html::activeHiddenInput($missionary, 'ministrySelection'); ?>
+                        <?= Html::activeHiddenInput($missionary, 'select'); ?>
                     </div>
                 </div>
             </div>

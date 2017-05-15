@@ -1201,28 +1201,31 @@ class Profile extends \yii\db\ActiveRecord
      */
     public function handleFormPMM()
     {
-        if (!$staff = Staff::find()
-            ->where(['staff_id' => $this->id])
-            ->andWhere(['staff_type' => $this->type])
-            ->andWhere(['staff_title' => $this->titleM])
-            ->andWhere(['ministry_id' => $this->selectM])
-            ->andWhere(['ministry_other' => 1])
-            ->one()) {
-            $staff = new Staff();
-            $staff->save();
-            if ($staff->ministry_id != $this->selectM) {
-                
+        if ($this->selectM != NULL) {
+            if (!$staff = Staff::find()
+                ->where(['staff_id' => $this->id])
+                ->andWhere(['staff_type' => $this->type])                                           // Allow for multiple staff roles at same church
+                ->andWhere(['staff_title' => $this->titleM])                                            // 
+                ->andWhere(['ministry_id' => $this->selectM])
+                ->andWhere(['ministry_other' => 1])
+                ->one()) {
+                $staff = new Staff();
+                $staff->save();
+            }
+
+            if ($staff->ministry_id != $this->selectM) {                                            // Send mail to notify ministry profile owner of new link
                 $ministryProfile = ProfileController::findProfile($this->selectM);
                 $ministryProfileOwner = User::findOne($ministryProfile->user_id);
-                MailController::initSendLink($this, $ministryProfile, $ministryProfileOwner, 'PM', 'L');   // Notify ministry profile owner of new link
-            
+                MailController::initSendLink($this, $ministryProfile, $ministryProfileOwner, 'PM', 'L');   
             }
+                
             $staff->updateAttributes([
                 'staff_id' => $this->id, 
                 'staff_type' => $this->type,
                 'staff_title' => $this->titleM,
                 'ministry_id' => $this->selectM,
                 'ministry_other' => 1]);
+
         }
         return true;
     }

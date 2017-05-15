@@ -19,7 +19,7 @@ use yii\web\UploadedFile;
 class Missionary extends \yii\db\ActiveRecord
 {
 
-    public $ministrySelection;      // User selected ministry from AJAX dropdown
+    public $selec;                  // User selected ministry from AJAX dropdown
     public $showMap;                // Accepts checkbox selection for map display on missionary church plant form
 
     /**
@@ -33,7 +33,7 @@ class Missionary extends \yii\db\ActiveRecord
     public function scenarios() {
         return[
             'fi' => ['field', 'status'],
-            'cp' => ['ministrySelection', 'showMap'],
+            'cp' => ['select', 'showMap'],
             'ma-missionary' => ['mission_agcy_id', 'packet'],
         ];
     }
@@ -45,7 +45,7 @@ class Missionary extends \yii\db\ActiveRecord
     {
         return [
             [['field', 'status'], 'required', 'on' => 'fi'],
-            [['ministrySelection', 'showMap'], 'safe', 'on' => 'cp'],
+            [['select', 'showMap'], 'safe', 'on' => 'cp'],
             ['mission_agcy_id', 'required', 'on' => 'ma-missionary'],
             ['packet', 'file', 'extensions' => 'pdf', 'mimeTypes' => 'application/pdf', 'maxFiles' => 1, 'maxSize' => 1024 * 6000, 'skipOnEmpty' => true, 'on' => 'ma-missionary'],
         ];
@@ -57,7 +57,7 @@ class Missionary extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'ministrySelection' => 'Church-Planting Pastor at',
+            'select' => 'Church-Planting Pastor at',
             'showMap' => 'Show a Google map of this church plant on my profile',
             'mission_agcy_id' => 'Mission Agency',
             'packet' => '',
@@ -72,28 +72,29 @@ class Missionary extends \yii\db\ActiveRecord
     public function handleFormCP($profile)
     {
 
-        if ($this->getOldAttribute('cp_pastor_at') != $this->ministrySelection) {
-            $this->updateAttributes(['cp_pastor_at' => $this->ministrySelection]);
-        }
+        if ($this->select != NULL) {
+            if ($this->getOldAttribute('cp_pastor_at') != $this->select) {
+                $this->updateAttributes(['cp_pastor_at' => $this->select]);
+            }
     
-        if (!$staff = Staff::find()
-            ->where(['staff_id' => $profile->id])
-            ->andWhere(['ministry_id' => $this->ministrySelection])
-            ->andWhere(['staff_type' => $profile->type])
-            ->andWhere(['staff_title' => $profile->sub_type])
-            ->andWhere('home_church <> 1')
-            ->andwhere(['church_pastor' => 1])
-            ->one()) {
-            $staff = new Staff();
-            $staff->save();
+            if (!$staff = Staff::find()
+                ->where(['staff_id' => $profile->id])
+                ->andWhere(['ministry_id' => $this->select])
+                ->andWhere(['staff_type' => $profile->type])                                        // Allow for different staff roles at same church
+                ->andWhere(['staff_title' => $profile->sub_type])                                       //
+                ->andwhere(['church_pastor' => 1])                                                  // Pastor of church plant
+                ->one()) {
+                $staff = new Staff();
+                $staff->save();
+            }
+            $staff->updateAttributes([
+                'staff_id' => $profile->id, 
+                'staff_type' => $profile->type,
+                'staff_title' => $profile->sub_type,
+                'ministry_id' => $this->select,
+                'church_pastor' => 1]);
         }
-        $staff->updateAttributes([
-            'staff_id' => $profile->id, 
-            'staff_type' => $profile->type,
-            'staff_title' => $profile->sub_type,
-            'ministry_id' => $this->ministrySelection,
-            'church_pastor' => 1]);
-
+        
         $oldMap = $profile->show_map;
         if ($oldMap == Profile::MAP_CHURCH_PLANT && empty($this->showMap)) {
             $profile->updateAttributes(['show_map' => NULL]);
@@ -101,7 +102,7 @@ class Missionary extends \yii\db\ActiveRecord
             $profile->updateAttributes(['show_map' => Profile::MAP_CHURCH_PLANT]);
         }
 
-        return $profile;
+         return $profile;
     }
 
     /**
@@ -111,10 +112,12 @@ class Missionary extends \yii\db\ActiveRecord
      */
     public function handleFormCPR($profile)
     {
-        if ($staff = Staff::find()                                                         // Remove from Staff table
+        if ($staff = Staff::find()                                                                  // Remove from Staff table
             ->where(['staff_id' => $profile->id])
             ->andWhere(['ministry_id' => $this->cp_pastor_at])
-            ->andWhere(['cp_pastor' => 1])
+            ->andWhere(['staff_type' => $profile->type])
+            ->andWhere(['staff_title' => $profile->sub_type])
+            ->andWhere(['church_pastor' => 1])
             ->one()) {
             $staff->delete();
         }
