@@ -17,17 +17,13 @@ $this->title = 'My Account';
 
         <?= Tabs::widget([
             'items' => [
-                // [
-                //     'label' => 'Account Profile',  
-                //     'active' => false,
-                // ],
+                [
+                    'label' => 'Dashboard',
+                    'url' => ['/site/dashboard'],
+                ],
                 [
                     'label' => 'Profiles',  
                     'active' => true,
-                ],
-                [
-                    'label' => 'Settings',
-                    'url' => ['/site/my-settings'],
                 ],
             ],
         ]); ?>
@@ -38,8 +34,6 @@ $this->title = 'My Account';
 <?= Alert::widget() ?>
 
 <div class="profile-owner-index">
-
-    <?php $form = ActiveForm::begin(); ?>
 
     <div class="row">
         <div class="col-md-10">
@@ -110,13 +104,5 @@ $this->title = 'My Account';
         </div>
     </div>
     <p>&nbsp;</p>
-    <?php ActiveForm::end(); ?>
   
 </div>
-
-<script>
-    $("td").click(function(event)
-    {
-           event.stopImmediatePropagation();
-    });
-</script>

@@ -37,7 +37,7 @@ if ($profile->type == 'Staff') {
 
             <p><?= HTML::icon('info-sign') ?> A ministry or orginzation must have a listing in this directory.</p>
             <div class="row">
-                <div class="col-md-8">
+                <div class="col-md-7">
                     <?php echo $form->field($profile, 'select')->widget(Select2::classname(), [ 
                         'options' => ['placeholder' => 'Search by name or city...'],
                         'initValueText' => 'Search ...', 
@@ -69,13 +69,14 @@ if ($profile->type == 'Staff') {
                             }'),
                         ],
                     ]); ?>
-                    <p><?= HTML::submitbutton('Save Ministry', [
+                </div>
+                <div class = "col-md-1 top-margin-28">
+                    <?= HTML::submitbutton('Save Ministry', [
                         'method' => 'POST',
                         'class' => 'btn btn-form btn-sm',
-                        'name' => 'submit',
-                    ]) ?></p>
-                    <br>
-                </div>
+                        'name' => 'submit-ministry',
+                    ]) ?>
+                </div>   
             </div>
 
         <?php } else { ?>
@@ -104,6 +105,7 @@ if ($profile->type == 'Staff') {
 
         <?php } ?>
 
+        <br>
         <div class="row">
             <div class="col-md-8">
                 <p><?php if ($profile->show_map == Profile::MAP_PRIMARY) {
@@ -196,12 +198,11 @@ if ($profile->type == 'Staff') {
                     ],
                 ]); ?>
             </div>  
-            <div class = "col-md-1">
+            <div class = "col-md-1 top-margin-28">
                 <?= HTML::submitbutton('Save Ministry', [
                     'method' => 'POST',
                     'class' => 'btn btn-form btn-sm',
-                    'name' => 'submitM',
-                    'id' => 'btn-form-submit'
+                    'name' => 'submit-more',
                 ]) ?>
             </div>          
         </div>
@@ -224,7 +225,7 @@ if ($profile->type == 'Staff') {
 
         <?php } ?>
 
-        <?= $this->render('_profileFormFooter', ['profile' => $profile]) ?>
+        <?= $this->render('_profileFormFooter', ['profile' => $profile, 'e' => $e]) ?>
         
         <?php ActiveForm::end(); ?>
 

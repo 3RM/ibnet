@@ -40,23 +40,13 @@ jQuery(document).ready(function($){
 // mySettings page
 jQuery(document).ready(function($){
 
-    $("#current-username").click(function(e) {
-      $('.update-username').toggle('1000');
+    $("#personal-settings").click(function(e) {
+      $('.edit-personal').toggle('1000');
       $("span", this).toggleClass("glyphicon glyphicon-triangle-bottom glyphicon glyphicon-triangle-top");
     });
 
-    $("#current-email").click(function(e) {     
-      $('.update-email').toggle('1000');
-      $("span", this).toggleClass("glyphicon glyphicon-triangle-bottom glyphicon glyphicon-triangle-top");
-    });
-
-    $("#current-password").click(function(e) {     
-      $('.update-password').toggle('1000');
-      $("span", this).toggleClass("glyphicon glyphicon-triangle-bottom glyphicon glyphicon-triangle-top");
-    });
-
-    $("#current-preferences").click(function(e) {     
-      $('.update-preferences').toggle('1000');
+    $("#account-settings").click(function(e) {
+      $('.edit-account').toggle('1000');
       $("span", this).toggleClass("glyphicon glyphicon-triangle-bottom glyphicon glyphicon-triangle-top");
     });
 });

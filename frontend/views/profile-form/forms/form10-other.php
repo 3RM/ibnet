@@ -112,7 +112,7 @@ $this->title = 'Other Ministries';
                     <?= HTML::submitbutton('Save Ministry', [
                         'method' => 'POST',
                         'class' => 'btn btn-form btn-sm',
-                        'name' => 'submitM',
+                        'name' => 'submit-more',
                     ]) ?>
                 </div>
             </div>
@@ -135,7 +135,7 @@ $this->title = 'Other Ministries';
         <?php } ?>
         <?= Html::activeHiddenInput($profile, 'select'); ?>
 
-        <?= $this->render('_profileFormFooter', ['profile' => $profile]) ?>
+        <?= $this->render('_profileFormFooter', ['profile' => $profile, 'e' => $e]) ?>
 
         <?php ActiveForm::end(); ?>
 

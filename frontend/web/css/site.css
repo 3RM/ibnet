@@ -499,7 +499,7 @@ nav.shrink .navbar-toggle {
 .states a {width: 50px;display: inline-block;}
 .states a.nowidth {width: auto;}
 
-.Browse, .my-settings p, .profile-form, .profile-form label {
+.Browse, .dashboard p, .profile-form, .profile-form label {
   color: #6c8296;
 }
 .Browse b {
@@ -645,7 +645,7 @@ nav.shrink .navbar-toggle {
 /*
   * Search
   *-----------------------------*/
-.Search, .my-settings p, .profile-form, .profile-form label {
+.Search, .dashboard p, .profile-form, .profile-form label {
   color: #6c8296;
 }
 .profile-form label {
@@ -742,22 +742,37 @@ margin: 0;
  color: #6c8296;
  font-weight: normal;
 }
-.my-settings h3 {
+.dashboard h3 {
   color: #2c2b2a;
   padding-bottom: 5px;
   margin-bottom: 0;
 }
-.my-settings .update {
+.dashboard .personal {
+  padding: 20px;
+  border: 1px solid #F0F0F0;
+}
+.dashboard .account {
+  padding: 20px;
+  border: 1px solid #F0F0F0;
+}
+.dashboard .update {
   background-color: #F6F6F6;
   padding: 20px;
   border: 1px solid #F0F0F0;
   border-radius: 10px;
 }
-.my-settings .form-group button {
+.dashboard .form-group button {
   float: right;
 }
-.my-settings a {
+.dashboard a {
   color: #dc9f27;
+}
+.pwd {
+  height: 18px;
+  width: 126px;
+  background: url(../images/pwd.jpg) center left;
+  background-repeat: no-repeat;
+  display: inline-block;
 }
 
 /*

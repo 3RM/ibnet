@@ -1,6 +1,7 @@
 <?php
 namespace common\models;
 
+use sadovojav\cutter\behaviors\CutterBehavior;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
@@ -11,6 +12,7 @@ use yii\web\IdentityInterface;
  * User model
  *
  * @property integer $id
+ * @property string $image
  * @property string $username
  * @property string $password_hash
  * @property string $password_reset_token
@@ -23,9 +25,14 @@ use yii\web\IdentityInterface;
  */
 class User extends ActiveRecord implements IdentityInterface
 {
-    const STATUS_DELETED = 0; 
+    public $newUsername;
+    public $newEmail;
+    public $currentPassword;
+    public $newPassword;
+    public $emailMaintenance = 1;
+
+    const STATUS_DELETED = 0;
     const STATUS_ACTIVE = 10;
-    const STATUS_BANNED = 20;
 
 
     /**
@@ -43,6 +50,20 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return [
             TimestampBehavior::className(),
+            'image' => [
+                'class' => CutterBehavior::className(),
+                'attributes' => ['image'],
+                'baseDir' => '/uploads/image',
+                'basePath' => '@webroot',
+            ],
+        ];
+    }
+
+    public function scenarios() {
+        return[
+            'all' => ['status'],
+            'personal' => ['screen_name', 'home_church', 'role', 'image'],
+            'account' => ['newUsername', 'newEmail', 'newPassword', 'emailPrefProfile', 'emailPrefLinks', 'emailPrefFeatures'],
         ];
     }
 
@@ -52,8 +73,42 @@ class User extends ActiveRecord implements IdentityInterface
     public function rules()
     {
         return [
-            ['status', 'default', 'value' => self::STATUS_ACTIVE],
-            ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_DELETED]],
+            ['status', 'default', 'value' => self::STATUS_ACTIVE, 'on' => 'all'],
+            ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_DELETED], 'on' => 'all'],
+
+            ['image', 'image', 'extensions' => 'jpg, jpeg, gif, png', 'mimeTypes' => 'image/jpeg, image/png', 'maxFiles' => 1, 'maxSize' => 1024 * 4000, 'skipOnEmpty' => true, 'on' => 'personal'],
+            [['screen_name', 'home_church', 'role'], 'default', 'value' => NULL,'on' => 'personal'],
+            ['screen_name', 'unique', 'targetClass' => '\common\models\User', 'message' => 'This name is already in use.', 'on' => 'personal'],
+            ['screen_name', 'string', 'max' => 60, 'on' => 'personal'],
+            ['screen_name', 'filter', 'filter' => 'strip_tags', 'skipOnEmpty' => true, 'on' => 'personal'],
+
+            ['username', 'unique', 'targetClass' => '\common\models\User', 'message' => 'This username has already been taken.', 'on' => 'account'],
+            ['username', 'string', 'min' => 4, 'max' => 255, 'on' => 'account'],
+            ['newEmail', 'email', 'message' => 'Please provide a valid email address.', 'on' => 'account'],
+            ['newPassword', 'string', 'max' => 20, 'on' => 'account'],
+            ['currentPassword', 'validateCurrentPass', 'on' => 'account'],
+            [['emailPrefProfile', 'emailPrefLinks', 'emailPrefFeatures'], 'safe', 'on' => 'account'],
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function attributeLabels()
+    {
+        return [
+            'image' => '',
+            'screen_name' => 'Screen Name',
+            'home_church' => 'Home Church',
+            'role' => 'Primary Role',
+            'newUsername' => '',
+            'newEmail' => '',
+            'currentPassword' => '',
+            'newPassword' => '',
+            'emailMaintenance' => 'Email me regarding my account maintenance',
+            'emailPrefProfile' => 'Keep me updated on visitor stats for my profile pages',
+            'emailPrefLinks' => 'Tell me when someone links to or unlinks from my profiles',
+            'emailPrefFeatures' => 'Notify me of new or updated website features',
         ];
     }
 
@@ -227,5 +282,53 @@ class User extends ActiveRecord implements IdentityInterface
     public function removeNewEmailToken()
     {
         $this->updateAttributes(['new_email_token' => null]);
+    }
+
+    /**
+     * Validate current password on mySettings form
+     *
+     * @param string $attribute the attribute currently being validated
+     * @param array $params the additional name-value pairs given in the rule
+     */
+    public function validateCurrentPass($attribute, $params)
+    {
+        $user = Yii::$app->user->identity;
+        if (!$user || !$user->validatePassword($this->$attribute, $user->password_hash)) { 
+            $this->addError($attribute, 'The password you entered is incorrect.');
+            $this->toggle = 'visible';
+        }
+        return $this;
+    }
+
+    /**
+     * handleAccount
+     * Process updates to account settings
+     * @return mixed
+     */
+    public function handleAccount()
+    {
+        if ($this->validate()) {
+            if ($this->newUsername) {
+                $this->username = $this->newUsername;
+            }
+            if ($this->newEmail != NULL) {
+                $this->generateNewEmailToken();
+                $this->new_email = $this->newEmail;
+                Mail::sendEmailConfLink($this->email, $this->newEmail, $this->new_email_token);
+            } 
+            if ($this->newPassword != NULL) {
+                $this->updateAttributes(['password_hash' => 
+                        Yii::$app->security->generatePasswordHash($this->newPassword)]);
+                Mail::sendNewPwd($this->email);
+                $this->newPassword = '';
+                $this->currentPassword = '';
+            }
+            $this->newEmail == NULL ?
+                Yii::$app->session->setFlash('success', 'Your settings have been updated.') :
+                Yii::$app->session->setFlash('success', 'Your settings have been updated.  An email with a confirmation link has been sent to your new email address.');
+
+            return true;
+        }
+        return false;
     }
 }

@@ -6,7 +6,10 @@ use common\models\LoginForm;
 use common\models\profile\Profile;
 use common\models\profile\ProfileBrowse;
 use common\models\profile\ProfileSearch;
+use common\models\Role;
 use common\models\User;
+use common\models\Utility;
+use frontend\controllers\ProfileController;
 use frontend\models\Box3Content;
 use frontend\models\ContactForm;
 use frontend\models\PasswordResetRequestForm;
@@ -19,6 +22,7 @@ use yii\data\ActiveDataProvider;
 use yii\data\ArrayDataProvider;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
+use yii\helpers\ArrayHelper;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use xj\sitemap\models\Url;
@@ -39,8 +43,13 @@ class SiteController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['logout'],
+                'only' => ['logout', 'signup'],
                 'rules' => [
+                    [
+                        'actions' => ['signup'],
+                        'allow' => true,
+                        'roles' => ['?'],
+                    ],
                     [
                         'actions' => ['logout'],
                         'allow' => true,
@@ -268,16 +277,16 @@ class SiteController extends Controller
                         'username' => $user->username]));
                     Yii::$app->session->setFlash('error', 'Your email is not verified.  Find the 
                         verification email we sent and follow the link to complete your 
-                        registration. Be sure to check your spam folder.<br>' . $link);
+                        registration.  Be sure to check your spam folder.<br>' . $link);
                     return $this->render('login', ['model' => $model]);
 
                 } else {        // incorrect password
-                    Yii::$app->session->setFlash('error', 'Your password or username/email is incorrect.');
+                    Yii::$app->session->setFlash('error', 'Your password or username is incorrect.');
                     return $this->render('login', ['model' => $model]);
                 } 
 
-            } else {        // Incorrect username  or email
-                Yii::$app->session->setFlash('error', 'Your password or username/email is incorrect.');
+            } else {        // Incorrect username
+                Yii::$app->session->setFlash('error', 'Your password or username is incorrect.');
                 return $this->render('login', ['model' => $model]);
             }
         } else {
@@ -367,9 +376,6 @@ class SiteController extends Controller
      */
     public function actionRegister()
     {
-        if (!Yii::$app->user->isGuest) {
-            return $this->goHome();
-        }
         $model = new RegisterForm();
         if ($model->load(Yii::$app->request->post())) {
             if ($user = $model->register()) {                
@@ -545,26 +551,57 @@ class SiteController extends Controller
      * User profile and account management area
      * @return mixed
      */
-    public function actionMySettings()
+    public function actionDashboard()
     {
-        $user = Yii::$app->user->identity;
-        $account = new AccountSettings;
-        $account->scenario = 'update';
-        $account->email = $user->email;
-        $account->currentUsername = $user->username;   
-        $account->emailMaintenance = 1;
-        $account->emailPrefProfile = $user->emailPrefProfile;
-        $account->emailPrefLinks = $user->emailPrefLinks;
-        $account->emailPrefFeatures = $user->emailPrefFeatures;
-        $account->toggle = 'none';
-        if ($account->load(Yii::$app->request->Post()) && $account->updateAccount($user)) {
-            $account->newEmail = '';
+        $userP = Yii::$app->user->identity;                                                         // Personal user settings
+        $userP->scenario = 'personal';
 
-            return $this->render('mySettings', ['account' => $account, 'toggle' => $account->toggle]); 
+        $userA = Yii::$app->user->identity;                                                         // Account user settings
+        $userA->scenario = 'account';
 
-        } else {
-
-            return $this->render('mySettings', ['account' => $account, 'toggle' => $account->toggle]);
+        if ($userP->role == NULL) {
+            $userP->role = 'Church Member';                                                          // Set default role
         }
+        $home_church = NULL;
+        if ($userP->home_church != NULL) {
+            if ($hc = ProfileController::findActiveProfile($userP->home_church)) {
+                $home_church = $hc->org_name . ', ' . $hc->org_city . ', ' . $hc->org_st_prov_reg;
+            }
+        }
+        $list = ArrayHelper::map(Role::find()->all(), 'role', 'role', 'type');
+
+        return $this->render('dashboard', [
+            'userP' => $userP,
+            'userA' => $userA,
+            'account' => $account,
+            'list' => $list,
+            'home_church' => $home_church,
+        ]);
+    }
+
+    public function actionPersonalSettings()
+    {
+        $user = Yii::$app->user->identity;                                                          // Personal user settings
+        $user->scenario = 'personal';
+
+        if ($user->load(Yii::$app->request->Post())) {
+            $user->validate(); 
+            $user->save();
+        }
+        return $this->redirect(['dashboard']);
+
+    }
+
+    public function actionAccountSettings()
+    {
+        $user = Yii::$app->user->identity;                                                          // Personal user settings
+        $user->scenario = 'account';
+
+        if ($user->load(Yii::$app->request->Post()) &&
+            $user->handleAccount()) {
+            $user->validate(); 
+            $user->save();
+        }
+        return $this->redirect(['dashboard']);
     }
 }

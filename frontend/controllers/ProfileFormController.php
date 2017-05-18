@@ -1121,12 +1121,12 @@ class ProfileFormController extends ProfileController
             $staff->delete();
             return $this->redirect(['form' . $fmNum, 'id' => $profile->id]);                        // Refresh page
 
-        } elseif (isset($_POST['submit']) && 
+        } elseif (isset($_POST['submit-ministry']) && 
             $profile->load(Yii::$app->request->Post()) &&
             $profile->handleFormPM()) {
             return $this->redirect(['form' . $fmNum, 'id' => $profile->id]);                        // Save select and refresh page
 
-         } elseif (isset($_POST['submitM']) &&
+         } elseif (isset($_POST['submit-other']) &&
             $profile->load(Yii::$app->request->Post()) &&
             $profile->handleFormPMM()) {
             return $this->redirect(['form' . $fmNum, 'id' => $profile->id]);                        // Save select and refresh page
