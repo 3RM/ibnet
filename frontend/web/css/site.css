@@ -744,8 +744,7 @@ margin: 0;
 }
 .dashboard h3 {
   color: #2c2b2a;
-  padding-bottom: 5px;
-  margin-bottom: 0;
+  margin-bottom: 15px;
 }
 .dashboard .personal {
   padding: 20px;
@@ -755,17 +754,11 @@ margin: 0;
   padding: 20px;
   border: 1px solid #F0F0F0;
 }
-.dashboard .update {
-  background-color: #F6F6F6;
-  padding: 20px;
-  border: 1px solid #F0F0F0;
-  border-radius: 10px;
-}
-.dashboard .form-group button {
-  float: right;
-}
 .dashboard a {
   color: #dc9f27;
+}
+.dashboard .no-label {
+  margin-top: -20px;
 }
 .pwd {
   height: 18px;

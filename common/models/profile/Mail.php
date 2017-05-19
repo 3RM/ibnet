@@ -24,7 +24,7 @@ class Mail extends \yii\db\ActiveRecord
                 ['html' => 'profile-transfer-html'], 
                 ['title' => $title, 'msg' => $msg, 'profile' => $profile, 'link' => $link]
             )
-            ->setFrom([\yii::$app->params['teamEmail']])
+            ->setFrom([\yii::$app->params['adminEmail']])
             ->setTo([$email])
             ->setSubject($subject)
             ->send();
@@ -38,13 +38,12 @@ class Mail extends \yii\db\ActiveRecord
      * @return boolean
      */
     public function sendForwardingEmailRqst($id, $email, $email_pvt)
-    {  
-        $msg = 'New Forwarding Email Request:';
+    {       
         Yii::$app
             ->mailer
             ->compose(
-                ['html' => 'system/forwarding-email-html'], 
-                ['email' => $email, 'email_pvt' => $email_pvt, 'id' => $id, 'msg' => $msg]
+                ['html' => 'forwarding-email-html'], 
+                ['id' => $id, 'email' => $email, 'email_pvt' => $email_pvt]
             )
             ->setFrom([\yii::$app->params['no-replyEmail']])
             ->setTo([\yii::$app->params['adminEmail']])
@@ -296,7 +295,7 @@ class Mail extends \yii\db\ActiveRecord
                 ['html' => 'profile-link-html'],
                 ['title' => $title, 'msg' => $msg, 'profile' => $profile]
             )
-            ->setFrom([\yii::$app->params['teamEmail']])
+            ->setFrom([\yii::$app->params['adminEmail']])
             ->setTo([$profileOwner->email])
             ->setSubject($subject)
             ->send();

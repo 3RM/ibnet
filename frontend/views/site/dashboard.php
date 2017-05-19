@@ -61,7 +61,7 @@ $this->title = 'My Account';
         </div>
                 
         <div class="row">
-            <a href="#personal-settings" id="personal-settings">edit<span class="glyphicon glyphicon-triangle-bottom tiny"></span></a>
+            <a href="#personal-settings" id="personal-settings">edit<span class="glyphicon glyphicon-triangle-bottom small"></span></a>
         </div>
 
         <?php $form = ActiveForm::begin([
@@ -177,7 +177,7 @@ $this->title = 'My Account';
         </div>
                 
         <div class="row top-margin">
-            <a href="#account-settings" id="account-settings">edit<span class="glyphicon glyphicon-triangle-bottom tiny"></span></a>
+            <a href="#account-settings" id="account-settings">edit<span class="glyphicon glyphicon-triangle-bottom small"></span></a>
         </div>
 
         <?php $form = ActiveForm::begin(['action' => 'account-settings']); ?>
@@ -187,15 +187,15 @@ $this->title = 'My Account';
 
                 <h3 class="top-margin">Login ID</h3>
 
-                <p>Username: <?= $userA->username ?></p>
-                <?= $form->field($userA, 'newUsername')->textInput(['maxlength' => true, 'placeholder' => 'New username']) ?>
+                <p class="top-margin">Username: <?= $userA->username ?></p>
+                <?= $form->field($userA, 'newUsername', ['options' => ['class' => "no-label"]])->textInput(['maxlength' => true, 'placeholder' => 'New username']) ?>
 
                 <p>Email: <?= $userA->email ?></p>
-                <?= $form->field($userA, 'newEmail')->textInput(['maxlength' => true, 'placeholder' => 'New email']) ?>
+                <?= $form->field($userA, 'newEmail', ['options' => ['class' => "no-label"]])->textInput(['maxlength' => true, 'placeholder' => 'New email']) ?>
 
                 <h3 class="top-margin-28">Password</h3>
-                <?= $form->field($userA, 'currentPassword')->passwordInput(['maxlength' => true, 'placeholder' => 'Current password']) ?>
-                <?= $form->field($userA, 'newPassword')->passwordInput(['maxlength' => true, 'placeholder' => 'New password']) ?>
+                <?= $form->field($userA, 'currentPassword', ['options' => ['class' => "no-label"]])->passwordInput(['maxlength' => true, 'placeholder' => 'Current password']) ?>
+                <?= $form->field($userA, 'newPassword', ['options' => ['class' => "no-label"]])->passwordInput(['maxlength' => true, 'placeholder' => 'New password']) ?>
 
                 <h3 class="top-margin-28">Email Preferences</h3>
                 <?= $form->field($userA, 'emailMaintenance')->widget(CheckboxX::classname(), [
@@ -237,7 +237,12 @@ $this->title = 'My Account';
                     ]
                 ])->label(false) ?>
 
-                <?= Html::submitButton('Save', ['class' => 'btn btn-primary', 'name' => 'personal']) ?>
+                <?= Html::submitButton('Save', [
+                    'method' => 'post',
+                    'class' => 'btn btn-primary top-margin', 
+                    'name' => 'personal'
+                ]) ?>
+
             </div>
         </div>
 
