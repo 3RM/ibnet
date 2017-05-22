@@ -1,10 +1,12 @@
 <?php
+
+use common\models\profile\Profile;
 use yii\helpers\Html;
 use yii\helpers\HtmlPurifier;
 ?>
 
-<div class="col-sm-2 col-md-1 center search-icon">
-	<?= Html::img('@web/images/' . $model->type . '.png') ?>
+<div class="col-sm-2 col-md-1 center search-icon icon-sm">
+	<?= Profile::$icon[$model->type] ?>
 </div>
 <div class="col-sm-10 col-md-11">
     <?php switch ($model->type) { 

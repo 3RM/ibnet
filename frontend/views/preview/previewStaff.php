@@ -67,9 +67,9 @@ $this->title = isset($profile->spouse_first_name) ?
     <div class="profile-header">
     	<div class="container">
            	<div class="row">
-           		<div class="col-md-1">
-           			<div class="icon-lg"><?= Html::img('@web/images/' . $profile->type . '-lg.png') ?></div>
-           		</div>
+           		<div class="col-lg-1 icon-lg top-margin">
+	    			<?= Profile::$icon[$profile->type] ?>
+	    		</div>
            		<div class="col-md-10">
                		<h1><?= $this->title ?></h1>
                		<span class="tagline"><?= empty($profile->tagline) ? NULL : $profile->tagline ?></span> <?= '<span  class="edit">' . Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['nd']-1, 'id' => $profile->id]) . '</span>' ?>

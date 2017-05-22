@@ -42,8 +42,8 @@ $this->title = '';
     <div class="container">
         <div class="site-index">
             <div class="row">
-              <div class="col-sm-10 col-md-6 main responsive center">
-                  <?= Html::img('@web/images/main.jpg') ?>
+              <div class="col-md-6 center">
+                  <?= Html::img('@web/images/main.jpg', ['class' => 'responsive']) ?>
               </div>
               <div class="col-sm-10 col-md-6">
                   <h3>What is IBNet?</h3>

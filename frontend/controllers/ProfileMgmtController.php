@@ -93,12 +93,15 @@ class ProfileMgmtController extends ProfileController
                 ->where(['type' => 'Pastor'])->all(), 'sub_type', 'sub_type');
             $missionaryTypes = ArrayHelper::map(SubType::find()->select('sub_type')
                 ->where(['type' => 'Missionary'])->all(), 'sub_type', 'sub_type');
+             $chaplainTypes = ArrayHelper::map(SubType::find()->select('sub_type')
+                ->where(['type' => 'Chaplain'])->all(), 'sub_type', 'sub_type');
 
             return $this->render('profileCreate', [
                 'profile' => $profile, 
                 'types' => $types, 
                 'pastorTypes' => $pastorTypes,
-                'missionaryTypes' => $missionaryTypes]);
+                'missionaryTypes' => $missionaryTypes,
+                'chaplainTypes' => $chaplainTypes]);
         }
     }
 

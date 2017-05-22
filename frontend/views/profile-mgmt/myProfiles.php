@@ -52,9 +52,8 @@ $this->title = 'My Account';
 
                 <table class="table table-profile">
                     <?php foreach($profileArray as $profile) {
-                        $imgpath = '@web/images/' . $profile->type . '.png';
                         echo '<tr>
-                            <td class="middle center"><div class="cell-padding">' . Html::img('@web/images/' . $profile->type . '-lg.png') . '<br>' . $profile->type . '</div></td>
+                            <td class="middle center"><div class="cell-padding"><span class="icon-lg">' . Profile::$icon[$profile->type] . '</span><br>' . $profile->type . '</div></td>
                             <td class="middle center"><div class="cell-padding">"' . $profile->profile_name . '"</div></td>';
                     ?>            
                     <?=    '<td class="middle">' ?>

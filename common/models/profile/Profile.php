@@ -98,8 +98,26 @@ class Profile extends \yii\db\ActiveRecord
     const MAP_MINISTRY = 30;
     const MAP_CHURCH_PLANT = 40;
 
+    public static $icon = [
+        'Association' => '<span class="glyphicons glyphicons-group"></span>',
+        'Camp' => '<span class="glyphicons glyphicons-camping"></span>',
+        'Chaplain' => '<span class="glyphicons glyphicons-shield"></span>',
+        'Church' => '<span class="glyphicons glyphicons-temple-christianity-church"></span>',
+        'Evangelist' => '<span class="glyphicons glyphicons-fire"></span>',
+        'Fellowship' => '<span class="glyphicons glyphicons-handshake"></span>',
+        'Mission Agency' => '<span class="glyphicons glyphicons-globe-af"></span>',
+        'Missionary' => '<span class="glyphicons glyphicons-person-walking"></span>',
+        'Music Ministry' => '<span class="glyphicons glyphicons-music"></span>',
+        'Pastor' => '<span class="glyphicons glyphicons-book-open"></span>',
+        'Print Ministry' => '<span class="glyphicons glyphicons-book"></span>',
+        'School' => '<span class="glyphicons glyphicons-education"></span>',
+        'Special Ministry' => '<span class="glyphicons glyphicons-global"></span>',
+        'Staff' => '<span class="glyphicons glyphicons-briefcase"></span>',
+    ];
+
     public $ptype;                      // Pastor sub-type
     public $mtype;                      // Missionary sub-type
+    public $ctype;                      // Chaplain sub-type
     public $name;                       // User entered fellowship or association name
     public $acronym;                    // User entered fellowship or association acronym
     public $aName;                      // alternate name 
@@ -233,6 +251,7 @@ class Profile extends \yii\db\ActiveRecord
             [['org_name', 'description'], 'required', 'on' => 'nd-org'],
             ['tagline', 'default', 'value' => NULL,'on' => 'nd-org'],
             [['org_name', 'tagline'], 'string', 'max' => 60, 'on' => 'nd-org'],
+            [['org_name', 'tagline'], 'trim', 'on' => 'nd-org'],
             ['description', 'string', 'max' => 1500, 'on' => 'nd-org', 'message' => 'Your text exceeds 1500 characters.'],
             [['org_name', 'tagline', 'description'], 'filter', 'filter' => 'strip_tags', 'skipOnEmpty' => true, 'on' => 'nd-org'],
 
@@ -242,6 +261,7 @@ class Profile extends \yii\db\ActiveRecord
             [['ind_first_name', 'spouse_first_name'], 'string', 'max' => 20, 'on' => 'nd-ind'],
             ['ind_last_name', 'string', 'max' => 40, 'on' => 'nd-ind'],
             [['title', 'tagline'], 'string', 'max' => 60, 'on' => 'nd-ind'],
+            [['ind_first_name', 'ind_last_name', 'spouse_first_name', 'title', 'tagline'], 'trim', 'on' => 'nd-ind'],
             ['description', 'string', 'max' => 1500, 'on' => 'nd-ind', 'message' => 'Your text exceeds 1500 characters.'],      
             [['ind_first_name', 'ind_last_name', 'spouse_first_name', 'title', 'tagline'], 'filter', 'filter' => 'strip_tags', 'skipOnEmpty' => true, 'on' => 'nd-ind'],
      
@@ -517,6 +537,7 @@ class Profile extends \yii\db\ActiveRecord
                 'type' => 'Profile Type',
                 'ptype' => 'Pastor Type',
                 'mtype' => 'Missionary Type',
+                'ctype' => 'Chaplain Type',
             ];
             break;
 
@@ -774,6 +795,8 @@ class Profile extends \yii\db\ActiveRecord
             $this->sub_type = $this->ptype;
         } elseif ($this->type == 'Missionary') {
             $this->sub_type = $this->mtype;
+        } elseif ($this->type == 'Chaplain') {
+            $this->sub_type = $this->ctype;
         } else {
             $this->sub_type = $this->type;
         }

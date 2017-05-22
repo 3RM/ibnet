@@ -1,8 +1,9 @@
 <?php
 
-use common\widgets\Alert;
+use common\models\profile\Profile;
 use kartik\markdown\Markdown;
 use tugmaks\GoogleMaps\Map;
+use yii\bootstrap\Alert;
 use yii\bootstrap\Modal;
 use yii\bootstrap\Html;
 use yii\helpers\Url;
@@ -11,16 +12,15 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 $this->title = $profile->org_name;
 ?>
-<?= Alert::widget() ?>
 
 <div class="site-index profile-page">
 
     <div class="profile-header">
         <div class="container">
         	<div class="row">
-        		<div class="col-md-1">
-        			<div class="icon-lg"><?= Html::img('@web/images/' . $profile->type . '-lg.png') ?></div>
-        		</div>
+        		<div class="col-lg-1 icon-lg top-margin">
+	    			<?= Profile::$icon[$profile->type] ?>
+	    		</div>
         		<div class="col-md-10">
             		<h1><?= $this->title ?></h1>
             		<span class="tagline"><?= empty($profile->tagline) ? NULL : $profile->tagline ?></span>

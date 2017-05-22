@@ -63,6 +63,16 @@ $this->title = 'Profile Type';
                 'pluginOptions' => ['allowClear' => true],
             ]); ?>
         </div>
+
+        <div id="sub_chaplain" style="display:none;">
+            <?= $form->field($profile, 'ctype')->widget(Select2::classname(), [
+                'data' => $chaplainTypes,
+                'language' => 'en',
+                'theme' => 'krajee',
+                'options' => ['placeholder' => 'Type ...', ['Individuals', 'Groups']],
+                'pluginOptions' => ['allowClear' => true],
+            ]); ?>
+        </div>
         
         <?= Html::submitButton('Create', ['class' => 'btn btn-primary', 'style' => 'margin-left:60px']) ?>
 
@@ -79,9 +89,12 @@ $(document).ready(function () {
             $("#sub_pastor").show();
         } else if (this.value == 'Missionary') {
             $("#sub_missionary").show();
+         } else if (this.value == 'Chaplain') {
+            $("#sub_chaplain").show();    
         } else {
             $("#sub_pastor").hide();
             $("#sub_missionary").hide();
+            $("#sub_chaplain").hide();
         }
     }).change();
 });

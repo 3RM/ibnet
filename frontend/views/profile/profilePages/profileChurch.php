@@ -20,8 +20,8 @@ $this->title = $profile->org_name;
 	<div class="profile-header">
 	    <div class="container">
 	    	<div class="row">
-	    		<div class="col-lg-1">
-	    			<div class="icon-lg"><?= Html::img('@web/images/' . $profile->type . '-lg.png') ?></div>
+	    		<div class="col-lg-1 icon-lg top-margin">
+	    			<div><?= Profile::$icon[$profile->type] ?></div>
 	    		</div>
 	    		<div class="col-md-10">
 	        		<h1><?= $this->title ?></h1>

@@ -1,9 +1,9 @@
 <?php
 
 use common\models\profile\Profile;
-use common\widgets\Alert;
 use kartik\markdown\Markdown;
 use tugmaks\GoogleMaps\Map;
+use yii\bootstrap\Alert;
 use yii\bootstrap\Modal;
 use yii\bootstrap\Html;
 use yii\helpers\Url;
@@ -14,16 +14,15 @@ $this->title = isset($profile->spouse_first_name) ?
 	($profile->ind_first_name . ' & ' . $profile->spouse_first_name . ' ' . $profile->ind_last_name) :
 	($profile->ind_first_name . ' ' . $profile->ind_last_name);
 ?>
-<?= Alert::widget() ?>
 
 <div class="site-index profile-page">
 
     <div class="profile-header">
         <div class="container">
         	<div class="row">
-        		<div class="col-md-1">
-        			<div class="icon-lg"><?= Html::img('@web/images/' . $profile->type . '-lg.png') ?></div>
-        		</div>
+        		<div class="col-lg-1 icon-lg top-margin">
+	    			<?= Profile::$icon[$profile->type] ?>
+	    		</div>
         		<div class="col-md-10">
             		<h1><?= $this->title ?></h1>
             		<span class="tagline"><?= empty($profile->tagline) ? NULL : $profile->tagline ?></span>
@@ -103,7 +102,7 @@ $this->title = isset($profile->spouse_first_name) ?
 			<div class="col-md-4 profile-thirds">
 				<!-- Begin Distinctives (Box 2) -->
 				<strong>Bible: </strong><?= $profile->bible ?><br />
-				<strong>Worship: </strong><?= $profile->worship_style ?><br />
+				<strong>Worship Style: </strong><?= $profile->worship_style ?><br />
 				<strong>Government: </strong><?= $profile->polity ?><br />
 				<!-- Εnd Distinctives -->
 				<br />
