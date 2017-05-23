@@ -267,11 +267,15 @@ class SiteController extends Controller
         if ($model->load(Yii::$app->request->post())) {
             $user = $model->user;
             if (isset($user)) {
+
+        // =============== login successful =======================
                 if ($user->email != NULL && $model->login()) {
                     return $url == NULL ?
                         $this->goHome() :
                         $this->redirect($url);
-                } elseif ($user->new_email != NULL && $user->email == NULL) {       // email not verified
+
+        // =============== email not verified =======================   
+                } elseif ($user->new_email != NULL && $user->email == NULL) {       
                     $link = HTML::a('Resend Confirmation Link', Yii::$app->urlManager->createAbsoluteUrl([
                         'site/resend-verification-email', 
                         'username' => $user->username]));
@@ -280,15 +284,18 @@ class SiteController extends Controller
                         registration.  Be sure to check your spam folder.<br>' . $link);
                     return $this->render('login', ['model' => $model]);
 
-                } else {        // incorrect password
+        // =============== Incorrect Password =======================
+                } else {
                     Yii::$app->session->setFlash('error', 'Your password or username is incorrect.');
                     return $this->render('login', ['model' => $model]);
                 } 
 
-            } else {        // Incorrect username
+        // ============== Incorrect username =======================
+            } else {
                 Yii::$app->session->setFlash('error', 'Your password or username is incorrect.');
                 return $this->render('login', ['model' => $model]);
             }
+
         } else {
             return $this->render('login', ['model' => $model]);
         }
@@ -534,17 +541,16 @@ class SiteController extends Controller
      */
     public function actionEmailConfirmed($token)
     {
+        $confirmed = false;
         if ($token && $user = User::findByNewEmailToken($token)) {
             $user->updateAttributes([
                 'new_email_token' => NULL,
                 'email' => $user->new_email,
                 'new_email' => NULL]);
-            
-            return $this->render('emailConfirmed');
-
-        } else {
-            // Throw a bad request error
+            $confirmed = true;
         }
+            
+        return $this->render('emailConfirmed', ['confirmed' => $confirmed]);
     }
 
     /**

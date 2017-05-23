@@ -1,18 +1,16 @@
 <?php
 
 use yii\bootstrap\Html;
-use common\widgets\Alert;
 use yii\helpers\Url;
 use yii\web\View;
 
 /* @var $this yii\web\View */
 $this->title = 'Profile Expired';
 ?>
-<?= Alert::widget() ?>
 
 <div class="site-index profile-page">
     <div class="container">
-    	<div class="row top-margin-lg">
+    	<div class="row top-margin-100">
     		<div class="col-md-3">
         		<h1><?= $this->title ?>:</h1>
         	</div>

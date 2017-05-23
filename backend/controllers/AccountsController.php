@@ -160,6 +160,10 @@ class AccountsController extends Controller
                     }             
                 },
             ],
+            'usr_image',
+            'screen_name',
+            'home_church',
+            'role',
             'emailPrefProfile',
             'emailPrefLinks',
             'emailPrefFeatures',

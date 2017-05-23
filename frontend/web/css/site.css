@@ -271,6 +271,12 @@ div.required label.control-label:after {
   .modal-footer #email-id {
     margin-top: 19px;
   }
+  .no-label {
+    margin-top: -22px;
+  }
+  .no-label-32 {
+    margin-top: -32px;
+  }
 
   /* 
    * Header 
@@ -878,6 +884,9 @@ margin: 0;
   max-width: 100%;
   height: auto;
 }
+.top-margin-10 {
+  margin-top: 10px;
+}
 .top-margin {
   margin-top: 20px;
 }
@@ -887,10 +896,10 @@ margin: 0;
 .top-margin-40 {
   margin-top: 40px;
 }
-.top-margin-md {
+.top-margin-60 {
   margin-top: 60px;
 }
-.top-margin-lg {
+.top-margin-100 {
   margin-top: 100px;
 }
 
