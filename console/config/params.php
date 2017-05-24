@@ -1,4 +1,5 @@
 <?php
 return [
-    'adminEmail' => 'admin@example.com',
+    'adminEmail' => 'admin@ibnet.org',
+    'frontendUrl' => 'http://adev.ibnet.org',
 ];

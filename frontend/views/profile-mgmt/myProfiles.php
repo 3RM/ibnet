@@ -54,7 +54,7 @@ $this->title = 'My Account';
                     <?php foreach($profileArray as $profile) {
                         echo '<tr>
                             <td class="middle center"><div class="cell-padding"><span class="icon-lg">' . Profile::$icon[$profile->type] . '</span><br>' . $profile->type . '</div></td>
-                            <td class="middle center"><div class="cell-padding">"' . $profile->profile_name . '"</div></td>';
+                            <td class="middle center"><div class="cell-padding lead">"' . $profile->profile_name . '"</div></td>';
                     ?>            
                     <?=    '<td class="middle">' ?>
                                 <div class="cell-padding">
