@@ -64,6 +64,7 @@ use yii\helpers\Html;
                             ['label' => 'Tables', 
                                 'icon' => 'table', 
                                 'items' => [
+                                    ['label' => 'Social', 'icon' => 'sitemap', 'url' => ['/directory/social'],],
                                     ['label' => 'Staff', 'icon' => 'sitemap', 'url' => ['/directory/staff'],],
                                     ['label' => 'Missionary', 'icon' => 'sitemap', 'url' => ['/directory/missionary'],],
                                     ['label' => 'Mission Housing', 'icon' => 'sitemap', 'url' => ['/directory/housing'],],

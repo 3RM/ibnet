@@ -12,7 +12,7 @@ use yii\web\IdentityInterface;
  * User model
  *
  * @property integer $id
- * @property string $image
+ * @property string $usr_image
  * @property string $username
  * @property string $password_hash
  * @property string $password_reset_token
@@ -50,9 +50,9 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return [
             TimestampBehavior::className(),
-            'image' => [
+            'usr_image' => [
                 'class' => CutterBehavior::className(),
-                'attributes' => ['image'],
+                'attributes' => ['usr_image'],
                 'baseDir' => '/uploads/image',
                 'basePath' => '@webroot',
             ],
@@ -62,7 +62,7 @@ class User extends ActiveRecord implements IdentityInterface
     public function scenarios() {
         return[
             'all' => ['status'],
-            'personal' => ['screen_name', 'home_church', 'role', 'image'],
+            'personal' => ['screen_name', 'home_church', 'role', 'usr_image'],
             'account' => ['newUsername', 'newEmail', 'newPassword', 'emailPrefProfile', 'emailPrefLinks', 'emailPrefFeatures'],
         ];
     }
@@ -76,7 +76,7 @@ class User extends ActiveRecord implements IdentityInterface
             ['status', 'default', 'value' => self::STATUS_ACTIVE, 'on' => 'all'],
             ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_DELETED], 'on' => 'all'],
 
-            ['image', 'image', 'extensions' => 'jpg, jpeg, gif, png', 'mimeTypes' => 'image/jpeg, image/png', 'maxFiles' => 1, 'maxSize' => 1024 * 4000, 'skipOnEmpty' => true, 'on' => 'personal'],
+            ['usr_image', 'image', 'extensions' => 'jpg, jpeg, gif, png', 'mimeTypes' => 'image/jpeg, image/png', 'maxFiles' => 1, 'maxSize' => 1024 * 4000, 'skipOnEmpty' => true, 'on' => 'personal'],
             [['screen_name', 'home_church', 'role'], 'default', 'value' => NULL,'on' => 'personal'],
             ['screen_name', 'unique', 'targetClass' => '\common\models\User', 'message' => 'This name is already in use.', 'on' => 'personal'],
             ['screen_name', 'string', 'max' => 60, 'on' => 'personal'],
@@ -97,7 +97,7 @@ class User extends ActiveRecord implements IdentityInterface
     public function attributeLabels()
     {
         return [
-            'image' => '',
+            'usr_image' => '',
             'screen_name' => 'Screen Name',
             'home_church' => 'Home Church',
             'role' => 'Primary Role',

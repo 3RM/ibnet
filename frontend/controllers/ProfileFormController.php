@@ -1126,7 +1126,7 @@ class ProfileFormController extends ProfileController
             $profile->handleFormPM()) {
             return $this->redirect(['form' . $fmNum, 'id' => $profile->id]);                        // Save select and refresh page
 
-         } elseif (isset($_POST['submit-other']) &&
+         } elseif (isset($_POST['submit-more']) &&
             $profile->load(Yii::$app->request->Post()) &&
             $profile->handleFormPMM()) {
             return $this->redirect(['form' . $fmNum, 'id' => $profile->id]);                        // Save select and refresh page
