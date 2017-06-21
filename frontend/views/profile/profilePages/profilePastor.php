@@ -2,6 +2,7 @@
 
 use common\widgets\Alert;
 use common\models\profile\Profile;
+use frontend\controllers\ProfileController;
 use kartik\markdown\Markdown;
 use tugmaks\GoogleMaps\Map;
 use yii\bootstrap\Modal;

@@ -17,7 +17,7 @@ $this->title = 'Register';
     <h1><?= Html::encode($this->title) ?></h1>
 
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-xs-12 col-sm-12 col-md-11 col-lg-10">
 
             <p>Registration is free and will enable you to create profile listings and take advantage of current and future features of IBNet. By registering you agree that you have read and agreed to our <?= HTML::a('Terms', ['site/terms'], ['target' => 'blank']) ?> of use.</P>
 
@@ -40,7 +40,7 @@ $this->title = 'Register';
             <div class="row">
                 <div class="col-md-6"><?= $form->field($model, 'password')->passwordInput(['maxlength' => true]) ?></div>
                 <div class="col-md-6"><?= $form->field($model, 'verifyCode')->widget(Captcha::className(), [
-                    'template' => '<div class="row"><div class="col-md-4">{image}</div><div class="col-md-8">{input}</div></div>',
+                    'template' => '<div class="row"><div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">{image}</div><div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">{input}</div></div>',
                     'options' => ['placeholder' => 'Enter verification code', 'class' => 'form-control',], 
                 ]) ?></div>
             </div>
