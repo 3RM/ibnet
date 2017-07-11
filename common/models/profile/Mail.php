@@ -33,16 +33,38 @@ class Mail extends \yii\db\ActiveRecord
     }
 
     /**
+     * Send user notification of forwarding email activation
+     * 
+     * @return boolean
+     */
+    public function sendForwardingEmailNotif($email)
+    {
+        $msg = 'Your forwarding email ' . $email . ' has been set up.<br><br>Administrator<br><b>IBNet</b> | Https://ibnet.org';
+        Yii::$app
+            ->mailer
+            ->compose(
+                ['html' => 'notification-html'], 
+                ['message' => $msg]
+            )
+            ->setFrom([\yii::$app->params['adminEmail']])
+            ->setTo($email)
+            ->setSubject('IBNet Forwarding Email')
+            ->send();
+
+        return true;
+    }
+
+    /**
      * System: Forwarding email has been requested by user
      * 
      * @return boolean
      */
     public function sendForwardingEmailRqst($id, $email, $email_pvt)
-    {       
+    {
         Yii::$app
             ->mailer
             ->compose(
-                ['html' => 'forwarding-email-html'], 
+                ['html' => 'system/forwarding-email-html'], 
                 ['id' => $id, 'email' => $email, 'email_pvt' => $email_pvt]
             )
             ->setFrom([\yii::$app->params['no-replyEmail']])

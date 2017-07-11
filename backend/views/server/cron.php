@@ -5,7 +5,7 @@
 use kartik\grid\GridView;
 use yii\bootstrap\Html;
 
-$this->title = 'Housing Table';
+$this->title = 'Cron Jobs';
 ?>
 
 <div class="site-index">

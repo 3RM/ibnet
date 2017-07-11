@@ -347,13 +347,13 @@ class Box3Content extends Model
                     break;
 
                 case 'School' :
-                    $content = Html::a(Html::img('@web/images/school-new.jpg', ['class' => 'img-thumbnail']), ['profile/print',
+                    $content = Html::a(Html::img('@web/images/school-new.jpg', ['class' => 'img-thumbnail']), ['profile/school',
                         'city' => $profile->url_city, 
                         'name' => $profile->url_name, 
                         'id' => $profile->id]);
                     $content .= '<div class="caption">';
                     $content .=     '<h3>';
-                    $content .=         Html::a($profile->org_name, ['profile/print',
+                    $content .=         Html::a($profile->org_name, ['profile/school',
                                             'city' => $profile->url_city, 
                                             'name' => $profile->url_name, 
                                             'id' => $profile->id]);

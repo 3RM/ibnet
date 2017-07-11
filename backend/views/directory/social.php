@@ -5,14 +5,14 @@
 use kartik\grid\GridView;
 use yii\bootstrap\Html;
 
-$this->title = 'Housing Table';
+$this->title = 'Social Table';
 ?>
 
-<div class="site-index">
+<div class="site-index"> 
 
 	<?= GridView::widget([
 	    'dataProvider'=>$dataProvider,
-	    'filterModel'=>$searchModel,
+	    //'filterModel'=>$searchModel,
 	    'columns'=>$gridColumns,
 	    'headerRowOptions'=>['class'=>'kartik-sheet-style'],
 	    'filterRowOptions'=>['class'=>'kartik-sheet-style'],

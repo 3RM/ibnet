@@ -37,8 +37,8 @@ use yii\helpers\Html;
             [
                 'options' => ['class' => 'sidebar-menu'],
                 'items' => [
-                    ['label' => 'Tools', 'options' => ['class' => 'header']],
-                    ['label' => 'Stats', 'icon' => 'bar-chart', 'url' => ['/debug']],
+                    ['label' => 'Tools Menu', 'options' => ['class' => 'header']],
+                    ['label' => 'Stats', 'icon' => 'bar-chart', 'url' => ['stats/stats']],
                     [
                         'label' => 'Users', 
                         'icon' => 'user', 
@@ -47,10 +47,10 @@ use yii\helpers\Html;
                             ['label' => 'RBAC', 
                                 'icon' => 'sitemap', 
                                 'items' => [
-                                    ['label' => 'Assignments', 'icon' => 'sitemap', 'url' => ['/accounts/assignments'],],
-                                    ['label' => 'Roles', 'icon' => 'sitemap', 'url' => ['/accounts/roles'],],
-                                    ['label' => 'Permissions', 'icon' => 'sitemap', 'url' => ['/accounts/permissions'],],
-                                    ['label' => 'Rules', 'icon' => 'sitemap', 'url' => ['/accounts/rules'],],
+                                    ['label' => 'Assignments', 'icon' => 'sitemap', 'url' => ['/rbac/assignment'],],
+                                    ['label' => 'Roles', 'icon' => 'sitemap', 'url' => ['/rbac/role'],],
+                                    ['label' => 'Permissions', 'icon' => 'sitemap', 'url' => ['/rbac/permission'],],
+                                    ['label' => 'Rules', 'icon' => 'sitemap', 'url' => ['/rbac/rule'],],
                                 ],
                             ],
                         ],

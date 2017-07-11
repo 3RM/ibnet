@@ -16,7 +16,6 @@ $this->title = 'Ministry Profiles';
 	    'columns'=>$gridColumns,
 	    'headerRowOptions'=>['class'=>'kartik-sheet-style'],
 	    'filterRowOptions'=>['class'=>'kartik-sheet-style'],
-	    'afterHeader' => ['type' => 'This is a test'],
 	    'bootstrap' => true,
 	    'filterPosition' => GridView::FILTER_POS_BODY,
 	    'toolbar'=> false,

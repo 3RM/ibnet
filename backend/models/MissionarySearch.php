@@ -26,7 +26,7 @@ class MissionarySearch extends \common\models\profile\Missionary
 
     public function search($params)
     {
-        $query = Missionary::find();
+        $query = Missionary::find()->orderBy(['id' => SORT_DESC]);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,

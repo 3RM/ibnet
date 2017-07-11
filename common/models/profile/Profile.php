@@ -186,6 +186,8 @@ class Profile extends \yii\db\ActiveRecord
             'lo-ind' => ['ind_address1', 'ind_address2', 'ind_city', 'ind_st_prov_reg', 'ind_zip', 'ind_country', 'map', 'ind_po_address1', 'ind_po_address2', 'ind_po_box', 'ind_po_city', 'ind_po_st_prov_reg', 'ind_po_zip', 'ind_po_country'],
     // co: Contact
             'co' => ['phone', 'email', 'email_pvt', 'website'],
+    // co: Contact - Backend Forswarding Email
+            'default' => ['email'],
     // co: Contact - Forwarding Email
             'co-fe' => ['phone', 'email', 'email_pvt', 'website'],
     // sf: Staff - Church
@@ -382,12 +384,12 @@ class Profile extends \yii\db\ActiveRecord
             }, 'whenClient' => "function (attribute, value) {
                 return (($('#profile-ind_po_address1').val() == '') && ($('#profile-ind_po_box').val() == ''));
             }", 'message' => 'A physical or mailing address is required.', 'on' => 'lo-ind'],
-             ['ind_po_address1', 'required', 'when' => function($profile) {                         // po_address1 is required if address1 and po_box are missing
+            ['ind_po_address1', 'required', 'when' => function($profile) {                         // po_address1 is required if address1 and po_box are missing
                 return (empty($profile->ind_address1) && empty($profile->ind_po_box));
             }, 'whenClient' => "function (attribute, value) {
                 return (($('#profile-ind_address1').val() == '') && ($('#profile-ind_po_box').val() == ''));
             }", 'message' => 'A physical or mailing address is required.', 'on' => 'lo-ind'],
-             ['ind_po_box', 'required', 'when' => function($profile) {                              // po_box is required if address1 and po_address1 are missing
+            ['ind_po_box', 'required', 'when' => function($profile) {                              // po_box is required if address1 and po_address1 are missing
                 return (empty($profile->ind_address1) && empty($profile->ind_po_address1));
             }, 'whenClient' => "function (attribute, value) {
                 return (($('#profile-ind_address1').val() == '') && ($('#profile-ind_po_address1').val() == ''));
@@ -427,18 +429,23 @@ class Profile extends \yii\db\ActiveRecord
 
     // co: Contact ('phone', 'email', 'email_pvt', 'website')
             [['phone', 'email'], 'required', 'on' => 'co'],
-            ['phone', 'string', 'on' => 'co'],
-            ['phone', PhoneInputValidator::className(),'on' => 'co'],
+            [['phone'], 'string', 'on' => 'co'],
+            [['phone'], PhoneInputValidator::className(),'on' => 'co'],
             [['email', 'email_pvt'], 'string', 'max' => 60, 'on' => 'co'],
             [['email', 'email_pvt'], 'email', 'message' => 'Please enter a valid email', 'on' => 'co'],
-            ['website', 'url', 'defaultScheme' => 'http', 'skipOnEmpty' =>true, 'on' => 'co'],
+            [['website'], 'url', 'defaultScheme' => 'http', 'skipOnEmpty' =>true, 'on' => 'co'],
+        // Backend email forwarding ('email', 'email_pvt')
+            [['email'], 'string', 'max' => 30, 'on' => 'default'],
+            [['email_pvt'], 'string', 'max' => 10, 'on' => 'default'],
+            [['email', 'email_pvt'], 'email', 'message' => 'Please enter a valid email', 'on' => 'default'],
 
     // co-fe: Contact - Forwarding Email ('phone', 'email', 'email_pvt', 'website')
-            ['phone', 'string', 'on' => 'co-fe'],
-            ['phone', PhoneInputValidator::className(),'on' => 'co-fe'],
+            [['email_pvt'], 'required', 'on' => 'co-fe'],
+            [['phone'], 'string', 'on' => 'co-fe'],
+            [['phone'], PhoneInputValidator::className(),'on' => 'co-fe'],
             [['email', 'email_pvt'], 'string', 'max' => 60, 'on' => 'co-fe'],
             [['email', 'email_pvt'], 'email','message' => 'Please enter a valid email', 'on' => 'co-fe'],
-            ['website', 'url', 'defaultScheme' => 'http', 'skipOnEmpty' =>true, 'on' => 'co-fe'],
+            [['website'], 'url', 'defaultScheme' => 'http', 'skipOnEmpty' =>true, 'on' => 'co-fe'],
 
     // sf-church: Staff Church ('ind_first_name', 'ind_last_name', 'spouse_first_name', 'pastor_interim', 'cp_pastor')
             [['ind_first_name', 'ind_last_name'], 'required', 'on' => 'sf-church'],

@@ -139,3 +139,9 @@ $this->title = 'Contact Information';
         $("#hidden").val($("#phone").intlTelInput("getNumber"));
     });
 </script>
+<script>
+    $("td").click(function(event)
+    {
+           event.stopImmediatePropagation();
+    });
+</script>

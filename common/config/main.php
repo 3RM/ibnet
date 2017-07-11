@@ -6,7 +6,7 @@ return [
         'rbac' =>  [
             'class' => 'johnitvn\rbacplus\Module',
             'beforeCreateController' => function($route){
-                return true;                                   // Set to true to access rbac module (i.e. rule/permission/role/assignment routes)
+                return false;                                   // Set to true to access rbac module (i.e. rule/permission/role/assignment routes)
             },
             'userModelExtraDataColumls'=>[
                 [

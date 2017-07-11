@@ -26,13 +26,13 @@ class StaffSearch extends \common\models\profile\Staff
 
     public function search($params)
     {
-        $query = Staff::find();
+        $query = Staff::find()->orderBy(['id' => SORT_DESC]);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
-    		    'pageSize' => 10,
-    		],
+    		        'pageSize' => 10,
+    		    ],
         ]);
 
         // load the search form data and validate

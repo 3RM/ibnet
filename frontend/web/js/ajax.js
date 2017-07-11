@@ -48,6 +48,8 @@ var ajaxCallbacks = {
         // This is called by the link attribute 'data-on-done' => 'emailDone'
         //console.dir(response);
         $('#email-result').html(response.body);
-        window.location.reload();
+        if (response.success == true) {
+            window.location.reload();
+        }
     },
 }

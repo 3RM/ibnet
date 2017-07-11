@@ -69,10 +69,19 @@ class AjaxController extends Controller
             if (!($profile->load(Yii::$app->request->Post()) && 
                 $profile->validate())) {
 
-                return [
-                    'body' => 'Oops!  It looks like you need to fix an error with your contact information first.',
-                    'success' => true,
-                ];
+                if ($profile->email_pvt == NULL) {
+
+                    return [
+                        'body' => 'A private email is required.',
+                        'success' => false,
+                    ];
+                } else {
+
+                    return [
+                        'body' => 'Oops!  It looks like you need to fix an error with your contact information first.',
+                        'success' => true,
+                    ];
+                }
             }
 
             if ($profile->email_pvt_status == Profile::PRIVATE_EMAIL_PENDING) {

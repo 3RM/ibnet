@@ -2,6 +2,7 @@
 namespace backend\controllers;
 
 use backend\models\ProfileSearch;
+use backend\models\SocialSearch;
 use backend\models\StaffSearch;
 use backend\models\MissionarySearch;
 use backend\models\HousingSearch;
@@ -10,17 +11,21 @@ use backend\models\FellowshipSearch;
 use common\models\Utility;
 use common\models\profile\Association;
 use common\models\profile\Fellowship;
+use common\models\profile\Mail;
 use common\models\profile\Missionary;
 use common\models\profile\MissHousing;
 use common\models\profile\Profile;
+use common\models\profile\Social;
 use common\models\profile\Staff;
 use frontend\controllers\ProfileController;
+use kartik\grid\EditableColumnAction;
 use Yii;
 use yii\bootstrap\Html;
 use yii\data\ActiveDataProvider;
 use yii\db\Query;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 
 /**
@@ -413,6 +418,39 @@ class DirectoryController extends Controller
     }
 
     /**
+     * Displays social table
+     *
+     * @return string
+     */
+    public function actionSocial()
+    {
+        $searchModel = new SocialSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->get());
+        $gridColumns = [
+            'id',
+            'sermonaudio',
+            'facebook',
+            'linkedin',
+            'twitter',
+            'google',
+            'rss',
+            'youtube',
+            'vimeo',
+            'pinterest',
+            'tumblr',
+            'soundcloud',
+            'instagram',
+            'flickr'
+        ];
+
+        return $this->render('social', [
+            'searchModel' => $searchModel, 
+            'dataProvider' => $dataProvider,
+            'gridColumns' => $gridColumns,
+        ]);
+    }
+
+    /**
      * Displays staff table
      *
      * @return string
@@ -601,21 +639,40 @@ class DirectoryController extends Controller
             ],
         ]);
         $gridColumns = [
-            'id',
+            [
+                'attribute' => '',
+                'format' => 'raw',
+                'value' => function ($model) {                      
+                    return $model['status'] == Profile::STATUS_ACTIVE ? 
+                        Html::a(Html::icon('new-window'), ['frontend/profile/view-profile-by-id', 'id' => $model['id']], ['target' => '_blank']) :
+                        '';
+                },
+            ],
+            [
+                'attribute' => 'id',
+                'format' => 'raw',
+                'value' => function ($model) {                      
+                    return $model['status'] === Profile::STATUS_TRASH ? 
+                        '<span style="color: #CCC;">' . $model['id'] . '</span>' : 
+                        $model['id'];
+                }, 
+                'hAlign'=>'center',
+                'width'=>'1%',
+            ],
             [
                 'attribute' => 'user_id',
                 'format' => 'raw',
                 'value' => function ($model) {                      
                      return Html::a($model['user_id'], ['accounts/view', 'id' => $model['user_id']]);
                 },
+                'hAlign'=>'center',
+                'width'=>'1%'
             ],
             'type',
             'org_name',
             'ind_last_name',
             'created_at',
             'last_update',
-            'renewal_date',
-            'inactivation_date',
             [
                 'attribute' => 'status',
                 'format' => 'raw',
@@ -634,6 +691,16 @@ class DirectoryController extends Controller
             [
                 'class' => 'yii\grid\ActionColumn',
                 'header' => 'Actions',
+                'template' => '{clear} {disable}',
+                'buttons' =>
+                [
+                    'clear' => function ($url, $model, $key) {
+                        return Html::a(Html::icon('check'), ['clear-flag', 'id' => $model['id']]);
+                    },
+                    'disable' => function ($url, $model, $key) {
+                        return Html::a(Html::icon('ban-circle'), ['disable-profile', 'id' => $model['id']]);
+                    }
+                ],
             ],
         ];
 
@@ -644,13 +711,43 @@ class DirectoryController extends Controller
     }
 
     /**
+     * Clear a profile flag
+     *
+     * @return string
+     */
+    public function actionClearFlag($id)
+    {
+        if ($profile = Profile::findOne($id)) {
+            $profile->updateAttributes(['inappropriate' => NULL]);
+        }
+
+        return $this->redirect(['flagged']);
+    }
+
+    /**
+     * Disable a flagged profile
+     *
+     * @return string
+     */
+    public function actionDisableProfile($id)
+    {
+        if ($profile = Profile::findOne($id)) {
+            $profile->inactivate();
+        }
+
+        return $this->redirect(['flagged']);
+    }
+
+    /**
      * Displays forwarding email requests
      *
      * @return string
      */
     public function actionForwarding()
     {
-        $query = (new Query())->from('profile')->where(['email_pvt_status' => Profile::PRIVATE_EMAIL_PENDING]);
+       $query = Profile::find()
+            ->where(['email_pvt_status' => Profile::PRIVATE_EMAIL_PENDING])
+            ->indexBy('id');
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
@@ -658,12 +755,108 @@ class DirectoryController extends Controller
             ],
         ]);
         $gridColumns = [
-            
+            [
+                'attribute' => 'id',
+                'format' => 'raw',
+                'value' => function ($model) {                      
+                     return Html::a($model['id'], ['view', 'id' => $model['id']]);
+                },
+            ],
+            [
+                'attribute' => 'user_id',
+                'format' => 'raw',
+                'value' => function ($model) {                      
+                     return Html::a($model['user_id'], ['accounts/view', 'id' => $model['user_id']]);
+                },
+            ],
+            [
+                'attribute' => 'status',
+                'format' => 'raw',
+                'value' => function ($model) {  
+                    if ($model['status'] == Profile::STATUS_NEW) {
+                        return '<span style="color:blue">New</span>';
+                    } elseif ($model['status'] == Profile::STATUS_ACTIVE) {
+                        return '<span style="color:green">Active</span>';
+                    } elseif ($model['status'] == Profile::STATUS_INACTIVE) {
+                        return '<span style="color: orange;">Inactive</span>';  
+                    } else {
+                        return '<span style="color: #CCC;">Trash</span>';    
+                    }             
+                },
+            ],
+            'type',
+            'org_name',
+            'ind_last_name',
+            [
+                'class' => 'kartik\grid\EditableColumn',
+                'attribute' => 'email',
+                'editableOptions'=>[
+                    'inputType'=>\kartik\editable\Editable::INPUT_TEXT,
+                    'formOptions'=>['action' => ['updateForward']],
+                ],
+            ],
+            [
+                'class' => 'kartik\grid\EditableColumn',
+                'attribute' => 'email_pvt',
+                'editableOptions'=>[
+                    'inputType'=>\kartik\editable\Editable::INPUT_TEXT,
+                    'formOptions'=>['action' => ['updateForward']],
+                ],
+            ],
+            'email_pvt_status',
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'header' => 'Actions',
+                'template' => '{activate}',
+                'buttons' =>
+                [
+                    'activate' => function ($url, $model, $key) {
+                        return Html::a(Html::icon('check'), ['activate-forward', 'id' => $model['id']]);
+                    }
+                ],
+            ],
         ];
 
-        return $this->render('forwarding', [ 
+        
+        return $this->render('forwarding', [
             'dataProvider' => $dataProvider,
             'gridColumns' => $gridColumns,
+        ]);
+    }
+
+    /**
+     * Activate a private email & send new forwarding email request notification to admin
+     *
+     * @return string
+     */
+    public function actionActivateForward($id)
+    {
+        $profile = Profile::findOne($id);
+        if ($profile) {
+            $profile->updateAttributes(['email_pvt_status' => Profile::PRIVATE_EMAIL_ACTIVE]);
+        }
+
+        if (Mail::sendForwardingEmailNotif($profile->email)) {                                      // Send request to admin
+            Yii::$app->session->setFlash('success', 
+                'Private email status has been set to <i>Active</i> for profile ' . $profile->id . ' and a notification email has 
+                been sent to the user.');
+        }
+
+        return $this->redirect(['forwarding']);
+    }
+
+    /**
+     * Update editable columns in Gridview widget
+     *
+     * @return string
+     */
+    public function actions()
+    {
+        return ArrayHelper::merge(parent::actions(), [
+            'updateForward' => [                                                                    // identifier for the editable action
+                'class' => EditableColumnAction::className(),
+                'modelClass' => Profile::className(),
+            ],
         ]);
     }
 }

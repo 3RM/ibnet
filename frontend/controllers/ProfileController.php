@@ -183,7 +183,7 @@ class ProfileController extends Controller
      * Redirect to the proper profile page, given the profile id, city, name
      * @return mixed
      */
-    public function actionViewProfile($id, $city=NULL, $name=NULL)
+    public function actionViewProfile($city=NULL, $name=NULL, $id)
     {
         if (!$profile = $this->findViewProfile($id)) {
             $this->checkExpired($id);  
