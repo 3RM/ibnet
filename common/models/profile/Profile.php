@@ -580,7 +580,7 @@ class Profile extends \yii\db\ActiveRecord
             case 'nd-flwsp_ass':
             return [
                 'select' => $this->type . ' Name',
-                'name' => 'Or enter a new name here',
+                'name' => $this->org_name == NULL ? 'Or enter a new name here' : 'Fellowship Name',
                 'acronym' => 'Acronym',
                 'tagline' => $this->type . ' Tagline',
                 'flwsp_ass_level' => $this->type . ' Level',
@@ -866,7 +866,7 @@ class Profile extends \yii\db\ActiveRecord
                     if ($oldA = Fellowship::find()->where(['profile_id' => $this->id])->one()) {    // Unlink old fellowship
                         $oldA->unlink('profile', $this);
                     }
-                    $fellowship->link('profile', $this);                                            // link fellowship in fellowship table
+                    $fellowship->link('linkedProfile', $this);                                      // link fellowship in fellowship table
                 }
             } elseif (!empty($this->name) && !Fellowship::find()                                    // Check for duplicate
                 ->where(['fellowship' => $this->name])->exists()) {
@@ -889,7 +889,7 @@ class Profile extends \yii\db\ActiveRecord
                     if ($oldA = Association::find()->where(['profile_id' => $this->id])->one()) {   // Unlink old association
                         $oldA->unlink('profile', $this);
                     }
-                    $association->link('profile', $this);                                           // link association in association table
+                    $association->link('linkedProfile', $this);                                     // link association in association table
                 }
             } elseif (!empty($this->name) && !Association::find()                                   // Check for duplicate
                 ->where(['association' => $this->name])->exists()) {

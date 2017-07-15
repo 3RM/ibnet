@@ -161,20 +161,21 @@ use yii\helpers\Html;
 
                 <li class="dropdown user user-menu">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        <?= empty($user->image) ? 
-                                Html::img('@web/images/user.png', ['class' => 'user-image', 'alt' => 'User image']) : 
-                                Html::img($user->image, ['class' => 'user-image', 'alt' => 'User image']) ?>
+                        <?= empty($user->usr_image) ? 
+                            Html::img('@web/images/user.png', ['class' => 'user-image img-circle', 'alt' => 'User image']) :
+                            Html::img(\Yii::$app->params['frontendUrl'] . $user->usr_image, ['class' => 'user-image img-circle', 'alt' => 'User image']) ?>
                         <span class="hidden-xs"><?= $user->first_name . ' ' . $user->last_name ?></span>
                     </a>
                     <ul class="dropdown-menu">
                         <!-- User image -->
                         <li class="user-header">
-                            <?= empty($user->image) ? 
-                                Html::img('@web/images/user.png', ['class' => 'img-circle', 'alt' => 'User image']) : 
-                                Html::img($user->image, ['class' => 'img-circle', 'alt' => 'User image']) ?>
+                            <?= empty($user->usr_image) ? 
+                                Html::img('@web/images/user.png', ['class' => 'img-circle', 'alt' => 'User image']) :
+                                Html::img(\Yii::$app->params['frontendUrl'] . $user->usr_image, ['class' => 'img-circle', 'alt' => 'User image']) ?>
 
                             <p>
-                                <?= $user->first_name . ' ' . $user->last_name . ' - Role' ?>
+                                <?php $assignment = $user->assignment ?>
+                                <?= $user->first_name . ' ' . $user->last_name . ' - ' . $assignment->item_name ?>
                                 <small>Member since <?= Yii::$app->formatter->asDate($user->created_at, 'php:F Y') ?></small>
                             </p>
                         </li>

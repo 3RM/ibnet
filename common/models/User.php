@@ -1,6 +1,7 @@
 <?php
 namespace common\models;
 
+use common\models\Assignment;
 use sadovojav\cutter\behaviors\CutterBehavior;
 use Yii;
 use yii\base\NotSupportedException;
@@ -255,6 +256,30 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAssignment()
+    {
+        return $this->hasOne(Assignment::className(), ['user_id' => 'id']);
+    }
+
+    /**
+     * Generates new email confirmation token
+     */
+    public function generateNewEmailToken()
+    {
+        return $this->updateAttributes(['new_email_token' => Yii::$app->security->generateRandomString() . '_' . time()]);
+    }
+
+    /**
+     * Removes new email confirmation token
+     */
+    public function removeNewEmailToken()
+    {
+        $this->updateAttributes(['new_email_token' => null]);
+    }
+
+    /**
      * Finds user by new email confirmation token
      *
      * @param string $token new email confirmation token
@@ -269,19 +294,20 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
-     * Generates new email confirmation token
+     * Finds out if new email token is valid
+     *
+     * @param string $token new email token
+     * @return boolean
      */
-    public function generateNewEmailToken()
+    public static function isNewEmailTokenValid($token)
     {
-        return $this->updateAttributes(['new_email_token' => Yii::$app->security->generateRandomString()]);
-    }
+        if (empty($token)) {
+            return false;
+        }
 
-    /**
-     * Removes new email confirmation token
-     */
-    public function removeNewEmailToken()
-    {
-        $this->updateAttributes(['new_email_token' => null]);
+        $timestamp = (int) substr($token, strrpos($token, '_') + 1);
+        $expire = Yii::$app->params['user.newEmailTokenExpire'];
+        return $timestamp + $expire >= time();
     }
 
     /**

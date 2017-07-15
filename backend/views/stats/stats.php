@@ -1,5 +1,8 @@
 <?php
 
+use common\models\Utility;  
+use yii\web\View;
+
 /* @var $this yii\web\View */
 
 $this->title = 'Stats';
@@ -11,35 +14,45 @@ $this->title = 'Stats';
     <div class="body-content">
 
         <div id="container1" style="width:60%; height:300px;"></div>
-         <div id="container2" style="width:60%; height:300px;"></div>
-          <div id="container3" style="width:60%; height:300px;"></div>
-        
+        <div id="container2" style="width:60%; height:300px;"></div>
+        <div id="container3" style="width:60%; height:300px;"></div>
 
-    </div>
-</div>
+    </div> 
+</div> 
+
 <?php
 $script = <<< JS
      $(function () { 
-
         var myChart = Highcharts.chart('container1', {
             title: {
-                text: 'Profiles'
+                text: 'Profiles - Rolling 12 Month'
             },
             xAxis: {
-                categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+                type: 'datetime',
+                dateTimeLabelFormats: {
+                    day: '%b %e, %y'
+                }
+            },
+            yAxis: {
+                title: {
+                    text: 'Count',
+                }
             },
             series: [{
-                data: [5, 6, 7, 8, null, 10, 11, null, 13],
-                step: 'center',
+                data: [$total],
+                pointStart: Date.UTC($yr, $mo, $dy),
+                pointInterval: 7 * 24 * 3600 * 1000,  
                 name: 'Total'
             }, {
-                data: [9, 10, 11, 12, null, 14, 15, null, 17],
-                step: 'left',
-                name: 'Organizations'
+                data: [$ind],
+                pointStart: Date.UTC($yr, $mo, $dy),
+                pointInterval: 7 * 24 * 3600 * 1000,  
+                name: 'Total'
             }, {
-                data: [5, 6, 7, 8, null, 10, 11, null, 13],
-                step: 'center',
-                name: 'Individuals'
+                data: [$org],
+                pointStart: Date.UTC($yr, $mo, $dy),
+                pointInterval: 7 * 24 * 3600 * 1000,  
+                name: 'Total'
             }]
         
         });
@@ -48,8 +61,16 @@ $script = <<< JS
             title: {
                 text: 'Organizations'
             },
-            xAxis: {
-                categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+           xAxis: {
+                type: 'datetime',
+                dateTimeLabelFormats: {
+                    day: '%e %b, %y'
+                }
+            },
+            yAxis: {
+                title: {
+                    text: 'Count',
+                }
             },
             series: [{
                 data: [5, 6, 7, 8, null, 10, 11, null, 13],

@@ -5,6 +5,7 @@ use common\models\profile\ProfileTracking;
 use common\models\Utility;
 use Yii;
 use yii\bootstrap\Html;
+use yii\helpers\ArrayHelper;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -45,13 +46,28 @@ class StatsController extends Controller
      */
     public function actionStats()
     {
-        $statsArray = ProfileTracking::find()->all();
+        $statsArray = ProfileTracking::find()->limit(52)->orderBy('date Asc')->all();
+        $total = [];
         foreach ($statsArray as $stat) {
-            $types = unserialize($stat->type_array);
-           // Utility::pp($stat->type_array);
+            $statsArray['typeArray'] = unserialize($stat->type_array);
+            $types = unserialize($stat->type_array); //Utility::pp($statsArray);
+            $countCol = ArrayHelper::getcolumn($types, 'count');
+            array_push($total, array_sum($countCol));
         }
-        //$total = ;
-        return $this->render('stats');
+
+        $total = join($total, ',');
+
+        $date = strtotime($statsArray[0]['date']);                                                  // Plot start date
+        $yr = date('Y', $date);
+        $mo = date('m', $date)-1;                                                                   // UTC month is zer-based
+        $dy = date('d', $date);
+    
+        return $this->render('stats', [
+            'total' => $total,
+            'yr' => $yr,
+            'mo' => $mo,
+            'dy' => $dy,
+        ]);
     }
 
 }

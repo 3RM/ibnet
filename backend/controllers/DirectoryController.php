@@ -795,23 +795,19 @@ class DirectoryController extends Controller
                     'formOptions'=>['action' => ['updateForward']],
                 ],
             ],
-            [
-                'class' => 'kartik\grid\EditableColumn',
-                'attribute' => 'email_pvt',
-                'editableOptions'=>[
-                    'inputType'=>\kartik\editable\Editable::INPUT_TEXT,
-                    'formOptions'=>['action' => ['updateForward']],
-                ],
-            ],
+            'email_pvt',
             'email_pvt_status',
             [
                 'class' => 'yii\grid\ActionColumn',
                 'header' => 'Actions',
-                'template' => '{activate}',
+                'template' => '{activate} {cancel}',
                 'buttons' =>
                 [
                     'activate' => function ($url, $model, $key) {
                         return Html::a(Html::icon('check'), ['activate-forward', 'id' => $model['id']]);
+                    },
+                    'cancel' => function ($url, $model, $key) {
+                        return Html::a(Html::icon('unchecked'), ['cancel-forward', 'id' => $model['id']]);
                     }
                 ],
             ],
@@ -840,6 +836,25 @@ class DirectoryController extends Controller
             Yii::$app->session->setFlash('success', 
                 'Private email status has been set to <i>Active</i> for profile ' . $profile->id . ' and a notification email has 
                 been sent to the user.');
+        }
+
+        return $this->redirect(['forwarding']);
+    }
+
+    /**
+     * Activate a private email & send new forwarding email request notification to admin
+     *
+     * @return string
+     */
+    public function actionCancelForward($id)
+    {
+        $profile = Profile::findOne($id);
+        if ($profile) {
+            $profile->updateAttributes(['email_pvt' => NULL, 'email_pvt_status' => NULL]);
+
+            Yii::$app->session->setFlash('success', 
+                'Private email has been canceled for profile ' . $profile->id . '. "status" and "email_pvt" were set 
+                to NULL.');
         }
 
         return $this->redirect(['forwarding']);

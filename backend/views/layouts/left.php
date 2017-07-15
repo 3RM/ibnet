@@ -10,9 +10,9 @@ use yii\helpers\Html;
         <!-- Sidebar user panel -->
         <div class="user-panel">
             <div class="pull-left image">
-                <?= empty($user->image) ? 
-                                Html::img('@web/images/user.png', ['class' => 'img-circle', 'alt' => 'User image']) : 
-                                Html::img($user->image, ['class' => 'img-circle', 'alt' => 'User image']) ?>
+                <?= empty($user->usr_image) ? 
+                    Html::img('@web/images/user.png', ['class' => 'img-circle', 'alt' => 'User image']) :
+                    Html::img(\Yii::$app->params['frontendUrl'] . $user->usr_image, ['class' => 'img-circle', 'alt' => 'User image']) ?>
             </div>
             <div class="pull-left info">
                 <p><?= $user->first_name . ' ' . $user->last_name ?></p>
@@ -76,7 +76,7 @@ use yii\helpers\Html;
                             ['label' => 'Flagged', 'icon' => 'flag', 'url' => ['/directory/flagged'],],
                         ],
                     ],
-                    ['label' => 'Database', 'icon' => 'database', 'url' => ['/debug']],
+                    ['label' => 'Database', 'icon' => 'database', 'url' => ['/database/db']],
                     [
                         'label' => 'Server', 
                         'icon' => 'server', 

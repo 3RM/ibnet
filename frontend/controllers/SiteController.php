@@ -443,17 +443,20 @@ class SiteController extends Controller
      *
      * @return mixed
      */
-    public function actionRegistrationComplete($token)
+    public function actionRegistrationComplete($token=null)
     {
-        if ($token && $user = User::findByNewEmailToken($token)) {
-            $user->updateAttributes([
-                'new_email_token' => NULL,
-                'email' => $user->new_email,
-                'new_email' => NULL]);
-            Yii::$app->getUser()->login($user);
-
-            return $this->render('registrationComplete');
+        if (!empty($token)) {
+            if (($user = User::findByNewEmailToken($token)) && ($user->isnewEmailTokenValid($token))) {
+                $user->updateAttributes([
+                    'new_email_token' => NULL,
+                    'email' => $user->new_email,
+                    'new_email' => NULL]);
+                Yii::$app->getUser()->login($user);
+                return $this->render('registrationComplete');
+            }
+            return $this->render('registeredAlready');
         }
+        return $this->goHome();
     }
 
     /**

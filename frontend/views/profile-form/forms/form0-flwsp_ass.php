@@ -25,7 +25,7 @@ $this->title = 'Name and Description';
 
         <?php $form = ActiveForm::begin(); ?>
           
-             <?php if ($profile->org_name == NULL || $toggle) { ?>
+             <?php if ($profile->org_name == NULL) { ?>
 
             <div class="row">
                 <div class="col-md-8">        
