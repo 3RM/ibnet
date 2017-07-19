@@ -115,18 +115,18 @@ EOD
                                             'class' => 'btn btn-form btn-sm',
                                             'name' => 'add',
                                             'value' => $staff->id,
-                                        ]) ?>
+                                        ]); ?>
                                         
 
                                         <?php if ($staff['sr_pastor'] == NULL && 
                                             ($staff->staff_title == 'Senior Pastor' || $staff->staff_title == 'Pastor' || 
-                                            ($staff->staff_title == 'Church Planter' && $staff->prof_home_church != $profile->id))) { ?>
+                                            ($staff->staff_title == 'Church Planter' && $staff->home_church != $profile->id))) { ?>
                                             <?= Html::submitButton(HTML::icon('ok') . ' Add Sr. Pastor', [
                                                 'method' => 'POST',
                                                 'class' => 'btn btn-form btn-sm',
                                                 'name' => 'senior',
                                                 'value' => $staff->staff_id . '+' . $staff->id,
-                                            ]) ?>
+                                            ]); ?>
                                         <?php } ?>
 
 
@@ -136,7 +136,7 @@ EOD
                                             'class' => 'btn btn-form btn-sm',
                                             'name' => 'remove',
                                             'value' => $staff->id,
-                                        ]) ?>
+                                        ]); ?>
                                     <?php } ?>
                                 </td>
                                 

@@ -13,7 +13,7 @@ use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-$this->title = isset($profile->spouse_first_name) ?
+$this->title = !empty($profile->spouse_first_name) ?
 	($profile->ind_first_name . ' & ' . $profile->spouse_first_name . ' ' . $profile->ind_last_name) :
 	($profile->ind_first_name . ' ' . $profile->ind_last_name);
 ?>
@@ -199,6 +199,12 @@ $this->title = isset($profile->spouse_first_name) ?
 				<br>
 				<?php } ?>
 				<!-- End Ministry Of (Box 3) -->
+				<!-- Begin Linked Mission Agency (Box 3) -->
+				<strong>Mission Agency: </strong><span  class="pull-right edit"><?= Html::a(Html::icon('edit'), ['/profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['ma']-1, 'id' => $profile->id]) ?></span><br>
+				<?= empty($missionLink) ?
+			    	$mission->mission . '<br><br>' : 
+			    	HTML::a($missionLink->org_name, ['profile/mission-agency', 'id' => $missionLink->id, 'city' => $missionLink->url_city, 'name' => $missionLink->url_name], ['target' => '_blank']) . '<br><br>' ?>
+				<!-- End Linked Mission Agency -->
 				<!-- Begin Fellowship (Box 3) -->
 				<strong>Fellowship:</strong><span  class="pull-right edit"><?= Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['as']-1, 'id' => $profile->id]) ?></span><br>
 				<?php if ($fellowships) {

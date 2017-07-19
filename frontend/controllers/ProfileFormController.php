@@ -44,7 +44,7 @@ class ProfileFormController extends ProfileController
         'Pastor' =>           [1,  1,  1,  1,  1,  0,  0,  0,  1,  0,  1,  0,  1,  0,  1,  0,  0,  1,  0],  
         'Evangelist' =>       [1,  1,  1,  1,  1,  0,  0,  0,  1,  0,  1,  0,  1,  0,  1,  0,  0,  1,  0],
         'Missionary' =>       [1,  1,  1,  1,  1,  0,  0,  1,  1,  1,  1,  0,  1,  0,  1,  1,  0,  0,  0],
-        'Chaplain' =>         [1,  1,  1,  1,  1,  0,  0,  0,  1,  0,  1,  0,  1,  0,  0,  0,  0,  0,  0],
+        'Chaplain' =>         [1,  1,  1,  1,  1,  0,  0,  0,  1,  0,  1,  0,  1,  0,  0,  1,  0,  0,  0],
         'Staff' =>            [1,  1,  1,  1,  1,  0,  0,  0,  1,  0,  1,  0,  1,  0,  0,  0,  0,  0,  0],
         'Church' =>           [1,  1,  1,  1,  1,  1,  1,  0,  0,  0,  0,  1,  0,  0,  1,  1,  1,  1,  0],
         'Mission Agency' =>   [1,  1,  1,  1,  1,  1,  0,  0,  0,  0,  1,  0,  0,  0,  0,  0,  0,  0,  0],
@@ -712,7 +712,7 @@ class ProfileFormController extends ProfileController
                     profile.ind_city,
                     profile.ind_st_prov_reg,
                     profile.sub_type,
-                    profile.home_church AS prof_home_church')
+                    profile.home_church')
                 ->innerJoinWith('profile', '`staff`.`staff_id` = `profile`.`id`')
                 ->where(['staff.ministry_id' => $profile->id])
                 ->andWhere(['staff.sr_pastor' => NULL])
@@ -1391,11 +1391,13 @@ class ProfileFormController extends ProfileController
             return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
         }
 
-        if ($profile->type == 'Missionary') {
+        if ($profile->type == 'Missionary' || $profile->type == 'Chaplain') {
             $profile->missionary_id == NULL ?
                 $missionary = new Missionary() :
                 $missionary = $profile->missionary;
-            $missionary->scenario = 'ma-missionary';
+            $profile->type == 'Missionary' ?
+                $missionary->scenario = 'ma-missionary' :
+                $missionary->scenario = 'ma-chaplain';
         }
 
     // ************************* Remove Packet *********************************
@@ -1429,7 +1431,7 @@ class ProfileFormController extends ProfileController
             } 
 
     // ************************** Missionary POST *******************************    
-        } elseif ($profile->type == 'Missionary' && 
+         } elseif (($profile->type == 'Missionary' || $profile->type == 'Chaplain') &&  
             $missionary->load(Yii::$app->request->Post()) && 
             $missionary->handleFormMA($profile) && 
             $profile->setProgress($fmNum)) { 

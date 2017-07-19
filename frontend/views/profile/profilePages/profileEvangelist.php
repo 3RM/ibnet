@@ -3,6 +3,7 @@
 use common\models\profile\Profile;
 use common\widgets\Alert;
 use frontend\assets\AppAsset;
+use frontend\controllers\ProfileController;
 use kartik\markdown\Markdown;
 use tugmaks\GoogleMaps\Map;
 use yii\bootstrap\Modal;
@@ -11,7 +12,7 @@ use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-$this->title = isset($profile->spouse_first_name) ?
+$this->title = !empty($profile->spouse_first_name) ?
 	($profile->ind_first_name . ' & ' . $profile->spouse_first_name . ' ' . $profile->ind_last_name) :
 	($profile->ind_first_name . ' ' . $profile->ind_last_name);
 ?>
@@ -139,8 +140,15 @@ $this->title = isset($profile->spouse_first_name) ?
 				<?= $churchLink ? '<strong>Home Church: </strong><br>' . HTML::a($churchLink, ['church', 'id' => $church->id, 'city' => $church->url_city, 'name' => $church->url_name]) . '<br><br>' : '<br>' ?>
 				<!-- End Home Church -->
 				<!-- Begin Parent Ministry (Box 3) -->
-				<?= $ministryLink ? '<strong>Serving with: </strong><br>' . HTML::a($ministryLink, ['church', 'id' => $ministry->id, 'city' => $ministry->url_city, 'name' => $ministry->url_name]) . '<br><br>' : '<br>' ?>
+				<?= $ministryLink ? '<strong>Serving with: </strong><br>' . HTML::a($ministryLink, ['church', 'id' => $ministry->id, 'city' => $ministry->url_city, 'name' => $ministry->url_name]) . '<br><br>' : NULL ?>
 				<!-- End Parent Ministry -->
+				<!-- Begin Linked Mission Agency (Box 3) -->
+				<?php if ($mission ||  $missionLink) { ?>
+					<strong>Mission Agency: </strong><br>
+					<?= empty($missionLink) ? 
+						$mission->mission . '<br><br>' : 
+						HTML::a($missionLink->org_name, ['mission-agency', 'id' => $missionLink->id, 'city' => $missionLink->url_city, 'name' => $missionLink->url_name]) . '<br><br>' ?><br>
+				<?php } ?>
 				<!-- Begin Fellowship (Box 3) -->
 				<?php if ($fellowships) {
 					echo '<br><strong>Fellowship:</strong><br>';

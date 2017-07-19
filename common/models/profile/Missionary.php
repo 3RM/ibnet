@@ -19,7 +19,7 @@ use yii\web\UploadedFile;
 class Missionary extends \yii\db\ActiveRecord
 {
 
-    public $selec;                  // User selected ministry from AJAX dropdown
+    public $select;                  // User selected ministry from AJAX dropdown
     public $showMap;                // Accepts checkbox selection for map display on missionary church plant form
 
     /**
@@ -35,6 +35,7 @@ class Missionary extends \yii\db\ActiveRecord
             'fi' => ['field', 'status'],
             'cp' => ['select', 'showMap'],
             'ma-missionary' => ['mission_agcy_id', 'packet'],
+            'ma-chaplain' => ['mission_agcy_id', 'packet'],
         ];
     }
 
@@ -46,8 +47,11 @@ class Missionary extends \yii\db\ActiveRecord
         return [
             [['field', 'status'], 'required', 'on' => 'fi'],
             [['select', 'showMap'], 'safe', 'on' => 'cp'],
-            ['mission_agcy_id', 'required', 'on' => 'ma-missionary'],
-            ['packet', 'file', 'extensions' => 'pdf', 'mimeTypes' => 'application/pdf', 'maxFiles' => 1, 'maxSize' => 1024 * 6000, 'skipOnEmpty' => true, 'on' => 'ma-missionary'],
+            [['mission_agcy_id'], 'required', 'on' => 'ma-missionary'],
+            [['packet'], 'file', 'extensions' => 'pdf', 'mimeTypes' => 'application/pdf', 'maxFiles' => 1, 'maxSize' => 1024 * 6000, 'skipOnEmpty' => true, 'on' => 'ma-missionary'],
+            
+            [['mission_agcy_id'], 'safe', 'on' => 'ma-chaplain'],
+            [['packet'], 'file', 'extensions' => 'pdf', 'mimeTypes' => 'application/pdf', 'maxFiles' => 1, 'maxSize' => 1024 * 6000, 'skipOnEmpty' => true, 'on' => 'ma-chaplain'],
         ];
     }
 

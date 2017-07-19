@@ -92,7 +92,7 @@ $this->title = $profile->org_name;
 			<div class="col-xs-8">
 				<!-- Begin Image & Description -->
 				<h2>About <?= $this->title ?></h2>
-				<h4><?= '<span  class="edit">' . Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => 6-1, 'id' => $profile->id]) . '</span>' ?> 
+				<h4><?= '<span  class="edit">' . Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['sf']-1, 'id' => $profile->id]) . '</span>' ?> 
 					Pastor <?= empty($pastorLink) ? $profile->formattedNames :
 						HTML::a($profile->formattedNames, ['/profile/pastor', 'id' => $pastorLink->id, 'city' => $pastorLink->url_city, 'name' => $pastorLink->url_name], ['target' => '_blank']); ?>
 					<?= $profile->pastor_interim ? ' (Interim)' : NULL ?>

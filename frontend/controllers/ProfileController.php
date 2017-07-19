@@ -327,6 +327,7 @@ class ProfileController extends Controller
                 return $this->render('profilePages/profileExpired');
             }
         }
+        $missionary = $profile->missionary;
         if ($profile && ($profile->type == 'Chaplain')) {
             $profile->getformattedNames();
             $church = NULL;
@@ -334,8 +335,15 @@ class ProfileController extends Controller
             $social = NULL;
             $fellowship = NULL;
             $flwshipLink = NULL;
-            if ($profile->ministry_of && 
-                $church = $this->findActiveProfile($profile->ministry_of)) {
+            $mission = NULL;
+            $missionLink = NULL;
+            if ($mission = $missionary->missionAgcy) {
+                if ($mission->profile_id) {
+                    $missionLink = $this->findActiveProfile($mission->profile_id);
+                }
+            }
+            if ($profile->home_church && 
+                $church = $this->findActiveProfile($profile->home_church)) {
                 $churchLink = $church->org_name . ', ' . 
                     $church->org_city . ', ' . $church->org_st_prov_reg;
                 $church->org_country == 'United States' ? NULL : 
@@ -366,6 +374,8 @@ class ProfileController extends Controller
                 'flwshipLink' => $flwshipLink,
                 'church' => $church,
                 'churchLink' => $churchLink,
+                'mission' => $mission,
+                'missionLink' => $missionLink,
                 'ministry'  => NULL,
                 'ministryLink' => NULL,
                 'schoolsAttended' => $schoolsAttended]);

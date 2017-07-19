@@ -221,6 +221,9 @@ class PreviewController extends ProfileFormController
         if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
             throw new NotFoundHttpException;
         }
+        if (!$missionary = $profile->missionary) {
+            throw new NotFoundHttpException;
+        }
         if ($profile->type == 'Chaplain') {
 
             if (isset($_POST['activate'])) {
@@ -236,7 +239,14 @@ class PreviewController extends ProfileFormController
             $social = NULL;
             $fellowship = NULL;
             $flwshipLink = NULL;
-            if ($profile->ministry_of && 
+            $mission = NULL;
+            $missionLink = NULL;
+            if ($mission = $missionary->missionAgcy) {
+                if ($mission->profile_id) {
+                    $missionLink = $this->findActiveProfile($mission->profile_id);
+                }
+            }
+            if ($profile->home_church && 
                 $church = $this->findActiveProfile($profile->home_church)) {
                 $churchLink = $church->org_name . ', ' . 
                     $church->org_city . ', ' . $church->org_st_prov_reg;
@@ -271,6 +281,8 @@ class PreviewController extends ProfileFormController
                 'flwshipLink' => $flwshipLink,
                 'church' => $church,
                 'churchLink' => $churchLink,
+                'mission' => $mission,
+                'missionLink' => $missionLink,
                 'schoolsAttended' => $schoolsAttended,
                 'formList' => ProfileFormController::$formList,
                 'typeMask' => $typeMask,
