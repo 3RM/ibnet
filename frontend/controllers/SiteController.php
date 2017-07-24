@@ -446,7 +446,7 @@ class SiteController extends Controller
     public function actionRegistrationComplete($token=null)
     {
         if (!empty($token)) {
-            if (($user = User::findByNewEmailToken($token)) && ($user->isnewEmailTokenValid($token))) {
+            if (($user = User::findByNewEmailToken($token)) && ($user->isNewEmailTokenValid($token))) {
                 $user->updateAttributes([
                     'new_email_token' => NULL,
                     'email' => $user->new_email,

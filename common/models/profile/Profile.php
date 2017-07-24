@@ -8,6 +8,7 @@ use common\models\profile\Country;
 use common\models\profile\FormsCompleted;
 use common\models\profile\GoogleGeocoder;
 use common\models\profile\State;
+use common\models\profile\Type;
 use common\models\SendMail;
 use common\models\User;
 use common\models\Utility;
@@ -88,6 +89,12 @@ class Profile extends \yii\db\ActiveRecord
     const STATUS_ACTIVE = 10;
     const STATUS_INACTIVE = 20;
     const STATUS_TRASH = 30;
+
+    /**
+     * The profile category.
+     */
+    const CATEGORY_IND = 10;
+    const CATEGORY_ORG = 20;
 
     const PRIVATE_EMAIL_NONE = 0;       // Private email status
     const PRIVATE_EMAIL_ACTIVE = 10;
@@ -1612,7 +1619,7 @@ class Profile extends \yii\db\ActiveRecord
         if (!empty($oldSelectM) && ($selectM = $this->selectM) != NULL) {                           // handle all other cases of change in selection
             foreach($selectM as $value) {                                                           // link any new selections
                 if(!in_array($value, $oldSelectM)) {
-                    $a = Association::findOne($value); var_dump($a); die;
+                    $a = Association::findOne($value);
                     $this->link('association', $a);
  
                     if ($aProfile =$a->linkedProfile) {                                            // notify new association profile owner of new link
@@ -1756,6 +1763,13 @@ class Profile extends \yii\db\ActiveRecord
         }
 
         MailController::dbSendLink($this->id);                                                      // send link notifications to profile owners
+        
+        if ($this->category = self::CATEGORY_IND) {                                                 // Update number of active individual profiles
+            $user = Yii::$app->user->identity;
+            $indProfiles = $user->ind_act_profiles + 1;
+            $user->updateAttributes(['ind_act_profiles' => $indProfiles]);
+        }
+
         $this->updateAttributes([
             'created_at' => $createDate, 
             'status' => self::STATUS_ACTIVE,
@@ -1773,11 +1787,17 @@ class Profile extends \yii\db\ActiveRecord
      */
     public function inactivate()
     {
-        if ($progress = FormsCompleted::findOne($this->id)) {
+        if ($progress = FormsCompleted::findOne($this->id)) {                                       // Delete progress
             $progress->delete();
         }
         if ($this->setUpdateDate() && 
             $this->updateAttributes(['status' => Profile::STATUS_INACTIVE, 'renewal_date' => NULL])) {
+
+            if ($this->category = self::CATEGORY_IND) {                                             // Update number of active individual profiles
+                $user = Yii::$app->user->identity;
+                $indProfiles = $user->ind_act_profiles - 1;
+                $user->updateAttributes(['ind_act_profiles' => $indProfiles]);
+            }
             return true;
         }
         return false;

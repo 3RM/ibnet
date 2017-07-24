@@ -1,6 +1,7 @@
 <?php
 namespace common\models\profile;
 
+use frontend\controllers\ProfileController;
 use frontend\controllers\ProfileFormController;
 use yii;
 use yii\base\Model;
@@ -89,7 +90,7 @@ class Mail extends \yii\db\ActiveRecord
                     $title = 'A Link to your Church Profile has Changed' :
                     $title = 'New Link to your Church Profile';
                 $msg = Html::a($linkingProfile->ind_first_name . ' ' . $linkingProfile->ind_last_name, 
-                    Url::toRoute(['profile/' . strtolower($linkingProfile->type), 
+                    Url::toRoute(['profile/' . ProfileController::$profilePageArray[$linkingProfile->type], 
                         'city' => $linkingProfile->url_city, 
                         'name' => $linkingProfile->url_name, 
                         'id' => $linkingProfile->id], 'https'));
@@ -97,7 +98,7 @@ class Mail extends \yii\db\ActiveRecord
                     $msg .= ' has just unlinked from ' :
                     $msg .= ' has just linked to ';
                 $msg .= Html::a($profile->org_name, 
-                    Url::toRoute(['profile/' . strtolower($profile->type), 
+                    Url::toRoute(['profile/' . ProfileController::$profilePageArray[$profile->type], 
                         'city' => $profile->url_city, 
                         'name' => $profile->url_name, 
                         'id' => $profile->id], 'https')) . '.';
@@ -126,13 +127,13 @@ class Mail extends \yii\db\ActiveRecord
                 }
                 if ($linkingProfile->isIndividual($linkingProfile->type)) {
                     $msg = Html::a($linkingProfile->ind_first_name . ' ' . $linkingProfile->ind_last_name, 
-                        Url::toRoute(['profile/' . strtolower($linkingProfile->type), 
+                        Url::toRoute(['profile/' . ProfileController::$profilePageArray[$linkingProfile->type], 
                             'city' => $linkingProfile->url_city, 
                             'name' => $linkingProfile->url_name, 
                             'id' => $linkingProfile->id], 'https'));
                 } else {
                     $msg = Html::a($linkingProfile->org_name, 
-                        Url::toRoute(['profile/' . strtolower($linkingProfile->type), 
+                        Url::toRoute(['profile/' . ProfileController::$profilePageArray[$linkingProfile->type], 
                             'city' => $linkingProfile->url_city, 
                             'name' => $linkingProfile->url_name, 
                             'id' => $linkingProfile->id], 'https'));
@@ -141,7 +142,7 @@ class Mail extends \yii\db\ActiveRecord
                     $msg .= ' has just unlinked from ' :
                     $msg .= ' has just linked to ';
                 $msg .= Html::a($profile->org_name, 
-                    Url::toRoute(['profile/' . strtolower($profile->type), 
+                    Url::toRoute(['profile/' . ProfileController::$profilePageArray[$profile->type], 
                         'city' => $profile->url_city, 
                         'name' => $profile->url_name, 
                         'id' => $profile->id], 'https')) . '.';
@@ -172,7 +173,7 @@ class Mail extends \yii\db\ActiveRecord
                     $title = 'Change to Your Status' :
                     $title = 'Staff Status Confirmed';
                 $msg = Html::a($linkingProfile->org_name, 
-                    Url::toRoute(['profile/' . strtolower($linkingProfile->type), 
+                    Url::toRoute(['profile/' . ProfileController::$profilePageArray[$linkingProfile->type], 
                         'city' => $linkingProfile->url_city, 
                         'name' => $linkingProfile->url_name, 
                         'id' => $linkingProfile->id], 'https'));
@@ -180,7 +181,7 @@ class Mail extends \yii\db\ActiveRecord
                     $msg .= ' has just removed your status as staff for your profile "' :
                     $msg .= ' has just confirmed your status as staff for your profile "';
                 $msg .= Html::a($profile->profile_name, 
-                    Url::toRoute(['profile/' . strtolower($profile->type), 
+                    Url::toRoute(['profile/' . ProfileController::$profilePageArray[$profile->type], 
                         'city' => $profile->url_city, 
                         'name' => $profile->url_name, 
                         'id' => $profile->id], 'https')) . '".';
@@ -192,7 +193,7 @@ class Mail extends \yii\db\ActiveRecord
                     $title = 'Change to your Status' :
                     $title = 'Staff Status Confirmed';
                 $msg = Html::a($linkingProfile->org_name, 
-                    Url::toRoute(['profile/' . strtolower($linkingProfile->type), 
+                    Url::toRoute(['profile/' . ProfileController::$profilePageArray[$linkingProfile->type], 
                         'city' => $linkingProfile->url_city, 
                         'name' => $linkingProfile->url_name, 
                         'id' => $linkingProfile->id], 'https'));
@@ -200,7 +201,7 @@ class Mail extends \yii\db\ActiveRecord
                     $msg .= ' has just removed your status as Senior Pastor for your profile "' :
                     $msg .= ' has just confirmed your status as Senior Pastor for your profile "';
                 $msg .= Html::a($profile->profile_name, 
-                    Url::toRoute(['profile/' . strtolower($profile->type), 
+                    Url::toRoute(['profile/' . ProfileController::$profilePageArray[$profile->type], 
                         'city' => $profile->url_city, 
                         'name' => $profile->url_name, 
                         'id' => $profile->id], 'https')) . '".';
@@ -212,7 +213,7 @@ class Mail extends \yii\db\ActiveRecord
                     $title = 'Change to a Linked Minsitry' :
                     $title = 'New Linked Minsitry';
                 $msg = Html::a($linkingProfile->org_name, 
-                    Url::toRoute(['profile/' . strtolower($linkingProfile->type), 
+                    Url::toRoute(['profile/' . ProfileController::$profilePageArray[$linkingProfile->type], 
                         'city' => $linkingProfile->url_city, 
                         'name' => $linkingProfile->url_name, 
                         'id' => $linkingProfile->id], 'https'));
@@ -220,7 +221,7 @@ class Mail extends \yii\db\ActiveRecord
                     $msg .= ' has just removed ' :
                     $msg .= ' has just added ';
                 $msg .= Html::a($profile->org_name, 
-                    Url::toRoute(['profile/' . strtolower($profile->type), 
+                    Url::toRoute(['profile/' . ProfileController::$profilePageArray[$profile->type], 
                         'city' => $profile->url_city, 
                         'name' => $profile->url_name, 
                         'id' => $profile->id], 'https'));
@@ -234,12 +235,12 @@ class Mail extends \yii\db\ActiveRecord
                     $title = 'New Linked Minsitry';
                 $linkingProfile->isIndividual($linkingProfile->type) ?
                     $msg = Html::a($linkingProfile->ind_first_name . ' ' . $linkingProfile->ind_last_name, 
-                        Url::toRoute(['profile/' . strtolower($linkingProfile->type), 
+                        Url::toRoute(['profile/' . ProfileController::$profilePageArray[$linkingProfile->type], 
                             'city' => $linkingProfile->url_city, 
                             'name' => $linkingProfile->url_name, 
                             'id' => $linkingProfile->id], 'https')) :
                     $msg = Html::a($linkingProfile->org_name, 
-                        Url::toRoute(['profile/' . strtolower($linkingProfile->type), 
+                        Url::toRoute(['profile/' . ProfileController::$profilePageArray[$linkingProfile->type], 
                             'city' => $linkingProfile->url_city, 
                             'name' => $linkingProfile->url_name, 
                             'id' => $linkingProfile->id], 'https'));
@@ -253,7 +254,7 @@ class Mail extends \yii\db\ActiveRecord
                         $msg .= ' has just indicated their affiliation with the ';
                 }                
                 $msg .= Html::a($profile->org_name, 
-                    Url::toRoute(['profile/' . strtolower($profile->type), 
+                    Url::toRoute(['profile/' . ProfileController::$profilePageArray[$profile->type], 
                         'city' => $profile->url_city, 
                         'name' => $profile->url_name, 
                         'id' => $profile->id], 'https'));
@@ -269,7 +270,7 @@ class Mail extends \yii\db\ActiveRecord
                     $title = 'New Linked Missionary';
                 $msg = 'Missionary ';
                 $msg .= Html::a($linkingProfile->ind_first_name . ' ' . $linkingProfile->ind_last_name, 
-                    Url::toRoute(['profile/' . strtolower($linkingProfile->type), 
+                    Url::toRoute(['profile/' . ProfileController::$profilePageArray[$linkingProfile->type], 
                         'city' => $linkingProfile->url_city, 
                         'name' => $linkingProfile->url_name, 
                         'id' => $linkingProfile->id], 'https'));
@@ -277,7 +278,7 @@ class Mail extends \yii\db\ActiveRecord
                     $msg .= ' has just unlinked from the ' :
                     $msg .= ' has just linked to the ';
                 $msg .= Html::a($profile->org_name, 
-                    Url::toRoute(['profile/' . strtolower($profile->type), 
+                    Url::toRoute(['profile/' . ProfileController::$profilePageArray[$profile->type], 
                         'city' => $profile->url_city, 
                         'name' => $profile->url_name, 
                         'id' => $profile->id], 'https')) . ' profile.';
@@ -289,7 +290,7 @@ class Mail extends \yii\db\ActiveRecord
                     $title = 'Change to a Linked Profile' :
                     $title = 'New Linked Profile';
                 $msg = Html::a($linkingProfile->ind_first_name . ' ' . $linkingProfile->ind_last_name, 
-                    Url::toRoute(['profile/' . strtolower($linkingProfile->type), 
+                    Url::toRoute(['profile/' . ProfileController::$profilePageArray[$linkingProfile->type], 
                         'city' => $linkingProfile->url_city, 
                         'name' => $linkingProfile->url_name, 
                         'id' => $linkingProfile->id], 'https'));
@@ -297,7 +298,7 @@ class Mail extends \yii\db\ActiveRecord
                     $msg .= ' has just unlinked from ' :
                     $msg .= ' has just identified ';
                 $msg .= Html::a($profile->org_name, 
-                    Url::toRoute(['profile/' . strtolower($profile->type), 
+                    Url::toRoute(['profile/' . ProfileController::$profilePageArray[$profile->type], 
                         'city' => $profile->url_city, 
                         'name' => $profile->url_name, 
                         'id' => $profile->id], 'https'));

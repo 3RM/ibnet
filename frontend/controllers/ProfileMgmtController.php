@@ -116,7 +116,6 @@ class ProfileMgmtController extends ProfileController
         if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile])) {
             throw new NotFoundHttpException;
         }
-
         if (!$progress = FormsCompleted::findOne($id)) {                                            // Check if all required forms for this profile type have been completed
             $progress = $profile->createProgress($id);
         }
@@ -126,9 +125,7 @@ class ProfileMgmtController extends ProfileController
         $missingArray = array_diff_assoc($completeArray, $typeArray);                               // any $fmNum => 1 pairs that are missing from $completeArray  
   
         if (!$progress || !empty($missingArray)) {
-
             if ($profile->type == 'Church') {                                                       
-
                 if (!((count($missingArray) == 1) &&                                                // Ignore skipped form (church profile missions housing)
                     isset($missingArray[ProfileFormController::$form['mh']]))) {
                     
@@ -140,16 +137,13 @@ class ProfileMgmtController extends ProfileController
                 }
             
             } else {
-
                 $missing = json_encode($missing);
                 return $this->redirect(['profile-form/missing-forms', 
                     'id' => $profile->id, 
                     'missing' => $missing,
                 ]);
-
             }
         }
-
         if ($progress->delete() && !ProfileFormController::isDuplicate($id) && $profile->activate()) {
             return $this->render('activationComplete', ['profile' => $profile]);
         } else {
