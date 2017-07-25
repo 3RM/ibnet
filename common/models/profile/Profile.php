@@ -948,7 +948,7 @@ class Profile extends \yii\db\ActiveRecord
         if ($this->validate()) {
 
     // ************************* Individual Address ******************************
-            if ($this->isIndividual($this->type)) {
+            if ($this->category == self::CATEGORY_IND) {
 
                 if (empty($this->ind_city)) {                                                       // if physical address is empty, populate city, state, country, and zip from mailing address
                     $this->ind_city = $this->ind_po_city;
@@ -1190,7 +1190,7 @@ class Profile extends \yii\db\ActiveRecord
     public function handleFormPM()
     {
         if ($this->select != NULL) {
-            if ($this->isIndividual($this->type)) {                                                 // If individual, Update staff table regardless of new or existing connection
+            if ($this->category == self::CATEGORY_IND) {                                                 // If individual, Update staff table regardless of new or existing connection
                 $this->type == 'Staff' ? $title = $this->title : $title = $this->sub_type;
                 if (!$staff = Staff::find()                                                         // Add to staff table if not already there
                     ->where(['staff_id' => $this->id])
@@ -1754,7 +1754,7 @@ class Profile extends \yii\db\ActiveRecord
     {
         $createDate = new Expression('CURDATE()');
 
-        if ($this->isIndividual($this->type)) {
+        if ($this->category == self::CATEGORY_IND) {
             $name = $this->urlName($this->ind_last_name);
             $city = $this->urlName($this->ind_city);
         } else {
@@ -1923,7 +1923,7 @@ class Profile extends \yii\db\ActiveRecord
         }
 
     // ********************* Remove Link to School *****************************
-        if ($this->isIndividual($this->type)) {                                                     // Remove links to schools attended
+        if ($this->category == self::CATEGORY_IND) {                                                 // Remove links to schools attended
             $schools = ProfileHasSchool::find()
                 ->select('*')
                 ->where(['profile_id' => $this->id])
@@ -2107,7 +2107,7 @@ class Profile extends \yii\db\ActiveRecord
      */
     public function validatePhysicalAddress($attribute, $params)
     {
-        if ($this->isIndividual($this->type)) {
+        if ($this->category == self::CATEGORY_IND) {
             if ($this->ind_city && 
                 $this->ind_st_prov_reg && 
                 $this->ind_country) {
@@ -2135,7 +2135,7 @@ class Profile extends \yii\db\ActiveRecord
      */
     public function validateMailingAddress($attribute, $params)
     {
-        if ($this->isIndividual($this->type)) {
+        if ($this->category == self::CATEGORY_IND) {
             if ($this->ind_po_city && 
                 $this->ind_po_st_prov_reg && 
                 $this->ind_po_country) {
@@ -2302,7 +2302,7 @@ class Profile extends \yii\db\ActiveRecord
      */
     public function requiredFields()
     {  
-        if ($this->isIndividual($this->type)) {
+        if ($this->category == self::CATEGORY_IND) {
             if (!ProfileController::findActiveProfile($this->home_church)) {
                 return false;
             }
@@ -2340,17 +2340,6 @@ class Profile extends \yii\db\ActiveRecord
         ];
 
         return in_array($this->type, $typeArray);
-    }
-
-    /**
-     * Returns true if profile type is for an individual
-     * @param string $id
-     * @return boolean
-     */
-    public function isIndividual($type)
-    {
-        $t = Type::find()->select('*')->where(['type' => $type])->one();
-        return $t->group == 'Individuals' ? true : false;
     }
 
     /**

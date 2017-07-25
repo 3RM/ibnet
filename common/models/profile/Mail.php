@@ -1,6 +1,7 @@
 <?php
 namespace common\models\profile;
 
+use common\models\profile\Profile;
 use frontend\controllers\ProfileController;
 use frontend\controllers\ProfileFormController;
 use yii;
@@ -125,7 +126,7 @@ class Mail extends \yii\db\ActiveRecord
                         $title = 'A Link to your Ministry Profile has Changed' :
                         $title = 'New Link to your Ministry Profile';
                 }
-                if ($linkingProfile->isIndividual($linkingProfile->type)) {
+                if ($linkingProfile->category == Profile::CATEGORY_IND) {
                     $msg = Html::a($linkingProfile->ind_first_name . ' ' . $linkingProfile->ind_last_name, 
                         Url::toRoute(['profile/' . ProfileController::$profilePageArray[$linkingProfile->type], 
                             'city' => $linkingProfile->url_city, 
@@ -146,7 +147,7 @@ class Mail extends \yii\db\ActiveRecord
                         'city' => $profile->url_city, 
                         'name' => $profile->url_name, 
                         'id' => $profile->id], 'https')) . '.';
-                if ($linkingProfile->isIndividual($linkingProfile->type) && ($profile->type == 'Church')) {
+                if ($linkingProfile->category == Profile::CATEGORY_IND && $profile->type == 'Church') {
                     $dir == 'UL'?
                         NULL :
                         $msg .= ' Be sure to visit the ' . Html::a('church staff page', 
@@ -155,7 +156,7 @@ class Mail extends \yii\db\ActiveRecord
                                 'fmNum' => ProfileFormController::$form['sf']-1, 
                                 'id' => $profile->id], 'https')], 'https')) 
                             . ' where you can manage all church staff.';
-                } elseif ($linkingProfile->isIndividual($linkingProfile->type)) {
+                } elseif ($linkingProfile->category == Profile::CATEGORY_IND) {
                     $dir == 'UL'?
                         NULL :
                         $msg .= ' Be sure to visit the ' . Html::a('staff page', 
@@ -233,7 +234,7 @@ class Mail extends \yii\db\ActiveRecord
                 $dir == 'UL' ?
                     $title = 'Change to a Linked Minsitry' :
                     $title = 'New Linked Minsitry';
-                $linkingProfile->isIndividual($linkingProfile->type) ?
+                $linkingProfile->category == Profile::CATEGORY_IND ?
                     $msg = Html::a($linkingProfile->ind_first_name . ' ' . $linkingProfile->ind_last_name, 
                         Url::toRoute(['profile/' . ProfileController::$profilePageArray[$linkingProfile->type], 
                             'city' => $linkingProfile->url_city, 
@@ -244,7 +245,7 @@ class Mail extends \yii\db\ActiveRecord
                             'city' => $linkingProfile->url_city, 
                             'name' => $linkingProfile->url_name, 
                             'id' => $linkingProfile->id], 'https'));
-                if ($linkingProfile->isIndividual($linkingProfile->type)) {
+                if ($linkingProfile->category == Profile::CATEGORY_IND) {
                     $dir == 'UL'? 
                         $msg .= ' has just removed his affiliated status with the ' :
                         $msg .= ' has just indicated his affiliation with the ';
@@ -258,7 +259,7 @@ class Mail extends \yii\db\ActiveRecord
                         'city' => $profile->url_city, 
                         'name' => $profile->url_name, 
                         'id' => $profile->id], 'https'));
-                $linkingProfile->isIndividual($linkingProfile->type) ?
+                $linkingProfile->category == Profile::CATEGORY_IND ?
                     $msg .= ' on his personal profile.' :
                     $msg .= ' on their church profile.';
                 break;

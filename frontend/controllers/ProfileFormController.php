@@ -202,7 +202,7 @@ class ProfileFormController extends ProfileController
         } elseif ($profile->type == 'School') {
             $profile->scenario = 'nd-school';
         } else {
-            $profile->isIndividual($profile->type) ?
+            $profile->category == Profile::CATEGORY_IND ?
                 $profile->scenario = 'nd-ind':
                 $profile->scenario = 'nd-org';
         }
@@ -488,7 +488,7 @@ class ProfileFormController extends ProfileController
         $fmNum = Self::$form['lo'];
         $fm = 'forms/form' . $fmNum;
         $profile = $this->findProfile($id);
-        $profile->isIndividual($profile->type) ?
+        $profile->category == Profile::CATEGORY_IND ?
             $profile->scenario = 'lo-ind' :
             $profile->scenario = 'lo-org';
 
@@ -596,7 +596,7 @@ class ProfileFormController extends ProfileController
                 $preferred[] = 'US';
             }
 
-            $profile->isIndividual($profile->type) ?
+            $profile->category == Profile::CATEGORY_IND ?
                 $ibnetEmail = Profile::urlName($profile->ind_last_name) . $profile->id . '@ibnet.org' :
                 $ibnetEmail = Profile::urlName($profile->org_name) . $profile->id . '@ibnet.org';
 
@@ -1050,7 +1050,7 @@ class ProfileFormController extends ProfileController
         $profile = $this->findProfile($id); 
         if ($profile->type == 'Staff') {
             $profile->scenario = 'pm-required';
-        } elseif ($profile->isIndividual($profile->type)) {
+        } elseif ($profile->category == Profile::CATEGORY_IND) {
             $profile->scenario = 'pm-ind';
         } else {
             $profile->scenario = 'pm-org';
@@ -1091,7 +1091,7 @@ class ProfileFormController extends ProfileController
             $more = true;
 
         } elseif (isset($_POST['remove'])) {                                                        // This code is a work-around for the Kartik Select2 AJAX drop-down widget which won't show the current ministry_of upon page load.
-            if ($profile->isIndividual($profile->type) && 
+            if ($profile->category == Profile::CATEGORY_IND && 
                 $staff = Staff::find()
                     ->where(['ministry_id' => $profile->ministry_of])
                     ->andWhere(['ministry_of' => 1])
@@ -1151,7 +1151,7 @@ class ProfileFormController extends ProfileController
             ->andWhere(['ministry_other' => 1])
             ->all();
 
-        if ($profile->isIndividual($profile->type)) {
+        if ($profile->category == Profile::CATEGORY_IND) {
             return ($profile->type == 'Staff' || $profile->type == 'Evangelist') ?
                 $this->render($fm . '-ind', [
                     'profile' => $profile,
@@ -1683,7 +1683,7 @@ class ProfileFormController extends ProfileController
     public function isDuplicate($id) 
     {
         $profile = ProfileController::findProfile($id);
-        if ($profile->isIndividual($profile->type)) {
+        if ($profile->category == Profile::CATEGORY_IND) {
             $duplicate = Profile::find()                                                            // Check to see if a duplicate profile exists
                 ->select('*')
                 ->where(['ind_first_name' => $profile->ind_first_name])
@@ -1828,7 +1828,7 @@ class ProfileFormController extends ProfileController
         $profile = $this->findProfile($id);
         $profile->scenario = '';
 
-        $profile->isIndividual($profile->type) ?
+        $profile->category == Profile::CATEGORY_IND ?
             $profile->email = Profile::urlName($profile->ind_last_name) . $profile->id . '@ibnet.org' :
             $profile->email = Profile::urlName($profile->org_name) . $profile->id . '@ibnet.org';
 

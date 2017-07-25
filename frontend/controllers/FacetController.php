@@ -252,7 +252,7 @@ class FacetController extends Controller
             $center = '{lat: ' . $spatial['lat'] . ', lng: ' . $spatial['lng'] . '}';
             $i = 0;
             foreach ($resultSet as $doc) {
-                //if (Profile::isIndividual($doc->type)) {continue;}
+                //if ($dox->category == Profile::CATEGORY_IND) {continue;}
                 if ($doc->org_loc) { 
                     $latlng = explode(',', $doc->org_loc);
                     $markers[$i][0] = $doc->org_name;

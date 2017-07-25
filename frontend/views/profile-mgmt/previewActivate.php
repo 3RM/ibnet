@@ -20,7 +20,7 @@ $this->title = 'Preview & Activate';
     <br>
     <br>
 
-    <?= $profile->isIndividual($profile->type) ? 
+    <?= $profile->category == Profile::CATEGORY_IND ? 
     	Html::a('Edit', ['profile/form1', 'id' => $profile->id], ['class' => 'btn btn-primary']) :
         Html::a('Edit', ['profile/form0', 'id' => $profile->id], ['class' => 'btn btn-primary']) ?>
 

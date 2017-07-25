@@ -1,5 +1,6 @@
 <?php
 
+use common\models\profile\Profile;
 use yii\bootstrap\Html;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
@@ -16,7 +17,7 @@ $this->title = 'Duplicate Profile?';
 
 	<div class="row">
 		<div class="bg-info col-md-4" style="padding:10px; margin:0 0 10pt 20pt">
-			<?php if ($profile->isIndividual($profile->type)) { ?>
+			<?php if ($profile->category == Profile::CATEGORY_IND) { ?>
 				<p>
 					<?= Html::a('<h4>' . $duplicate->ind_first_name . ' ' . $duplicate->ind_last_name . '</h4>', [
 						'/profile/view-profile',

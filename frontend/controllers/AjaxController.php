@@ -97,7 +97,7 @@ class AjaxController extends Controller
                 ];
             }
 
-            $profile->isIndividual($profile->type) ?
+            $profile->category == Profile::CATEGORY_IND ?
                 $profile->email = Profile::urlName($profile->ind_last_name) . $profile->id . '@ibnet.org' :
                 $profile->email = Profile::urlName($profile->org_name) . $profile->id . '@ibnet.org';
 

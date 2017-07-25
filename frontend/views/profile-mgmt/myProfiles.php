@@ -89,7 +89,7 @@ $this->title = 'My Account';
                                     '<p>' . Html::a(Html::icon('ban-circle') . ' Disable', ['profile-mgmt/disable', 'id' => $profile->id]) . '</p>' : 
                                     '<p>' . Html::a(Html::icon('trash') . ' Trash', ['profile-mgmt/trash', 'id' => $profile->id]) . '</p>';
                                 ?>
-                                <?= $profile->isIndividual($profile->type) ?
+                                <?= $profile->category == Profile::CATEGORY_IND ?
                                     NULL : 
                                     '<p>' . Html::a(Html::icon('transfer') . ' Transfer', ['profile-mgmt/transfer', 'id' => $profile->id]) . '</p>';
                                 ?>
