@@ -176,7 +176,7 @@ if ($profile->type == 'Staff') {
                             'errorLoading' => new JsExpression("function () { return 'Waiting for results...'; }"),
                         ],
                         'ajax' => [
-                            'url' => Url::to(['ministry-list-ajax']),
+                            'url' => Url::to(['ministry-list-ajax', 'id' => $profile->id]),
                             'dataType' => 'json',
                             'data' => new JsExpression('function(params) { return {q:params.term}; }')
                         ],

@@ -1,10 +1,10 @@
 <?php
 
 use common\models\profile\Profile;
+use common\widgets\Alert;
 use frontend\controllers\ProfileFormController;
 use kartik\markdown\Markdown;
 use tugmaks\GoogleMaps\Map;
-use yii\bootstrap\Alert;
 use yii\bootstrap\Modal;
 use yii\bootstrap\Html;
 use yii\helpers\Url;
@@ -60,6 +60,7 @@ $this->title = !empty($profile->spouse_first_name) ?
     </ul>
 </div>
 <br />
+<?= Alert::widget() ?>
 
 <div class="site-index profile-page">
     <div class="profile-header">
@@ -106,11 +107,14 @@ $this->title = !empty($profile->spouse_first_name) ?
             	<!-- Begin Contact Information (Box 1) -->
             	<span  class="pull-right edit"><?= Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['lo']-1, 'id' => $profile->id]) ?></span>
 				<?php if ($profile->ind_address1 && $profile->ind_city && $profile->ind_st_prov_reg && $profile->ind_country) { ?>
-					<?= Html::icon('map-marker') . ' ' . $profile->ind_address1 . ', ' ?>
+					<?= Html::icon('map-marker') . ' ' ?>
+					<?= empty($profile->ind_address1) ? NULL : $profile->ind_address1 . ', ' ?>
 					<?= empty($profile->ind_address2) ? NULL : $profile->ind_address2 . ', ' ?>
-					<?= $profile->ind_city . ', ' . $profile->ind_st_prov_reg ?>
-					<?= empty($profile->ind_zip) ? NULL : ' ' . $profile->ind_zip ?>
-					<?= $profile->ind_country == 'United States' ? NULL : ', ' . $profile->ind_country ?>
+					<?= empty($profile->ind_box) ? NULL : ' PO Box ' . $profile->ind_box . ', ' ?>
+					<?= $profile->ind_city . ', ' ?>
+					<?= empty($profile->ind_zip) ? $profile->ind_st_prov_reg . ', ' : $profile->ind_st_prov_reg . ' ' ?>
+					<?= $profile->ind_zip ?>
+					<?= $profile->ind_country == 'United States' ? NULL : $profile->ind_country ?>
 					<?= '<br>' ?>
 				<?php } ?>
 				<?php if (($profile->ind_po_address1 || $profile->ind_po_box) && $profile->ind_po_city && $profile->ind_po_st_prov_reg && $profile->ind_po_country) { ?>
@@ -118,8 +122,9 @@ $this->title = !empty($profile->spouse_first_name) ?
 					<?= empty($profile->ind_po_address1) ? NULL : $profile->ind_po_address1 . ', ' ?>
 					<?= empty($profile->ind_po_address2) ? NULL : $profile->ind_po_address2 . ', ' ?>
 					<?= empty($profile->ind_po_box) ? NULL : ' PO Box ' . $profile->ind_po_box . ', ' ?>
-					<?= $profile->ind_po_city . ', ' . $profile->ind_po_st_prov_reg . ', ' ?>
-					<?= empty($profile->ind_po_zip) ? NULL : ' ' . $profile->ind_po_zip ?>
+					<?= $profile->ind_po_city . ', ' ?>
+					<?= empty($profile->ind_po_zip) ? $profile->ind_po_st_prov_reg . ', ' : $profile->ind_po_st_prov_reg . ' ' ?>
+					<?= $profile->ind_po_zip ?>
 					<?= $profile->ind_po_country == 'United States' ? NULL : $profile->ind_po_country ?>
 					<?= '<br>' ?>
 				<?php } ?>
@@ -210,9 +215,7 @@ $this->title = !empty($profile->spouse_first_name) ?
 				<!-- End Linked Mission Agency -->
 				<br>
 				<!-- Church Plant (Box 3) -->
-				<?= empty($missionary->cp_pastor_at) ?
-					NULL :
-					'Church-Planting Pastor at ' . HTML::a($churchPlantLink, ['profile/church', 'id' => $churchPlant->id, 'city' => $churchPlant->url_city, 'name' => $churchPlant->url_name], ['target' => '_blank']) ?>
+				<?= empty($missionary->cp_pastor_at) ? NULL : 'Church-Planting Pastor at ' . HTML::a($churchPlantLink, ['profile/church', 'id' => $churchPlant->id, 'city' => $churchPlant->url_city, 'name' => $churchPlant->url_name], ['target' => '_blank']) ?>
 				<span  class="pull-right edit"><?= Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['cp']-1, 'id' => $profile->id]) ?></span>
 				<br>
 				<!-- Last Update -->

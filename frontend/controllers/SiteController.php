@@ -412,7 +412,7 @@ class SiteController extends Controller
                     'title' => 'Complete your registration with IBNet.org', 
                     'message' => 'Follow this link to complete your registration: ' . $link,
                 ])
-            ->setFrom(Yii::$app->params['no-replyEmail'])
+            ->setFrom(Yii::$app->params['adminEmail'])
             ->setTo($user->new_email)
             ->setSubject(Yii::$app->params['emailSubject'])
             ->send()) {

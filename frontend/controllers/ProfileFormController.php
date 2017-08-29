@@ -716,6 +716,7 @@ class ProfileFormController extends ProfileController
                 ->innerJoinWith('profile', '`staff`.`staff_id` = `profile`.`id`')
                 ->where(['staff.ministry_id' => $profile->id])
                 ->andWhere(['staff.sr_pastor' => NULL])
+                ->andWhere('staff.staff_title IS NOT NULL')
                 ->andWhere(['profile.status' => Profile::STATUS_ACTIVE])
                 ->all();
 
@@ -1011,7 +1012,7 @@ class ProfileFormController extends ProfileController
             
             if (isset($missionary->cp_pastor_at) && 
                 ($ministryLink = $profile->findOne($missionary->cp_pastor_at))) {                  // Load any previously selected ministry_of (sending church)
-                $missionary->ministrySelection = $ministryLink->id;
+                $missionary->select = $ministryLink->id;
                 
                 if ($ministryLink->status != Profile::STATUS_ACTIVE) {                              // A linked profile is inactive.  Show info message to user to reactivate the linked profile
                     Yii::$app->session->setFlash('info', 'The profile for ' . 
@@ -1111,6 +1112,7 @@ class ProfileFormController extends ProfileController
             }
             $profile->updateAttributes(['ministry_of' => NULL]);
             $ministryLink = NULL;
+            $profile->select = NULL;
             
         } elseif (isset($_POST['removeM']) && $staff = Staff::findOne($_POST['removeM'])) {
             

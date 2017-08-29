@@ -54,11 +54,14 @@ $this->title = !empty($profile->spouse_first_name) ?
             <div class="col-md-4 profile-thirds">
             	<!-- Begin Contact Information (Box 1) -->
 				<?php if ($profile->ind_address1 && $profile->ind_city && $profile->ind_st_prov_reg && $profile->ind_country) { ?>
-					<?= Html::icon('map-marker') . ' ' . $profile->ind_address1 . ', ' ?>
+					<?= Html::icon('map-marker') . ' ' ?>
+					<?= empty($profile->ind_address1) ? NULL : $profile->ind_address1 . ', ' ?>
 					<?= empty($profile->ind_address2) ? NULL : $profile->ind_address2 . ', ' ?>
-					<?= $profile->ind_city . ', ' . $profile->ind_st_prov_reg ?>
-					<?= empty($profile->ind_zip) ? NULL : ' ' . $profile->ind_zip ?>
-					<?= $profile->ind_country == 'United States' ? NULL : ', ' . $profile->ind_country ?>
+					<?= empty($profile->ind_box) ? NULL : ' PO Box ' . $profile->ind_box . ', ' ?>
+					<?= $profile->ind_city . ', ' ?>
+					<?= empty($profile->ind_zip) ? $profile->ind_st_prov_reg . ', ' : $profile->ind_st_prov_reg . ' ' ?>
+					<?= $profile->ind_zip ?>
+					<?= $profile->ind_country == 'United States' ? NULL : $profile->ind_country ?>
 					<?= '<br>' ?>
 				<?php } ?>
 				<?php if (($profile->ind_po_address1 || $profile->ind_po_box) && $profile->ind_po_city && $profile->ind_po_st_prov_reg && $profile->ind_po_country) { ?>
@@ -66,8 +69,9 @@ $this->title = !empty($profile->spouse_first_name) ?
 					<?= empty($profile->ind_po_address1) ? NULL : $profile->ind_po_address1 . ', ' ?>
 					<?= empty($profile->ind_po_address2) ? NULL : $profile->ind_po_address2 . ', ' ?>
 					<?= empty($profile->ind_po_box) ? NULL : ' PO Box ' . $profile->ind_po_box . ', ' ?>
-					<?= $profile->ind_po_city . ', ' . $profile->ind_po_st_prov_reg . ', ' ?>
-					<?= empty($profile->ind_po_zip) ? NULL : ' ' . $profile->ind_po_zip ?>
+					<?= $profile->ind_po_city . ', ' ?>
+					<?= empty($profile->ind_po_zip) ? $profile->ind_po_st_prov_reg . ', ' : $profile->ind_po_st_prov_reg . ' ' ?>
+					<?= $profile->ind_po_zip ?>
 					<?= $profile->ind_po_country == 'United States' ? NULL : $profile->ind_po_country ?>
 					<?= '<br>' ?>
 				<?php } ?>

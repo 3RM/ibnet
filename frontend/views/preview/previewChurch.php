@@ -2,12 +2,12 @@
 
 use common\models\profile\Profile;
 use common\models\Utility;
+use common\widgets\Alert;
 use frontend\controllers\ProfileController;
 use frontend\controllers\ProfileFormController;
 use kartik\markdown\Markdown;
 use tugmaks\GoogleMaps\Map;
 use yii\base\Controller;
-use yii\bootstrap\Alert;
 use yii\bootstrap\Html;
 use yii\bootstrap\Modal;
 use yii\helpers\Url;
@@ -62,6 +62,7 @@ $this->title = $profile->org_name;
     </ul>
 </div>
 <br />
+<?= Alert::widget() ?>
 
 <div class="site-index profile-page">
 
@@ -106,11 +107,14 @@ $this->title = $profile->org_name;
             	<!-- Begin Contact Information (Box 1) -->
             	<span  class="pull-right edit"><?= Html::a(Html::icon('edit'), ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['lo']-1, 'id' => $profile->id]) ?></span>
 				<?php if ($profile->org_address1 && $profile->org_city && $profile->org_st_prov_reg && $profile->org_country) { ?>
-					<?= Html::icon('map-marker') . ' ' . $profile->org_address1 . ', ' ?>
+					<?= Html::icon('map-marker') . ' ' ?>
+					<?= empty($profile->org_address1) ? NULL : $profile->org_address1 . ', ' ?>
 					<?= empty($profile->org_address2) ? NULL : $profile->org_address2 . ', ' ?>
-					<?= $profile->org_city . ', ' . $profile->org_st_prov_reg ?>
-					<?= empty($profile->org_zip) ? NULL : ' ' . $profile->org_zip ?>
-					<?= $profile->org_country == 'United States' ? NULL : ', ' . $profile->org_country ?>
+					<?= empty($profile->org_box) ? NULL : ' PO Box ' . $profile->org_box . ', ' ?>
+					<?= $profile->org_city . ', ' ?>
+					<?= empty($profile->org_zip) ? $profile->org_st_prov_reg . ', ' : $profile->org_st_prov_reg . ' ' ?>
+					<?= $profile->org_zip ?>
+					<?= $profile->org_country == 'United States' ? NULL : $profile->org_country ?>
 					<?= '<br>' ?>
 				<?php } ?>
 				<?php if (($profile->org_po_address1 || $profile->org_po_box) && $profile->org_po_city && $profile->org_po_st_prov_reg && $profile->org_po_country) { ?>
@@ -118,8 +122,9 @@ $this->title = $profile->org_name;
 					<?= empty($profile->org_po_address1) ? NULL : $profile->org_po_address1 . ', ' ?>
 					<?= empty($profile->org_po_address2) ? NULL : $profile->org_po_address2 . ', ' ?>
 					<?= empty($profile->org_po_box) ? NULL : ' PO Box ' . $profile->org_po_box . ', ' ?>
-					<?= $profile->org_po_city . ', ' . $profile->org_po_st_prov_reg . ', ' ?>
-					<?= empty($profile->org_po_zip) ? NULL : ' ' . $profile->org_po_zip ?>
+					<?= $profile->org_po_city . ', ' ?>
+					<?= empty($profile->org_po_zip) ? $profile->org_po_st_prov_reg . ', ' : $profile->org_po_st_prov_reg . ' ' ?>
+					<?= $profile->org_po_zip ?>
 					<?= $profile->org_po_country == 'United States' ? NULL : $profile->org_po_country ?>
 					<?= '<br>' ?>
 				<?php } ?>

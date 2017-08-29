@@ -52,11 +52,14 @@ $this->title = $profile->org_name;
             <div class="col-md-4 profile-thirds">
             	<!-- Begin Contact Information (Box 1) -->
 				<?php if ($profile->org_address1 && $profile->org_city && $profile->org_st_prov_reg && $profile->org_country) { ?>
-					<?= Html::icon('map-marker') . ' ' . $profile->org_address1 . ', ' ?>
+					<?= Html::icon('map-marker') . ' ' ?>
+					<?= empty($profile->org_address1) ? NULL : $profile->org_address1 . ', ' ?>
 					<?= empty($profile->org_address2) ? NULL : $profile->org_address2 . ', ' ?>
-					<?= $profile->org_city . ', ' . $profile->org_st_prov_reg ?>
-					<?= empty($profile->org_zip) ? NULL : ' ' . $profile->org_zip ?>
-					<?= $profile->org_country == 'United States' ? NULL : ', ' . $profile->org_country ?>
+					<?= empty($profile->org_box) ? NULL : ' PO Box ' . $profile->org_box . ', ' ?>
+					<?= $profile->org_city . ', ' ?>
+					<?= empty($profile->org_zip) ? $profile->org_st_prov_reg . ', ' : $profile->org_st_prov_reg . ' ' ?>
+					<?= $profile->org_zip ?>
+					<?= $profile->org_country == 'United States' ? NULL : $profile->org_country ?>
 					<?= '<br>' ?>
 				<?php } ?>
 				<?php if (($profile->org_po_address1 || $profile->org_po_box) && $profile->org_po_city && $profile->org_po_st_prov_reg && $profile->org_po_country) { ?>
@@ -64,8 +67,9 @@ $this->title = $profile->org_name;
 					<?= empty($profile->org_po_address1) ? NULL : $profile->org_po_address1 . ', ' ?>
 					<?= empty($profile->org_po_address2) ? NULL : $profile->org_po_address2 . ', ' ?>
 					<?= empty($profile->org_po_box) ? NULL : ' PO Box ' . $profile->org_po_box . ', ' ?>
-					<?= $profile->org_po_city . ', ' . $profile->org_po_st_prov_reg . ', ' ?>
-					<?= empty($profile->org_po_zip) ? NULL : ' ' . $profile->org_po_zip ?>
+					<?= $profile->org_po_city . ', ' ?>
+					<?= empty($profile->org_po_zip) ? $profile->org_po_st_prov_reg . ', ' : $profile->org_po_st_prov_reg . ' ' ?>
+					<?= $profile->org_po_zip ?>
 					<?= $profile->org_po_country == 'United States' ? NULL : $profile->org_po_country ?>
 					<?= '<br>' ?>
 				<?php } ?>

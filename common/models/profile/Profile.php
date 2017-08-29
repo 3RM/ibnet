@@ -814,6 +814,12 @@ class Profile extends \yii\db\ActiveRecord
         } else {
             $this->sub_type = $this->type;
         }
+
+        $type = Type::findOne(['type' => $this->type]);
+        $type->group == 'Individuals' ? 
+            $this->category = self::CATEGORY_IND : 
+            $this->category = self::CATEGORY_ORG;
+
         if ($this->validate() && $this->getIsNewRecord() && $this->save()) { 
             return $this;
         }
@@ -978,11 +984,11 @@ class Profile extends \yii\db\ActiveRecord
                     $po_state = State::find()
                         ->where(['state' => $this->ind_po_st_prov_reg])
                         ->one();
-                    $this->ind_po_st_prov_reg = $state->abbreviation;
-                    $this->ind_po_state_long = $state->long;
+                    $this->ind_po_st_prov_reg = $po_state->abbreviation;
+                    $this->ind_po_state_long = $po_state->long;
                 }
 
-    // ************************* USA Address - Org ******************************
+    // ************************* Organization Address ******************************
             } else {
 
                 if (empty($this->org_city)) {                                                       // if physical address is empty, populate city, state, country, and zip from mailing address

@@ -2,6 +2,7 @@
 
 namespace common\models\profile;
 
+use Yii;
 use yii\web\HttpException;
 
 /**
@@ -408,25 +409,26 @@ class GoogleGeocoder{
         if(isset($decodedArr['status'])){
             $status = $decodedArr['status'];
             if($status == 'ZERO_RESULTS'){
-                throw new HTTPException('No results found!');
+                // throw new HTTPException('No results found!');
+                Yii::$app->session->setFlash('danger', 'The address you entered on the "Location" form did not return valid map coordinates.  Your profile will not be able to display a map for the address you entered.');
             }
             if($status == 'OVER_QUERY_LIMIT'){
-                throw new HTTPException('You have reached your query limit quota!');
+                // throw new HTTPException('You have reached your query limit quota!');
             }
             if($status == 'REQUEST_DENIED'){
-                throw new HTTPException('This request was denied!');
+                // throw new HTTPException('This request was denied!');
             }
             if($status == 'INVALID_REQUEST'){
-                throw new HTTPException('Your request was invalid. Are you missing a required parameter?');
+                // throw new HTTPException('Your request was invalid. Are you missing a required parameter?');
             }
             if($status == 'NOT_FOUND'){
-                throw new HTTPException('At least one of the locations specified in the request\'s origin, destination, or waypoints could not be geocoded.');
+                // throw new HTTPException('At least one of the locations specified in the request\'s origin, destination, or waypoints could not be geocoded.');
             }
             if($status == 'MAX_WAYPOINTS_EXCEEDED'){
-                throw new HTTPException('Too many waypoints were provided in the request.');
+                // throw new HTTPException('Too many waypoints were provided in the request.');
             }
             if($status == 'UNKNOWN_ERROR'){
-                throw new HTTPException('An unknown server error occured!');
+                // throw new HTTPException('An unknown server error occured!');
             }
         }
     }

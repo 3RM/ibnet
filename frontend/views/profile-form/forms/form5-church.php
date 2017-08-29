@@ -102,7 +102,7 @@ EOD
                             <?php foreach($staffArray as $staff) { ?>
                             <tr>
                                 <td class="center"><b><?= $staff->{'profile'}->sub_type == 'Missionary' ? 'Church Planting Pastor' : $staff->staff_title ?></b></td>
-                                <td class="center"><?= $staff->{'profile'}->spouse_first_name ? $staff->{'profile'}->ind_first_name . ' (& ' . $staff->{'profile'}->spouse_first_name . ') ' . $staff->{'profile'}->ind_last_name : $staff->{'profile'}->ind_first_name . ' ' . $staff->ind_last_name; ?></td>
+                                <td class="center"><?= $staff->{'profile'}->spouse_first_name ? $staff->{'profile'}->ind_first_name . ' (& ' . $staff->{'profile'}->spouse_first_name . ') ' . $staff->{'profile'}->ind_last_name : $staff->{'profile'}->ind_first_name . ' ' . $staff->{'profile'}->ind_last_name; ?></td>
                                 <td class="center"><?= $staff->{'profile'}->ind_city . ', ' ?><?= $staff->{'profile'}->ind_st_prov_reg ? $staff->{'profile'}->ind_st_prov_reg : NULL ?></td>
                                 <td class="center"><?= $staff->confirmed == NULL ? 'Uncomfirmed' : 'Confirmed Staff' ?></td>
                                 
