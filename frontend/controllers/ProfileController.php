@@ -2,14 +2,19 @@
 
 namespace frontend\controllers;
 
+use common\models\User;
+use common\models\Utility;
 use common\models\profile\Association;
 use common\models\profile\Fellowship;
+use common\models\profile\MissionAgcy;
+use common\models\profile\Missionary;
 use common\models\profile\Profile;
 use common\models\profile\ProfileBrowse;
 use common\models\profile\ProfileSearch;
 use common\models\profile\Staff;
 use common\models\profile\Social;
 use Yii;
+use yii\data\ActiveDataProvider;
 use yii\db\Query;
 use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
@@ -213,7 +218,7 @@ class ProfileController extends Controller
      * Render association profile
      * @return mixed
      */
-    public function actionAssociation($id, $city, $name)
+    public function actionAssociation($id, $city, $name, $p=NULL)
     {
         if (!$profile = $this->findViewProfile($id, $city, $name)) {
             if ($this->checkExpired($id)) {
@@ -221,21 +226,71 @@ class ProfileController extends Controller
             }
         }
         if ($profile && $profile->type == 'Association') {
+
             $social = NULL;
             if ($profile->social_id) {
                 $social = $profile->social;
             }
 
-            if ($profile->show_map == Profile::MAP_PRIMARY && !empty($profile->org_loc)) {
-                $loc = explode(',', $profile->org_loc);
-            } else {
-                $loc = NULL;
+            if ($p == 'connections') {                                                              // Prepare connections list if connections link is clicked
+            
+            // ============================== Staff ============================   
+                $staff = Staff::find()->select('staff_id, staff_title')
+                    ->where(['ministry_id' => $profile->id])
+                    ->andWhere(['confirmed' => 1])
+                    ->orderBy('staff_id')
+                    ->all();
+                $i = 0;
+                foreach ($staff as $stf) {                                                          // Combine multiple staff titles for same individual
+                    if ($i > 0 && ($stf['staff_id'] == $staff[$i-1]['staff_id'])) {
+                        $staff[$i-1]['staff_title'] .= ' &middot ' . $stf['staff_title'];
+                        unset($staff[$i]);
+                        $staff = array_values($staff);
+                        continue;
+                    }
+                    $i++;
+                }
+                $ids = ArrayHelper::getColumn($staff, 'staff_id');
+                $names = ArrayHelper::getColumn($staff, 'staff_title');
+                $staffArray = Profile::findAll($ids);
+                $i = 0;
+                foreach ($staffArray as $stf) {
+                    $stf->titleM = $names[$i];
+                    $i++;
+                }
+
+            // =========================== Member Churches =====================
+                if ($ass = Association::findOne(['profile_id' => $profile->id])) {
+                    $profiles = $ass->profile;
+                    $ids = ArrayHelper::getColumn($profiles, 'id');
+                    $churchArray = Profile::findAll($ids);
+                    $i = 0;
+                    foreach ($churchArray as $ch) {
+                        if ($ch->type != 'Church') {
+                            unset($churchArray[$i]);
+                        }
+                        $i++;
+                    }
+                }   
             }
+            if ($p == 'history') {
+                $events = $profile->history;
+            }
+
+            ($profile->org_loc && $profile->show_map == Profile::MAP_PRIMARY) ?
+                $loc = explode(',', $profile->org_loc) :
+                $loc = NULL;
 
             return $this->render('profilePages/profileFlwshpAss', [
                 'profile' => $profile,
                 'loc' =>  $loc,
-                'social' => $social]);
+                'social' => $social,
+                'staffArray' => $staffArray,
+                'churchArray' => $churchArray,
+                'events' => $events,
+                'p' => $p,
+            ]);
+    
         } else {
             $this->redirect(['view-profile', 'id' => $id, 'city' => $city, 'name' => $name]);       // If user tries to access wrong profile action, reroute to the correct one
         } 
@@ -245,7 +300,7 @@ class ProfileController extends Controller
      * Render fellowship profile
      * @return mixed
      */
-    public function actionFellowship($id, $city, $name)
+    public function actionFellowship($id, $city, $name, $p=NULL)
     {
         if (!$profile = $this->findViewProfile($id, $city, $name)) {
             if ($this->checkExpired($id)) {
@@ -258,26 +313,87 @@ class ProfileController extends Controller
                 $social = $profile->social;
             }
 
-            if ($profile->show_map == Profile::MAP_PRIMARY && !empty($profile->org_loc)) {
-                $loc = explode(',', $profile->org_loc);
-            } else {
-                $loc = NULL;
+            if ($p == 'connections') {                                                              // Prepare connections list if connections link is clicked
+                
+            // ============================== Staff ============================
+                $staff = Staff::find()->select('staff_id, staff_title')
+                    ->where(['ministry_id' => $profile->id])
+                    ->andWhere(['confirmed' => 1])
+                    ->orderBy('staff_id')
+                    ->all();
+                $i = 0;
+                foreach ($staff as $stf) {                                                          // Combine multiple staff titles for same individual
+                    if ($i > 0 && ($stf['staff_id'] == $staff[$i-1]['staff_id'])) {
+                        $staff[$i-1]['staff_title'] .= ' &middot ' . $stf['staff_title'];
+                        unset($staff[$i]);
+                        $staff = array_values($staff);
+                        continue;
+                    }
+                    $i++;
+                }
+                $ids = ArrayHelper::getColumn($staff, 'staff_id');
+                $names = ArrayHelper::getColumn($staff, 'staff_title');
+                $staffArray = Profile::findAll($ids);
+                $i = 0;
+                foreach ($staffArray as $stf) {
+                    $stf->titleM = $names[$i];
+                    $i++;
+                }
+
+            // ============================== Members ==========================
+                if ($flwship = Fellowship::findOne(['profile_id' => $profile->id])) {
+                    $profileArray = $flwship->profile;
+
+            // ========================= Individual Members ====================
+                    $indvArray = $profileArray;
+                    $i = 0;
+                    foreach ($indvArray as $ind) {
+                        if ($ind->category != Profile::CATEGORY_IND) {
+                            unset($indvArray[$i]);
+                        }
+                        $i++;
+                    }
+
+            // ========================= Member Churches =======================
+                    $churchArray = $profileArray;
+                    $i = 0;
+                    foreach ($churchArray as $ch) {
+                        if ($ch->type != 'Church') {
+                            unset($churchArray[$i]);
+                        }
+                        $i++;
+                    }
+                }
+
             }
+            if ($p == 'history') {
+                $events = $profile->history;
+            }
+
+            ($profile->org_loc && $profile->show_map == Profile::MAP_PRIMARY) ?
+                $loc = explode(',', $profile->org_loc) :
+                $loc = NULL;
 
             return $this->render('profilePages/profileFlwshpAss', [
                 'profile' => $profile,
                 'loc' => $loc,
-                'social' => $social]);
+                'social' => $social,
+                'staffArray' => $staffArray,
+                'indvArray' => $indvArray,
+                'churchArray' => $churchArray,
+                'events' => $events,
+                'p' => $p,
+            ]);
         } else {
             $this->redirect(['view-profile', 'id' => $id, 'city' => $city, 'name' => $name]);
         }
     }
 
-        /**
+    /**
      * Render camp profile
      * @return mixed
      */
-    public function actionCamp($id, $city, $name)
+    public function actionCamp($id, $city, $name, $p=NULL)
     {
         if (!$profile = $this->findViewProfile($id, $city, $name)) {
             if ($this->checkExpired($id)) {
@@ -285,32 +401,65 @@ class ProfileController extends Controller
             }
         }
         if ($profile && $profile->type == 'Camp') {
-            $church = NULL;
-            $churchLink = NULL;
+            $parentMinistry = NULL;
+            $parentMinistryLink = NULL;
             $social = NULL;
             if ($profile->ministry_of && 
-                $church = $this->findActiveProfile($profile->ministry_of)) {
-                $churchLink = $church->org_name . ', ' . 
-                    $church->org_city . ', ' . $church->org_st_prov_reg;
-                $church->org_country == 'United States' ? NULL : 
-                    ($churchLink .= ', ' . $church->org_country);
+                $parentMinistry = $this->findActiveProfile($profile->ministry_of)) {
+                $parentMinistryLink = $parentMinistry->org_name . ', ' . 
+                    $parentMinistry->org_city . ', ' . $parentMinistry->org_st_prov_reg;
+                $parentMinistry->org_country == 'United States' ? NULL : 
+                    ($parentMinistryLink .= ', ' . $parentMinistry->org_country);
             }
             if ($profile->social_id) {
                 $social = $profile->social;
             }
 
-            if ($profile->show_map == Profile::MAP_PRIMARY && !empty($profile->org_loc)) {
-                $loc = explode(',', $profile->org_loc);
-            } else {
-                $loc = NULL;
+            if ($p == 'connections') {                                                              // Prepare connections list if connections link is clicked
+                
+            // ============================== Staff ============================
+                $staff = Staff::find()->select('staff_id, staff_title')
+                    ->where(['ministry_id' => $profile->id])
+                    ->andWhere(['confirmed' => 1])
+                    ->orderBy('staff_id')
+                    ->all();
+                $i = 0;
+                foreach ($staff as $stf) {                                                          // Combine multiple staff titles for same individual
+                    if ($i > 0 && ($stf['staff_id'] == $staff[$i-1]['staff_id'])) {
+                        $staff[$i-1]['staff_title'] .= ' &middot ' . $stf['staff_title'];
+                        unset($staff[$i]);
+                        $staff = array_values($staff);
+                        continue;
+                    }
+                    $i++;
+                }
+                $ids = ArrayHelper::getColumn($staff, 'staff_id');
+                $names = ArrayHelper::getColumn($staff, 'staff_title');
+                $staffArray = Profile::findAll($ids);
+                $i = 0;
+                foreach ($staffArray as $stf) {
+                    $stf->titleM = $names[$i];
+                    $i++;
+                }
             }
+            if ($p == 'history') {
+                $events = $profile->history;
+            }
+
+            ($profile->org_loc && $profile->show_map == Profile::MAP_PRIMARY) ?
+                $loc = explode(',', $profile->org_loc) :
+                $loc = NULL;
 
             return $this->render('profilePages/profileOrg', [
                 'profile' => $profile,
                 'loc' => $loc,
                 'social' => $social,
-                'church' => $church,
-                'churchLink' => $churchLink]);
+                'parentMinistry' => $parentMinistry,
+                'parentMinistryLink' => $parentMinistryLink,
+                'staffArray' => $staffArray,
+                'events' => $events,
+                'p' => $p,
+            ]);
         } else {
             $this->redirect(['view-profile', 'id' => $id, 'city' => $city, 'name' => $name]);
         }
@@ -320,7 +469,7 @@ class ProfileController extends Controller
      * Render chaplain profile
      * @return mixed
      */
-    public function actionChaplain($id, $city, $name)
+    public function actionChaplain($id, $city, $name, $p=NULL)
     {
         if (!$profile = $this->findViewProfile($id, $city, $name)) {
             if ($this->checkExpired($id)) {
@@ -358,6 +507,98 @@ class ProfileController extends Controller
                 $flwshipLink = $this->findActiveProfile($fellowship->profile_id);                   // Only link to active profiles
             }
 
+            if ($p == 'connections') {                                                              // Prepare connections list if connections link is clicked
+                
+            // ============================== Pastor ===========================
+                if ($church) {
+                    if ($staff = Staff::find()
+                        ->where(['ministry_id' => $church->id])
+                        ->andWhere(['sr_pastor' => 1])
+                        ->andWhere(['confirmed' => 1])
+                        ->one()) {
+                        $pastor = $this->findActiveProfile($staff->staff_id);
+                    }
+                }
+
+            // ======================= Other Ministries ========================
+                if ($ministries = Staff::find()
+                    ->where(['staff_id' => $profile->id])
+                    ->andWhere(['ministry_other' => 1])
+                    ->andWhere(['confirmed' => 1])
+                    ->orderBy('id Asc')
+                    ->all()) {
+                    $i = 0;
+                    foreach ($ministries as $mstry) {                                               // Combine multiple staff titles for same ministry
+                        if ($i > 0 && ($mstry['ministry_id'] == $ministries[$i-1]['ministry_id'])) {
+                            $ministries[$i-1]['staff_title'] .= ' &middot ' . $mstry['staff_title'];
+                            unset($ministries[$i]);
+                            $ministries = array_values($ministries);
+                            continue;
+                        }
+                        $i++;
+                    }
+                    $ids = ArrayHelper::getColumn($ministries, 'ministry_id');
+                    $names = ArrayHelper::getColumn($ministries, 'staff_title');
+                    $otherMinistryArray = Profile::findAll($ids);
+
+                    $i = 0;
+                    foreach ($otherMinistryArray as $min) {
+                        $min->titleM = $names[$i];
+                        $i++;
+                    }
+                }
+
+            // ======================= Ministry Partners =======================
+                if ($sChurch = (new \yii\db\Query())
+                    ->select('staff_id')
+                    ->from('staff')
+                    ->where(['ministry_id' => $profile->home_church])
+                    ->andWhere(['<>', 'staff_id', $profile->id])
+                    ->andWhere(['sr_pastor' => NULL])
+                    ->andWhere(['confirmed' => 1])
+                    ->groupBy('staff_id')
+                    ->all()) {
+                    $sChurchIds = ArrayHelper::getColumn($sChurch, 'staff_id');
+                    $sChurchArray = Profile::findAll($sChurchIds);
+                }
+                if ($ministries) {                                                                  // Ministry partners at other ministries
+                    $otherArray = ArrayHelper::getColumn($ministries, 'ministry_id');
+                    $otherIds = implode (",", $otherArray);
+                    if ($staffOther = (new \yii\db\Query())
+                        ->select('staff_id, ministry_id')
+                        ->from('staff')
+                        ->where('ministry_id IN ("' . $otherIds . '")')
+                        ->andWhere(['<>', 'staff_id', $profile->id])
+                        ->andWhere(['confirmed' => 1])
+                        ->groupBy('staff_id')
+                        ->orderBy('id')
+                        ->all()) {
+                        $sOtherIds = ArrayHelper::getColumn($staffOther, 'staff_id');
+                        $mOtherIds = ArrayHelper::getcolumn($staffOther, 'ministry_id');
+                        $sOtherArray = Profile::findAll($sOtherIds);
+
+                        $i = 0;
+                        foreach ($sOtherArray as $sOther) {
+                            $sOther->titleM = Profile::findOne($mOtherIds[$i])->org_name;
+                            $i++;
+                        }
+                    }
+                }
+            
+            // ===================== Fellow Church Members =====================
+                $memberArray = User::find()
+                    ->where(['<>', 'screen_name', NULL])
+                    ->andWhere(['ind_act_profiles' => NULL])
+                    ->andWhere(['home_church' => $profile->home_church])
+                    ->andWhere(['<>', 'id', $profile->user_id])
+                    ->andWhere(['role' => 'Church Member'])
+                    ->all();
+
+            }
+            if ($p == 'history') {
+                $events = $profile->history;
+            }
+
             if ($profile->org_loc && $profile->show_map == Profile::MAP_PRIMARY) {
                 $loc = explode(',', $profile->org_loc);
             } elseif ($church && $church->org_loc && $profile->show_map == Profile::MAP_CHURCH) {
@@ -376,9 +617,17 @@ class ProfileController extends Controller
                 'churchLink' => $churchLink,
                 'mission' => $mission,
                 'missionLink' => $missionLink,
-                'ministry'  => NULL,
-                'ministryLink' => NULL,
-                'schoolsAttended' => $schoolsAttended]);
+                'parentMinistry'  => NULL,
+                'parentMinistryLink' => NULL,
+                'schoolsAttended' => $schoolsAttended,
+                'pastor' => $pastor,
+                'otherMinistryArray' => $otherMinistryArray,
+                'memberArray' => $memberArray,
+                'sChurchArray' => $sChurchArray,
+                'sOtherArray' => $sOtherArray,
+                'events' => $events,
+                'p' => $p,
+            ]);
         } else {
             $this->redirect(['view-profile', 'id' => $id, 'city' => $city, 'name' => $name]);
         }
@@ -388,7 +637,7 @@ class ProfileController extends Controller
      * Render church profile
      * @return mixed
      */
-    public function actionChurch($id, $city, $name)
+    public function actionChurch($id, $city, $name, $p=NULL)
     {
         if (!$profile = $this->findViewProfile($id, $city, $name)) {
             if ($this->checkExpired($id)) {
@@ -399,44 +648,121 @@ class ProfileController extends Controller
             $profile->getformattedNames();
             $pastorLink = NULL;
             $social = NULL;
-            $programs = $profile->program;
-            $association = NULL;
+            $memberArray = NULL;
+            $programArray = $profile->program;
+            $assArray = NULL;
             $assLink = NULL;
-            $fellowship = NULL;
+            $flwshipArray = NULL;
             $flwshipLink = NULL;
             if ($staff = Staff::find()
                 ->where(['ministry_id' => $profile->id])
                 ->andWhere(['sr_pastor' => 1])
+                ->andWhere(['confirmed' => 1])
                 ->one()) {
-                $pastorLink = $this->findActiveProfile($staff->staff_id);
+                $pastor = $this->findActiveProfile($staff->staff_id);
             }
             if ($profile->social_id) {
                 $social = $profile->social;
             }
-            if (!$ministries = Profile::find()
+            if (!$otherMinistryArray = Profile::find()
                 ->where(['status' => Profile::STATUS_ACTIVE])
                 ->andWhere(['ministry_of' => $profile->id])
                 ->all()) {
-                $ministries = NULL;
+                $otherMinistryArray = NULL;
             }
-            $fellowships = $profile->fellowship;
-            $associations = $profile->association;
+            $flwshipArray = $profile->fellowship;
+            $assArray = $profile->association;
+
+            if ($p == 'connections') {                                                              // Prepare connections list if connections link is clicked
+                
+            // ============================== Staff ============================
+                $staff = Staff::find()->select('staff_id, staff_title')
+                    ->where(['ministry_id' => $profile->id])
+                    ->andWhere(['sr_pastor' => NULL])
+                    ->andWhere(['confirmed' => 1])
+                    ->orderBy('staff_id')
+                    ->all();
+
+                $i = 0;
+                foreach ($staff as $stf) {                                                          // Combine multiple staff titles for same individual
+                    if ($i > 0 && ($stf['staff_id'] == $staff[$i-1]['staff_id'])) {
+                        $pos = strpos($staff[$i-1]['staff_title'], $staff[$i]['staff_title']);      // Remove duplicate staff roles for same individual
+                        if ($pos === false) {                                                           // staff_title was not found in list of titles
+                            $staff[$i-1]['staff_title'] .= ' &middot ' . $stf['staff_title'];           // go ahead and add it to the list
+                        } 
+                        unset($staff[$i]);
+                        $staff = array_values($staff);
+                        continue;
+                    }
+                    $i++;
+                }
+                $ids = ArrayHelper::getColumn($staff, 'staff_id');
+                $names = ArrayHelper::getColumn($staff, 'staff_title');
+                $staffArray = Profile::findAll($ids);
+                $i = 0;
+                foreach ($staffArray as $stf) {
+                    $stf->titleM = $names[$i];
+                    $i++;
+                }
+
+            // ========================= Fellowships ===========================
+                $flwships = $profile->fellowship;
+                $flwshipIds = ArrayHelper::getColumn($flwships, 'profile_id');
+                $fArray = Profile::findAll($flwshipIds);
+
+            // ======================== Associations ===========================
+                $asss = $profile->association;
+                $assIds = ArrayHelper::getColumn($asss, 'profile_id');
+                $aArray = Profile::findAll($assIds);
+
+            // ======================= Church Members ==========================
+                $memberArray = User::find()
+                    ->select('id, screen_name')
+                    ->where(['home_church' => $profile->id])
+                    ->andWhere(['role' => 'Church Member'])
+                    ->all();
+                $i = 0;
+                foreach($memberArray as $member) {                                                  // Remove members who have an individual profile already
+                    if ($profileArray = Profile::find()
+                        ->select('type')
+                        ->where(['user_id' => $member->id])
+                        ->all()) {
+                        foreach ($profileArray as $pa) {
+                            if ($pa->category == Profile::CATEGORY_IND) {
+                                unset($memberArray[$i]);
+                                $memberArray = array_values($memberArray);
+                                break;
+                            }
+                        }
+                    }
+                    $i++;
+                }
+
+            }
+            if ($p == 'history') {
+                $events = $profile->history;
+            }
             
-            if ($profile->org_loc && $profile->show_map == Profile::MAP_PRIMARY) {
-                $loc = explode(',', $profile->org_loc);
-            } else {
+            ($profile->org_loc && $profile->show_map == Profile::MAP_PRIMARY) ?
+                $loc = explode(',', $profile->org_loc) :
                 $loc = NULL;
-            }
 
             return $this->render('profilePages/profileChurch', [
                 'profile' => $profile,
                 'loc' => $loc,
                 'social' => $social,
-                'pastorLink' => $pastorLink,
-                'ministries' => $ministries,
-                'programs' => $programs,
-                'associations' => $associations,
-                'fellowships' => $fellowships]);
+                'pastor' => $pastor,
+                'otherMinistryArray' => $otherMinistryArray,
+                'programArray' => $programArray,
+                'assArray' => $assArray,                                                            // flwshipArray & assArray are arrays from fellowship and association tables (contains names with and without profiles)
+                'flwshipArray' => $flwshipArray,
+                'aArray' => $aArray,                                                                // fArray & aArray are arrays from profile table (contains only active profiles)
+                'fArray' => $fArray,
+                'staffArray' => $staffArray,
+                'memberArray' => $memberArray,
+                'events' => $events,
+                'p' => $p,
+            ]);
         } else {
             $this->redirect(['view-profile', 'id' => $id, 'city' => $city, 'name' => $name]);
         }
@@ -446,7 +772,7 @@ class ProfileController extends Controller
      * Render evangelist profile
      * @return mixed
      */
-    public function actionEvangelist($id, $city, $name)
+    public function actionEvangelist($id, $city, $name, $p=NULL)
     {
         if (!$profile = $this->findViewProfile($id, $city, $name)) {
             if ($this->checkExpired($id)) {
@@ -457,8 +783,8 @@ class ProfileController extends Controller
             $profile->getformattedNames();
             $church = NULL;
             $churchLink = NULL;
-            $ministry = NULL;
-            $ministryLink = NULL;
+            $parentMinistry = NULL;
+            $parentMinistryLink = NULL;
             $social = NULL;
             $fellowship = NULL;
             $flwshipLink = NULL;
@@ -470,11 +796,11 @@ class ProfileController extends Controller
                     ($churchLink .= ', ' . $church->org_country);
             }
             if ($profile->ministry_of && 
-                $ministry = $this->findActiveProfile($profile->ministry_of)) {
-                $ministryLink = $ministry->org_name . ', ' . $ministry->org_city;
-                $ministry->org_st_prov_reg ? $ministryLink.= ', ' . $ministry->org_st_prov_reg : NULL;
-                $ministry->org_country == 'United States' ? NULL : 
-                    ($ministryLink .= ', ' . $ministry->org_country);
+                $parentMinistry = $this->findActiveProfile($profile->ministry_of)) {
+                $parentMinistryLink = $parentMinistry->org_name . ', ' . $parentMinistry->org_city;
+                $parentMinistry->org_st_prov_reg ? $parentMinistryLink.= ', ' . $parentMinistry->org_st_prov_reg : NULL;
+                $parentMinistry->org_country == 'United States' ? NULL : 
+                    ($parentMinistryLink .= ', ' . $parentMinistry->org_country);
             }
             $schoolsAttended = $profile->school;                                                    // relational db call
             if ($profile->social_id) {
@@ -482,12 +808,116 @@ class ProfileController extends Controller
             }
             $fellowships = $profile->fellowship;
 
+            if ($p == 'connections') {                                                              // Prepare connections list if connections link is clicked
+                
+            // ============================== Pastor ===========================
+                if ($church) {
+                    if ($staff = Staff::find()
+                        ->where(['ministry_id' => $church->id])
+                        ->andWhere(['sr_pastor' => 1])
+                        ->andWhere(['confirmed' => 1])
+                        ->one()) {
+                        $pastor = $this->findActiveProfile($staff->staff_id);
+                    }
+                }
+
+            // ======================== Parent Ministry ========================
+                if ($profile->ministry_of) {
+                    $parentMinistry = self::findActiveProfile($profile->ministry_of);
+                }
+
+            // =========================== Other Ministries ====================
+                if ($ministries = Staff::find()
+                    ->where(['staff_id' => $profile->id])
+                    ->andWhere(['ministry_other' => 1])
+                    ->andWhere(['confirmed' => 1])
+                    ->orderBy('id Asc')
+                    ->all()) {
+                    $i = 0;
+                    foreach ($ministries as $mstry) {                                                          // Combine multiple staff titles for same ministry
+                        if ($i > 0 && ($mstry['ministry_id'] == $ministries[$i-1]['ministry_id'])) {
+                            $ministries[$i-1]['staff_title'] .= ' &middot ' . $mstry['staff_title'];
+                            unset($ministries[$i]);
+                            $ministries = array_values($ministries);
+                            continue;
+                        }
+                        $i++;
+                    }
+                    $ids = ArrayHelper::getColumn($ministries, 'ministry_id');
+                    $names = ArrayHelper::getColumn($ministries, 'staff_title');
+                    $otherMinistryArray = Profile::findAll($ids);
+
+                    $i = 0;
+                    foreach ($otherMinistryArray as $min) {
+                        $min->titleM = $names[$i];
+                        $i++;
+                    }
+                }
+
+            // ======================= Ministry Partners =======================
+                $q = new Query();
+                $q->select('staff_id, ministry_id')
+                    ->from('staff')
+                    ->where(['ministry_id' => $profile->home_church]);
+                if (isset($parentMinistry)) {
+                    $q->orWhere(['ministry_id' => $parentMinistry->id]);
+                }
+                $q->andWhere(['<>', 'staff_id', $profile->id])
+                    ->andWhere(['sr_pastor' => NULL])
+                    ->orderBy('staff_id');
+                $staff = $q->all();
+                
+                $i = 0;
+                foreach ($staff as $stf) {                                                          // Combine multiple ministries for same individual
+                    if ($min = $this->findActiveProfile($stf['ministry_id'])) {
+                        if ($i > 0 && 
+                            ($stf['staff_id'] == $staff[$i-1]['staff_id']) &&
+                            ($stf['ministry_id'] == $staff[$i-1]['ministry_id'])) {                 // Remove duplicate ministries
+                            unset($staff[$i]);
+                            $staff = array_values($staff);
+                            continue;
+                        } elseif ($i > 0 && 
+                            ($stf['staff_id'] == $staff[$i-1]['staff_id']) &&
+                            ($stf['ministry_id'] != $staff[$i-1]['ministry_id'])) {                 // Combine multiple unique ministries
+                            $staff[$i-1]['staff_title'] .= ' & <br>' . $min->org_name;
+                            unset($staff[$i]);
+                            $staff = array_values($staff);
+                            continue;
+                        } else {
+                            $staff[$i]['staff_title'] = $min->org_name;
+                        }
+                    }
+                    $i++;
+                }
+                $sChurchIds = ArrayHelper::getColumn($sChurch, 'staff_id');
+                $sChurchNames = ArrayHelper::getColumn($sChurch, 'staff_title');
+                $sChurchArray = Profile::findAll($sChurchIds);
+                $i = 0;
+                foreach ($sChurchArray as $stf) {
+                    $stf->titleM = $sChurchNames[$i];
+                    $i++;
+                }
+
+            // ===================== Fellow Church Members =====================
+                $memberArray = User::find()
+                    ->where(['<>', 'screen_name', NULL])
+                    ->andWhere(['ind_act_profiles' => NULL])
+                    ->andWhere(['home_church' => $profile->home_church])
+                    ->andWhere(['<>', 'id', $profile->user_id])
+                    ->andWhere(['role' => 'Church Member'])
+                    ->all();
+
+            }
+            if ($p == 'history') {
+                $events = $profile->history;
+            }
+
             if ($profile->org_loc && $profile->show_map == Profile::MAP_PRIMARY) {
                 $loc = explode(',', $profile->org_loc);
             } elseif ($church && $church->org_loc && $profile->show_map == Profile::MAP_CHURCH) {
                  $loc = explode(',', $church->org_loc);
-            } elseif ($ministry && $ministry->org_loc && $profile->show_map == Profile::MAP_MINISTRY) {
-                 $loc = explode(',', $ministry->org_loc);
+            } elseif ($parentMinistry && $parentMinistry->org_loc && $profile->show_map == Profile::MAP_MINISTRY) {
+                 $loc = explode(',', $parentMinistry->org_loc);
             } else {
                 $loc = NULL;
             }
@@ -499,9 +929,16 @@ class ProfileController extends Controller
                 'fellowships' => $fellowships,
                 'church' => $church,
                 'churchLink' => $churchLink,
-                'ministry' => $ministry,
-                'ministryLink' => $ministryLink,
-                'schoolsAttended' => $schoolsAttended]);
+                'parentMinistry' => $parentMinistry,
+                'parentMinistryLink' => $parentMinistryLink,
+                'schoolsAttended' => $schoolsAttended,
+                'pastor' => $pastor,
+                'otherMinistryArray' => $otherMinistryArray,
+                'sChurchArray' => $sChurchArray,
+                'memberArray' => $memberArray,
+                'events' => $events,
+                'p' => $p,
+            ]);
         } else {
             $this->redirect(['view-profile', 'id' => $id, 'city' => $city, 'name' => $name]);
         }
@@ -511,7 +948,7 @@ class ProfileController extends Controller
      * Render Mission Agency profile
      * @return mixed
      */
-    public function actionMissionAgency($id, $city, $name)
+    public function actionMissionAgency($id, $city, $name, $p=NULL)
     {
         if (!$profile = $this->findViewProfile($id, $city, $name)) {
             if ($this->checkExpired($id)) {
@@ -534,20 +971,72 @@ class ProfileController extends Controller
                 $social = $profile->social;
             }
 
-            if ($profile->org_loc && $profile->show_map == Profile::MAP_PRIMARY) {
-                $loc = explode(',', $profile->org_loc);
-            } else {
-                $loc = NULL;
+            if ($p == 'connections') {                                                              // Prepare connections list if connections link is clicked
+                
+            // ============================== Staff ============================
+                $staff = Staff::find()->select('staff_id, staff_title')
+                    ->where(['ministry_id' => $profile->id])
+                    ->andWhere(['confirmed' => 1])
+                    ->orderBy('staff_id')
+                    ->all();
+                $i = 0;
+                foreach ($staff as $stf) {                                                          // Combine multiple staff titles for same individual
+                    if ($i > 0 && ($stf['staff_id'] == $staff[$i-1]['staff_id'])) {
+                        $staff[$i-1]['staff_title'] .= ' &middot ' . $stf['staff_title'];
+                        unset($staff[$i]);
+                        $staff = array_values($staff);
+                        continue;
+                    }
+                    $i++;
+                }
+                $ids = ArrayHelper::getColumn($staff, 'staff_id');
+                $names = ArrayHelper::getColumn($staff, 'staff_title');
+                $staffArray = Profile::findAll($ids);
+                $i = 0;
+                foreach ($staffArray as $stf) {
+                    $stf->titleM = $names[$i];
+                    $i++;
+                }
+
+            // ======================== Parent Ministry ========================
+                if ($profile->ministry_of) {
+                    $parentMinistry = self::findActiveProfile($profile->ministry_of);
+                }
+
+            // ========================= Missionaries ==========================
+                $missAgcyId = MissionAgcy::find()
+                    ->select('id')
+                    ->where(['profile_id' => $profile->id])
+                    ->one();
+                $missionaryArray = Missionary::find()
+                    ->joinWith('profile')
+                    ->where(['missionary.mission_agcy_id' => $missAgcyId])
+                    ->andWhere(['profile.status' => Profile::STATUS_ACTIVE])
+                    ->all();
+
             }
+            if ($p == 'history') {
+                $events = $profile->history;
+            }
+
+            ($profile->org_loc && $profile->show_map == Profile::MAP_PRIMARY) ?
+                $loc = explode(',', $profile->org_loc) :
+                $loc = NULL;
 
             return $this->render('profilePages/profileOrg', [
                 'profile' => $profile,
                 'loc' => $loc,
                 'social' => $social,
                 'church' => $church,
-                'churchLink' => $churchLink]);
+                'churchLink' => $churchLink,
+                'staffArray' => $staffArray,
+                'missionaryArray' => $missionaryArray,
+                'parentMinistry' => $parentMinistry,
+                'events' => $events,
+                'p' => $p,
+            ]);
         } else {
-            $this->redirect(['view-profile', 'id' => $id, 'city' => $city, 'name' => $name]);
+            $this->redirect(['view-profile', 'id' => $id, 'city' => $city, 'name' => $name, 'parentMinistry' => $parentMinistry]);
         }
     }
 
@@ -555,7 +1044,7 @@ class ProfileController extends Controller
      * Render missionary profile
      * @return mixed
      */
-    public function actionMissionary($id, $city, $name)
+    public function actionMissionary($id, $city, $name, $p=NULL)
     {
         if (!$profile = $this->findViewProfile($id, $city, $name)) {
             if ($this->checkExpired($id)) {
@@ -570,7 +1059,6 @@ class ProfileController extends Controller
             $churchPlant = NULL;
             $churchPlantLink = NULL;
             $social = NULL;
-            $m = NULL;
             $mission = NULL;
             $missionLink = NULL;
             if ($profile->home_church && $church = $this->findActiveProfile($profile->home_church)) {
@@ -591,6 +1079,119 @@ class ProfileController extends Controller
                 if ($mission->profile_id) {
                     $missionLink = $this->findActiveProfile($mission->profile_id);
                 }
+            }
+
+            if ($p == 'connections') {                                                              // Prepare connections list if connections link is clicked
+                
+            // =========================== Pastor ==============================
+                if ($church) {
+                    if ($staff = Staff::find()
+                        ->where(['ministry_id' => $church->id])
+                        ->andWhere(['sr_pastor' => 1])
+                        ->andWhere(['confirmed' => 1])
+                        ->one()) {
+                        $pastor = $this->findActiveProfile($staff->staff_id);
+                    }
+                }
+
+            // ====================== Other Ministries =========================
+                if ($ministries = Staff::find()
+                    ->where(['staff_id' => $profile->id])
+                    ->andWhere(['ministry_other' => 1])
+                    ->andWhere(['confirmed' => 1])
+                    ->orderBy('id Asc')
+                    ->all()) {
+                    $i = 0;
+                    foreach ($ministries as $mstry) {                                               // Combine multiple staff titles for same ministry
+                        if ($i > 0 && ($mstry['ministry_id'] == $ministries[$i-1]['ministry_id'])) {
+                            $ministries[$i-1]['staff_title'] .= ' &middot ' . $mstry['staff_title'];
+                            unset($ministries[$i]);
+                            $ministries = array_values($ministries);
+                            continue;
+                        }
+                        $i++;
+                    }
+                    $ids = ArrayHelper::getColumn($ministries, 'ministry_id');
+                    $names = ArrayHelper::getColumn($ministries, 'staff_title');
+                    $otherMinistryArray = Profile::findAll($ids);
+
+                    $i = 0;
+                    foreach ($otherMinistryArray as $min) {
+                        $min->titleM = $names[$i];
+                        $i++;
+                    }
+                }
+
+            // ======================= Ministry Partners =======================
+                if ($sMinistry = (new \yii\db\Query())                                              // Ministry partners at primary ministry (if not home church)
+                    ->select('staff_id')
+                    ->from('staff')
+                    ->where(['ministry_id' => $profile->ministry_of])
+                    ->andWhere(['<>', 'staff_id', $profile->id])
+                    ->andWhere(['<>', 'home_church', 1])
+                    ->andWhere(['confirmed' => 1])
+                    ->groupBy('staff_id')
+                    ->all()) {
+                    $sMinistryIds = ArrayHelper::getColumn($sMinistry, 'staff_id');
+                    $sMinistryArray = Profile::findAll($sMinistryIds);
+
+                    $i = 0;
+                    foreach ($sMinistryArray as $staff) {
+                        $staff->titleM = $names[$i];
+                        $i++;
+                    }
+                }
+                if ($ministries) {                                                                  // Ministry partners at other ministries
+                    $otherArray = ArrayHelper::getColumn($ministries, 'ministry_id');
+                    $otherIds = implode (",", $otherArray);
+                    if ($staffOther = (new \yii\db\Query())
+                        ->select('staff_id, ministry_id')
+                        ->from('staff')
+                        ->where('ministry_id IN ("' . $otherIds . '")')
+                        ->andWhere(['<>', 'staff_id', $profile->id])
+                        ->andWhere(['confirmed' => 1])
+                        ->groupBy('staff_id')
+                        ->orderBy('id')
+                        ->all()) {
+                        $sOtherIds = ArrayHelper::getColumn($staffOther, 'staff_id');
+                        $mOtherIds = ArrayHelper::getcolumn($staffOther, 'ministry_id');
+                        $sOtherArray = Profile::findAll($sOtherIds);
+
+                        $i = 0;
+                        foreach ($sOtherArray as $sOther) {
+                            $sOther->titleM = Profile::findOne($mOtherIds[$i])->org_name;
+                            $i++;
+                        }
+                    }
+                }
+                if ($churchPlant && 
+                    $staffCP = (new \yii\db\Query())
+                        ->select('staff_id, ministry_id')
+                        ->from('staff')
+                        ->where(['ministry_id' => $churchPlant->id])
+                        ->andWhere(['<>', 'staff_id', $profile->id])
+                        ->andWhere(['confirmed' => 1])
+                        ->groupBy('staff_id')
+                        ->orderBy('id')
+                        ->all()) {
+                    $sCPIds = ArrayHelper::getColumn($staffCP, 'staff_id');
+                    $mCPIds = ArrayHelper::getcolumn($staffCP, 'ministry_id');
+                    $sCPArray = Profile::findAll($sCPIds);
+                }
+
+            // ===================== Fellow Church Members =====================
+                $miss = $profile->missionary;
+                $cpChurch = $miss->churchPlant;
+                $memberArray = User::find()
+                    ->where('screen_name IS NOT NULL')
+                    ->andWhere(['ind_act_profiles' => NULL])
+                    ->andWhere('home_church= "' . $profile->home_church . '" OR home_church="' . $cpChurch->id . '"')
+                    ->andWhere(['<>', 'id', $profile->user_id])
+                    ->andWhere(['role' => 'Church Member'])
+                    ->all();
+            }
+            if ($p == 'history') {
+                $events = $profile->history;
             }
 
             if ($profile->ind_loc && $profile->show_map == Profile::MAP_PRIMARY) {
@@ -619,7 +1220,16 @@ class ProfileController extends Controller
                 'churchPlantLink' => $churchPlantLink,
                 'schoolsAttended' => $schoolsAttended,
                 'mission' => $mission,
-                'missionLink' => $missionLink]);
+                'missionLink' => $missionLink,
+                'pastor' => $pastor,
+                'otherMinistryArray' => $otherMinistryArray,
+                'memberArray' => $memberArray,
+                'sCPArray' => $sCPArray,
+                'sMinistryArray' => $sMinistryArray,
+                'sOtherArray' => $sOtherArray,
+                'events' => $events,
+                'p' => $p,
+            ]);
         } else {
             $this->redirect(['view-profile', 'id' => $id, 'city' => $city, 'name' => $name]);
         }
@@ -629,7 +1239,7 @@ class ProfileController extends Controller
      * Render Music Ministry profile
      * @return mixed
      */
-    public function actionMusic($id, $city, $name)
+    public function actionMusic($id, $city, $name, $p=NULL)
     {
         if (!$profile = $this->findViewProfile($id, $city, $name)) {
             if ($this->checkExpired($id)) {
@@ -637,75 +1247,65 @@ class ProfileController extends Controller
             }
         }
         if ($profile && $profile->type == 'Music Ministry') {
-            $church = NULL;
-            $churchLink = NULL;
+            $parentMinistry = NULL;
+            $parentMinistryLink = NULL;
             $social = NULL;
             if ($profile->ministry_of && 
-                $church = $this->findActiveProfile($profile->ministry_of)) {
-                $churchLink = $church->org_name . ', ' . 
-                    $church->org_city . ', ' . $church->org_st_prov_reg;
-                $church->org_country == 'United States' ? NULL : 
-                    ($churchLink .= ', ' . $church->org_country);
+                $parentMinistry = $this->findActiveProfile($profile->ministry_of)) {
+                $parentMinistryLink = $parentMinistry->org_name . ', ' . 
+                    $parentMinistry->org_city . ', ' . $parentMinistry->org_st_prov_reg;
+                $parentMinistry->org_country == 'United States' ? NULL : 
+                    ($parentMinistryLink .= ', ' . $parentMinistry->org_country);
             }
             if ($profile->social_id) {
                 $social = $profile->social;
             }
 
-            if ($profile->org_loc && $profile->show_map == Profile::MAP_PRIMARY) {
-                $loc = explode(',', $profile->org_loc);
-            } else {
-                $loc = NULL;
+            if ($p == 'connections') {                                                              // Prepare connections list if connections link is clicked
+                
+            // ============================== Staff ============================
+                $staff = Staff::find()->select('staff_id, staff_title')
+                    ->where(['ministry_id' => $profile->id])
+                    ->andWhere(['confirmed' => 1])
+                    ->orderBy('staff_id')
+                    ->all();
+                $i = 0;
+                foreach ($staff as $stf) {                                                          // Combine multiple staff titles for same individual
+                    if ($i > 0 && ($stf['staff_id'] == $staff[$i-1]['staff_id'])) {
+                        $staff[$i-1]['staff_title'] .= ' &middot ' . $stf['staff_title'];
+                        unset($staff[$i]);
+                        $staff = array_values($staff);
+                        continue;
+                    }
+                    $i++;
+                }
+                $ids = ArrayHelper::getColumn($staff, 'staff_id');
+                $names = ArrayHelper::getColumn($staff, 'staff_title');
+                $staffArray = Profile::findAll($ids);
+                $i = 0;
+                foreach ($staffArray as $stf) {
+                    $stf->titleM = $names[$i];
+                    $i++;
+                }
             }
+            if ($p == 'history') {
+                $events = $profile->history;
+            }
+
+            ($profile->org_loc && $profile->show_map == Profile::MAP_PRIMARY) ?
+                $loc = explode(',', $profile->org_loc) :
+                $loc = NULL;
 
             return $this->render('profilePages/profileOrg', [
                 'profile' => $profile,
                 'loc' => $loc,
                 'social' => $social,
-                'church' => $church,
-                'churchLink' => $churchLink]);
-        } else {
-            $this->redirect(['view-profile', 'id' => $id, 'city' => $city, 'name' => $name]);
-        }
-    }
-
-    /**
-     * Render special ministry profile
-     * @return mixed
-     */
-    public function actionSpecialMinistry($id, $city, $name)
-    {
-        if (!$profile = $this->findViewProfile($id, $city, $name)) {
-            if ($this->checkExpired($id)) {
-                return $this->render('profilePages/profileExpired');
-            }
-        }
-        if ($profile && $profile->type == 'Special Ministry') {
-            $church = NULL;
-            $churchLink = NULL;
-            $social = NULL;
-            if ($profile->ministry_of && 
-                $church = $this->findActiveProfile($profile->ministry_of)) {
-                $churchLink = $church->org_name . ', ' . 
-                    $church->org_city . ', ' . $church->org_st_prov_reg;
-                $church->org_country == 'United States' ? NULL : 
-                    ($churchLink .= ', ' . $church->org_country);
-            }
-            if ($profile->social_id) {
-                $social = $profile->social;
-            }
-
-            if ($profile->org_loc && $profile->show_map == Profile::MAP_PRIMARY) {
-                $loc = explode(',', $profile->org_loc);
-            } else {
-                $loc = NULL;
-            }
-
-            return $this->render('profilePages/profileOrg', [
-                'profile' => $profile,
-                'loc' => $loc,
-                'social' => $social,
-                'church' => $church,
-                'churchLink' => $churchLink]);
+                'parentMinistry' => $parentMinistry,
+                'parentMinistryLink' => $parentMinistryLink,
+                'staffArray' => $staffArray,
+                'events' => $events,
+                'p' => $p,
+            ]);
         } else {
             $this->redirect(['view-profile', 'id' => $id, 'city' => $city, 'name' => $name]);
         }
@@ -715,7 +1315,7 @@ class ProfileController extends Controller
      * Render pastor profile
      * @return mixed
      */
-    public function actionPastor($id, $city, $name)
+    public function actionPastor($id, $city, $name, $p=NULL)
     {
         if (!$profile = $this->findViewProfile($id, $city, $name)) {
             if ($this->checkExpired($id)) {
@@ -727,8 +1327,6 @@ class ProfileController extends Controller
             $church = NULL;
             $churchLink = NULL;
             $social = NULL;
-            $fellowship = NULL;
-            $flwshipLink = NULL;
             if ($profile->home_church && 
                 $church = $this->findActiveProfile($profile->home_church)) {
                 $churchLink = $church->org_name . ', ' . $church->org_city;
@@ -740,7 +1338,86 @@ class ProfileController extends Controller
             if ($profile->social_id) {
                 $social = $profile->social;
             }
-            $fellowships = $profile->fellowship;
+            $flwshipArray = $profile->fellowship;
+
+            if ($p == 'connections') {
+
+            // =========================== Other Ministries ====================
+                if ($ministries = Staff::find()
+                    ->where(['staff_id' => $profile->id])
+                    ->andWhere(['ministry_other' => 1])
+                    ->andWhere(['confirmed' => 1])
+                    ->orderBy('id Asc')
+                    ->all()) {
+                    $i = 0;
+                    foreach ($ministries as $mstry) {                                                          // Combine multiple staff titles for same ministry
+                        if ($i > 0 && ($mstry['ministry_id'] == $ministries[$i-1]['ministry_id'])) {
+                            $ministries[$i-1]['staff_title'] .= ' &middot ' . $mstry['staff_title'];
+                            unset($ministries[$i]);
+                            $ministries = array_values($ministries);
+                            continue;
+                        }
+                        $i++;
+                    }
+                    $ids = ArrayHelper::getColumn($ministries, 'ministry_id');
+                    $names = ArrayHelper::getColumn($ministries, 'staff_title');
+                    $otherMinistryArray = Profile::findAll($ids);
+
+                    $i = 0;
+                    foreach ($otherMinistryArray as $min) {
+                        $min->titleM = $names[$i];
+                        $i++;
+                    }
+                }
+
+            // ===================== Fellow Church Members =====================
+                $memberArray = User::find()
+                    ->where('screen_name IS NOT NULL')
+                    ->andWhere(['ind_act_profiles' => NULL])
+                    ->andWhere(['home_church' => $profile->home_church])
+                    ->andWhere(['<>', 'id', $profile->user_id])
+                    ->andWhere(['role' => 'Church Member'])
+                    ->all();
+
+           // ======================= Ministry Partners =======================                
+                if ($sChurch = (new \yii\db\Query())                                                // Ministry partners at church
+                    ->select('staff_id')
+                    ->from('staff')
+                    ->where(['ministry_id' => $profile->home_church])
+                    ->andWhere(['<>', 'staff_id', $profile->id])
+                    ->andWhere(['confirmed' => 1])
+                    ->groupBy('staff_id')
+                    ->all()) {
+                    $sChurchIds = ArrayHelper::getColumn($sChurch, 'staff_id');
+                    $sChurchArray = Profile::findAll($sChurchIds);
+                }
+                if ($ministries) {                                                                  // Ministry partners at other ministries
+                    $otherArray = ArrayHelper::getColumn($ministries, 'ministry_id');
+                    $otherIds = implode (",", $otherArray);
+                    if ($staffOther = (new \yii\db\Query())
+                        ->select('staff_id, ministry_id')
+                        ->from('staff')
+                        ->where('ministry_id IN ("' . $otherIds . '")')
+                        ->andWhere(['<>', 'staff_id', $profile->id])
+                        ->andWhere(['confirmed' => 1])
+                        ->groupBy('staff_id')
+                        ->orderBy('id')
+                        ->all()) {
+                        $sOtherIds = ArrayHelper::getColumn($staffOther, 'staff_id');
+                        $mOtherIds = ArrayHelper::getcolumn($staffOther, 'ministry_id');
+                        $sOtherArray = Profile::findAll($sOtherIds);
+
+                        $i = 0;
+                        foreach ($sOtherArray as $sOther) {
+                            $sOther->titleM = Profile::findOne($mOtherIds[$i])->org_name;
+                            $i++;
+                        }
+                    }
+                }
+            }
+            if ($p == 'history') {
+                $events = $profile->history;
+            }
 
             if ($profile->org_loc && $profile->show_map == Profile::MAP_PRIMARY) {
                 $loc = explode(',', $profile->org_loc);
@@ -756,8 +1433,15 @@ class ProfileController extends Controller
                 'churchLink' => $churchLink,
                 'church' => $church,
                 'social' => $social,
-                'fellowships' => $fellowships,
-                'schoolsAttended' => $schoolsAttended]);
+                'flwshipArray' => $flwshipArray,
+                'schoolsAttended' => $schoolsAttended,
+                'otherMinistryArray' => $otherMinistryArray,
+                'sChurchArray' => $sChurchArray,
+                'sOtherArray' => $sOtherArray,
+                'memberArray' => $memberArray,
+                'events' => $events,
+                'p' => $p,
+            ]);
         } else {
             $this->redirect(['view-profile', 'id' => $id, 'city' => $city, 'name' => $name]);
         }
@@ -767,7 +1451,7 @@ class ProfileController extends Controller
      * Render print ministry profile
      * @return mixed
      */
-    public function actionPrint($id, $city, $name)
+    public function actionPrint($id, $city, $name, $p=NULL)
     {
         if (!$profile = $this->findViewProfile($id, $city, $name)) {
             if ($this->checkExpired($id)) {
@@ -775,32 +1459,65 @@ class ProfileController extends Controller
             }
         }
         if ($profile && $profile->type == 'Print Ministry') {
-            $church = NULL;
-            $churchLink = NULL;
+            $parentMinistry = NULL;
+            $parentMinistryLink = NULL;
             $social = NULL;
             if ($profile->ministry_of && 
-                $church = $this->findActiveProfile($profile->ministry_of)) {
-                $churchLink = $church->org_name . ', ' . 
-                    $church->org_city . ', ' . $church->org_st_prov_reg;
-                $church->org_country == 'United States' ? NULL : 
-                    ($churchLink .= ', ' . $church->org_country);
+                $parentMinistry = $this->findActiveProfile($profile->ministry_of)) {
+                $parentMinistryLink = $parentMinistry->org_name . ', ' . 
+                    $parentMinistry->org_city . ', ' . $parentMinistry->org_st_prov_reg;
+                $parentMinistry->org_country == 'United States' ? NULL : 
+                    ($parentMinistryLink .= ', ' . $parentMinistry->org_country);
             }
             if ($profile->social_id) {
                 $social = $profile->social;
             }
 
-            if ($profile->org_loc && $profile->show_map == Profile::MAP_PRIMARY) {
-                $loc = explode(',', $profile->org_loc);
-            } else {
-                $loc = NULL;
+            if ($p == 'connections') {                                                              // Prepare connections list if connections link is clicked
+                
+            // ============================== Staff ============================
+                $staff = Staff::find()->select('staff_id, staff_title')
+                    ->where(['ministry_id' => $profile->id])
+                    ->andWhere(['confirmed' => 1])
+                    ->orderBy('staff_id')
+                    ->all();
+                $i = 0;
+                foreach ($staff as $stf) {                                                          // Combine multiple staff titles for same individual
+                    if ($i > 0 && ($stf['staff_id'] == $staff[$i-1]['staff_id'])) {
+                        $staff[$i-1]['staff_title'] .= ' &middot ' . $stf['staff_title'];
+                        unset($staff[$i]);
+                        $staff = array_values($staff);
+                        continue;
+                    }
+                    $i++;
+                }
+                $ids = ArrayHelper::getColumn($staff, 'staff_id');
+                $names = ArrayHelper::getColumn($staff, 'staff_title');
+                $staffArray = Profile::findAll($ids);
+                $i = 0;
+                foreach ($staffArray as $stf) {
+                    $stf->titleM = $names[$i];
+                    $i++;
+                }
             }
+            if ($p == 'history') {
+                $events = $profile->history;
+            }
+
+            ($profile->org_loc && $profile->show_map == Profile::MAP_PRIMARY) ?
+                $loc = explode(',', $profile->org_loc) :
+                $loc = NULL;
 
             return $this->render('profilePages/profileOrg', [
                 'profile' => $profile,
                 'loc' => $loc,
                 'social' => $social,
-                'church' => $church,
-                'churchLink' => $churchLink]);
+                'parentMinistry' => $parentMinistry,
+                'parentMinistryLink' => $parentMinistryLink,
+                'staffArray' => $staffArray,
+                'events' => $events,
+                'p' => $p,
+            ]);
         } else {
             $this->redirect(['view-profile', 'id' => $id, 'city' => $city, 'name' => $name]);
         }
@@ -810,7 +1527,7 @@ class ProfileController extends Controller
      * Render school profile
      * @return mixed
      */
-    public function actionSchool($id, $city, $name)
+    public function actionSchool($id, $city, $name, $p=NULL)
     {
         if (!$profile = $this->findViewProfile($id, $city, $name)) {
             if ($this->checkExpired($id)) {
@@ -818,16 +1535,16 @@ class ProfileController extends Controller
             }
         }
         if ($profile && $profile->type == 'School') {
-            $church = NULL;
-            $churchLink = NULL;
+            $parentMinistry = NULL;
+            $parentMinistryLink = NULL;
             $social = NULL;
             $accreditation = NULL;
             if ($profile->ministry_of && 
-                $church = $this->findActiveProfile($profile->ministry_of)) {
-                $churchLink = $church->org_name . ', ' . 
-                    $church->org_city . ', ' . $church->org_st_prov_reg;
-                $church->org_country == 'United States' ? NULL : 
-                    ($churchLink .= ', ' . $church->org_country);
+                $parentMinistry = $this->findActiveProfile($profile->ministry_of)) {
+                $parentMinistryLink = $parentMinistry->org_name . ', ' . 
+                    $parentMinistry->org_city . ', ' . $parentMinistry->org_st_prov_reg;
+                $parentMinistry->org_country == 'United States' ? NULL : 
+                    ($parentMinistryLink .= ', ' . $parentMinistry->org_country);
             }
             if ($profile->social_id) {
                 $social = $profile->social;
@@ -837,20 +1554,147 @@ class ProfileController extends Controller
         
             $accreditations = $profile->accreditation;
 
-            if ($profile->org_loc && $profile->show_map == Profile::MAP_PRIMARY) {
-                $loc = explode(',', $profile->org_loc);
-            } else {
-                $loc = NULL;
+            if ($p == 'connections') {                                                              // Prepare connections list if connections link is clicked
+                
+            // ============================== Staff ============================
+                $staff = Staff::find()->select('staff_id, staff_title')
+                    ->where(['ministry_id' => $profile->id])
+                    ->andWhere(['confirmed' => 1])
+                    ->orderBy('staff_id')
+                    ->all();
+                $i = 0;
+                foreach ($staff as $stf) {                                                          // Combine multiple staff titles for same individual
+                    if ($i > 0 && ($stf['staff_id'] == $staff[$i-1]['staff_id'])) {
+                        $staff[$i-1]['staff_title'] .= ' &middot ' . $stf['staff_title'];
+                        unset($staff[$i]);
+                        $staff = array_values($staff);
+                        continue;
+                    }
+                    $i++;
+                }
+                $ids = ArrayHelper::getColumn($staff, 'staff_id');
+                $names = ArrayHelper::getColumn($staff, 'staff_title');
+                $staffArray = Profile::findAll($ids);
+                $i = 0;
+                foreach ($staffArray as $stf) {
+                    $stf->titleM = $names[$i];
+                    $i++;
+                }
             }
+
+            // ==================== Parent Ministry Pastor =====================
+                if ($parentMinistry && 
+                    $staff = Staff::find()
+                        ->where(['ministry_id' => $parentMinistry->id])
+                        ->andWhere(['sr_pastor' => 1])
+                        ->andWhere(['confirmed' => 1])
+                        ->one()) {
+                    $pastor = $this->findActiveProfile($staff->staff_id);
+                }
+
+            if ($p == 'history') {
+                $events = $profile->history;
+            }
+
+            ($profile->org_loc && $profile->show_map == Profile::MAP_PRIMARY) ?
+                $loc = explode(',', $profile->org_loc) :
+                $loc = NULL;
 
             return $this->render('profilePages/profileSchool', [
                 'profile' => $profile, 
                 'loc' => $loc,
                 'social' => $social,
                 'schoolLevel' => $schoolLevel,
-                'church' => $church,
-                'churchLink' => $churchLink,
-                'accreditations' => $accreditations
+                'parentMinistry' => $parentMinistry,
+                'parentMinistryLink' => $parentMinistryLink,
+                'pastor' => $pastor,
+                'accreditations' => $accreditations,
+                'staffArray' => $staffArray,
+                'events' => $events,
+                'p' => $p,
+            ]);
+        } else {
+            $this->redirect(['view-profile', 'id' => $id, 'city' => $city, 'name' => $name]);
+        }
+    }
+
+    /**
+     * Render special ministry profile
+     * @return mixed
+     */
+    public function actionSpecialMinistry($id, $city, $name, $p=NULL)
+    {
+        if (!$profile = $this->findViewProfile($id, $city, $name)) {
+            if ($this->checkExpired($id)) {
+                return $this->render('profilePages/profileExpired');
+            }
+        }
+        if ($profile && $profile->type == 'Special Ministry') {
+            $parentMinistry = NULL;
+            $parentMinistryLink = NULL;
+            $social = NULL;
+            if ($profile->ministry_of && 
+                $parentMinistry = $this->findActiveProfile($profile->ministry_of)) {
+                $parentMinistryLink = $parentMinistry->org_name . ', ' . 
+                    $parentMinistry->org_city . ', ' . $parentMinistry->org_st_prov_reg;
+                $parentMinistry->org_country == 'United States' ? NULL : 
+                    ($parentMinistryLink .= ', ' . $parentMinistry->org_country);
+            }
+            if ($profile->social_id) {
+                $social = $profile->social;
+            }
+
+            if ($p == 'connections') {                                                              // Prepare connections list if connections link is clicked
+             
+            // ============================== Staff ============================
+                $staff = Staff::find()->select('staff_id, staff_title')
+                    ->where(['ministry_id' => $profile->id])
+                    ->andWhere(['confirmed' => 1])
+                    ->orderBy('staff_id')
+                    ->all();
+                $i = 0;
+                foreach ($staff as $stf) {                                                          // Combine multiple staff titles for same individual
+                    if ($i > 0 && ($stf['staff_id'] == $staff[$i-1]['staff_id'])) {
+                        $staff[$i-1]['staff_title'] .= ' &middot ' . $stf['staff_title'];
+                        unset($staff[$i]);
+                        $staff = array_values($staff);
+                        continue;
+                    }
+                    $i++;
+                }
+                $ids = ArrayHelper::getColumn($staff, 'staff_id');
+                $names = ArrayHelper::getColumn($staff, 'staff_title');
+                $staffArray = Profile::findAll($ids);
+                $i = 0;
+                foreach ($staffArray as $stf) {
+                    $stf->titleM = $names[$i];
+                    $i++;
+                }
+
+            // ===================== Churches with Program =====================
+                if (!($programChurchArray = $profile->churches)) {
+                    $programChurchArray = NULL;
+                }
+
+            }
+            if ($p == 'history') {
+                $events = $profile->history;
+            }
+
+            ($profile->org_loc && $profile->show_map == Profile::MAP_PRIMARY) ?
+                $loc = explode(',', $profile->org_loc) :
+                $loc = NULL;
+
+            return $this->render('profilePages/profileOrg', [
+                'profile' => $profile,
+                'loc' => $loc,
+                'social' => $social,
+                'parentMinistry' => $parentMinistry,
+                'parentMinistryLink' => $parentMinistryLink,
+                'programChurchArray' => $programChurchArray,
+                'staffArray' => $staffArray,
+                'events' => $events,
+                'p' => $p,
             ]);
         } else {
             $this->redirect(['view-profile', 'id' => $id, 'city' => $city, 'name' => $name]);
@@ -861,7 +1705,7 @@ class ProfileController extends Controller
      * Render evangelist profile
      * @return mixed
      */
-    public function actionStaff($id, $city, $name)
+    public function actionStaff($id, $city, $name, $p=NULL)
     {
         if (!$profile = $this->findViewProfile($id, $city, $name)) {
             if ($this->checkExpired($id)) {
@@ -870,21 +1714,22 @@ class ProfileController extends Controller
         }
         if ($profile && $profile->type == 'Staff') {
             $profile->getformattedNames();
-            $ministry = NULL;
-            $ministryLink = NULL;
+            $parentMinistry = NULL;
+            $parentMinistryLink = NULL;
             $church = NULL;
             $churchLink = NULL;
             $social = NULL;
             $fellowship = NULL;
             $flwshipLink = NULL;
             if ($profile->ministry_of && 
-                $ministry = $this->findActiveProfile($profile->ministry_of)) {
-                $ministryLink = $ministry->org_name . ', ' . $ministry->org_city;
-                $ministry->org_st_prov_reg  ? ($ministryLink .= ', ' . $ministry->org_st_prov_reg) : NULL;
-                $ministry->org_country == 'United States' ? NULL : 
-                    ($ministryLink .= ', ' . $ministry->org_country);
+                $parentMinistry = $this->findActiveProfile($profile->ministry_of)) {
+                $parentMinistryLink = $parentMinistry->org_name . ', ' . $parentMinistry->org_city;
+                $parentMinistry->org_st_prov_reg  ? ($parentMinistryLink .= ', ' . $parentMinistry->org_st_prov_reg) : NULL;
+                $parentMinistry->org_country == 'United States' ? NULL : 
+                    ($parentMinistryLink .= ', ' . $parentMinistry->org_country);
             }
-            if($profile->home_church && 
+            if($profile->home_church &&
+                $profile->home_church != $profile->ministry_of &&
                 $church = $this->findActiveProfile($profile->home_church)) {
                 $churchLink = $church->org_name . ', ' . $church->org_city;
                 $church->org_st_prov_reg ? ($churchLink .= ', ' . $church->org_st_prov_reg) : NULL;
@@ -900,12 +1745,120 @@ class ProfileController extends Controller
                 $flwshipLink = $this->findActiveProfile($fellowship->profile_id);                   // Only link to active profiles
             }
 
+            if ($p == 'connections') {                                                              // Prepare connections list if connections link is clicked
+                
+            // ============================== Pastor ===========================
+                if ($church) {
+                    if ($staff = Staff::find()
+                        ->where(['ministry_id' => $church->id])
+                        ->andWhere(['sr_pastor' => 1])
+                        ->andWhere(['confirmed' => 1])
+                        ->one()) {
+                        $pastor = $this->findActiveProfile($staff->staff_id);
+                    }
+                }
+
+            // =========================== Other Ministries ====================
+                if ($ministries = Staff::find()
+                    ->where(['staff_id' => $profile->id])
+                    ->andWhere(['ministry_other' => 1])
+                    ->andWhere(['confirmed' => 1])
+                    ->orderBy('id Asc')
+                    ->all()) {
+                    $i = 0;
+                    foreach ($ministries as $mstry) {                                               // Combine multiple staff titles for same ministry
+                        if ($i > 0 && ($mstry['ministry_id'] == $ministries[$i-1]['ministry_id'])) {
+                            $ministries[$i-1]['staff_title'] .= ' &middot ' . $mstry['staff_title'];
+                            unset($ministries[$i]);
+                            $ministries = array_values($ministries);
+                            continue;
+                        }
+                        $i++;
+                    }
+                    $ids = ArrayHelper::getColumn($ministries, 'ministry_id');
+                    $names = ArrayHelper::getColumn($ministries, 'staff_title');
+                    $otherMinistryArray = Profile::findAll($ids);
+
+                    $i = 0;
+                    foreach ($otherMinistryArray as $min) {
+                        $min->titleM = $names[$i];
+                        $i++;
+                    }
+                }
+
+            // ======================= Ministry Partners =======================
+                if ($staffChurch = (new \yii\db\Query())                                            // Ministry partners at home church
+                    ->select('staff_id')
+                    ->from('staff')
+                    ->where(['ministry_id' => $profile->home_church])
+                    ->andWhere(['<>', 'staff_id', $profile->id])
+                    ->andWhere(['confirmed' => 1])
+                    ->groupBy('staff_id')
+                    ->all()) {
+                    $staffChurchIds = ArrayHelper::getColumn($staffChurch, 'staff_id');
+                    $sChurchArray = Profile::findAll($staffChurchIds);
+                }
+                if ($staffMinistry = (new \yii\db\Query())                                          // Ministry partners at primary ministry (if not home church)
+                    ->select('staff_id, ministry_id')
+                    ->from('staff')
+                    ->where(['ministry_id' => $profile->ministry_of])
+                    ->andWhere(['<>', 'staff_id', $profile->id])
+                    ->andWhere(['confirmed' => 1])
+                    ->groupBy('staff_id')
+                    ->all()) {
+                    $sMinistryIds = ArrayHelper::getColumn($staffMinistry, 'staff_id');
+                    $mMinistryIds = ArrayHelper::getcolumn($staffMinistry, 'ministry_id');
+                    $sMinistryArray = Profile::findAll($sMinistryIds);
+
+                    $i = 0;
+                    foreach ($sMinistryArray as $sMinistry) {
+                        $sMinistry->titleM = Profile::findOne($mMinistryIds[$i])->org_name;
+                        $i++;
+                    }
+                }
+                if ($ministries) {                                                                  // Ministry partners at other ministries
+                    $otherArray = ArrayHelper::getColumn($ministries, 'ministry_id');
+                    $otherIds = implode (",", $otherArray);
+                    if ($staffOther = (new \yii\db\Query())
+                        ->select('staff_id, ministry_id')
+                        ->from('staff')
+                        ->where('ministry_id IN ("' . $otherIds . '")')
+                        ->andWhere(['<>', 'staff_id', $profile->id])
+                        ->andWhere(['confirmed' => 1])
+                        ->groupBy('staff_id')
+                        ->orderBy('id')
+                        ->all()) {
+                        $sOtherIds = ArrayHelper::getColumn($staffOther, 'staff_id');
+                        $mOtherIds = ArrayHelper::getcolumn($staffOther, 'ministry_id');
+                        $sOtherArray = Profile::findAll($sOtherIds);
+
+                        $i = 0;
+                        foreach ($sOtherArray as $sOther) {
+                            $sOther->titleM = Profile::findOne($mOtherIds[$i])->org_name;
+                            $i++;
+                        }
+                    }
+                }
+
+            // ===================== Fellow Church Members =====================
+                $memberArray = User::find()
+                    ->where(['<>', 'screen_name', NULL])
+                    ->andWhere(['ind_act_profiles' => NULL])
+                    ->andWhere(['home_church' => $profile->home_church])
+                    ->andWhere(['<>', 'id', $profile->user_id])
+                    ->andWhere(['role' => 'Church Member'])
+                    ->all();
+            }
+            if ($p == 'history') {
+                $events = $profile->history;
+            }
+
             if ($profile->org_loc && $profile->show_map == Profile::MAP_PRIMARY) {
                 $loc = explode(',', $profile->org_loc);
             } elseif ($church && $church->org_loc && $profile->show_map == Profile::MAP_CHURCH) {
                  $loc = explode(',', $church->org_loc);
-            } elseif ($ministry && $ministry->org_loc && $profile->show_map == Profile::MAP_MINISTRY) {
-                 $loc = explode(',', $ministry->org_loc);
+            } elseif ($parentMinistry && $parentMinistry->org_loc && $profile->show_map == Profile::MAP_MINISTRY) {
+                 $loc = explode(',', $parentMinistry->org_loc);
             } else {
                 $loc = NULL;
             }
@@ -916,11 +1869,20 @@ class ProfileController extends Controller
                 'social' => $social,
                 'fellowship' => $fellowship,
                 'flwshipLink' => $flwshipLink,
-                'ministry' => $ministry,
-                'ministryLink' => $ministryLink,
+                'parentMinistry' => $parentMinistry,                                                // Primary ministry
+                'parentMinistryLink' => $parentMinistryLink,
+                'otherMinistryArray' => $otherMinistryArray,
                 'church' => $church,
                 'churchLink' => $churchLink,
-                'schoolsAttended' => $schoolsAttended]);
+                'schoolsAttended' => $schoolsAttended,
+                'sChurchArray' => $sChurchArray,                                                    // Staff partners at church
+                'sMinistryArray' => $sMinistryArray,                                                // Staff partners at primary ministry
+                'sOtherArray' => $sOtherArray,                                                      // staff partners at other ministries
+                'memberArray' => $memberArray,
+                'pastor' => $pastor,
+                'events' => $events,
+                'p' => $p,
+            ]);
         } else {
             $this->redirect(['view-profile', 'id' => $id, 'city' => $city, 'name' => $name]);
         }
@@ -1041,20 +2003,16 @@ class ProfileController extends Controller
     }
 
     /**
-     * Returns an fellowship object.
+     * Returns a fellowship object.
      * @param string $id
-     * @return Staff model
-     * @throws NotFoundHttpException if the model cannot be found
+     * @return  fellowship model
      */
     public function findFellowship($id)
     {
-        if ($fellowship = Fellowship::find()
-            ->where(['id' =>$id])
+        return Fellowship::find()
+            ->where(['id' => $id])
             ->andWhere(['status' => Profile::STATUS_ACTIVE])
-            ->one()) {
-            return $fellowship;
-        }
-        return NULL;
+            ->one();
     }
 
     /**

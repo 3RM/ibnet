@@ -170,6 +170,8 @@ $this->title = 'My Account';
                         '<span class="fa fa-check-square-o"></span>' : '<span class="fa fa-square-o"></span>' ?>
                     <?= $userA->emailPrefLinks ?
                         '<span class="fa fa-check-square-o"></span>' : '<span class="fa fa-square-o"></span>' ?>
+                    <?= $userA->emailPrefComments ?
+                        '<span class="fa fa-check-square-o"></span>' : '<span class="fa fa-square-o"></span>' ?>
                     <?= $userA->emailPrefFeatures ?
                         '<span class="fa fa-check-square-o"></span>' : '<span class="fa fa-square-o"></span>' ?>
                 </h4>
@@ -219,6 +221,15 @@ $this->title = 'My Account';
                     ]
                 ])->label(false) ?>
                 <?= $form->field($userA, 'emailPrefLinks')->widget(CheckboxX::classname(), [
+                    'initInputType' => CheckboxX::INPUT_CHECKBOX,
+                    'autoLabel' => true,
+                    'pluginOptions'=>[
+                        'theme' => 'krajee-flatblue',
+                        'enclosedLabel' => true,
+                        'threeState'=>false, 
+                    ]
+                ])->label(false) ?>
+                <?= $form->field($userA, 'emailPrefComments')->widget(CheckboxX::classname(), [
                     'initInputType' => CheckboxX::INPUT_CHECKBOX,
                     'autoLabel' => true,
                     'pluginOptions'=>[

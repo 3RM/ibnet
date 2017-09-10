@@ -11,13 +11,13 @@ use yii\db\Expression;
 
 
 /**
- * Cron controller
+ * Profile count tracking controller
  */
 class ProfileTrackingController extends Controller
 {
     
     /**
-     * Run CheckProfileExpirations::RunCheck for a period of time
+     * Check profile expirations
      * Cron job can be found at ~/crontab -e
      * @param string $from
      * @param string $to
@@ -30,7 +30,6 @@ class ProfileTrackingController extends Controller
             return Controller::EXIT_CODE_ERROR;
         } else {
             foreach ($dates as $date) {
-                //this is the function to execute for each day
                 $type = Yii::$app->db->createCommand('SELECT type,COUNT(*) as count FROM profile WHERE status=10 GROUP BY sub_type ORDER BY count DESC')
                     ->queryAll();
                 $sub_type = Yii::$app->db->createCommand('SELECT sub_type,COUNT(*) as count FROM profile WHERE status=10 GROUP BY sub_type ORDER BY count DESC')

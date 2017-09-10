@@ -1111,7 +1111,7 @@ class ProfileFormController extends ProfileController
 
             }
             $profile->updateAttributes(['ministry_of' => NULL]);
-            $ministryLink = NULL;
+            $ministryLink = NULL; 
             $profile->select = NULL;
             
         } elseif (isset($_POST['removeM']) && $staff = Staff::findOne($_POST['removeM'])) {
@@ -1142,7 +1142,7 @@ class ProfileFormController extends ProfileController
         } elseif ($profile->load(Yii::$app->request->Post()) &&
             $profile->setProgress($fmNum) &&
             $profile->handleFormPM() &&
-            $profile->handleFormPMM()) { 
+            $profile->handleFormPMM()) { // Utility::pp(isset($_POST['save']));
             return isset($_POST['save']) ?
                 $this->redirect(['/preview/view-preview', 'id' => $id]) :
                 $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
@@ -1433,7 +1433,7 @@ class ProfileFormController extends ProfileController
             } 
 
     // ************************** Missionary POST *******************************    
-         } elseif (($profile->type == 'Missionary' || $profile->type == 'Chaplain') &&  
+        } elseif (($profile->type == 'Missionary' || $profile->type == 'Chaplain') && 
             $missionary->load(Yii::$app->request->Post()) && 
             $missionary->handleFormMA($profile) && 
             $profile->setProgress($fmNum)) { 

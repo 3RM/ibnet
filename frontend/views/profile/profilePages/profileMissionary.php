@@ -1,9 +1,11 @@
 <?php
 
 use common\models\profile\Profile;
+use common\models\Utility;
+use common\widgets\Alert;
+use frontend\controllers\ProfileController;
 use kartik\markdown\Markdown;
 use tugmaks\GoogleMaps\Map;
-use yii\bootstrap\Alert;
 use yii\bootstrap\Modal;
 use yii\bootstrap\Html;
 use yii\helpers\Url;
@@ -45,11 +47,11 @@ $this->title = !empty($profile->spouse_first_name) ?
 					<h2>About <?= $this->title ?></h2>
 					<h4>
 						<?php if ($profile->sub_type == 'Furlough Replacement') { ?>
-							<?= $profile->ind_first_name == NULL ? 'Furlough Replacement Missionary</h4>' : 'Furlough Replacement Missionaries' ?>
+							<?= $profile->spouse_first_name == NULL ? 'Furlough Replacement Missionary</h4>' : 'Furlough Replacement Missionaries' ?>
 						<?php } elseif ($profile->sub_type == 'Bible Translator') { ?>
-							<?= $profile->ind_first_name == NULL ? 'Bible Translator</h4>' : 'Bible Translators' ?>
+							<?= $profile->spouse_first_name == NULL ? 'Bible Translator</h4>' : 'Bible Translators' ?>
 						<?php } else { ?>
-							<?= $profile->ind_first_name == NULL ? 'Missionary to ' : 'Missionaries to ' ?><?= $missionary->field ?></h4>
+							<?= $profile->spouse_first_name == NULL ? 'Missionary to ' : 'Missionaries to ' ?><?= $missionary->field ?>
 						<?php } ?>
 					</h4>
 					<!-- Begin Image & Description -->
@@ -169,6 +171,27 @@ $this->title = !empty($profile->spouse_first_name) ?
 				<p><strong>Last Update: </strong><?= Yii::$app->formatter->asDate($profile->last_update) ?></p>
 			</div>
         </div>
-        <?= $this->render('_profileFooter', ['id' => $profile->id]) ?>
+        <div id="p">
+        	<?= $this->render('_profileFooter', ['id' => $profile->id]) ?>
+    	</div>
+        
+        <div class="add-content center">
+        	<?= Html::a('Show Comments', Url::current(['p' => 'comments', '#' => 'p']), ['class' => 'btn btn-primary']); ?>
+        	<?= Html::a('Show Connections', Url::current(['p' => 'connections', '#' => 'p']), ['class' => 'btn btn-primary']); ?>
+        	<?= Html::a('Show History', Url::current(['p' => 'history', '#' => 'p']), ['class' => 'btn btn-primary']); ?>
+    	</div>
+
 	</div>
+
+	<?php
+	if ($p == 'comments') {
+		echo $this->render('comment/_comments', ['profile' => $profile]);
+	} elseif ($p == 'connections') {
+		echo $this->render('connection/_' . ProfileController::$profilePageArray[$profile->type] . 'Connections', ['profile' => $profile, 'church' => $church, 'missionLink' => $missionLink, 'churchPlant' => $churchPlant, 'pastor' => $pastor, 'otherMinistryArray' => $otherMinistryArray, 'sCPArray' => $sCPArray, 'sChurchArray' => $sChurchArray, 'sOtherArray' => $sOtherArray, 'memberArray' => $memberArray]);
+	} elseif ($p == 'history') {
+		echo $this->render('_history', ['profile' => $profile, 'events' => $events]);
+	}
+	?>
+
+	<div class="top-margin-60"></div>
 </div>

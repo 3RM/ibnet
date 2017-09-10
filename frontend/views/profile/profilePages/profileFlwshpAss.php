@@ -1,9 +1,11 @@
 <?php
 
 use common\models\profile\Profile;
+use common\models\Utility;
+use common\widgets\Alert;
+use frontend\controllers\ProfileController;
 use kartik\markdown\Markdown;
 use tugmaks\GoogleMaps\Map;
-use yii\bootstrap\Alert;
 use yii\bootstrap\Modal;
 use yii\bootstrap\Html;
 use yii\helpers\Url;
@@ -53,7 +55,7 @@ $this->title = $profile->org_name;
             	<?php if ($profile->org_address1 && $profile->org_city && $profile->org_st_prov_reg && $profile->org_country) { ?>
 					<?= Html::icon('map-marker') . ' ' ?>
 					<?= empty($profile->org_address1) ? NULL : $profile->org_address1 . ', ' ?>
-					<?= empty($profile->org_address2) ? NULL : $profile->org_address2 . ', ' ?>
+					<?= empty($profile->ind_address2) ? NULL : $profile->org_address2 . ', ' ?>
 					<?= empty($profile->org_box) ? NULL : ' PO Box ' . $profile->org_box . ', ' ?>
 					<?= $profile->org_city . ', ' ?>
 					<?= empty($profile->org_zip) ? $profile->org_st_prov_reg . ', ' : $profile->org_st_prov_reg . ' ' ?>
@@ -122,6 +124,27 @@ $this->title = $profile->org_name;
 				<p><strong>Last Update: </strong><?= Yii::$app->formatter->asDate($profile->last_update) ?></p>
 			</div>
         </div>
-        <?= $this->render('_profileFooter', ['id' => $profile->id]) ?>
+        <div id="p">
+        	<?= $this->render('_profileFooter', ['id' => $profile->id]) ?>
+    	</div>
+        
+        <div class="add-content center">
+        	<?= Html::a('Show Comments', Url::current(['p' => 'comments', '#' => 'p']), ['class' => 'btn btn-primary']); ?>
+        	<?= Html::a('Show Connections', Url::current(['p' => 'connections', '#' => 'p']), ['class' => 'btn btn-primary']); ?>
+        	<?= Html::a('Show History', Url::current(['p' => 'history', '#' => 'p']), ['class' => 'btn btn-primary']); ?>
+    	</div>
+
 	</div>
+
+	<?php
+	if ($p == 'comments') {
+		echo $this->render('comment/_comments', ['profile' => $profile]);
+	} elseif ($p == 'connections') {
+		echo $this->render('connection/_' . ProfileController::$profilePageArray[$profile->type] . 'Connections', ['profile' => $profile, 'staffArray' => $staffArray, 'indvArray' => $indvArray, 'churchArray' => $churchArray]);
+	} elseif ($p == 'history') {
+		echo $this->render('_history', ['profile' => $profile, 'events' => $events]);
+	}
+	?>
+
+	<div class="top-margin-60"></div>
 </div>

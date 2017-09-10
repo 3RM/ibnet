@@ -4,36 +4,21 @@ return [
 
     'modules' => [
         'rbac' =>  [
-            'class' => 'johnitvn\rbacplus\Module',
-            'beforeCreateController' => function($route){
-                return false;                                   // Set to true to access rbac module (i.e. rule/permission/role/assignment routes)
-            },
-            'userModelExtraDataColumls'=>[
-                [
-                    'attribute'=>'First Name',
-                    'value'=>function($model) {
-                        return $model->first_name;
-                    }
-                ],
-                [
-                    'attribute'=>'Last Name',
-                    'value'=>function($model) {
-                        return $model->last_name;
-                    }
-                ],
-                [
-                    'attribute'=>'email',
-                    'value'=>function($model) {
-                        return $model->email;
-                    }
-                ],
-            ]
-        ],   
+            'class' => 'dektrium\rbac\RbacWebModule',
+        ],
+        'comments' => [
+            'class' => 'rmrevin\yii\module\Comments\Module',
+            'userIdentityClass' => 'common\models\User',
+            'useRbac' => true,
+            'modelMap' => [
+                'Comment' => 'frontend\models\Comment'
+            ],
+        ],     
     ],
 
     'components' => [
         'authManager' => [
-            'class' => 'yii\rbac\DbManager',
+            'class' => 'dektrium\rbac\components\DbManager',
             'cache' => 'yii\caching\FileCache',
         ],
         'cache' => [
@@ -51,6 +36,13 @@ return [
                         'port' => '8983',
                         'path' => '/solr/ibnet',
                     ],
+                ],
+            ],
+        ],
+        'view' => [
+            'theme' => [
+                'pathMap' => [
+                    '@vendor/rmrevin/yii2-comments/widgets/views' => '@frontend/views/profile/profilePages/comment',
                 ],
             ],
         ],

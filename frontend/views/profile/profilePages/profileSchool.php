@@ -1,16 +1,17 @@
 <?php
 
 use common\models\profile\Profile;
+use common\widgets\Alert;
+use frontend\controllers\ProfileController;
 use kartik\markdown\Markdown;
 use tugmaks\GoogleMaps\Map;
-use yii\bootstrap\Alert;
 use yii\bootstrap\Modal;
-use yii\helpers\ArrayHelper;
 use yii\bootstrap\Html;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
+rmrevin\yii\fontawesome\AssetBundle::register($this);
 $this->title = $profile->org_name;
 ?>
 
@@ -54,7 +55,7 @@ $this->title = $profile->org_name;
 				<?php if ($profile->org_address1 && $profile->org_city && $profile->org_st_prov_reg && $profile->org_country) { ?>
 					<?= Html::icon('map-marker') . ' ' ?>
 					<?= empty($profile->org_address1) ? NULL : $profile->org_address1 . ', ' ?>
-					<?= empty($profile->org_address2) ? NULL : $profile->org_address2 . ', ' ?>
+					<?= empty($profile->ind_address2) ? NULL : $profile->org_address2 . ', ' ?>
 					<?= empty($profile->org_box) ? NULL : ' PO Box ' . $profile->org_box . ', ' ?>
 					<?= $profile->org_city . ', ' ?>
 					<?= empty($profile->org_zip) ? $profile->org_st_prov_reg . ', ' : $profile->org_st_prov_reg . ' ' ?>
@@ -123,8 +124,8 @@ $this->title = $profile->org_name;
 			</div>
 			<div class="col-md-4 profile-thirds">
 				<!-- Begin "Ministry of ... Baptist Church" (Box 2) -->
-				<?= (empty($church) || empty($churchLink)) ? NULL :
-				'<b>Ministry of:</b><br>' . HTML::a($churchLink, ['church', 'id' => $church->id, 'city' => $church->url_city, 'name' => $church->url_name]) . '<br>' ?>
+				<?= (empty($parentMinistry) || empty($parentMinistryLink)) ? NULL :
+				'<b>Ministry of:</b><br>' . HTML::a($parentMinistryLink, ['church', 'id' => $parentMinistry->id, 'city' => $parentMinistry->url_city, 'name' => $parentMinistry->url_name]) . '<br>' ?>
 				<!-- End "Ministry of ... Baptist Church" -->
 				<br>
 				<!-- Begin Accreditation/Association (Box 3) -->
@@ -140,6 +141,28 @@ $this->title = $profile->org_name;
 				<p><strong>Last Update: </strong><?= Yii::$app->formatter->asDate($profile->last_update) ?></p>
 			</div>
         </div>
-        <?= $this->render('_profileFooter', ['id' => $profile->id]) ?>
+        <div id="p">
+        	<?= $this->render('_profileFooter', ['id' => $profile->id]) ?>
+    	</div>
+        
+        <div class="add-content center">
+        	<?= Html::a('Show Comments', Url::current(['p' => 'comments', '#' => 'p']), ['class' => 'btn btn-primary']); ?>
+        	<?= Html::a('Show Connections', Url::current(['p' => 'connections', '#' => 'p']), ['class' => 'btn btn-primary']); ?>
+        	<?= Html::a('Show History', Url::current(['p' => 'history', '#' => 'p']), ['class' => 'btn btn-primary']); ?>
+    	</div>
+
+
 	</div>
+
+	<?php
+	if ($p == 'comments') {
+		echo $this->render('comment/_comments', ['profile' => $profile]);
+	} elseif ($p == 'connections') {
+		echo $this->render('connection/_' . ProfileController::$profilePageArray[$profile->type] . 'Connections', ['profile' => $profile, 'parentMinistry' => $parentMinistry, 'pastor' => $pastor, 'staffArray' => $staffArray]);
+	} elseif ($p == 'history') {
+		echo $this->render('_history', ['profile' => $profile, 'events' => $events]);
+	}
+	?>
+
+	<div class="top-margin-60"></div>
 </div>

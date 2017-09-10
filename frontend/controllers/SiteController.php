@@ -3,6 +3,7 @@ namespace frontend\controllers;
 
 use common\models\AccountSettings;
 use common\models\LoginForm;
+use common\models\profile\Mail;
 use common\models\profile\Profile;
 use common\models\profile\ProfileBrowse;
 use common\models\profile\ProfileSearch;
@@ -595,7 +596,26 @@ class SiteController extends Controller
 
         if ($user->load(Yii::$app->request->Post())) {
             $user->validate(); 
+            if ($user->role == NULL) {
+                $user->role = 'Church Member';                                                      // Set default role
+            }
+            $oldId = $user->getOldAttribute('home_church');
             $user->save();
+
+            if ($user->home_church && $user->home_church != $oldId) {                               // Notify church profile owner of new link
+                $church = ProfileController::findActiveProfile($user->home_church);
+                $churchProfOwner = User::findOne($church->user_id);
+                if ($churchProfOwner && $churchProfOwner->emailPrefLinks == 1) {
+                    Mail::sendLink($user, $church, $churchProfOwner, 'CM', 'L');
+                }
+                if ($oldId) {
+                    $oldChurch = ProfileController::findActiveProfile($oldId);
+                    $oldChurchProfOwner = User::findOne($oldChurch->user_id);
+                    if ($oldChurchProfOwner && $oldChurchProfOwner->emailPrefLinks == 1) {
+                        Mail::sendLink($user, $oldChurch, $oldChurchProfOwner, 'CM', 'UL');
+                    }
+                }
+            }
         }
         return $this->redirect(['dashboard']);
 

@@ -10,7 +10,7 @@ use yii\console\Controller;
 
 
 /**
- * Cron controller
+ * Profile expirations controller
  */
 class ProfileExpirationsController extends Controller
 {

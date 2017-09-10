@@ -144,7 +144,7 @@ $this->title = !empty($profile->spouse_first_name) ?
 				<?= $churchLink ? '<strong>Home Church: </strong><br>' . HTML::a($churchLink, ['church', 'id' => $church->id, 'city' => $church->url_city, 'name' => $church->url_name]) . '<br><br>' : '<br>' ?>
 				<!-- End Home Church -->
 				<!-- Begin Parent Ministry (Box 3) -->
-				<?= $ministryLink ? '<strong>Serving with: </strong><br>' . HTML::a($ministryLink, ['church', 'id' => $ministry->id, 'city' => $ministry->url_city, 'name' => $ministry->url_name]) . '<br><br>' : NULL ?>
+				<?= $parentMinistryLink ? '<strong>Serving with: </strong><br>' . HTML::a($parentMinistryLink, ['church', 'id' => $parentMinistry->id, 'city' => $parentMinistry->url_city, 'name' => $parentMinistry->url_name]) . '<br><br>' : NULL ?>
 				<!-- End Parent Ministry -->
 				<!-- Begin Linked Mission Agency (Box 3) -->
 				<?php if ($mission ||  $missionLink) { ?>
@@ -153,6 +153,7 @@ $this->title = !empty($profile->spouse_first_name) ?
 						$mission->mission . '<br><br>' : 
 						HTML::a($missionLink->org_name, ['mission-agency', 'id' => $missionLink->id, 'city' => $missionLink->url_city, 'name' => $missionLink->url_name]) . '<br><br>' ?><br>
 				<?php } ?>
+				<!-- End Linked Mission Agency -->
 				<!-- Begin Fellowship (Box 3) -->
 				<?php if ($fellowships) {
 					echo '<br><strong>Fellowship:</strong><br>';
@@ -169,6 +170,27 @@ $this->title = !empty($profile->spouse_first_name) ?
 				<p><strong>Last Update: </strong><?= Yii::$app->formatter->asDate($profile->last_update) ?></p>
 			</div>
         </div>
-        <?= $this->render('_profileFooter', ['id' => $profile->id]) ?>
+        <div id="p">
+        	<?= $this->render('_profileFooter', ['id' => $profile->id]) ?>
+    	</div>
+        
+        <div class="add-content center">
+        	<?= Html::a('Show Comments', Url::current(['p' => 'comments', '#' => 'p']), ['class' => 'btn btn-primary']); ?>
+        	<?= Html::a('Show Connections', Url::current(['p' => 'connections', '#' => 'p']), ['class' => 'btn btn-primary']); ?>
+        	<?= Html::a('Show History', Url::current(['p' => 'history', '#' => 'p']), ['class' => 'btn btn-primary']); ?>
+    	</div>
+
 	</div>
+
+	<?php
+	if ($p == 'comments') {
+		echo $this->render('comment/_comments', ['profile' => $profile]);
+	} elseif ($p == 'connections') {
+		echo $this->render('connection/_' . ProfileController::$profilePageArray[$profile->type] . 'Connections', ['profile' => $profile, 'parentMinistry' => $parentMinistry, 'church' => $church, 'missionLink' => $missionLink, 'sChurchArray' => $sChurchArray, 'pastor' => $pastor, 'otherMinistryArray' => $otherMinistryArray, 'sOtherArray' => $sOtherArray, 'memberArray' => $memberArray]);
+	} elseif ($p == 'history') {
+		echo $this->render('_history', ['profile' => $profile, 'events' => $events]);
+	}
+	?>
+
+	<div class="top-margin-60"></div>
 </div>

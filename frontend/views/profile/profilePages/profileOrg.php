@@ -1,16 +1,25 @@
 <?php
 
 use common\models\profile\Profile;
+use common\widgets\Alert;
+use frontend\controllers\ProfileController;
 use kartik\markdown\Markdown;
 use tugmaks\GoogleMaps\Map;
-use yii\bootstrap\Alert;
 use yii\bootstrap\Modal;
 use yii\bootstrap\Html;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
+rmrevin\yii\fontawesome\AssetBundle::register($this);
 $this->title = $profile->org_name;
+$connection = [
+	'Camp' => '_camp',
+	'Mission Agency' => '_missAgcy',
+	'Music Ministry' => '_music',
+	'Special Ministry' => '_special',
+	'Print Ministry' => '_print',
+];
 ?>
 
 <div class="site-index profile-page">
@@ -41,6 +50,7 @@ $this->title = $profile->org_name;
 			</div>
 			<div class="col-md-8">
 					<h2>About <?= $this->title ?></h2>
+					
 					<!-- Begin Image & Description -->
 					<p><?= Markdown::convert($profile->description) ?></p>							
 				 	<!-- End Image & Description -->
@@ -52,7 +62,7 @@ $this->title = $profile->org_name;
             	<?php if ($profile->org_address1 && $profile->org_city && $profile->org_st_prov_reg && $profile->org_country) { ?>
 					<?= Html::icon('map-marker') . ' ' ?>
 					<?= empty($profile->org_address1) ? NULL : $profile->org_address1 . ', ' ?>
-					<?= empty($profile->org_address2) ? NULL : $profile->org_address2 . ', ' ?>
+					<?= empty($profile->ind_address2) ? NULL : $profile->org_address2 . ', ' ?>
 					<?= empty($profile->org_box) ? NULL : ' PO Box ' . $profile->org_box . ', ' ?>
 					<?= $profile->org_city . ', ' ?>
 					<?= empty($profile->org_zip) ? $profile->org_st_prov_reg . ', ' : $profile->org_st_prov_reg . ' ' ?>
@@ -68,7 +78,7 @@ $this->title = $profile->org_name;
 					<?= $profile->org_po_city . ', ' ?>
 					<?= empty($profile->org_po_zip) ? $profile->org_po_st_prov_reg . ', ' : $profile->org_po_st_prov_reg . ' ' ?>
 					<?= $profile->org_po_zip ?>
-					<?= $profile->ind_po_country == 'United States' ? NULL : $profile->org_po_country ?>
+					<?= $profile->org_po_country == 'United States' ? NULL : $profile->org_po_country ?>
 					<?= '<br>' ?>
 				<?php } ?>
 				<?= Html::icon('phone') . ' ' . $profile->phone ?><br>
@@ -114,7 +124,7 @@ $this->title = $profile->org_name;
 			</div>
 			<div class="col-md-4 profile-thirds">
 				<!-- Begin linked Church (Box 3) -->
-				<?= (empty($church) || empty($churchLink)) ? NULL : $profile->org_name . ' is a ministry of ' . HTML::a($churchLink, ['church', 'id' => $church->id, 'city' => $church->url_city, 'name' => $church->url_name]) . '<br><br>' ?>
+				<?= (empty($parentMinistry) || empty($parentMinistryLink)) ? NULL : $profile->org_name . ' is a ministry of ' . HTML::a($parentMinistryLink, ['church', 'id' => $parentMinistry->id, 'city' => $parentMinistry->url_city, 'name' => $parentMinistry->url_name]) . '<br><br>' ?>
 				<!-- End linked Church -->
 				<!-- Begin profile tags (Box 3) -->
 				<?php if (!empty($tags = $profile->tag)) {
@@ -130,6 +140,27 @@ $this->title = $profile->org_name;
 				<p><br /><strong>Last Update: </strong><?= Yii::$app->formatter->asDate($profile->last_update) ?></p>
 			</div>
         </div>
-        <?= $this->render('_profileFooter', ['id' => $profile->id]) ?>
-	</div>
+        <div id="p">
+        	<?= $this->render('_profileFooter', ['id' => $profile->id]) ?>
+    	</div>
+        
+        <div class="add-content center">
+        	<?= Html::a('Show Comments', Url::current(['p' => 'comments', '#' => 'p']), ['class' => 'btn btn-primary']); ?>
+        	<?= Html::a('Show Connections', Url::current(['p' => 'connections', '#' => 'p']), ['class' => 'btn btn-primary']); ?>
+        	<?= Html::a('Show History', Url::current(['p' => 'history', '#' => 'p']), ['class' => 'btn btn-primary']); ?>
+    	</div>
+        
+    </div>
+        
+    <?php
+	if ($p == 'comments') {
+		echo $this->render('comment/_comments', ['profile' => $profile]);
+	} elseif ($p == 'connections') {
+		echo $this->render('connection/_' . ProfileController::$profilePageArray[$profile->type] . 'Connections', ['profile' => $profile, 'parentMinistry' => $parentMinistry, 'staffArray' => $staffArray, 'missionaryArray' => $missionaryArray, 'programChurchArray' => $programChurchArray, 'parentMinistry' => $parentMinistry]);
+	} elseif ($p == 'history') {
+		echo $this->render('_history', ['profile' => $profile, 'events' => $events]);
+	}
+	?>
+
+	<div class="top-margin-60"></div>
 </div>

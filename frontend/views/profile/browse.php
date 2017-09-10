@@ -92,7 +92,9 @@ $this->title = 'Browse';
                                 if (isset($fqs['country']['country']) && $countrySelected = ($fqs['country']['country'] == $countryConstraint)) {
                                     print('<b>&#187; ' . Html::a($country . ' (' . $countryCount . ')', ['facet/facet', 'constraint' => $countryConstraint . '+u', 'cat' => 'country', 'tabId' => '+tabId+']) . '</b><br/>');
                     echo '</div>';
-                    echo '<div class="left-block states">';
+                    echo $fqs['country']['country'] == 'f_country:"United States"' ?
+                        '<div class="left-block states">' :
+                        '<div class="left-block">';
                                 # =============================== State ===============================
                                     echo '<h4>State or Region</h4>';
                                     $j = 0;
@@ -129,8 +131,12 @@ $this->title = 'Browse';
                                                 }
                                         # =============================== End City ===============================
                                             } else {
-                                                print(Html::a($state . ' (' . $stateCount . ')', ['facet/facet', 'constraint' => $stateConstraint . '+s', 'cat' => 'state']));
-                                                echo $j%3 == 0 ? '<br/>' : '&nbsp&nbsp';
+                                                if ($fqs['country']['country'] == 'f_country:"United States"') {
+                                                    print(Html::a($state . ' (' . $stateCount . ')', ['facet/facet', 'constraint' => $stateConstraint . '+s', 'cat' => 'state']));
+                                                    echo $j%3 == 0 ? '<br/>' : '&nbsp&nbsp';
+                                                } else {
+                                                    print(Html::a($state . ' (' . $stateCount . ')', ['facet/facet', 'constraint' => $stateConstraint . '+s', 'cat' => 'state']) . '<br/>');
+                                                }
                                             }
                                         } else {break;}
                                     }

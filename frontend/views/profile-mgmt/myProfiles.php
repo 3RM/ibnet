@@ -66,9 +66,13 @@ $this->title = 'My Account';
                                     echo '<p>Update by: --</p>';
                                 } else {
                                     echo '<p>Update by: ';
-                                    echo (strtotime($profile->renewal_date) < strtotime('-14 day')) ?
-                                        '<span style="color:red">' . Yii::$app->formatter->asDate($profile->renewal_date) . '</span></p>' :
-                                        Yii::$app->formatter->asDate($profile->renewal_date) . '</p>';
+                                    if (time() > strtotime($profile->renewal_date)) {                                        // Profile is in grace period
+                                        echo '<span style="color:red">' . Yii::$app->formatter->asDate($profile->renewal_date) . '</span></p>';
+                                    } elseif (time() > (strtotime($profile->renewal_date) - 1209600)) {                      // Profile will expire in two weeks
+                                         echo '<span style="color:orange">' . Yii::$app->formatter->asDate($profile->renewal_date) . '</span></p>';
+                                    } else {                                                                                 // Profile is active
+                                        echo Yii::$app->formatter->asDate($profile->renewal_date) . '</p>';
+                                    }
                                 } ?>
                                 <?php if ($profile->status == 0) {
                                     echo '<p>Status:<span style="color:#337ab7"> New</p>';
@@ -93,7 +97,7 @@ $this->title = 'My Account';
                                     NULL : 
                                     '<p>' . Html::a(Html::icon('transfer') . ' Transfer', ['profile-mgmt/transfer', 'id' => $profile->id]) . '</p>';
                                 ?>
-                                <?= ''//'<p>' . Html::a(Html::icon('cog') . ' Settings', ['profile-mgmt/transfer', 'id' => $profile->id]) . '</p>' ?>
+                                <?= '<p>' . Html::a(Html::icon('cog') . ' Settings', ['profile-mgmt/settings', 'id' => $profile->id]) . '</p>' ?>
                                 </div>
                     <?=     '</td>
                         </tr>';

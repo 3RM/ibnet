@@ -6,12 +6,14 @@ use common\models\User;
 use common\models\Utility;
 use common\models\SendMail;
 use common\models\profile\FormsCompleted;
+use common\models\profile\History;
 use common\models\profile\Profile;
 use common\models\profile\Type;
 use common\models\profile\SubType;
 use Yii;
 use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 use yii\web\Controller;
 use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
@@ -81,10 +83,7 @@ class ProfileMgmtController extends ProfileController
             $profile->profileCreate() &&
             $profile->createProgress($profile->id)) {
 
-            return $this->redirect(['profile-form/form-route', 
-                'type' => $profile->type, 
-                'fmNum' => -1, 
-                'id' => $profile->id]);
+            return $this->redirect(['profile-form/form-route', 'type' => $profile->type, 'fmNum' => -1, 'id' => $profile->id]);
 
         } else {
             $types = ArrayHelper::map(Type::find()->all(),                      //add ->where(['active' => 1])
@@ -165,10 +164,7 @@ class ProfileMgmtController extends ProfileController
                 return $this->redirect(['profile-form/forms-menu', 'id' => $id]);
             }
         }
-        return $this->redirect(['profile-form/form-route', 
-            'type' => $profile->type, 
-            'fmNum' => -1, 
-            'id' => $profile->id]);                                
+        return $this->redirect(['profile-form/form-route', 'type' => $profile->type, 'fmNum' => -1, 'id' => $profile->id]);                                
     }
 
     /**
@@ -292,6 +288,42 @@ class ProfileMgmtController extends ProfileController
         } else {
             throw new NotFoundHttpException;
         }                              
+    }
+
+    /**
+     * Profile Settings
+     * @param string $id
+     * @return mixed
+     */
+    public function actionSettings($id) 
+    {
+        $profile = $this->findProfile($id); 
+        $profile->scenario = 'settings';
+
+        $add = false;
+        $history = new History();
+        if (isset($_POST['add'])) {
+            $add = true;
+
+        } elseif (isset($_POST['remove'])) {
+            $event = History::findOne($_POST['remove']);
+            $event->updateAttributes(['deleted' => 1]);
+
+        } elseif ($history->load(Yii::$app->request->Post()) && 
+            $history->validate()) {
+            $history->profile_id = $profile->id;
+            $history->date = strtotime($history->date);
+            $history->save();
+            $this->redirect(['settings', 'id' => $profile->id]);
+        }
+
+        $events = $profile->history;
+
+        return $this->render('settings', [
+            'profile' => $profile,
+            'history' => $history,
+            'events' => $events,
+            'add' => $add]);                              
     }
 
 }                     

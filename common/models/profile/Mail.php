@@ -2,6 +2,7 @@
 namespace common\models\profile;
 
 use common\models\profile\Profile;
+use common\models\User;
 use frontend\controllers\ProfileController;
 use frontend\controllers\ProfileFormController;
 use yii;
@@ -322,6 +323,46 @@ class Mail extends \yii\db\ActiveRecord
             ->setFrom([\yii::$app->params['adminEmail']])
             ->setTo([$profileOwner->email])
             ->setSubject($subject)
+            ->send();
+
+        return true;
+    }
+
+    /**
+     * Notify a profile owner of new comment
+     * 
+     * @return boolean
+     */
+    public function sendComment($id, $createdBy)
+    {
+        $user = User::findOne($profile->user_id);
+        if ($user->emailPrefComments != 1) {
+            return true;
+        }
+        $commenter = User::findOne($createdBy);
+        $profile = Profile::findOne($id);
+        $title = '<b>New Comment</b>';
+        $msg = $commenter->screen_name . ' just left a comment on your profile "' . $profile->profile_name . '". Click ' . 
+            Html::a('here', 
+                Url::toRoute([
+                    'profile/' . ProfileController::$profilePageArray[$profile->type], 
+                    'city' => $profile->url_city, 
+                    'name' => $profile->url_name,
+                    'id' => $profile->id,
+                    'p' => 'comments', 
+                    '#' => 'p'
+                ], ['target' => '_blank'])
+            ) . ' to see it.';
+        
+        Yii::$app
+            ->mailer
+            ->compose(
+                ['html' => 'notification-html'], 
+                ['title' => $title, 'message' => $msg]
+            )
+            ->setFrom([\yii::$app->params['adminEmail']])
+            ->setTo($user->email)
+            ->setSubject('IBNet | New Comment')
             ->send();
 
         return true;

@@ -54,7 +54,10 @@ class PreviewController extends ProfileFormController
             throw new NotFoundHttpException;
         }
         $previewPage = 'preview-' . ProfileController::$profilePageArray[$profile->type];                                     // Handle all other profile types
-        
+        if ($profile->edit != Profile::EDIT_YES) {
+            $profile->updateAttributes(['edit' => Profile::EDIT_YES]);
+        }
+
         return $this->redirect([$previewPage, 'id' => $profile->id, 'city' => $city, 'name' => $name]);
     }
 
@@ -316,7 +319,7 @@ class PreviewController extends ProfileFormController
             $profile->getformattedNames();
             $pastorLink = NULL;
             $social = NULL;
-            $programs = $profile->program;
+            $programArray = $profile->program;
             if ($staff = Staff::find()
                 ->where(['ministry_id' => $profile->id])
                 ->andWhere(['sr_pastor' => 1])
@@ -326,15 +329,15 @@ class PreviewController extends ProfileFormController
             if ($profile->social_id) {
                 $social = $profile->social;
             }
-            if (!$ministries = Profile::find()
+            if (!$ministryArray = Profile::find()
                 ->where(['status' => Profile::STATUS_ACTIVE])
                 ->andWhere(['ministry_of' => $profile->id])
                 ->all()) {
-                $ministries = NULL;
+                $ministryArray = NULL;
             }
             
-            $fellowships = $profile->fellowship;
-            $associations = $profile->association;
+            $flwshipArray = $profile->fellowship;
+            $assArray = $profile->association;
             
             if ($profile->org_loc && $profile->show_map == Profile::MAP_PRIMARY) {
                 $loc = explode(',', $profile->org_loc);
@@ -350,10 +353,10 @@ class PreviewController extends ProfileFormController
                 'loc' => $loc,
                 'social' => $social,
                 'pastorLink' => $pastorLink,
-                'ministries' => $ministries,
-                'programs' => $programs,
-                'fellowships' => $fellowships,
-                'associations' => $associations,
+                'ministryArray' => $ministryArray,
+                'programArray' => $programArray,
+                'flwshipArray' => $flwshipArray,
+                'assArray' => $assArray,
                 'formList' => ProfileFormController::$formList,
                 'typeMask' => $typeMask,
                 'activate' => $activate]);
@@ -542,7 +545,6 @@ class PreviewController extends ProfileFormController
             $churchPlant = NULL;
             $churchPlantLink = NULL;
             $social = NULL;
-            $m = NULL;
             $mission = NULL;
             $missionLink = NULL;
             if ($profile->home_church && $church = $this->findActiveProfile($profile->home_church)) {
@@ -745,8 +747,6 @@ class PreviewController extends ProfileFormController
             $church = NULL;
             $churchLink = NULL;
             $social = NULL;
-            $fellowship = NULL;
-            $flwshipLink = NULL;
             if ($profile->home_church && 
                 $church = $this->findActiveProfile($profile->home_church)) {
                 $churchLink = $church->org_name . ', ' . $church->org_city;
@@ -758,7 +758,7 @@ class PreviewController extends ProfileFormController
             if ($profile->social_id) {
                 $social = $profile->social;
             }
-            $fellowships = $profile->fellowship;
+            $flwshipArray = $profile->fellowship;
 
             if ($profile->ind_loc && $profile->show_map == Profile::MAP_PRIMARY) {
                 $loc = explode(',', $profile->ind_loc);
@@ -777,7 +777,7 @@ class PreviewController extends ProfileFormController
                 'churchLink' => $churchLink,
                 'church' => $church,
                 'social' => $social,
-                'fellowships' => $fellowships,
+                'flwshipArray' => $flwshipArray,
                 'schoolsAttended' => $schoolsAttended,
                 'formList' => ProfileFormController::$formList,
                 'typeMask' => $typeMask,

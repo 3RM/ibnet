@@ -1,13 +1,14 @@
 <?php
 namespace common\models;
 
-use common\models\Assignment;
+use common\models\profile\Profile;
+use frontend\controllers\ProfileController;
 use sadovojav\cutter\behaviors\CutterBehavior;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
-use yii\web\IdentityInterface;
+use yii\helpers\Url;
 
 /**
  * User model
@@ -24,7 +25,9 @@ use yii\web\IdentityInterface;
  * @property integer $updated_at
  * @property string $password write-only password
  */
-class User extends ActiveRecord implements IdentityInterface
+class User extends ActiveRecord implements 
+    \yii\web\IdentityInterface,
+    \rmrevin\yii\module\Comments\interfaces\CommentatorInterface
 {
     public $newUsername;
     public $newEmail;
@@ -64,7 +67,7 @@ class User extends ActiveRecord implements IdentityInterface
         return[
             'all' => ['status'],
             'personal' => ['screen_name', 'home_church', 'role', 'usr_image'],
-            'account' => ['newUsername', 'newEmail', 'newPassword', 'emailPrefProfile', 'emailPrefLinks', 'emailPrefFeatures'],
+            'account' => ['newUsername', 'newEmail', 'newPassword', 'emailPrefProfile', 'emailPrefLinks', 'emailPrefComments',   'emailPrefFeatures'],
         ];
     }
 
@@ -88,7 +91,7 @@ class User extends ActiveRecord implements IdentityInterface
             ['newEmail', 'email', 'message' => 'Please provide a valid email address.', 'on' => 'account'],
             ['newPassword', 'string', 'max' => 20, 'on' => 'account'],
             ['currentPassword', 'validateCurrentPass', 'on' => 'account'],
-            [['emailPrefProfile', 'emailPrefLinks', 'emailPrefFeatures'], 'safe', 'on' => 'account'],
+            [['emailPrefProfile', 'emailPrefLinks', 'emailPrefComments', 'emailPrefFeatures'], 'safe', 'on' => 'account'],
         ];
     }
 
@@ -109,6 +112,7 @@ class User extends ActiveRecord implements IdentityInterface
             'emailMaintenance' => 'Email me regarding my account maintenance',
             'emailPrefProfile' => 'Keep me updated on visitor stats for my profile pages',
             'emailPrefLinks' => 'Tell me when someone links to or unlinks from my profiles',
+            'emailPrefComments' => 'Tell me when someone comments on my profiles',
             'emailPrefFeatures' => 'Notify me of new or updated website features',
         ];
     }
@@ -357,4 +361,59 @@ class User extends ActiveRecord implements IdentityInterface
         }
         return false;
     }
+
+    /**
+     * @return string|false
+     */
+    public function getCommentatorAvatar()
+    {
+        return isset($this->usr_image) ? '@web' . $this->usr_image : '@web/images/user.png';
+    }
+
+    /**
+     * @return string
+     */
+    public function getCommentatorName()
+    {
+        return $this->screen_name;
+    }
+
+    /**
+     * @return string|false
+     */
+    public function getCommentatorUrl()
+    {
+        if ($profiles = Profile::find()
+            ->where(['user_id' => $this->id])
+            ->andWhere(['status' => Profile::STATUS_ACTIVE])
+            ->all()) {
+            foreach ($profiles as $profile) {
+                if ($profile->category == Profile::CATEGORY_IND) {
+                    return Url::to(['/profile/view-profile-by-id', 'id' => $profile->id]);
+                }
+            }
+        }
+        
+        return false;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCommentatorChurch()
+    {
+        $user = Yii::$app->user->identity;
+        $church = ProfileController::findActiveProfile($user->home_church);
+        return $church->org_name;
+    }
+
+    /**
+     * @return string|false
+     */
+    public function getCommentatorChurchUrl()
+    {
+        $user = Yii::$app->user->identity;
+        return Url::to(['/profile/view-profile-by-id', 'id' => $user->home_church]);
+    }
+
 }

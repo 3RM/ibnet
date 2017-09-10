@@ -1,6 +1,7 @@
 <?php
 
 use common\models\profile\Profile;
+use common\models\Utility;
 use common\widgets\Alert;
 use frontend\controllers\ProfileController;
 use kartik\markdown\Markdown;
@@ -21,7 +22,7 @@ $this->title = $profile->org_name;
 	    <div class="container">
 	    	<div class="row">
 	    		<div class="col-lg-1 icon-lg top-margin">
-	    			<div><?= Profile::$icon[$profile->type] ?></div>
+	    			<?= Profile::$icon[$profile->type] ?>
 	    		</div>
 	    		<div class="col-md-10">
 	        		<h1><?= $this->title ?></h1>
@@ -43,8 +44,8 @@ $this->title = $profile->org_name;
 			</div>
 			<div class="col-md-8">
 					<h2>About <?= $this->title ?></h2>
-					<h4>Pastor <?= empty($pastorLink) ? $profile->formattedNames :
-						HTML::a($profile->formattedNames, ['pastor', 'id' => $pastorLink->id, 'city' => $pastorLink->url_city, 'name' => $pastorLink->url_name]); ?>
+					<h4>Pastor <?= empty($pastor) ? $profile->formattedNames :
+						HTML::a($profile->formattedNames, ['pastor', 'id' => $pastor->id, 'city' => $pastor->url_city, 'name' => $pastor->url_name]); ?>
 						<?= $profile->pastor_interim ? ' (Interim)' : NULL ?>
 						<?= $profile->cp_pastor ? ' (Church Planter)' : NULL ?></h4>	
 					<!-- Begin Image & Description -->
@@ -58,7 +59,7 @@ $this->title = $profile->org_name;
             	<?php if ($profile->org_address1 && $profile->org_city && $profile->org_st_prov_reg && $profile->org_country) { ?>
 					<?= Html::icon('map-marker') . ' ' ?>
 					<?= empty($profile->org_address1) ? NULL : $profile->org_address1 . ', ' ?>
-					<?= empty($profile->org_address2) ? NULL : $profile->org_address2 . ', ' ?>
+					<?= empty($profile->ind_address2) ? NULL : $profile->org_address2 . ', ' ?>
 					<?= empty($profile->org_box) ? NULL : ' PO Box ' . $profile->org_box . ', ' ?>
 					<?= $profile->org_city . ', ' ?>
 					<?= empty($profile->org_zip) ? $profile->org_st_prov_reg . ', ' : $profile->org_st_prov_reg . ' ' ?>
@@ -137,27 +138,27 @@ $this->title = $profile->org_name;
 			</div>
 			<div class="col-md-4 profile-thirds">
 				<!-- Begin Ministries (Box 3) -->
-				<?php if ($ministries) {
+				<?php if ($otherMinistryArray) {
 					echo '<strong>Ministries: </strong><br>';
-					foreach ($ministries as $ministry) {
-						echo HTML::a($ministry->org_name, ['profile/' . ProfileController::$profilePageArray[$ministry->type], 'id' => $ministry->id, 'city' => $ministry->url_city, 'name' => $ministry->url_name]) . '<br>';
+					foreach ($otherMinistryArray as $otherMinistry) {
+						echo HTML::a($otherMinistry->org_name, ['profile/' . ProfileController::$profilePageArray[$otherMinistry->type], 'id' => $otherMinistry->id, 'city' => $otherMinistry->url_city, 'name' => $otherMinistry->url_name]) . '<br>';
 					}
 					echo '<br>';
 				} ?>
 				<!-- End Ministries -->
 				<!-- Begin Programs (Box 3) -->
-				<?php if ($programs) {
+				<?php if ($programArray) {
 					echo '<strong>Programs: </strong><br>';
-					foreach ($programs as $program) {
+					foreach ($programArray as $program) {
 						echo HTML::a($program->org_name, ['special-ministry', 'id' => $program->id, 'city' => $program->url_city, 'name' => $program->url_name]) . '<br>';
 					}
 					echo '<br>';
 				} ?>
 				<!-- End Programs -->
 				 <!-- Begin Associations/Fellowships (Box 3) -->
-				<?php if ($fellowships) {
+				<?php if ($flwshipArray) {
 					echo '<strong>Fellowship:</strong><br>';
-					foreach ($fellowships as $fellowship) {
+					foreach ($flwshipArray as $fellowship) {
 						if ($flwshipLink = ProfileController::findFellowship($fellowship->profile_id)) {
 							echo HTML::a($fellowship->fellowship, ['profile/fellowship', 'id' => $flwshipLink->id, 'city' => $flwshipLink->url_city, 'name' => $flwshipLink->url_name], ['title' => $fellowship->fellowship_acronym, 'target' => '_blank']) . '<br>';
 						} else {
@@ -166,9 +167,9 @@ $this->title = $profile->org_name;
 					}
 					echo '<br>';
 				} ?>
-				<?php if ($associations) {
+				<?php if ($assArray) {
 					echo '<strong>Association:</strong><br>';
-					foreach ($associations as $association) {
+					foreach ($assArray as $association) {
 						if ($assLink = ProfileController::findAssociation($association->profile_id)) {
 							echo HTML::a($association->association, ['profile/association', 'id' => $assLink->id, 'city' => $assLink->url_city, 'name' => $assLink->url_name], ['title' => $association->association_acronym, 'target' => '_blank']) . '<br>';
 						} else {
@@ -183,8 +184,27 @@ $this->title = $profile->org_name;
 				<p><br><strong>Last Update: </strong><?= Yii::$app->formatter->asDate($profile->last_update) ?></p>
 			</div>
         </div>
+		<div id="p">
+        	<?= $this->render('_profileFooter', ['id' => $profile->id]) ?>
+    	</div>
+        
+        <div class="add-content center">
+        	<?= Html::a('Show Comments', Url::current(['p' => 'comments', '#' => 'p']), ['class' => 'btn btn-primary']); ?>
+        	<?= Html::a('Show Connections', Url::current(['p' => 'connections', '#' => 'p']), ['class' => 'btn btn-primary']); ?>
+        	<?= Html::a('Show History', Url::current(['p' => 'history', '#' => 'p']), ['class' => 'btn btn-primary']); ?>
+    	</div>
 
-        <?= $this->render('_profileFooter', ['id' => $profile->id]) ?>
-     
 	</div>
+
+	<?php
+	if ($p == 'comments') {
+		echo $this->render('comment/_comments', ['profile' => $profile]);
+	} elseif ($p == 'connections') {
+		echo $this->render('connection/_' . ProfileController::$profilePageArray[$profile->type] . 'Connections', ['profile' => $profile, 'church' => $church, 'pastor' => $pastor, 'staffArray' => $staffArray, 'otherMinistryArray' => $otherMinistryArray, 'programArray' => $programArray, 'memberArray' => $memberArray, 'fArray' => $fArray, 'aArray' => $aArray]);
+	} elseif ($p == 'history') {
+		echo $this->render('_history', ['profile' => $profile, 'events' => $events]);
+	}
+	?>
+
+	<div class="top-margin-60"></div>
 </div>

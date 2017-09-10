@@ -1,7 +1,7 @@
 <?php
 
-use common\widgets\Alert;
 use common\models\profile\Profile;
+use common\widgets\Alert;
 use frontend\controllers\ProfileController;
 use kartik\markdown\Markdown;
 use tugmaks\GoogleMaps\Map;
@@ -140,10 +140,10 @@ $this->title = !empty($profile->spouse_first_name) ?
 				<strong><?= $profile->sub_type ?></strong> at <?= $church ? HTML::a($churchLink, ['church', 'id' => $church->id, 'city' => $church->url_city, 'name' => $church->url_name]) . '<br>' : '<br>' ?>
 				<!-- End "Pastor at ... Baptist Church" -->
 				<!-- Begin Fellowship (Box 3) -->
-				<?php if ($fellowships) {
+				<?php if ($flwshipArray) {
 					echo '<br><strong>Fellowship:</strong><br>';
-					foreach ($fellowships as $fellowship) {
-						if ($flwshipLink = ProfileController::findFellowship($fellowship->profile_id)) {
+					foreach ($flwshipArray as $fellowship) {
+						if ($flwshipLink = Profile::findOne($fellowship->profile_id)) {
 							echo HTML::a($fellowship->fellowship, ['profile/fellowship', 'id' => $flwshipLink->id, 'city' => $flwshipLink->url_city, 'name' => $flwshipLink->url_name], ['title' => $fellowship->fellowship_acronym, 'target' => '_blank']) . '<br>';
 						} else {
 							echo Html::tag('span', $fellowship->fellowship, ['title' => $fellowship->fellowship_acronym]) . '<br>';
@@ -156,6 +156,27 @@ $this->title = !empty($profile->spouse_first_name) ?
 				<p><strong>Last Update: </strong><?= Yii::$app->formatter->asDate($profile->last_update) ?></p>
 			</div>
         </div>
-        <?= $this->render('_profileFooter', ['id' => $profile->id]) ?>
+        <div id="p">
+        	<?= $this->render('_profileFooter', ['id' => $profile->id]) ?>
+    	</div>
+        
+        <div class="add-content center">
+        	<?= Html::a('Show Comments', Url::current(['p' => 'comments', '#' => 'p']), ['class' => 'btn btn-primary']); ?>
+        	<?= Html::a('Show Connections', Url::current(['p' => 'connections', '#' => 'p']), ['class' => 'btn btn-primary']); ?>
+        	<?= Html::a('Show History', Url::current(['p' => 'history', '#' => 'p']), ['class' => 'btn btn-primary']); ?>
+    	</div>
+
 	</div>
+
+	<?php
+	if ($p == 'comments') {
+		echo $this->render('comment/_comments', ['profile' => $profile]);
+	} elseif ($p == 'connections') {
+		echo $this->render('connection/_' . ProfileController::$profilePageArray[$profile->type] . 'Connections', ['profile' => $profile, 'church' => $church, 'otherMinistryArray' => $otherMinistryArray, 'sChurchArray' => $sChurchArray, 'sOtherArray' => $sOtherArray, 'flwshipArray' => $flwshipArray, 'memberArray' => $memberArray]);
+	} elseif ($p == 'history') {
+		echo $this->render('_history', ['profile' => $profile, 'events' => $events]);
+	}
+	?>
+
+	<div class="top-margin-60"></div>
 </div>

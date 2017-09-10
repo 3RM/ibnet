@@ -85,6 +85,11 @@ use yii\web\UploadedFile;
 class Profile extends \yii\db\ActiveRecord
 {
 
+    /**
+     *
+     * @const int $userModelClassName The user model class.
+     * Default it will get from `Yii::$app->getUser()->identityClass`
+     */
     const STATUS_NEW = 0;              // Profile status
     const STATUS_ACTIVE = 10;
     const STATUS_INACTIVE = 20;
@@ -96,15 +101,38 @@ class Profile extends \yii\db\ActiveRecord
     const CATEGORY_IND = 10;
     const CATEGORY_ORG = 20;
 
+    /**
+     *
+     * @const string $userModelClassName The user model class.
+     * Default it will get from `Yii::$app->getUser()->identityClass`
+     */
     const PRIVATE_EMAIL_NONE = 0;       // Private email status
     const PRIVATE_EMAIL_ACTIVE = 10;
     const PRIVATE_EMAIL_PENDING = 20;
 
+    /**
+     *
+     * @var string $userModelClassName The user model class.
+     * Default it will get from `Yii::$app->getUser()->identityClass`
+     */
     const MAP_PRIMARY = 10;             // Map choices
     const MAP_CHURCH = 20;
     const MAP_MINISTRY = 30;
     const MAP_CHURCH_PLANT = 40;
 
+    /**
+     *
+     * @var string $userModelClassName The user model class.
+     * Default it will get from `Yii::$app->getUser()->identityClass`
+     */
+    const EDIT_NO = 0;             // Indicates if profile is new or being edited
+    const EDIT_YES = 10;
+
+    /**
+    *
+    * @var string $userModelClassName The user model class.
+    * Default it will get from `Yii::$app->getUser()->identityClass`
+    */
     public static $icon = [
         'Association' => '<span class="glyphicons glyphicons-group"></span>',
         'Camp' => '<span class="glyphicons glyphicons-camping"></span>',
@@ -122,22 +150,123 @@ class Profile extends \yii\db\ActiveRecord
         'Staff' => '<span class="glyphicons glyphicons-briefcase"></span>',
     ];
 
+    /**
+     *
+     * @var string $userModelClassName The user model class.
+     * Default it will get from `Yii::$app->getUser()->identityClass`
+     */
     public $ptype;                      // Pastor sub-type
+
+    /**
+     *
+     * @var string $userModelClassName The user model class.
+     * Default it will get from `Yii::$app->getUser()->identityClass`
+     */
     public $mtype;                      // Missionary sub-type
+
+    /**
+     *
+     * @var string $userModelClassName The user model class.
+     * Default it will get from `Yii::$app->getUser()->identityClass`
+     */
     public $ctype;                      // Chaplain sub-type
+
+    /**
+     *
+     * @var string $userModelClassName The user model class.
+     * Default it will get from `Yii::$app->getUser()->identityClass`
+     */
     public $name;                       // User entered fellowship or association name
+
+    /**
+     *
+     * @var string $userModelClassName The user model class.
+     * Default it will get from `Yii::$app->getUser()->identityClass`
+     */
     public $acronym;                    // User entered fellowship or association acronym
+
+     /**
+      *
+      * @var string $userModelClassName The user model class.
+      * Default it will get from `Yii::$app->getUser()->identityClass`
+      */
     public $aName;                      // alternate name 
+
+     /**
+      *
+      * @var string $userModelClassName The user model class.
+      * Default it will get from `Yii::$app->getUser()->identityClass`
+      */
     public $aAcronym;                   // alternate acronym
+
+     /**
+      *
+      * @var string $userModelClassName The user model class.
+      * Default it will get from `Yii::$app->getUser()->identityClass`
+      */
     public $select;                     // User selection from data list
+
+     /**
+      *
+      * @var string $userModelClassName The user model class.
+      * Default it will get from `Yii::$app->getUser()->identityClass`
+      */
     public $selectM;                    // User selection for "add another ministry"
+
+     /**
+      *
+      * @var string $userModelClassName The user model class.
+      * Default it will get from `Yii::$app->getUser()->identityClass`
+      */
     public $titleM;                     // title for "add another ministry"
+
+     /**
+      *
+      * @var string $userModelClassName The user model class.
+      * Default it will get from `Yii::$app->getUser()->identityClass`
+      */
     public $duplicateId;                // id of a duplicate profile in the event user tries to create a duplicate
+
+     /**
+      *
+      * @var string $userModelClassName The user model class.
+      * Default it will get from `Yii::$app->getUser()->identityClass`
+      */
     public $formattedNames;             // Names in the format "First (& Spouse) Last" or "First Last"
+
+     /**
+      *
+      * @var string $userModelClassName The user model class.
+      * Default it will get from `Yii::$app->getUser()->identityClass`
+      */
     public $missHousing;                // User selection of whether church has missions housing
+
+     /**
+      *
+      * @var string $userModelClassName The user model class.
+      * Default it will get from `Yii::$app->getUser()->identityClass`
+      */
     public $location;                   // Stores city, state for geolookup on browse page
+
+     /**
+      *
+      * @var string $userModelClassName The user model class.
+      * Default it will get from `Yii::$app->getUser()->identityClass`
+      */
     public $phoneFull;
+
+     /**
+      *
+      * @var string $userModelClassName The user model class.
+      * Default it will get from `Yii::$app->getUser()->identityClass`
+      */
     public $map;                        // checkbox for show_map
+
+     /**
+      *
+      * @var string $userModelClassName The user model class.
+      * Default it will get from `Yii::$app->getUser()->identityClass`
+      */
     public $staff;                      // Used on form6 hidden input
 
     /**
@@ -193,8 +322,6 @@ class Profile extends \yii\db\ActiveRecord
             'lo-ind' => ['ind_address1', 'ind_address2', 'ind_city', 'ind_st_prov_reg', 'ind_zip', 'ind_country', 'map', 'ind_po_address1', 'ind_po_address2', 'ind_po_box', 'ind_po_city', 'ind_po_st_prov_reg', 'ind_po_zip', 'ind_po_country'],
     // co: Contact
             'co' => ['phone', 'email', 'email_pvt', 'website'],
-    // co: Contact - Backend Forswarding Email
-            'default' => ['email'],
     // co: Contact - Forwarding Email
             'co-fe' => ['phone', 'email', 'email_pvt', 'website'],
     // sf: Staff - Church
@@ -805,7 +932,8 @@ class Profile extends \yii\db\ActiveRecord
     {
         $this->status = self::STATUS_NEW;
         $this->user_id = Yii::$app->user->identity->id;
-        if ($this->type == 'Pastor') {
+
+        if ($this->type == 'Pastor') {                                                              // Set Subtype
             $this->sub_type = $this->ptype;
         } elseif ($this->type == 'Missionary') {
             $this->sub_type = $this->mtype;
@@ -856,7 +984,7 @@ class Profile extends \yii\db\ActiveRecord
                     if ($oldA = MissionAgcy::find()->where(['profile_id' => $this->id])->one()) {    // Unlink old mission agcency
                         $oldA->unlink('linkedProfile', $this);
                     }
-                    $mission->link('linkedProfile', $this);                                         // link mission agency in mission agency table
+                    $mission->link('linkedProfile', $this);                                          // link mission agency in mission agency table
                 }
             } elseif (!empty($this->name) && !MissionAgcy::find()                                    // Check for duplicate
                 ->where(['mission' => $this->name])->exists()) {
@@ -875,7 +1003,7 @@ class Profile extends \yii\db\ActiveRecord
             if (!empty($this->select)) {
                 $fellowship = ProfileController::findFellowship($this->select);
                 if ($fellowship && ($this->getOldAttribute('org_name') != $fellowship->fellowship)) {
-                    $this->org_name = $fellowship->fellowship;                                                          
+                    $this->org_name = $fellowship->fellowship;                                                      
                     if ($oldA = Fellowship::find()->where(['profile_id' => $this->id])->one()) {    // Unlink old fellowship
                         $oldA->unlink('profile', $this);
                     }
@@ -970,7 +1098,12 @@ class Profile extends \yii\db\ActiveRecord
                 $address = preg_replace('/\s+/', '+', $address);                                    // Replace all spaces with "+"
 
                 $geocoder = new GoogleGeocoder();
-                $result = $geocoder->getLatLngOfAddress($address);
+                try{
+                    $result = $geocoder->getLatLngOfAddress($address);
+                } catch(Exception $e){
+                    //Something went wrong!
+                    echo '$e->getMessage()'; die;
+                }
                 $this->ind_loc = $result['lat'] . ',' . $result['lng'];
 
                 if ($this->ind_country == 'United States') {                                        // Convert US states to abbreviations
@@ -988,7 +1121,7 @@ class Profile extends \yii\db\ActiveRecord
                     $this->ind_po_state_long = $po_state->long;
                 }
 
-    // ************************* Organization Address ******************************
+    // ************************** Organization Address *****************************
             } else {
 
                 if (empty($this->org_city)) {                                                       // if physical address is empty, populate city, state, country, and zip from mailing address
@@ -1062,7 +1195,7 @@ class Profile extends \yii\db\ActiveRecord
      * @return mixed
      */
     public function handleFormSFSA($profile)
-    {   
+    {
         $ids = explode('+', $_POST['senior']);
         $pastor = $this->findModel($ids[0]);
         $staff = Staff::findOne($ids[1]);
@@ -1180,7 +1313,7 @@ class Profile extends \yii\db\ActiveRecord
             $profile = ProfileController::findProfile($staff->staff_id);
             $churchProfile = ProfileController::findProfile($staff->ministry_id);
             $churchProfileOwner = User::findOne($churchProfile->user_id);
-            MailController::initSendLink($profile, $churchProfile, $churchProfileOwner, 'HC', 'UL');   // Notify church profile owner of unlinked profile
+            MailController::initSendLink($profile, $churchProfile, $churchProfileOwner, 'HC', 'UL');// Notify church profile owner of unlinked profile
 
             $staff->delete();
         }
@@ -1196,7 +1329,7 @@ class Profile extends \yii\db\ActiveRecord
     public function handleFormPM()
     {
         if ($this->select != NULL) {
-            if ($this->category == self::CATEGORY_IND) {                                                 // If individual, Update staff table regardless of new or existing connection
+            if ($this->category == self::CATEGORY_IND) {                                            // If individual, Update staff table regardless of new or existing connection
                 $this->type == 'Staff' ? $title = $this->title : $title = $this->sub_type;
                 if (!$staff = Staff::find()                                                         // Add to staff table if not already there
                     ->where(['staff_id' => $this->id])
@@ -1770,10 +1903,25 @@ class Profile extends \yii\db\ActiveRecord
 
         MailController::dbSendLink($this->id);                                                      // send link notifications to profile owners
         
-        if ($this->category = self::CATEGORY_IND) {                                                 // Update number of active individual profiles
+        if ($this->category == self::CATEGORY_IND) {                                                // Update number of active individual profiles
             $user = Yii::$app->user->identity;
             $indProfiles = $user->ind_act_profiles + 1;
             $user->updateAttributes(['ind_act_profiles' => $indProfiles]);
+        }
+
+        $events = $this->history;                                                                   // Enter first timeline event as "Joined IBNet"
+        $e = false;
+        foreach ($events as $event) {
+            if ($event->title = 'Joined IBNet') {
+                $e = true;
+            }
+        }
+        if ($e == false) {
+            $history = new History;
+            $history->profile_id = $this->id;
+            $history->date = time();
+            $history->title = 'Joined IBNet';
+            $history->save();
         }
 
         $this->updateAttributes([
@@ -1929,7 +2077,7 @@ class Profile extends \yii\db\ActiveRecord
         }
 
     // ********************* Remove Link to School *****************************
-        if ($this->category == self::CATEGORY_IND) {                                                 // Remove links to schools attended
+        if ($this->category == self::CATEGORY_IND) {                                                // Remove links to schools attended
             $schools = ProfileHasSchool::find()
                 ->select('*')
                 ->where(['profile_id' => $this->id])
@@ -1975,7 +2123,7 @@ class Profile extends \yii\db\ActiveRecord
     public function getProfileArray()
     {
         $id = Yii::$app->user->identity->id;
-        return Profile::find()                    
+        return Profile::find()     
             ->select('id, type, profile_name, created_at, renewal_date, status')
             ->where(['user_id' => $id])
             ->andwhere('status != ' . self::STATUS_TRASH)
@@ -2023,6 +2171,16 @@ class Profile extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Profile::className(), ['id' => 'program_id'])
             ->viaTable('profile_has_program', ['profile_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getChurches()
+    {
+        return $this->hasMany(Profile::className(), ['id' => 'profile_id'])
+            ->viaTable('profile_has_program', ['program_id' => 'id'])
+            ->where(['status' => self::STATUS_ACTIVE]);
     }
 
     /**
@@ -2094,6 +2252,14 @@ class Profile extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Association::className(), ['id' => 'ass_id'])
             ->viaTable('profile_has_association', ['profile_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getHistory()
+    {
+        return $this->hasMany(History::className(), ['profile_id' => 'id'])->where(['deleted' => 0])->orderBy('date ASC');
     }
 
     /**

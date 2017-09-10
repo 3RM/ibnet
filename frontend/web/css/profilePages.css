@@ -1,0 +1,21 @@
+/*************
+ *
+ * 
+ *
+ *
+ ************/
+
+
+/* 
+ * Additional Content Links
+------------------------------------*/
+.add-content { margin: 40px 0; }
+.add-content a { margin-bottom: 5px; padding: 10px 10px; }
+
+/* 
+ * Connections
+------------------------------------*/
+.connection { max-width: 300px; left: 50%; position: relative; margin: 85px 0  0 -200px; padding-left: 40px; font-size: 1.3em; line-height: .9; white-space: nowrap; }
+.connection .image { width: 80px; float: left; position: absolute; top: 50%; transform: translateY(-50%); }
+.connection .title { margin-left: 100px; }
+.connection .subTitle { font-size: .7em; color: #888; }
