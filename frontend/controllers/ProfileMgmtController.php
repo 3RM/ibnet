@@ -9,6 +9,7 @@ use common\models\profile\FormsCompleted;
 use common\models\profile\History;
 use common\models\profile\Profile;
 use common\models\profile\Type;
+use common\models\profile\Staff;
 use common\models\profile\SubType;
 use Yii;
 use yii\filters\AccessControl;
@@ -51,6 +52,11 @@ class ProfileMgmtController extends ProfileController
     public function actionMyProfiles()
     {
         $profileArray = Profile::getProfileArray();
+        foreach ($profileArray as $profile) {
+            if ($profile->category == Profile::CATEGORY_ORG) {
+                $profile->unconfirmed = Staff::checkUnconfirmed($profile->id);
+            }
+        }
         return $this->render('myProfiles', ['profileArray' => $profileArray]);
     }
 

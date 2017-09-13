@@ -86,52 +86,44 @@ class Profile extends \yii\db\ActiveRecord
 {
 
     /**
-     *
-     * @const int $userModelClassName The user model class.
-     * Default it will get from `Yii::$app->getUser()->identityClass`
+     * @const int $STATUS_* The status of the profile.
      */
-    const STATUS_NEW = 0;              // Profile status
+    const STATUS_NEW = 0;
     const STATUS_ACTIVE = 10;
     const STATUS_INACTIVE = 20;
     const STATUS_TRASH = 30;
 
     /**
-     * The profile category.
+     * @const int $CATEGORY_* The category (individual or organization) of the profile.
      */
     const CATEGORY_IND = 10;
     const CATEGORY_ORG = 20;
 
     /**
-     *
-     * @const string $userModelClassName The user model class.
-     * Default it will get from `Yii::$app->getUser()->identityClass`
+     * @const int $PRIVATE_EMAIL_* Private email request status
+     * Default is 0
      */
-    const PRIVATE_EMAIL_NONE = 0;       // Private email status
+    const PRIVATE_EMAIL_NONE = 0;
     const PRIVATE_EMAIL_ACTIVE = 10;
     const PRIVATE_EMAIL_PENDING = 20;
 
     /**
-     *
-     * @var string $userModelClassName The user model class.
-     * Default it will get from `Yii::$app->getUser()->identityClass`
+     * @const int $MAP_* Map choices to determine which map to display on profile
+     * Default is NULL
      */
-    const MAP_PRIMARY = 10;             // Map choices
+    const MAP_PRIMARY = 10;
     const MAP_CHURCH = 20;
     const MAP_MINISTRY = 30;
     const MAP_CHURCH_PLANT = 40;
 
     /**
-     *
-     * @var string $userModelClassName The user model class.
-     * Default it will get from `Yii::$app->getUser()->identityClass`
+     * @const int $EDIT_* Indicates if profile is newly created or edited as existing; Affects progression through profile forms.
      */
-    const EDIT_NO = 0;             // Indicates if profile is new or being edited
+    const EDIT_NO = 0;
     const EDIT_YES = 10;
 
     /**
-    *
-    * @var string $userModelClassName The user model class.
-    * Default it will get from `Yii::$app->getUser()->identityClass`
+    * @var array $icon Outputs html markup for glyphicon icons for each profile type
     */
     public static $icon = [
         'Association' => '<span class="glyphicons glyphicons-group"></span>',
@@ -151,123 +143,94 @@ class Profile extends \yii\db\ActiveRecord
     ];
 
     /**
-     *
-     * @var string $userModelClassName The user model class.
-     * Default it will get from `Yii::$app->getUser()->identityClass`
+     * @var string $ptype User entered pastor sub-type
      */
-    public $ptype;                      // Pastor sub-type
+    public $ptype;
 
     /**
-     *
-     * @var string $userModelClassName The user model class.
-     * Default it will get from `Yii::$app->getUser()->identityClass`
+     * @var string $mtype User entered missionary sub-type
      */
-    public $mtype;                      // Missionary sub-type
+    public $mtype;
 
     /**
-     *
-     * @var string $userModelClassName The user model class.
-     * Default it will get from `Yii::$app->getUser()->identityClass`
+     * @var string $ctype User entered chaplain sub-type
      */
-    public $ctype;                      // Chaplain sub-type
+    public $ctype;
 
     /**
-     *
-     * @var string $userModelClassName The user model class.
-     * Default it will get from `Yii::$app->getUser()->identityClass`
+     * @var string $name User entered fellowship or association name
      */
-    public $name;                       // User entered fellowship or association name
+    public $name;
 
     /**
-     *
-     * @var string $userModelClassName The user model class.
-     * Default it will get from `Yii::$app->getUser()->identityClass`
+     * @var string $acronym User entered fellowship or association acronym
      */
-    public $acronym;                    // User entered fellowship or association acronym
+    public $acronym;
 
-     /**
-      *
-      * @var string $userModelClassName The user model class.
-      * Default it will get from `Yii::$app->getUser()->identityClass`
-      */
-    public $aName;                      // alternate name 
+    /**
+     * @var string $aName User entered alternate name for various forms/scenarios
+     */
+    public $aName;
 
-     /**
-      *
-      * @var string $userModelClassName The user model class.
-      * Default it will get from `Yii::$app->getUser()->identityClass`
-      */
-    public $aAcronym;                   // alternate acronym
+    /**
+     * @var string $aAcronym User entered alternate acronym for various forms/scenarios
+     */
+    public $aAcronym;
 
-     /**
-      *
-      * @var string $userModelClassName The user model class.
-      * Default it will get from `Yii::$app->getUser()->identityClass`
-      */
-    public $select;                     // User selection from data list
+    /**
+     * @var string $select User selection for primary data list on form
+     */
+    public $select;
 
-     /**
-      *
-      * @var string $userModelClassName The user model class.
-      * Default it will get from `Yii::$app->getUser()->identityClass`
-      */
-    public $selectM;                    // User selection for "add another ministry"
+    /**
+     * @var string $selectM User selection for "add another ministry"
+     */
+    public $selectM;
 
-     /**
-      *
-      * @var string $userModelClassName The user model class.
-      * Default it will get from `Yii::$app->getUser()->identityClass`
-      */
-    public $titleM;                     // title for "add another ministry"
+    /**
+     * @var string $titleM User entered title for "add another ministry"
+     */
+    public $titleM;
 
-     /**
-      *
-      * @var string $userModelClassName The user model class.
-      * Default it will get from `Yii::$app->getUser()->identityClass`
-      */
-    public $duplicateId;                // id of a duplicate profile in the event user tries to create a duplicate
+    /**
+     * @var int $duplicateId Id of a duplicate profile in the event user tries to create a duplicate
+     */
+    public $duplicateId;
 
-     /**
-      *
-      * @var string $userModelClassName The user model class.
-      * Default it will get from `Yii::$app->getUser()->identityClass`
-      */
-    public $formattedNames;             // Names in the format "First (& Spouse) Last" or "First Last"
+    /**
+     * @var string $formattedNames Names in the format "First (& Spouse) Last" or "First Last"
+     */
+    public $formattedNames;
 
-     /**
-      *
-      * @var string $userModelClassName The user model class.
-      * Default it will get from `Yii::$app->getUser()->identityClass`
-      */
-    public $missHousing;                // User selection of whether church has missions housing
+    /**
+     * @var string $missHousing User selection of whether church has missions housing
+     */
+    public $missHousing;
 
-     /**
-      *
-      * @var string $userModelClassName The user model class.
-      * Default it will get from `Yii::$app->getUser()->identityClass`
-      */
-    public $location;                   // Stores city, state for geolookup on browse page
+    /**
+     * @var string $location Stores city and state for geolookup on browse page
+     */
+    public $location;
 
-     /**
-      *
-      * @var string $userModelClassName The user model class.
-      * Default it will get from `Yii::$app->getUser()->identityClass`
-      */
+    /**
+     * @var string $phoneFull Stores fully formatted phone number on contact page
+     */
     public $phoneFull;
 
-     /**
-      *
-      * @var string $userModelClassName The user model class.
-      * Default it will get from `Yii::$app->getUser()->identityClass`
-      */
-    public $map;                        // checkbox for show_map
+    /**
+     * @var int $map Checkbox entry for show_map
+     */
+    public $map;
+
+    /**
+     * @var string $staff Hidden input on form6
+     */
+    public $staff;
 
      /**
-      *
-      * @var string $userModelClassName The user model class.
-      * Default it will get from `Yii::$app->getUser()->identityClass`
-      */
-    public $staff;                      // Used on form6 hidden input
+     * @var array $unconfirmed Ids of any unconfirmed staff profiles associated with an organization
+     */
+    public $unconfirmed;
 
     /**
      * @inheritdoc
@@ -2124,7 +2087,7 @@ class Profile extends \yii\db\ActiveRecord
     {
         $id = Yii::$app->user->identity->id;
         return Profile::find()     
-            ->select('id, type, profile_name, created_at, renewal_date, status')
+            ->select('id, type, category, profile_name, created_at, renewal_date, status')
             ->where(['user_id' => $id])
             ->andwhere('status != ' . self::STATUS_TRASH)
             ->orderBy('id ASC')

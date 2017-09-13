@@ -1,7 +1,9 @@
 <?php
 
+use common\models\Utility;
 use common\models\profile\Profile;
 use common\widgets\Alert;
+use frontend\controllers\ProfileFormController;
 use yii\bootstrap\Html;
 use yii\bootstrap\Tabs;
 use yii\widgets\ActiveForm;
@@ -98,9 +100,12 @@ $this->title = 'My Account';
                                     '<p>' . Html::a(Html::icon('transfer') . ' Transfer', ['profile-mgmt/transfer', 'id' => $profile->id]) . '</p>';
                                 ?>
                                 <?= '<p>' . Html::a(Html::icon('cog') . ' Settings', ['profile-mgmt/settings', 'id' => $profile->id]) . '</p>' ?>
+                                <?= $profile->unconfirmed ? 
+                                    '<p>' . Html::a('<span style="color:#d92335">' . Html::icon('flag') . '</span> Unconfirmed Staff', ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['sf']-1, 'id' => $profile->id]) . '</p>' : NULL; ?>
                                 </div>
                     <?=     '</td>
                         </tr>';
+                    
                     } ?>
                 </table>
             </div>

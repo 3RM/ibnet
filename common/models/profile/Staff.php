@@ -41,6 +41,17 @@ class Staff extends \yii\db\ActiveRecord
     }
 
     /**
+     * @return array
+     */
+    public function checkUnconfirmed($id)
+    {
+        return Staff::find()
+            ->where(['ministry_id' => $id])
+            ->andWhere(['confirmed' => NULL])
+            ->exists();
+    }
+
+    /**
      * @return \yii\db\ActiveQuery
      */
     public function getProfile()
