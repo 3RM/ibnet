@@ -190,7 +190,7 @@ class ProfileController extends Controller
      */
     public function actionViewProfile($city=NULL, $name=NULL, $id)
     {
-        if (!$profile = $this->findViewProfile($id)) {
+        if (!$profile = $this->findViewProfile($id, $city, $name)) {
             $this->checkExpired($id);  
         }
         $profilePage = self::$profilePageArray[$profile->type];
@@ -2049,7 +2049,7 @@ class ProfileController extends Controller
                 'Notification of inappropriate content received. This profile is now under review. 
                 Thank you for bringing this to our attention.');
         }
-    
+        
         return $this->redirect(['view-profile', 'id' => $id, 'city' => $profile->url_city, 'name' => $profile->url_name]);
     }
 

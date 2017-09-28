@@ -17,6 +17,8 @@ $this->title = !empty($profile->spouse_first_name) ?
 	($profile->ind_first_name . ' (& ' . $profile->spouse_first_name . ') ' . $profile->ind_last_name) :
 	($profile->ind_first_name . ' ' . $profile->ind_last_name);
 ?>
+<?= Alert::widget() ?>
+
 <div class="site-index profile-page">
 
     <div class="profile-header">

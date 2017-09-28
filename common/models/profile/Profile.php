@@ -266,23 +266,23 @@ class Profile extends \yii\db\ActiveRecord
     // transfer a profile
             'transfer' => ['select'],
     // nd-org: Name & Description Organization
-            'nd-org' => ['org_name', 'tagline', 'description'],
+            'nd-org' => ['org_name', 'tagline', 'description', 'url_name'],
     // nd-ind: Name & Description Individual
-            'nd-ind' => ['ind_first_name', 'spouse_first_name', 'ind_last_name', 'title', 'tagline', 'description'],
+            'nd-ind' => ['ind_first_name', 'spouse_first_name', 'ind_last_name', 'title', 'tagline', 'description', 'url_name'],
     // nd-flwsp_ass: Name & Description Fellowship  or Association
-            'nd-flwsp_ass' => ['select', 'org_name', 'name', 'acronym', 'flwsp_ass_level', 'tagline', 'description'],
+            'nd-flwsp_ass' => ['select', 'org_name', 'name', 'acronym', 'flwsp_ass_level', 'tagline', 'description', 'url_name'],
     // nd-miss_agency: Name & Description Mission Agency
-            'nd-miss_agency' => ['select', 'name', 'acronym', 'tagline', 'description'],
+            'nd-miss_agency' => ['select', 'name', 'acronym', 'tagline', 'description', 'url_name'],
     // nd-school: Name & Description School
-            'nd-school' => ['select', 'name', 'tagline', 'description'],
+            'nd-school' => ['select', 'name', 'tagline', 'description', 'url_name'],
     // i1: Image 1
             'i1' => ['image1'],
     // i2: Image 2
             'i2' => ['image2'],
     // lo-org: Location Organization
-            'lo-org' => ['org_address1', 'org_address2', 'org_city', 'org_st_prov_reg', 'org_zip', 'org_country', 'map', 'org_po_address1', 'org_po_address2', 'org_po_box', 'org_po_city', 'org_po_st_prov_reg', 'org_po_zip', 'org_po_country'],
+            'lo-org' => ['org_address1', 'org_address2', 'org_city', 'org_st_prov_reg', 'org_zip', 'org_country', 'map', 'org_po_address1', 'org_po_address2', 'org_po_box', 'org_po_city', 'org_po_st_prov_reg', 'org_po_zip', 'org_po_country', 'url_city'],
     // lo-ind: Location Individual
-            'lo-ind' => ['ind_address1', 'ind_address2', 'ind_city', 'ind_st_prov_reg', 'ind_zip', 'ind_country', 'map', 'ind_po_address1', 'ind_po_address2', 'ind_po_box', 'ind_po_city', 'ind_po_st_prov_reg', 'ind_po_zip', 'ind_po_country'],
+            'lo-ind' => ['ind_address1', 'ind_address2', 'ind_city', 'ind_st_prov_reg', 'ind_zip', 'ind_country', 'map', 'ind_po_address1', 'ind_po_address2', 'ind_po_box', 'ind_po_city', 'ind_po_st_prov_reg', 'ind_po_zip', 'ind_po_country', 'url_city'],
     // co: Contact
             'co' => ['phone', 'email', 'email_pvt', 'website'],
     // co: Contact - Forwarding Email
@@ -353,6 +353,7 @@ class Profile extends \yii\db\ActiveRecord
             [['org_name', 'tagline'], 'trim', 'on' => 'nd-org'],
             ['description', 'string', 'max' => 1500, 'on' => 'nd-org', 'message' => 'Your text exceeds 1500 characters.'],
             [['org_name', 'tagline', 'description'], 'filter', 'filter' => 'strip_tags', 'skipOnEmpty' => true, 'on' => 'nd-org'],
+            [['url_name'], 'safe', 'on' => 'nd-org'],
 
     // nd-ind: Name & Description Individual ('ind_first_name', 'spouse_first_name', 'ind_last_name', 'title', 'tagline', 'description', 'select')
             [['ind_first_name', 'ind_last_name', 'description'], 'required', 'on' => 'nd-ind'],
@@ -363,7 +364,8 @@ class Profile extends \yii\db\ActiveRecord
             [['ind_first_name', 'ind_last_name', 'spouse_first_name', 'title', 'tagline'], 'trim', 'on' => 'nd-ind'],
             ['description', 'string', 'max' => 1500, 'on' => 'nd-ind', 'message' => 'Your text exceeds 1500 characters.'],      
             [['ind_first_name', 'ind_last_name', 'spouse_first_name', 'title', 'tagline'], 'filter', 'filter' => 'strip_tags', 'skipOnEmpty' => true, 'on' => 'nd-ind'],
-     
+            [['url_name'], 'safe', 'on' => 'nd-ind'],
+
     // nd-flwsp_ass: Name & Description Fellowship or Association ('select', 'name', 'acronym', 'flwsp_ass_level', 'tagline', 'description')
             [['flwsp_ass_level', 'description'], 'required', 'on' => 'nd-flwsp_ass'],
             ['select', 'required', 'when' => function($profile) {
@@ -378,10 +380,10 @@ class Profile extends \yii\db\ActiveRecord
             }", 'message' => 'Name and acronym are required.', 'on' => 'nd-flwsp_ass'],
             [['name', 'acronym', 'tagline'], 'default', 'value' => NULL,'on' => 'nd-flwsp_ass'],
             [['name','tagline'], 'string', 'max' => 60, 'on' => 'nd-flwsp_ass'],
-            ['acronym', 'string', 'max' => 20, 'on' => 'nd-flwsp_ass'],
-            ['description', 'string', 'max' => 1500, 'on' => 'nd-flwsp_ass', 'message' => 'Your text exceeds 1500 characters.'],
+            [['acronym'], 'string', 'max' => 20, 'on' => 'nd-flwsp_ass'],
+            [['description'], 'string', 'max' => 1500, 'on' => 'nd-flwsp_ass', 'message' => 'Your text exceeds 1500 characters.'],
             [['name', 'acronym', 'tagline', 'description'], 'filter', 'filter' => 'strip_tags', 'skipOnEmpty' => true, 'on' => 'nd-flwsp_ass'],
-            ['select', 'safe', 'on' => 'nd-flwsp_ass'],
+            [['select', 'url_name'], 'safe', 'on' => 'nd-flwsp_ass'],
 
     // nd-miss_agency: Name & Description Mission Agency ('select', 'name', 'acronym', 'tagline', 'description')
             ['description', 'required', 'on' => 'nd-miss_agency'],
@@ -397,10 +399,10 @@ class Profile extends \yii\db\ActiveRecord
             }", 'message' => 'Name and acronym are required.', 'on' => 'nd-miss_agency'],
             [['name', 'acronym', 'tagline'], 'default', 'value' => NULL, 'on' => 'nd-miss_agency'],
             [['name', 'tagline'], 'string', 'max' => 60, 'on' => 'nd-miss_agency'],
-            ['acronym', 'string', 'max' => 20, 'on' => 'nd-miss_agency'],
-            ['description', 'string', 'max' => 1500, 'on' => 'nd-miss_agency', 'message' => 'Your text exceeds 1500 characters.'],
+            [['acronym'], 'string', 'max' => 20, 'on' => 'nd-miss_agency'],
+            [['description'], 'string', 'max' => 1500, 'on' => 'nd-miss_agency', 'message' => 'Your text exceeds 1500 characters.'],
             [['name', 'acronym', 'tagline', 'description'], 'filter', 'filter' => 'strip_tags', 'skipOnEmpty' => true, 'on' => 'nd-miss_agency'],
-            ['select', 'safe', 'on' => 'nd-miss_agency'],
+            [['select', 'url_name'], 'safe', 'on' => 'nd-miss_agency'],
 
     // nd-school: Name & Description School ('select', 'schoolName', 'tagline', 'description')
             ['description', 'required', 'on' => 'nd-school'],
@@ -416,9 +418,9 @@ class Profile extends \yii\db\ActiveRecord
             }", 'message' => 'School name is required.', 'on' => 'nd-school'],
             [['schoolName', 'tagline'], 'default', 'value' => NULL, 'on' => 'nd-school'],
             [['schoolName', 'tagline'], 'string', 'max' => 60, 'on' => 'nd-school'],
-            ['description', 'string', 'max' => 1500, 'on' => 'nd-school', 'message' => 'Your text exceeds 1500 characters.'],
+            [['description'], 'string', 'max' => 1500, 'on' => 'nd-school', 'message' => 'Your text exceeds 1500 characters.'],
             [['schoolName', 'tagline', 'description'], 'filter', 'filter' => 'strip_tags', 'skipOnEmpty' => true, 'on' => 'nd-school'],
-            ['select', 'safe', 'on' => 'nd-school'],
+            [['select', 'url_name'], 'safe', 'on' => 'nd-school'],
 
     // i1: Image 1 ('image1')
             ['image1', 'image', 'extensions' => 'jpg, jpeg, gif, png', 'mimeTypes' => 'image/jpeg, image/png', 'maxFiles' => 1, 'maxSize' => 1024 * 4000, 'skipOnEmpty' => true, 'on' => 'i1'],
@@ -464,16 +466,16 @@ class Profile extends \yii\db\ActiveRecord
             }", 'message' => 'Zip code is required for a US address.', 'on' => 'lo-org'],
             [['org_address1', 'org_address2', 'org_st_prov_reg', 'org_zip', 'org_country', 'org_po_address1', 'org_po_address2', 'org_po_box', 'org_po_st_prov_reg', 'org_po_zip', 'org_po_country'], 'default', 'value' => NULL, 'on' => 'lo-org'],
             [['org_address1', 'org_address2', 'org_city', 'org_po_address1', 'org_po_address2', 'org_po_city'], 'string', 'max' => 60, 'on' => 'lo-org'],
-            ['org_po_box', 'string', 'max' => 6, 'on' => 'lo-org'],
+            [['org_po_box'], 'string', 'max' => 6, 'on' => 'lo-org'],
             [['org_st_prov_reg', 'org_po_st_prov_reg'], 'string', 'max' => 50, 'on' => 'lo-org'],
             [['org_zip', 'org_po_zip'], 'string', 'max' => 20, 'on' => 'lo-org'],
             [['org_address1', 'org_address2', 'org_city', 'org_st_prov_reg', 'org_zip', 'org_po_address1', 'org_po_address2', 'org_po_city', 'org_po_st_prov_reg', 'org_po_zip'], 'filter', 'filter' => 'strip_tags', 'skipOnEmpty' => true, 'on' => 'lo-org'],
             [['org_address1', 'org_address2', 'org_city', 'org_st_prov_reg', 'org_zip', 'org_po_address1', 'org_po_address2', 'org_po_city', 'org_po_st_prov_reg', 'org_po_zip'], 'trim', 'skipOnEmpty' => true, 'on' => 'lo-org'],
-            ['org_address1', 'validatePhysicalAddress', 'on' => 'lo-org'],
-            ['org_po_address1', 'validateMailingAddress', 'on' => 'lo-org'],
-            ['org_po_box', 'validateMailingAddress', 'on' => 'lo-org'],
+            [['org_address1'], 'validatePhysicalAddress', 'on' => 'lo-org'],
+            [['org_po_address1'], 'validateMailingAddress', 'on' => 'lo-org'],
+            [['org_po_box'], 'validateMailingAddress', 'on' => 'lo-org'],
             [['org_po_address1, org_po_box'], 'validateMailingAddress', 'on' => 'lo-org'],
-            ['map', 'safe', 'on' => 'lo-org'],
+            [['map', 'url_city'], 'safe', 'on' => 'lo-org'],
 
     // lo-ind: Location Individual ('ind_address1', 'ind_address2', 'ind_city', 'ind_st_prov_reg', 'ind_zip', 'ind_country', 'map', 'ind_po_address1', 'ind_po_address2', 'ind_po_box', 'ind_po_city', 'ind_po_st_prov_reg', 'ind_po_zip', 'ind_po_country')
             ['ind_address1', 'required', 'when' => function($profile) {                             // address1 is required if po_address1 and po_box are missing
@@ -513,16 +515,16 @@ class Profile extends \yii\db\ActiveRecord
             }", 'message' => 'Zip code is required for a US address.', 'on' => 'lo-ind'],
             [['ind_address1', 'ind_address2', 'ind_st_prov_reg', 'ind_zip', 'ind_country', 'ind_po_address1', 'ind_po_address2', 'ind_po_box', 'ind_po_st_prov_reg', 'ind_po_zip', 'ind_po_country'], 'default', 'value' => NULL, 'on' => 'lo-ind'],
             [['ind_address1', 'ind_address2', 'ind_city', 'ind_po_address1', 'ind_po_address2', 'ind_po_city'], 'string', 'max' => 60, 'on' => 'lo-ind'],
-            ['ind_po_box', 'string', 'max' => 6, 'on' => 'lo-ind'],
+            [['ind_po_box'], 'string', 'max' => 6, 'on' => 'lo-ind'],
             [['ind_st_prov_reg', 'ind_po_st_prov_reg'], 'string', 'max' => 50, 'on' => 'lo-ind'],
             [['ind_zip', 'ind_po_zip'], 'string', 'max' => 20, 'on' => 'lo-ind'],
             [['ind_address1', 'ind_address2', 'ind_city', 'ind_st_prov_reg', 'ind_zip', 'ind_po_address1', 'ind_po_address2', 'ind_po_city', 'ind_po_st_prov_reg', 'ind_po_zip'], 'filter', 'filter' => 'strip_tags', 'skipOnEmpty' => true, 'on' => 'lo-ind'],
             [['ind_address1', 'ind_address2', 'ind_city', 'ind_st_prov_reg', 'ind_zip', 'ind_po_address1', 'ind_po_address2', 'ind_po_city', 'ind_po_st_prov_reg', 'ind_po_zip'], 'trim', 'skipOnEmpty' => true, 'on' => 'lo-ind'],
-            ['ind_address1', 'validatePhysicalAddress', 'on' => 'lo-ind'],
-            ['ind_po_address1', 'validateMailingAddress', 'on' => 'lo-ind'],
-            ['ind_po_box', 'validateMailingAddress', 'on' => 'lo-ind'],
+            [['ind_address1'], 'validatePhysicalAddress', 'on' => 'lo-ind'],
+            [['ind_po_address1'], 'validateMailingAddress', 'on' => 'lo-ind'],
+            [['ind_po_box'], 'validateMailingAddress', 'on' => 'lo-ind'],
             [['ind_po_address1, ind_po_box'], 'validateMailingAddress', 'on' => 'lo-ind'],
-            ['map', 'safe', 'on' => 'lo-ind'],
+            [['map', 'url_city'], 'safe', 'on' => 'lo-ind'],
 
     // co: Contact ('phone', 'email', 'email_pvt', 'website')
             [['phone', 'email'], 'required', 'on' => 'co'],
@@ -1028,6 +1030,10 @@ class Profile extends \yii\db\ActiveRecord
             }
         }
 
+        $this->category == self::CATEGORY_IND ?                                                     // Update url name
+            $this->url_name = $this->urlName($this->ind_last_name) :
+            $this->url_name = $this->urlName($this->org_name);
+
     // ***************************** Save **************************************
         if ($this->validate() && $this->save() && $this->setUpdateDate()) {
             return $this;
@@ -1126,6 +1132,10 @@ class Profile extends \yii\db\ActiveRecord
             } elseif (!empty($this->map)) {
                 $this->show_map = self::MAP_PRIMARY;
             }
+
+            $this->category == self::CATEGORY_IND ?                                                 // Update Url name and city
+            $this->url_city = $this->urlName($this->ind_city) :
+            $this->url_city = $this->urlName($this->org_city);
 
     // ***************************** Save **************************************
             if ($this->save() && $this->setUpdateDate()) {

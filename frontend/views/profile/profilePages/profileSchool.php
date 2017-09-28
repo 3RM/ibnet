@@ -14,6 +14,7 @@ use yii\widgets\ActiveForm;
 rmrevin\yii\fontawesome\AssetBundle::register($this);
 $this->title = $profile->org_name;
 ?>
+<?= Alert::widget() ?>
 
 <div class="site-index profile-page">
 

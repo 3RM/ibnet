@@ -21,6 +21,7 @@ $connection = [
 	'Print Ministry' => '_print',
 ];
 ?>
+<?= Alert::widget() ?>
 
 <div class="site-index profile-page">
 

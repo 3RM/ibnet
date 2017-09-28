@@ -14,6 +14,7 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 $this->title = $profile->org_name;
 ?>
+<?= Alert::widget() ?>
 
 <div class="site-index profile-page">
 
