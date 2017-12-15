@@ -537,6 +537,9 @@ nav.shrink .navbar-toggle {
 .clearbrowse {
   height: 110px;
 }
+#mb {
+  display: none;
+}
 .browse-subcats a {color: #fff;}
 #map {
   width: 100%;
@@ -1014,6 +1017,12 @@ margin: 0;
     }
     .browse-card {
         height: auto;
+    }
+    #br {
+        display: none;
+    }
+    #mb {
+        display: block;
     }
 }
 

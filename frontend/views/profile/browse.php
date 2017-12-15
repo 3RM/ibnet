@@ -27,7 +27,7 @@ $this->title = 'Browse';
 
         <?php Pjax::begin(); ?>
             <div class="row">
-                <div class="col-xs-12 col-sm-3">
+                <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
 
                     <!-- =============================== Spatial Search =============================== -->
                    <div class="left-block">
@@ -465,14 +465,16 @@ $this->title = 'Browse';
 
                 <!-- =============================== Browse Results =============================== -->
 
-                <div class="col-xs-12 col-sm-9">
 
-                    <?php if (empty($fqs) && (empty($browseModel->distance) || empty($browseModel->location))) {
-                        echo '<div class="alert alert-cat" role="alert"><h3>' . Html::icon('hand-left') . ' Choose a category to begin browsing.</h3></div>';
-                    } elseif ($resultSet->getNumFound() == 0) {
-                       echo '<div class="alert alert-info" role="alert"><h4>No listings found.  Try a larger search radius.</h4></div>';
-                    } else {
-                        echo ListView::widget([
+                    <?php if (empty($fqs) && (empty($browseModel->distance) || empty($browseModel->location))) { ?>
+                        <div class="col-xs-12 col-sm-6">
+                        <?= '<div id="br" class="alert alert-cat" role="alert"><h3>' . Html::icon('hand-left') . ' Choose a category to begin browsing.</h3></div>';
+                    } elseif ($resultSet->getNumFound() == 0) { ?>
+                        <div class="col-xs-12 col-sm-6">
+                        <?= '<div class="alert alert-info" role="alert"><h4>No listings found.  Try a larger search radius.</h4></div>';
+                    } else { ?>
+                        <div class="col-xs-12 col-sm-9">
+                        <?= ListView::widget([
                             'dataProvider' => $dataProvider,
                             'showOnEmpty' => true,
                             'emptyText' => 'testing',
