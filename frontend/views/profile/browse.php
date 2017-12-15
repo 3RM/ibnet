@@ -38,31 +38,31 @@ $this->title = 'Browse';
                             ]
                         ]); ?>
                        <div id="slider-info">Within <span id="slider-value"><?= $browseModel->distance .' miles' ?></span></div>
-                            <?= $form->field($browseModel, 'distance')->widget(SliderInput::classname(), [
-                                    'clientOptions' => [
-                                        //'range' => 'min',
-                                        'min' => 5,
-                                        'max' => 250,
-                                        'step' => 5,
-                                        'slide' => new JsExpression('function( event, ui ) {
-                                                $("#slider-value").html(ui.value+" miles");
-                                                }'),
-                                    ],
-                                ]);
-                            ?>
-                            <?= $form->field($browseModel, 'location', ['enableLabel' => false])->textInput(['class' => 'form-control', 'placeholder' => 'city, state', 'id' => 'gplaces']) ?>
-                            <div class="form-group">
-                                <?= Html::submitButton(HTML::icon('search').' Search', [
-                                    'method' => 'POST',
-                                    'class' => 'btn btn-primary',
-                                    'name' => 'submit',
-                                ]) ?>
-                                <?= Html::submitButton(HTML::icon('remove').' Reset', [
-                                    'method' => 'POST',
-                                    'class' => 'btn btn-primary pull-right',
-                                    'name' => 'clear',
-                                ]) ?>
-                            </div>
+                        <?= $form->field($browseModel, 'distance')->widget(SliderInput::classname(), [
+                                'clientOptions' => [
+                                    //'range' => 'min',
+                                    'min' => 5,
+                                    'max' => 250,
+                                    'step' => 5,
+                                    'slide' => new JsExpression('function( event, ui ) {
+                                            $("#slider-value").html(ui.value+" miles");
+                                            }'),
+                                ],
+                            ]);
+                        ?>
+                        <?= $form->field($browseModel, 'location', ['enableLabel' => false])->textInput(['class' => 'form-control', 'placeholder' => 'city, state', 'id' => 'gplaces']) ?>
+                        <div class="form-group">
+                            <?= Html::submitButton(HTML::icon('search').' Search', [
+                                'method' => 'POST',
+                                'class' => 'btn btn-primary',
+                                'name' => 'submit',
+                            ]) ?>
+                            <?= Html::submitButton(HTML::icon('remove').' Reset', [
+                                'method' => 'POST',
+                                'class' => 'btn btn-primary pull-right',
+                                'name' => 'clear',
+                            ]) ?>
+                        </div>
                         <?php ActiveForm::end(); ?>
                     </div>
 
@@ -470,7 +470,7 @@ $this->title = 'Browse';
                     <?php if (empty($fqs) && (empty($browseModel->distance) || empty($browseModel->location))) {
                         echo '<div class="alert alert-cat" role="alert"><h3>' . Html::icon('hand-left') . ' Choose a category to begin browsing.</h3></div>';
                     } elseif ($resultSet->getNumFound() == 0) {
-                       echo '<div class="alert alert-info" role="alert"><h4>There are no listings inside your search radius.  Try a larger search radius.</h4></div>';
+                       echo '<div class="alert alert-info" role="alert"><h4>No listings found.  Try a larger search radius.</h4></div>';
                     } else {
                         echo ListView::widget([
                             'dataProvider' => $dataProvider,

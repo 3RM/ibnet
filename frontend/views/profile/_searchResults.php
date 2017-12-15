@@ -15,7 +15,7 @@ use yii\helpers\HtmlPurifier;
   
 	    <h4>
 	        <?= Html::a($model->org_name, ['association',
-	    		'city' => $model->url_city, 
+	    		'urlLoc' => $model->url_loc, 
 	    		'name' => $model->url_name, 
 	    		'id' => $model->id]) 
 	    	?>
@@ -36,7 +36,7 @@ use yii\helpers\HtmlPurifier;
 		    
 	    <h4>
 	    	<?= Html::a($model->org_name, ['camp',
-	    		'city' => $model->url_city, 
+	    		'urlLoc' => $model->url_loc, 
 	    		'name' => $model->url_name, 
 	    		'id' => $model->id]) 
 	    	?>
@@ -58,11 +58,11 @@ use yii\helpers\HtmlPurifier;
 	   	<h4>
 	        <?= $model->spouse_first_name == NULL ? 
 	        	Html::a($model->ind_first_name . ' ' . $model->ind_last_name, ['evangelist',
-		    		'city' => $model->url_city, 
+		    		'urlLoc' => $model->url_loc, 
 		    		'name' => $model->url_name, 
 		    		'id' => $model->id]) :
 	    		Html::a($model->ind_first_name . ' & ' . $model->spouse_first_name . ' ' . $model->ind_last_name, ['evangelist',
-		    		'city' => $model->url_city, 
+		    		'urlLoc' => $model->url_loc, 
 		    		'name' => $model->url_name, 
 		    		'id' => $model->id]);
 	    	?>
@@ -80,7 +80,7 @@ use yii\helpers\HtmlPurifier;
 	 
 	    <h4>
 	    	<?= Html::a($model->org_name, ['church',
-	    		'city' => $model->url_city, 
+	    		'urlLoc' => $model->url_loc, 
 	    		'name' => $model->url_name, 
 	    		'id' => $model->id]) 
 	    	?>
@@ -102,11 +102,11 @@ use yii\helpers\HtmlPurifier;
 	   	<h4>
 	        <?= $model->spouse_first_name == NULL ? 
 	        	Html::a($model->ind_first_name . ' ' . $model->ind_last_name, ['evangelist',
-		    		'city' => $model->url_city, 
+		    		'urlLoc' => $model->url_loc, 
 		    		'name' => $model->url_name, 
 		    		'id' => $model->id]) :
 	    		Html::a($model->ind_first_name . ' & ' . $model->spouse_first_name . ' ' . $model->ind_last_name, ['evangelist',
-		    		'city' => $model->url_city, 
+		    		'urlLoc' => $model->url_loc, 
 		    		'name' => $model->url_name, 
 		    		'id' => $model->id]);
 	    	?>
@@ -124,7 +124,7 @@ use yii\helpers\HtmlPurifier;
 		 
 	  	<h4>
 	   	    <?= Html::a($model->org_name, ['fellowship', 
-	   	    	'city' => $model->url_city, 
+	   	    	'urlLoc' => $model->url_loc, 
 	   	    	'name' => $model->url_name, 
 	   	    	'id' => $model->id]) 
 	   	    ?>
@@ -145,7 +145,7 @@ use yii\helpers\HtmlPurifier;
 		 
 	   	<h4>
 	  		<?= Html::a($model->org_name, ['special-ministry',
-	    		'city' => $model->url_city, 
+	    		'urlLoc' => $model->url_loc, 
 	    		'name' => $model->url_name, 
 	    		'id' => $model->id]) 
 	    	?>
@@ -166,7 +166,7 @@ use yii\helpers\HtmlPurifier;
 	
 	  	<h4>
 	  		<?= Html::a($model->org_name, ['mission-agency',
-	    		'city' => $model->url_city, 
+	    		'urlLoc' => $model->url_loc, 
 	    		'name' => $model->url_name, 
 	    		'id' => $model->id]) 
 	    	?>
@@ -188,11 +188,11 @@ use yii\helpers\HtmlPurifier;
 	    <h4>
 	    	<?= $model->spouse_first_name == NULL ? 
 	        	Html::a($model->ind_first_name . ' ' . $model->ind_last_name, ['missionary',
-		    		'city' => $model->url_city, 
+		    		'urlLoc' => $model->url_loc, 
 		    		'name' => $model->url_name, 
 		    		'id' => $model->id]) :
 	    		Html::a($model->ind_first_name . ' & ' . $model->spouse_first_name . ' ' . $model->ind_last_name, ['missionary',
-		    		'city' => $model->url_city, 
+		    		'urlLoc' => $model->url_loc, 
 		    		'name' => $model->url_name, 
 		    		'id' => $model->id]);
 	    	?>
@@ -212,7 +212,7 @@ use yii\helpers\HtmlPurifier;
 		  
 	  	<h4>
 	  		<?= Html::a($model->org_name, ['music',
-	    		'city' => $model->url_city, 
+	    		'urlLoc' => $model->url_loc, 
 	    		'name' => $model->url_name, 
 	    		'id' => $model->id]) 
 	    	?>
@@ -234,11 +234,11 @@ use yii\helpers\HtmlPurifier;
 	  	<h4>
 	   		<?= $model->spouse_first_name == NULL ? 
 	        	Html::a($model->ind_first_name . ' ' . $model->ind_last_name, ['pastor',
-		    		'city' => $model->url_city, 
+		    		'urlLoc' => $model->url_loc, 
 		    		'name' => $model->url_name, 
 		    		'id' => $model->id]) :
 	    		Html::a($model->ind_first_name . ' (& ' . $model->spouse_first_name . ') ' . $model->ind_last_name, ['pastor',
-		    		'city' => $model->url_city, 
+		    		'urlLoc' => $model->url_loc, 
 		    		'name' => $model->url_name, 
 		    		'id' => $model->id]);
 	    	?>
@@ -253,7 +253,7 @@ use yii\helpers\HtmlPurifier;
 
 	    <h4>
 	    	<?= Html::a($model->org_name, ['print',
-	    		'city' => $model->url_city, 
+	    		'urlLoc' => $model->url_loc, 
 	    		'name' => $model->url_name, 
 	    		'id' => $model->id]) 
 	    	?>
@@ -274,7 +274,7 @@ use yii\helpers\HtmlPurifier;
 			
 		<h4>
 	    	<?= Html::a($model->org_name, ['school',
-	    		'city' => $model->url_city, 
+	    		'urlLoc' => $model->url_loc, 
 	    		'name' => $model->url_name, 
 	    		'id' => $model->id]) 
 	    	?>
@@ -296,11 +296,11 @@ use yii\helpers\HtmlPurifier;
 	   	<h4>
 	        <?= $model->spouse_first_name == NULL ? 
 	        	Html::a($model->ind_first_name . ' ' . $model->ind_last_name, ['staff',
-		    		'city' => $model->url_city, 
+		    		'urlLoc' => $model->url_loc, 
 		    		'name' => $model->url_name, 
 		    		'id' => $model->id]) :
 	    		Html::a($model->ind_first_name . ' (& ' . $model->spouse_first_name . ') ' . $model->ind_last_name, ['staff',
-		    		'city' => $model->url_city, 
+		    		'urlLoc' => $model->url_loc, 
 		    		'name' => $model->url_name, 
 		    		'id' => $model->id]);
 	    	?>

@@ -306,7 +306,7 @@ class DirectoryController extends Controller
             'sub_type',
             'profile_name',
             'url_name',
-            'url_city',
+            'url_loc',
             'created_at:date',                                     
             'last_update:date',
             'last_modified:date',

@@ -36,6 +36,9 @@ use xj\sitemap\actions\SitemapIndexAction;
  */
 class SiteController extends Controller
 {
+
+    public $layout;
+    
     /**
      * @inheritdoc
      */
@@ -241,6 +244,7 @@ class SiteController extends Controller
             $content = new Box3Content();
             $box3Content = $content->getBox3Content();
             
+            $this->layout = 'bg-gray';
             return $this->render('/site/index', [
                 'searchModel' => $searchModel, 
                 'term' => $term,

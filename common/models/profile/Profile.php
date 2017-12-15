@@ -7,6 +7,7 @@ use borales\extensions\phoneInput\PhoneInputValidator;
 use common\models\profile\Country;
 use common\models\profile\FormsCompleted;
 use common\models\profile\GoogleGeocoder;
+use common\models\profile\ProfileHasLike;
 use common\models\profile\State;
 use common\models\profile\Type;
 use common\models\SendMail;
@@ -119,8 +120,8 @@ class Profile extends \yii\db\ActiveRecord
     /**
      * @const int $EDIT_* Indicates if profile is newly created or edited as existing; Affects progression through profile forms.
      */
-    const EDIT_NO = 0;
-    const EDIT_YES = 10;
+    const EDIT_NO = 0;      // Profile is new
+    const EDIT_YES = 10;    // Profile is existing
 
     /**
     * @var array $icon Outputs html markup for glyphicon icons for each profile type
@@ -129,7 +130,7 @@ class Profile extends \yii\db\ActiveRecord
         'Association' => '<span class="glyphicons glyphicons-group"></span>',
         'Camp' => '<span class="glyphicons glyphicons-camping"></span>',
         'Chaplain' => '<span class="glyphicons glyphicons-shield"></span>',
-        'Church' => '<span class="glyphicons glyphicons-temple-christianity-church"></span>',
+        'Church' => '<span class="glyphicons glyphicons-temple-christianity-church type-icon"></span>',
         'Evangelist' => '<span class="glyphicons glyphicons-fire"></span>',
         'Fellowship' => '<span class="glyphicons glyphicons-handshake"></span>',
         'Mission Agency' => '<span class="glyphicons glyphicons-globe-af"></span>',
@@ -280,9 +281,9 @@ class Profile extends \yii\db\ActiveRecord
     // i2: Image 2
             'i2' => ['image2'],
     // lo-org: Location Organization
-            'lo-org' => ['org_address1', 'org_address2', 'org_city', 'org_st_prov_reg', 'org_zip', 'org_country', 'map', 'org_po_address1', 'org_po_address2', 'org_po_box', 'org_po_city', 'org_po_st_prov_reg', 'org_po_zip', 'org_po_country', 'url_city'],
+            'lo-org' => ['org_address1', 'org_address2', 'org_city', 'org_st_prov_reg', 'org_zip', 'org_country', 'map', 'org_po_address1', 'org_po_address2', 'org_po_box', 'org_po_city', 'org_po_st_prov_reg', 'org_po_zip', 'org_po_country', 'url_loc'],
     // lo-ind: Location Individual
-            'lo-ind' => ['ind_address1', 'ind_address2', 'ind_city', 'ind_st_prov_reg', 'ind_zip', 'ind_country', 'map', 'ind_po_address1', 'ind_po_address2', 'ind_po_box', 'ind_po_city', 'ind_po_st_prov_reg', 'ind_po_zip', 'ind_po_country', 'url_city'],
+            'lo-ind' => ['ind_address1', 'ind_address2', 'ind_city', 'ind_st_prov_reg', 'ind_zip', 'ind_country', 'map', 'ind_po_address1', 'ind_po_address2', 'ind_po_box', 'ind_po_city', 'ind_po_st_prov_reg', 'ind_po_zip', 'ind_po_country', 'url_loc'],
     // co: Contact
             'co' => ['phone', 'email', 'email_pvt', 'website'],
     // co: Contact - Forwarding Email
@@ -426,7 +427,7 @@ class Profile extends \yii\db\ActiveRecord
             ['image1', 'image', 'extensions' => 'jpg, jpeg, gif, png', 'mimeTypes' => 'image/jpeg, image/png', 'maxFiles' => 1, 'maxSize' => 1024 * 4000, 'skipOnEmpty' => true, 'on' => 'i1'],
 
     // i2: Image 2 ('image2')
-            ['image2', 'image', 'extensions' => 'jpg, jpeg, gif, png', 'mimeTypes' => 'image/jpeg, image/png', 'maxFiles' => 1, 'maxSize' => 1024 * 4000, 'skipOnEmpty' => true, 'on' => 'i2'],
+            ['image2', 'image', 'extensions' => 'jpg, jpeg, gif, png', 'mimeTypes' => 'image/jpeg, image/png', 'maxFiles' => 1, 'maxSize' => 1024 * 10000, 'skipOnEmpty' => true, 'on' => 'i2'],
 
     // lo-org: Location Organization ('org_address1', 'org_address2', 'org_city', 'org_st_prov_reg', 'org_zip', 'org_country', 'map', 'org_po_address1', 'org_po_address2', 'org_po_box', 'org_po_city', 'org_po_st_prov_reg', 'org_po_zip', 'org_po_country')
             ['org_address1', 'required', 'when' => function($profile) {                             // address1 is required if po_address1 and po_box are missing
@@ -475,7 +476,7 @@ class Profile extends \yii\db\ActiveRecord
             [['org_po_address1'], 'validateMailingAddress', 'on' => 'lo-org'],
             [['org_po_box'], 'validateMailingAddress', 'on' => 'lo-org'],
             [['org_po_address1, org_po_box'], 'validateMailingAddress', 'on' => 'lo-org'],
-            [['map', 'url_city'], 'safe', 'on' => 'lo-org'],
+            [['map', 'url_loc'], 'safe', 'on' => 'lo-org'],
 
     // lo-ind: Location Individual ('ind_address1', 'ind_address2', 'ind_city', 'ind_st_prov_reg', 'ind_zip', 'ind_country', 'map', 'ind_po_address1', 'ind_po_address2', 'ind_po_box', 'ind_po_city', 'ind_po_st_prov_reg', 'ind_po_zip', 'ind_po_country')
             ['ind_address1', 'required', 'when' => function($profile) {                             // address1 is required if po_address1 and po_box are missing
@@ -524,7 +525,7 @@ class Profile extends \yii\db\ActiveRecord
             [['ind_po_address1'], 'validateMailingAddress', 'on' => 'lo-ind'],
             [['ind_po_box'], 'validateMailingAddress', 'on' => 'lo-ind'],
             [['ind_po_address1, ind_po_box'], 'validateMailingAddress', 'on' => 'lo-ind'],
-            [['map', 'url_city'], 'safe', 'on' => 'lo-ind'],
+            [['map', 'url_loc'], 'safe', 'on' => 'lo-ind'],
 
     // co: Contact ('phone', 'email', 'email_pvt', 'website')
             [['phone', 'email'], 'required', 'on' => 'co'],
@@ -1133,9 +1134,11 @@ class Profile extends \yii\db\ActiveRecord
                 $this->show_map = self::MAP_PRIMARY;
             }
 
-            $this->category == self::CATEGORY_IND ?                                                 // Update Url name and city
-            $this->url_city = $this->urlName($this->ind_city) :
-            $this->url_city = $this->urlName($this->org_city);
+            if ($this->type != 'Missionary') {
+                $this->category == self::CATEGORY_IND ?                                              // Update Url location
+                $this->url_loc = $this->urlName($this->ind_city) :
+                $this->url_loc = $this->urlName($this->org_city);
+            }
 
     // ***************************** Save **************************************
             if ($this->save() && $this->setUpdateDate()) {
@@ -1868,10 +1871,12 @@ class Profile extends \yii\db\ActiveRecord
 
         if ($this->category == self::CATEGORY_IND) {
             $name = $this->urlName($this->ind_last_name);
-            $city = $this->urlName($this->ind_city);
+            $urlLoc = ($this->type == 'Missionary') ?
+                $this->urlName($this->missionary->field) :
+                $this->urlName($this->ind_city);
         } else {
             $name = $this->urlName($this->org_name);
-            $city = $this->urlName($this->org_city);
+            $urlLoc = $this->urlName($this->org_city);
         }
 
         MailController::dbSendLink($this->id);                                                      // send link notifications to profile owners
@@ -1901,7 +1906,7 @@ class Profile extends \yii\db\ActiveRecord
             'created_at' => $createDate, 
             'status' => self::STATUS_ACTIVE,
             'url_name' => $name,
-            'url_city' => $city]); 
+            'url_loc' => $urlLoc]); 
         $this->setUpdateDate();
             
         return $this;
@@ -1918,7 +1923,7 @@ class Profile extends \yii\db\ActiveRecord
             $progress->delete();
         }
         if ($this->setUpdateDate() && 
-            $this->updateAttributes(['status' => Profile::STATUS_INACTIVE, 'renewal_date' => NULL])) {
+            $this->updateAttributes(['status' => Profile::STATUS_INACTIVE, 'renewal_date' => NULL, 'edit' => self::EDIT_NO])) {
 
             if ($this->category = self::CATEGORY_IND) {                                             // Update number of active individual profiles
                 $user = Yii::$app->user->identity;
@@ -2140,6 +2145,14 @@ class Profile extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
+    public function getMinistry()
+    {
+        return $array = $this->find()->where(['ministry_of' => $this->id])->andWhere(['status' => self::STATUS_ACTIVE])->all();
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
     public function getProgram()
     {
         return $this->hasMany(Profile::className(), ['id' => 'program_id'])
@@ -2242,6 +2255,24 @@ class Profile extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Accreditation::className(), ['id' => 'accreditation_id'])
             ->viaTable('profile_has_accreditation', ['profile_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getLike()
+    {
+        return $this->hasMany(User::className(), ['id' => 'liked_by_id'])
+            ->viaTable('profile_has_like', ['profile_id' => 'id'])
+            ->where(['status' => User::STATUS_ACTIVE]);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getILike()
+    {
+        return $this->hasOne(ProfileHasLike::className(), ['profile_id' => 'id'])->where(['liked_by_id' => Yii::$app->user->identity->id]);
     }
 
     /**
@@ -2660,6 +2691,31 @@ class Profile extends \yii\db\ActiveRecord
     public function urlName($name)
     {
         return preg_replace("/[^a-zA-Z0-9-]/", "", str_replace(' ', '-', strtolower(trim($name))));
+    }
+
+    /**
+     * Delete an image file on the server
+     * @param string $name
+     * @return string
+     */
+    public function deleteOldImg($img, $imageLink=NULL)
+    {
+        if ($img == 'image2' && 
+            ($this->type == 'Church') && 
+            ($pastorLink = $this->findSrPastor())) {
+            if (isset($pastorLink->image2)) {
+                $imageLink = $pastorLink->image2;
+            }
+        }
+
+        $oldImg = $this->getOldAttribute($img);
+        if ($oldImg && 
+            (strpos($oldImg, '/uploads/') !== false) &&                                             // Only delete if image is found in uploads folder
+            ($oldImg != $this->{$img}) &&                                                           // Only delte if image name and path has changed in db.
+            ($oldImg != $imageLink)) {                                                              // Don't delete a linked pastor image
+            unlink($oldImg);
+        }
+        return $this;
     }
 
 }

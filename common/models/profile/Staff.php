@@ -4,6 +4,7 @@ namespace common\models\profile;
 
 use common\models\profile\Profile;
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "type".
@@ -65,5 +66,57 @@ class Staff extends \yii\db\ActiveRecord
     public function getMinistry()
     {
         return $this->hasOne(Profile::className(), ['id' => 'ministry_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getOtherMinistries($id)
+    {
+        if ($ministries = self::find()
+            ->where(['staff_id' => $id])
+            ->andWhere(['ministry_other' => 1])
+            ->andWhere(['confirmed' => 1])
+            ->orderBy('id Asc')
+            ->all()) {
+            $i = 0;
+            foreach ($ministries as $mstry) {                                                          // Combine multiple staff titles for same ministry
+                if ($i > 0 && ($mstry['ministry_id'] == $ministries[$i-1]['ministry_id'])) {
+                    $ministries[$i-1]['staff_title'] .= ' & ' . $mstry['staff_title'];
+                    unset($ministries[$i]);
+                    $ministries = array_values($ministries);
+                    continue;
+                }
+                $i++;
+            }
+            $ids = ArrayHelper::getColumn($ministries, 'ministry_id');
+            $names = ArrayHelper::getColumn($ministries, 'staff_title');
+            $otherMinistryArray = Profile::findAll($ids);
+
+            $i = 0;
+            foreach ($otherMinistryArray as $min) {
+                $min->titleM = $names[$i];
+                $i++;
+            }
+            return $otherMinistryArray;
+        }
+        return NULL;
+    }    
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSrPastor($id)
+    {
+       
+        if ($staff = self::find()
+            ->where(['ministry_id' => $id])
+            ->andWhere(['sr_pastor' => 1])
+            ->andWhere(['confirmed' => 1])
+            ->one()) {
+            return $pastor = $staff->profile;
+        } else {
+            return NULL;
+        }
     }
 }

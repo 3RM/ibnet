@@ -6,6 +6,8 @@
  *
  * @var yii\web\View $this
  * @var yii\data\ActiveDataProvider $CommentsDataProvider
+ *
+ * customized by Steve McKinley & ibnet.org
  */
 
 use rmrevin\yii\fontawesome\FA;
@@ -20,14 +22,10 @@ $CommentListWidget = $this->context;
 
 $comments = [];
 
-echo Html::tag('h3', Yii::t('app', 'Comments'), ['class' => 'comment-title']);
-
 /** @var Comments\models\Comment $CommentModel */
 $CommentModel = \Yii::createObject(Comments\Module::instance()->model('comment'));
 
 if ($CommentListWidget->showCreateForm && $CommentModel::canCreate()) {
-    // echo Html::tag('h3', Yii::t('app', 'Add comment'), ['class' => 'comment-title']);
-
     echo Comments\widgets\CommentFormWidget::widget([
         'theme' => $CommentListWidget->theme,
         'entity' => $CommentListWidget->entity,
@@ -35,8 +33,6 @@ if ($CommentListWidget->showCreateForm && $CommentModel::canCreate()) {
         'anchor' => $CommentListWidget->anchorAfterUpdate,
     ]);
 }
-
-echo '<hr>';
 
 echo yii\widgets\ListView::widget([
     'dataProvider' => $CommentsDataProvider,
@@ -48,29 +44,20 @@ echo yii\widgets\ListView::widget([
             ob_start();
 
             $Formatter = Yii::$app->getFormatter();
-
             $Author = $Comment->author;
-
             $comments[$Comment->id] = $Comment->attributes;
-
             $options = [
                 'data-comment' => $Comment->id,
                 'class' => 'row comment',
             ];
-
             if ($index === 0) {
                 Html::addCssClass($options, 'first');
             }
-
-            if ($index === ($Widget->dataProvider->getCount() - 1)) {
-                Html::addCssClass($options, 'last');
-            }
-
             if ($Comment->isDeleted()) {
                 Html::addCssClass($options, 'deleted');
             }
-
             ?>
+
             <div <?= Html::renderTagAttributes($options) ?>>
                 <?php
                 $avatar = false;
@@ -86,7 +73,6 @@ echo yii\widgets\ListView::widget([
                     $url = $Author->getCommentatorUrl();
                     $churchName = $Author->getCommentatorChurch();
                     $churchName = empty($churchName) ? 'Unknown church' : $churchName;
-                    $churchUrl = $Author->getCommentatorChurchUrl();
                 }
 
                 $name_html = Html::tag('strong', $name);
@@ -105,29 +91,28 @@ echo yii\widgets\ListView::widget([
                     ]);
                 }
                 ?>
-                <div class="col-xs-4 col-sm-2 col-md-2 col-lg-1">
-                    <?= false !== $url ? 
-                        Html::a($avatar_html, $url, ['target' => '_blank']) :
-                        $avatar_html; ?>
-                </div>
-                <div class="col-xs-12 col-sm-10 col-md-8 col-lg-7">
-                    <div class="author">
+           
+                <?= false !== $url ? 
+                    Html::a($avatar_html, $url, ['target' => '_blank']) :
+                    $avatar_html; 
+                ?>
+             
+                <div class="comment-container">
+                    <div class="comment-author">
                         <?php
                         echo false !== $url ?
                             Html::a($name_html, $url, ['target' => '_blank']) :
                             $name_html;
                         echo Html::tag('bold', ' &middot ');
-                        echo false !== $churchUrl ?
-                            Html::a($churchName_html, $churchUrl, ['target' => '_blank']) :
-                            $churchName_html;
+                        echo $churchName_html;
                         if ((time() - $Comment->created_at) > (86400 * 2)) {
-                            echo Html::tag('span', $Formatter->asDatetime($Comment->created_at), ['class' => 'date']);
+                            echo '<br>' . Html::tag('span', $Formatter->asDatetime($Comment->created_at), ['class' => 'comment-date']);
                         } else {
-                            echo Html::tag('span', $Formatter->asRelativeTime($Comment->created_at), ['class' => 'date']);
+                            echo '<br>' . Html::tag('span', $Formatter->asRelativeTime($Comment->created_at), ['class' => 'comment-date']);
                         }
                         ?>
                     </div>
-                    <div class="text">
+                    <div class="comment-text">
                         <?php
                         if ($Comment->isDeleted()) {
                             echo Yii::t('app', 'Comment was deleted.');
@@ -159,7 +144,7 @@ echo yii\widgets\ListView::widget([
                         <?php
                     }
                     ?>
-                    <div class="actions">
+                    <div class="comment-actions">
                         <?php
                         if (!$Comment->isDeleted()) {
                             if ($Comment->canCreate()) {

@@ -84,8 +84,8 @@ EOD
             <div class="col-md-11">
                 <h3>Additional Staff</h3>
                 <?php if ($staffArray) { ?>
-                    <?= isset($staffArray[1]) ? '<p>' . Html::icon('search') . ' We found people in the directory who have identified themselves as church staff members.</p>' :
-                    '<p>' . Html::icon('search') . ' We found a person in the directory who has identified themself as a church staff member.</p>' ?>
+                    <?= isset($staffArray[1]) ? '<p>' . Html::icon('search') . ' We found people in the directory who have identified themselves as church staff members. "Staff" includes anyone in ministry who serves under the ministry of the church, and need not be in a paid staff position.</p>' :
+                    '<p>' . Html::icon('search') . ' We found a person in the directory who has identified themself as a church staff member.  "Staff" includes anyone in ministry who serves under the ministry of the church, and need not be in a paid staff position.</p>' ?>
                 <?php } else { ?>
                     <p><?= Html::icon('search') ?> We did not find any pastor or staff for your church in the directory.  Pastor and staff profiles can be a great way to help the public get aquainted with your church.</p>
                 <?php } ?>

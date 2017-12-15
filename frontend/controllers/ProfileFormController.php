@@ -38,13 +38,15 @@ use yii\web\UploadedFile;
  */
 class ProfileFormController extends ProfileController
 {
+    public $layout = 'main';
+
     // Determine sequence of forms
     public static $formArray = [     
           // Form #            0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18 
         'Pastor' =>           [1,  1,  1,  1,  1,  0,  0,  0,  1,  0,  1,  0,  1,  0,  1,  0,  0,  1,  0],  
         'Evangelist' =>       [1,  1,  1,  1,  1,  0,  0,  0,  1,  0,  1,  0,  1,  0,  1,  0,  0,  1,  0],
         'Missionary' =>       [1,  1,  1,  1,  1,  0,  0,  1,  1,  1,  1,  0,  1,  0,  1,  1,  0,  0,  0],
-        'Chaplain' =>         [1,  1,  1,  1,  1,  0,  0,  0,  1,  0,  1,  0,  1,  0,  0,  1,  0,  0,  0],
+        'Chaplain' =>         [1,  1,  1,  1,  1,  0,  0,  0,  1,  0,  1,  0,  1,  0,  1,  1,  0,  0,  0],
         'Staff' =>            [1,  1,  1,  1,  1,  0,  0,  0,  1,  0,  1,  0,  1,  0,  0,  0,  0,  0,  0],
         'Church' =>           [1,  1,  1,  1,  1,  1,  1,  0,  0,  0,  0,  1,  0,  0,  1,  1,  1,  1,  0],
         'Mission Agency' =>   [1,  1,  1,  1,  1,  1,  0,  0,  0,  0,  1,  0,  0,  0,  0,  0,  0,  0,  0],
@@ -397,13 +399,45 @@ class ProfileFormController extends ProfileController
         if (isset($_POST['exit'])) {
             return $this->redirect(['/profile-mgmt/my-profiles']); 
         }
-        if (Yii::$app->request->Post() && 
-            $profile->save() && 
+        if (isset($_POST['banner1'])) {
+            $profile->updateAttributes(['image1' => '/images/content/banner1.jpg']);
+            $profile->deleteOldImg('image1');
+            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum-1, 'id' => $id]);
+        }
+        if (isset($_POST['banner2'])) {
+            $profile->updateAttributes(['image1' => '/images/content/banner2.jpg']);
+            $profile->deleteOldImg('image1');
+            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum-1, 'id' => $id]);
+        }
+        if (isset($_POST['banner3'])) {
+            $profile->updateAttributes(['image1' => '/images/content/banner3.jpg']);
+            $profile->deleteOldImg('image1');
+            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum-1, 'id' => $id]);
+        }
+        if (isset($_POST['banner4'])) {
+            $profile->updateAttributes(['image1' => '/images/content/banner4.jpg']);
+            $profile->deleteOldImg('image1');
+            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum-1, 'id' => $id]);
+        }
+        if (isset($_POST['banner5'])) {
+            $profile->updateAttributes(['image1' => '/images/content/banner5.jpg']);
+            $profile->deleteOldImg('image1');
+            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum-1, 'id' => $id]);
+        }
+        if (isset($_POST['banner6'])) {
+            $profile->updateAttributes(['image1' => '/images/content/banner6.jpg']);
+            $profile->deleteOldImg('image1');
+            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum-1, 'id' => $id]);
+        }
+        if (Yii::$app->request->Post()) {
+            $profile->deleteOldImg('image1');
+            if ($profile->save() && 
             $profile->setUpdateDate() && 
             $profile->setProgress($fmNum)) {
             return isset($_POST['save']) ?
                 $this->redirect(['/preview/view-preview', 'id' => $id]) :
-                $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);   
+                $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);  
+            } 
 
         } else {   
             $profile->status != Profile::STATUS_ACTIVE ?
@@ -449,16 +483,18 @@ class ProfileFormController extends ProfileController
         if (isset($_POST['exit'])) {
             return $this->redirect(['/profile-mgmt/my-profiles']); 
         }
-        if (Yii::$app->request->Post() && 
-            $profile->save() && 
+        if (Yii::$app->request->Post()) {
+            $profile->deleteOldImg('image2');
+            if ($profile->save() && 
             $profile->setUpdateDate() && 
             $profile->setProgress($fmNum)) {
             return isset($_POST['save']) ?
                 $this->redirect(['/preview/view-preview', 'id' => $id]) :
-                $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]); // Give option to share linked pastor image with church profile
+                $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);  
+            }
 
-        } else {
-            $imageLink = NULL;
+        } else {  // Give option to share linked pastor image with church profile
+    
             if (($profile->type == 'Church') && ($pastorLink = $profile->findSrPastor())) {
                 if (isset($pastorLink->image2)) {
                     $imageLink = $pastorLink->image2;
@@ -872,6 +908,7 @@ class ProfileFormController extends ProfileController
             if ($profile->missionary_id != $missionary->id) {
                 $profile->link('missionary', $missionary);                                          // Link new missionary record to profile
             }
+            $profile->updateAttributes(['url_loc' =>  $missionary->field]);                         // Set url_loc to missionary field
             return isset($_POST['save']) ?
                 $this->redirect(['/preview/view-preview', 'id' => $id]) :
                 $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);     
@@ -1142,7 +1179,7 @@ class ProfileFormController extends ProfileController
         } elseif ($profile->load(Yii::$app->request->Post()) &&
             $profile->setProgress($fmNum) &&
             $profile->handleFormPM() &&
-            $profile->handleFormPMM()) { // Utility::pp(isset($_POST['save']));
+            $profile->handleFormPMM()) {
             return isset($_POST['save']) ?
                 $this->redirect(['/preview/view-preview', 'id' => $id]) :
                 $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);

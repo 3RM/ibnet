@@ -24,6 +24,7 @@ use yii\web\NotFoundHttpException;
  */
 class ProfileMgmtController extends ProfileController
 {
+    public $layout="main";  
 
     public function behaviors()
     {
@@ -92,8 +93,7 @@ class ProfileMgmtController extends ProfileController
             return $this->redirect(['profile-form/form-route', 'type' => $profile->type, 'fmNum' => -1, 'id' => $profile->id]);
 
         } else {
-            $types = ArrayHelper::map(Type::find()->all(),                      //add ->where(['active' => 1])
-                'type', 'type', 'group');
+            $types = ArrayHelper::map(Type::find()->where(['active' => 1])->all(), 'type', 'type', 'group');
             $pastorTypes = ArrayHelper::map(SubType::find()->select('sub_type')
                 ->where(['type' => 'Pastor'])->all(), 'sub_type', 'sub_type');
             $missionaryTypes = ArrayHelper::map(SubType::find()->select('sub_type')
@@ -306,14 +306,47 @@ class ProfileMgmtController extends ProfileController
         $profile = $this->findProfile($id); 
         $profile->scenario = 'settings';
 
-        $add = false;
         $history = new History();
         if (isset($_POST['add'])) {
-            $add = true;
+            $action = 'add';
 
         } elseif (isset($_POST['remove'])) {
             $event = History::findOne($_POST['remove']);
             $event->updateAttributes(['deleted' => 1]);
+
+        } elseif (isset($_POST['edit'])) {
+            $action = 'edit';
+            $events = $profile->history;
+            $i = 0;
+            foreach ($events as $event) {
+                if ($event->id == $_POST['edit']) {
+                    $events[$i]['edit'] = 1;
+                    $events[$i]['date'] = Yii::$app->formatter->asDate($event->date, 'MM/dd/yyyy');
+                }
+                $i++;
+            }
+            return $this->render('settings', [
+                'profile' => $profile,
+                'history' => $history,
+                'events' => $events,
+                'action' => $action]);
+
+        } elseif (isset($_POST['edit-save'])) {
+            $event = History::findOne($_POST['edit-save']);
+            if ($event->load(Yii::$app->request->Post()) && $event->validate()) {
+                $event->profile_id = $profile->id;
+                $event->date = strtotime($event->date);
+                $event->save();
+            }
+            $this->redirect(['settings', 'id' => $profile->id]);
+
+        } elseif (isset($_POST['cancel'])) {
+            $events = $profile->history;
+            return $this->render('settings', [
+                'profile' => $profile,
+                'history' => $history,
+                'events' => $events,
+                'action' => $action]);
 
         } elseif ($history->load(Yii::$app->request->Post()) && 
             $history->validate()) {
@@ -329,7 +362,7 @@ class ProfileMgmtController extends ProfileController
             'profile' => $profile,
             'history' => $history,
             'events' => $events,
-            'add' => $add]);                              
+            'action' => $action]);                              
     }
 
 }                     

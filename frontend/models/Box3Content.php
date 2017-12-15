@@ -3,6 +3,7 @@ namespace frontend\models;
 
 use common\models\profile\Missionary;
 use common\models\profile\Profile;
+use common\models\Utility;
 use yii;
 use yii\base\Model;
 use yii\bootstrap\Html;
@@ -75,13 +76,13 @@ class Box3Content extends Model
 
                 case 'Association':
                     $content = Html::a(Html::img('@web/images/association-new.jpg', ['class' => 'img-thumbnail']), ['profile/association',
-                        'city' => $profile->url_city, 
+                        'urlLoc' => $profile->url_loc, 
                         'name' => $profile->url_name, 
                         'id' => $profile->id]);
                     $content .= '<div class="caption">';
                     $content .=     '<h3>';
                     $content .=         Html::a($profile->org_name, ['profile/association',
-                                            'city' => $profile->url_city, 
+                                            'urlLoc' => $profile->url_loc, 
                                             'name' => $profile->url_name, 
                                             'id' => $profile->id]);
                     $content .=     '</h3>';
@@ -97,13 +98,13 @@ class Box3Content extends Model
                 
                 case 'Camp' :
                     $content = Html::a(Html::img('@web/images/camp-new.jpg', ['class' => 'img-thumbnail']), ['profile/camp',
-                        'city' => $profile->url_city, 
+                        'urlLoc' => $profile->url_loc, 
                         'name' => $profile->url_name, 
                         'id' => $profile->id]);
                     $content .= '<div class="caption">';
                     $content .=     '<h3>';
                     $content .=         Html::a($profile->org_name, ['profile/camp',
-                                            'city' => $profile->url_city, 
+                                            'urlLoc' => $profile->url_loc, 
                                             'name' => $profile->url_name, 
                                             'id' => $profile->id]);
                     $content .=     '</h3>';
@@ -119,13 +120,13 @@ class Box3Content extends Model
 
                 case 'Chaplain' :
                     $content = Html::a(Html::img('@web/images/chaplain-new.jpg', ['class' => 'img-thumbnail']), ['profile/chaplain',
-                        'city' => $profile->url_city, 
+                        'urlLoc' => $profile->url_loc, 
                         'name' => $profile->url_name, 
                         'id' => $profile->id]);
                     $content .= '<div class="caption">';
                     $content .=     '<h3>';
                     $content .=         Html::a($profile->getFormattedNames()->formattedNames, ['profile/chaplin',
-                                            'city' => $profile->url_city, 
+                                            'urlLoc' => $profile->url_loc, 
                                             'name' => $profile->url_name, 
                                             'id' => $profile->id]);
                     $content .=     '</h3>';
@@ -142,15 +143,14 @@ class Box3Content extends Model
                     break;
 
                 case 'Church' :
-
                     $content = Html::a(Html::img('@web/images/church-new.jpg', ['class' => 'img-thumbnail']), ['profile/church',
-                        'city' => $profile->url_city, 
+                        'urlLoc' => $profile->url_loc, 
                         'name' => $profile->url_name, 
                         'id' => $profile->id]);
                     $content .= '<div class="caption">';
                     $content .=     '<h3>';
                     $content .=         Html::a($profile->org_name, ['profile/church',
-                                            'city' => $profile->url_city, 
+                                            'urlLoc' => $profile->url_loc, 
                                             'name' => $profile->url_name, 
                                             'id' => $profile->id]);
                     $content .=     '</h3>';
@@ -167,13 +167,13 @@ class Box3Content extends Model
 
                 case 'Evangelist' :
                     $content = Html::a(Html::img('@web/images/evangelist-new.jpg', ['class' => 'img-thumbnail']), ['profile/evangelist',
-                        'city' => $profile->url_city, 
+                        'urlLoc' => $profile->url_loc, 
                         'name' => $profile->url_name, 
                         'id' => $profile->id]);
                     $content .= '<div class="caption">';
                     $content .=     '<h3>';
                     $content .=         Html::a($profile->getFormattedNames()->formattedNames, ['profile/evangelist',
-                                            'city' => $profile->url_city, 
+                                            'urlLoc' => $profile->url_loc, 
                                             'name' => $profile->url_name, 
                                             'id' => $profile->id]);
                     $content .=     '</h3>';
@@ -189,13 +189,13 @@ class Box3Content extends Model
 
                 case 'Fellowship' :
                     $content = Html::a(Html::img('@web/images/fellowship-new.jpg', ['class' => 'img-thumbnail']), ['profile/fellowship',
-                        'city' => $profile->url_city, 
+                        'urlLoc' => $profile->url_loc, 
                         'name' => $profile->url_name, 
                         'id' => $profile->id]);
                     $content .= '<div class="caption">';
                     $content .=     '<h3>';
                     $content .=         Html::a($profile->org_name, ['profile/fellowship',
-                                            'city' => $profile->url_city, 
+                                            'urlLoc' => $profile->url_loc, 
                                             'name' => $profile->url_name, 
                                             'id' => $profile->id]);
                     $content .=     '</h3>';
@@ -211,13 +211,13 @@ class Box3Content extends Model
 
                 case 'Special Ministry' :
                     $content = Html::a(Html::img('@web/images/special-new.jpg', ['class' => 'img-thumbnail']), ['profile/special-ministry',
-                        'city' => $profile->url_city, 
+                        'urlLoc' => $profile->url_loc, 
                         'name' => $profile->url_name, 
                         'id' => $profile->id]);
                     $content .= '<div class="caption">';
                     $content .=     '<h3>';
                     $content .=         Html::a($profile->org_name, ['profile/special-ministry',
-                                            'city' => $profile->url_city, 
+                                            'urlLoc' => $profile->url_loc, 
                                             'name' => $profile->url_name, 
                                             'id' => $profile->id]);
                     $content .=     '</h3>';
@@ -233,13 +233,13 @@ class Box3Content extends Model
 
                 case 'Mission Agency' :
                     $content = Html::a(Html::img('@web/images/mission-new.jpg', ['class' => 'img-thumbnail']), ['profile/mission-agency',
-                        'city' => $profile->url_city, 
+                        'urlLoc' => $profile->url_loc, 
                         'name' => $profile->url_name, 
                         'id' => $profile->id]);
                     $content .= '<div class="caption">';
                     $content .=     '<h3>';
                     $content .=         Html::a($profile->org_name, ['profile/mission-agency',
-                                            'city' => $profile->url_city, 
+                                            'urlLoc' => $profile->url_loc, 
                                             'name' => $profile->url_name, 
                                             'id' => $profile->id]);
                     $content .=     '</h3>';
@@ -258,13 +258,13 @@ class Box3Content extends Model
                         ($profile->ind_first_name . ' & ' . $profile->spouse_first_name . ' ' . $profile->ind_last_name) :
                         ($profile->ind_first_name . ' ' . $profile->ind_last_name);
                     $content = Html::a(Html::img('@web/images/missionary-new.jpg', ['class' => 'img-thumbnail']), ['profile/missionary',
-                        'city' => $profile->url_city, 
+                        'urlLoc' => $profile->url_loc, 
                         'name' => $profile->url_name, 
                         'id' => $profile->id]);
                     $content .= '<div class="caption">';
                     $content .=     '<h3>';
                     $content .=         Html::a($names, ['profile/missionary',
-                                            'city' => $profile->url_city, 
+                                            'urlLoc' => $profile->url_loc, 
                                             'name' => $profile->url_name, 
                                             'id' => $profile->id]);
                     $content .=     '</h3>';
@@ -281,13 +281,13 @@ class Box3Content extends Model
 
                 case 'Music Ministry' :
                     $content = Html::a(Html::img('@web/images/music-new.jpg', ['class' => 'img-thumbnail']), ['profile/music',
-                        'city' => $profile->url_city, 
+                        'urlLoc' => $profile->url_loc, 
                         'name' => $profile->url_name, 
                         'id' => $profile->id]);
                     $content .= '<div class="caption">';
                     $content .=     '<h3>';
                     $content .=         Html::a($profile->org_name, ['profile/music',
-                                            'city' => $profile->url_city, 
+                                            'urlLoc' => $profile->url_loc, 
                                             'name' => $profile->url_name, 
                                             'id' => $profile->id]);
                     $content .=     '</h3>';
@@ -303,13 +303,13 @@ class Box3Content extends Model
 
                 case 'Pastor' :
                     $content = Html::a(Html::img('@web/images/pastor-new.jpg', ['class' => 'img-thumbnail']), ['profile/pastor',
-                        'city' => $profile->url_city, 
+                        'urlLoc' => $profile->url_loc, 
                         'name' => $profile->url_name, 
                         'id' => $profile->id]);
                     $content .= '<div class="caption">';
                     $content .=     '<h3>';
                     $content .=         Html::a($profile->getFormattedNames()->formattedNames, ['profile/pastor',
-                                            'city' => $profile->url_city, 
+                                            'urlLoc' => $profile->url_loc, 
                                             'name' => $profile->url_name, 
                                             'id' => $profile->id]);
                     $content .=     '</h3>';
@@ -326,13 +326,13 @@ class Box3Content extends Model
 
                 case 'Print Ministry' :
                     $content = Html::a(Html::img('@web/images/print-new.jpg', ['class' => 'img-thumbnail']), ['profile/print',
-                        'city' => $profile->url_city, 
+                        'urlLoc' => $profile->url_loc, 
                         'name' => $profile->url_name, 
                         'id' => $profile->id]);
                     $content .= '<div class="caption">';
                     $content .=     '<h3>';
                     $content .=         Html::a($profile->org_name, ['profile/print',
-                                            'city' => $profile->url_city, 
+                                            'url_loc' => $profile->url_loc, 
                                             'name' => $profile->url_name, 
                                             'id' => $profile->id]);
                     $content .=     '</h3>';
@@ -348,13 +348,13 @@ class Box3Content extends Model
 
                 case 'School' :
                     $content = Html::a(Html::img('@web/images/school-new.jpg', ['class' => 'img-thumbnail']), ['profile/school',
-                        'city' => $profile->url_city, 
+                        'urlLoc' => $profile->url_loc, 
                         'name' => $profile->url_name, 
                         'id' => $profile->id]);
                     $content .= '<div class="caption">';
                     $content .=     '<h3>';
                     $content .=         Html::a($profile->org_name, ['profile/school',
-                                            'city' => $profile->url_city, 
+                                            'urlLoc' => $profile->url_loc, 
                                             'name' => $profile->url_name, 
                                             'id' => $profile->id]);
                     $content .=     '</h3>';
@@ -370,13 +370,13 @@ class Box3Content extends Model
 
                 case 'Staff' :
                     $content = Html::a(Html::img('@web/images/staff-new.jpg', ['class' => 'img-thumbnail']), ['profile/staff',
-                        'city' => $profile->url_city, 
+                        'urlLoc' => $profile->url_loc, 
                         'name' => $profile->url_name, 
                         'id' => $profile->id]);
                     $content .= '<div class="caption">';
                     $content .=     '<h3>';
                     $content .=         Html::a($profile->getFormattedNames()->formattedNames, ['profile/staff',
-                                            'city' => $profile->url_city, 
+                                            'urlLoc' => $profile->url_loc, 
                                             'name' => $profile->url_name, 
                                             'id' => $profile->id]);
                     $content .=     '</h3>';

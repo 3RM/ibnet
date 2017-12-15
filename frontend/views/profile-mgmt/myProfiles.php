@@ -40,7 +40,6 @@ $this->title = 'My Account';
     <div class="row">
         <div class="col-md-10">
             <div class="top-margin">
-                <p>&nbsp;&nbsp;<?= Html::icon('film') ?> <?= Html::a('How-to-videos &#187', ['/site/how-to'], ['target' => '_blank']) ?></p>
                 <p><?= Html::a(Html::icon('plus') . ' New Profile', ['profile-mgmt/terms'], ['class' => 'btn btn-primary']) ?></p>
             </div>
         </div>

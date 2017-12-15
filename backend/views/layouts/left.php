@@ -35,7 +35,7 @@ use yii\helpers\Html;
 
         <?= dmstr\widgets\Menu::widget(
             [
-                'options' => ['class' => 'sidebar-menu'],
+                'options' => ['class' => 'sidebar-menu', 'data-widget' => 'tree'],
                 'items' => [
                     ['label' => 'Tools Menu', 'options' => ['class' => 'header']],
                     ['label' => 'Stats', 'icon' => 'bar-chart', 'url' => ['stats/stats']],
@@ -82,6 +82,7 @@ use yii\helpers\Html;
                         'icon' => 'server', 
                         'url' => ['#'],
                         'items' => [
+                            ['label' => 'PHP Info', 'icon' => 'file-code-o', 'url' => ['/server/phpinfo'],],
                             ['label' => 'Cron Jobs', 'icon' => 'clock-o', 'url' => ['/server/cron'],],
                         ],
                     ],

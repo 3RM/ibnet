@@ -20,6 +20,7 @@ use yii\web\NotFoundHttpException;
  */
 class PreviewController extends ProfileFormController
 {
+    public $layout = 'bg-gray';
 
     public function behaviors()
     {
@@ -82,11 +83,7 @@ class PreviewController extends ProfileFormController
                 return $this->redirect(['/profile-mgmt/my-profiles']);
             }
 
-            $social = NULL;
-            if ($profile->social_id) {
-                $social = $profile->social;
-            }
-
+            $social = $this->getSocial($profile);
             if ($profile->org_loc && $profile->show_map == Profile::MAP_PRIMARY) {
                 $loc = explode(',', $profile->org_loc);
             } else {
@@ -98,8 +95,8 @@ class PreviewController extends ProfileFormController
 
             return $this->render('previewFlwshpAss', [
                 'profile' => $profile,
-                'loc' => $loc,
                 'social' => $social,
+                'loc' => $loc,
                 'formList' => ProfileFormController::$formList,
                 'typeMask' => $typeMask,
                 'activate' => $activate]);
@@ -129,23 +126,20 @@ class PreviewController extends ProfileFormController
                 return $this->redirect(['/profile-mgmt/my-profiles']);
             }
 
-            $social = NULL;
-            if ($profile->social_id) {
-                $social = $profile->social;
-            }
-            $typeMask = ProfileFormController::$formArray[$profile->type];
-
+            $social = $this->getSocial($profile);
             if ($profile->org_loc && $profile->show_map == Profile::MAP_PRIMARY) {
                 $loc = explode(',', $profile->org_loc);
             } else {
                 $loc = NULL;
             }
+
+            $typeMask = ProfileFormController::$formArray[$profile->type];
             $profile->status == Profile::STATUS_ACTIVE ? $activate = NULL : $activate = 1;
 
             return $this->render('previewFlwshpAss', [
                 'profile' => $profile,
-                'loc' => $loc,
                 'social' => $social,
+                'loc' => $loc,
                 'formList' => ProfileFormController::$formList,
                 'typeMask' => $typeMask,
                 'activate' => $activate]);
@@ -175,20 +169,8 @@ class PreviewController extends ProfileFormController
                 return $this->redirect(['/profile-mgmt/my-profiles']);
             }
 
-            $church = NULL;
-            $churchLink = NULL;
-            $social = NULL;
-            if ($profile->ministry_of && 
-                $church = $this->findActiveProfile($profile->ministry_of)) {
-                $churchLink = $church->org_name . ', ' . 
-                    $church->org_city . ', ' . $church->org_st_prov_reg;
-                $church->org_country == 'United States' ? NULL : 
-                    ($churchLink .= ', ' . $church->org_country);
-            }
-            if ($profile->social_id) {
-                $social = $profile->social;
-            }
-
+            $parentMinistry = $profile->ministryOf;
+            $social = $this->getSocial($profile);
             if ($profile->org_loc && $profile->show_map == Profile::MAP_PRIMARY) {
                 $loc = explode(',', $profile->org_loc);
             } else {
@@ -200,10 +182,9 @@ class PreviewController extends ProfileFormController
 
             return $this->render('previewOrg', [
                 'profile' => $profile,
-                'loc' => $loc,
+                'parentMinistry' => $parentMinistry,
                 'social' => $social,
-                'church' => $church,
-                'churchLink' => $churchLink,
+                'loc' => $loc,
                 'formList' => ProfileFormController::$formList,
                 'typeMask' => $typeMask,
                 'activate' => $activate]);
@@ -237,34 +218,13 @@ class PreviewController extends ProfileFormController
             }
 
             $profile->getformattedNames();
-            $church = NULL;
-            $churchLink = NULL;
-            $social = NULL;
-            $fellowship = NULL;
-            $flwshipLink = NULL;
-            $mission = NULL;
-            $missionLink = NULL;
-            if ($mission = $missionary->missionAgcy) {
-                if ($mission->profile_id) {
-                    $missionLink = $this->findActiveProfile($mission->profile_id);
-                }
-            }
-            if ($profile->home_church && 
-                $church = $this->findActiveProfile($profile->home_church)) {
-                $churchLink = $church->org_name . ', ' . 
-                    $church->org_city . ', ' . $church->org_st_prov_reg;
-                $church->org_country == 'United States' ? NULL : 
-                    ($churchLink .= ', ' . $church->org_country);
-            }
-            $schoolsAttended = $profile->school;                                                    // relational db call
-            if ($profile->social_id) {
-                $social = $profile->social;
-            }
-            if ($profile->flwship_id) {                                                             // Retrieve fellowship
-                $fellowship = $this->findFellowship($profile->flwship_id);                              
-                $flwshipLink = $this->findActiveProfile($fellowship->profile_id);                   // Only link to active profiles
-            }
-
+            $church = $profile->homeChurch;
+            $flwshipArray = $profile->fellowship;
+            $mission = $missionary->missionAgcy;
+            $missionLink = $this->findActiveProfile($mission->profile_id);
+            $otherMinistryArray = Staff::getOtherMinistries($profile->id);
+            $schoolsAttended = $profile->school;
+            $social = $this->getSocial($profile);
             if ($profile->ind_loc && $profile->show_map == Profile::MAP_PRIMARY) {
                 $loc = explode(',', $profile->ind_loc);
             } elseif ($church &&  $church->org_loc && $profile->show_map == Profile::MAP_CHURCH) {
@@ -278,15 +238,14 @@ class PreviewController extends ProfileFormController
 
             return $this->render('previewEvangelist', [
                 'profile' => $profile,
-                'loc' => $loc,
-                'social' => $social,
-                'fellowship' => $fellowship,
-                'flwshipLink' => $flwshipLink,
                 'church' => $church,
-                'churchLink' => $churchLink,
                 'mission' => $mission,
                 'missionLink' => $missionLink,
+                'otherMinistryArray' => $otherMinistryArray,
                 'schoolsAttended' => $schoolsAttended,
+                'flwshipArray' => $flwshipArray,
+                'social' => $social,
+                'loc' => $loc,
                 'formList' => ProfileFormController::$formList,
                 'typeMask' => $typeMask,
                 'activate' => $activate]);
@@ -317,28 +276,16 @@ class PreviewController extends ProfileFormController
             }
 
             $profile->getformattedNames();
-            $pastorLink = NULL;
-            $social = NULL;
+            if (!$pastor = Staff::getSrPastor($profile->id)) {
+                $pastor = $profile->getformattedNames();
+            } else {
+                $pastor = $pastor->getformattedNames();
+            }
+            $ministryArray = $profile->ministry;
             $programArray = $profile->program;
-            if ($staff = Staff::find()
-                ->where(['ministry_id' => $profile->id])
-                ->andWhere(['sr_pastor' => 1])
-                ->one()) {
-                $pastorLink = $this->findActiveProfile($staff->staff_id);
-            }
-            if ($profile->social_id) {
-                $social = $profile->social;
-            }
-            if (!$ministryArray = Profile::find()
-                ->where(['status' => Profile::STATUS_ACTIVE])
-                ->andWhere(['ministry_of' => $profile->id])
-                ->all()) {
-                $ministryArray = NULL;
-            }
-            
             $flwshipArray = $profile->fellowship;
             $assArray = $profile->association;
-            
+            $social = $this->getSocial($profile);
             if ($profile->org_loc && $profile->show_map == Profile::MAP_PRIMARY) {
                 $loc = explode(',', $profile->org_loc);
             } else {
@@ -350,13 +297,13 @@ class PreviewController extends ProfileFormController
 
             return $this->render('previewChurch', [
                 'profile' => $profile,
-                'loc' => $loc,
-                'social' => $social,
-                'pastorLink' => $pastorLink,
+                'pastor' => $pastor,
                 'ministryArray' => $ministryArray,
                 'programArray' => $programArray,
                 'flwshipArray' => $flwshipArray,
                 'assArray' => $assArray,
+                'social' => $social,
+                'loc' => $loc,
                 'formList' => ProfileFormController::$formList,
                 'typeMask' => $typeMask,
                 'activate' => $activate]);
@@ -387,40 +334,12 @@ class PreviewController extends ProfileFormController
             }
 
             $profile->getformattedNames();
-            $church = NULL;
-            $churchLink = NULL;
-            $ministry = NULL;
-            $ministryLink = NULL;
-            $social = NULL;
-            $fellowship = NULL;
-            $flwshipLink = NULL;
-            if ($profile->home_church && 
-                $church = $this->findActiveProfile($profile->home_church)) {
-                $churchLink = $church->org_name . ', ' . $church->org_city;
-                $church->org_st_prov_reg ? $churchLink .= ', ' . $church->org_st_prov_reg : NULL;
-                $church->org_country == 'United States' ? NULL : 
-                    ($churchLink .= ', ' . $church->org_country);
-            }
-            if ($profile->home_church && 
-                $church = $this->findActiveProfile($profile->home_church)) {
-                $churchLink = $church->org_name . ', ' . $church->org_city;
-                $church->org_st_prov_reg ? $churchLink .= ', ' . $church->org_st_prov_reg : NULL;
-                $church->org_country == 'United States' ? NULL : 
-                    ($churchLink .= ', ' . $church->org_country);
-            }
-            if ($profile->ministry_of && 
-                $ministry = $this->findActiveProfile($profile->ministry_of)) {
-                $ministryLink = $ministry->org_name . ', ' . $ministry->org_city;
-                $ministry->org_st_prov_reg ? $ministryLink .= ', ' . $ministry->org_st_prov_reg : NULL;
-                $ministry->org_country == 'United States' ? NULL : 
-                    ($ministryLink .= ', ' . $ministry->org_country);
-            }
-            $schoolsAttended = $profile->school;                                                    // relational db call
-            if ($profile->social_id) {
-                $social = $profile->social;
-            }
-            $fellowships = $profile->fellowship;
-
+            $church = $profile->homeChurch;
+            $parentMinistry = $profile->ministryOf;
+            $otherMinistryArray = Staff::getOtherMinistries($profile->id);
+            $flwshipArray = $profile->fellowship;
+            $schoolsAttended = $profile->school;
+            $social = $this->getSocial($profile);
             if ($profile->ind_loc && $profile->show_map == Profile::MAP_PRIMARY) {
                 $loc = explode(',', $profile->ind_loc);
             } elseif ($church && $church->org_loc && $profile->show_map == Profile::MAP_CHURCH) {
@@ -436,14 +355,13 @@ class PreviewController extends ProfileFormController
 
             return $this->render('previewEvangelist', [
                 'profile' => $profile,
-                'loc' => $loc,
-                'social' => $social,
-                'fellowships' => $fellowships,
                 'church' => $church,
-                'churchLink' => $churchLink,
-                'ministry' => $ministry,
-                'ministryLink' => $ministryLink,
+                'parentMinistry' => $parentMinistry,
+                'otherMinistryArray' => $otherMinistryArray,
                 'schoolsAttended' => $schoolsAttended,
+                'fellowships' => $fellowships,
+                'social' => $social,
+                'loc' => $loc,
                 'formList' => ProfileFormController::$formList,
                 'typeMask' => $typeMask,
                 'activate' => $activate]);
@@ -473,23 +391,8 @@ class PreviewController extends ProfileFormController
                 return $this->redirect(['/profile-mgmt/my-profiles']);
             }
 
-            $ministry = NULL;
-            $ministryLink = NULL;
-            $social = NULL;
-            $church = NULL;
-            $churchLink = NULL;
-            if ($profile && 
-                $profile->ministry_of && 
-                $church = $this->findActiveProfile($profile->ministry_of)) {
-                $churchLink = $church->org_name . ', ' . 
-                    $church->org_city . ', ' . $church->org_st_prov_reg;
-                $church->org_country == 'United States' ? NULL : 
-                    ($churchLink .= ', ' . $church->org_country);
-            }
-            if ($profile->social_id) {
-                $social = $profile->social;
-            }
-
+            $parentMinistry = $profile->ministryOf;
+            $social = $this->getSocial($profile);
             if ($profile->org_loc && $profile->show_map == Profile::MAP_PRIMARY) {
                 $loc = explode(',', $profile->org_loc);
             } elseif ($church && $church->org_loc && $profile->show_map == Profile::MAP_MINISTRY) {
@@ -503,10 +406,9 @@ class PreviewController extends ProfileFormController
 
             return $this->render('previewOrg', [
                 'profile' => $profile,
-                'loc' => $loc,
+                'parentMinistry' => $parentMinistry,
                 'social' => $social,
-                'church' => $church,
-                'churchLink' => $churchLink,
+                'loc' => $loc,
                 'formList' => ProfileFormController::$formList,
                 'typeMask' => $typeMask,
                 'activate' => $activate]);
@@ -540,33 +442,13 @@ class PreviewController extends ProfileFormController
             }
 
             $profile->getformattedNames();
-            $church = NULL;
-            $churchLink = NULL;
-            $churchPlant = NULL;
-            $churchPlantLink = NULL;
-            $social = NULL;
-            $mission = NULL;
-            $missionLink = NULL;
-            if ($profile->home_church && $church = $this->findActiveProfile($profile->home_church)) {
-                $churchLink = $church->org_name . ', ' . 
-                    $church->org_city . ', ' . $church->org_st_prov_reg;
-                if ($church->org_country != 'United States') { 
-                    ($churchLink .= ', ' . $church->org_country);
-                }
-            }
-            if ($missionary->cp_pastor_at && $churchPlant = $missionary->churchPlant) {
-                $churchPlantLink = $churchPlant->org_name . ', ' . 
-                $churchPlant->org_city . ', ' . $churchPlant->org_st_prov_reg;
-                if ($churchPlant->org_country != 'United States') { 
-                    ($churchPlantLink .= ', ' . $churchPlant->org_country);
-                }
-            }
-            if ($mission = $missionary->missionAgcy) {
-                if ($mission->profile_id) {
-                    $missionLink = $this->findActiveProfile($mission->profile_id);
-                }
-            }
-
+            $church = $profile->homeChurch;
+            $churchPlant = $missionary->churchPlant;
+            $mission = $missionary->missionAgcy;
+            $missionLink = $this->findActiveProfile($mission->profile_id);
+            $otherMinistryArray = Staff::getOtherMinistries($profile->id);
+            $schoolsAttended = $profile->school;
+            $social = $this->getSocial($profile);
             if ($profile->show_map == Profile::MAP_PRIMARY && !empty($profile->ind_loc)) {
                 $loc = explode(',', $profile->ind_loc);
             } elseif ($church && $church->org_loc && $profile->show_map == Profile::MAP_CHURCH) {
@@ -577,27 +459,20 @@ class PreviewController extends ProfileFormController
                 $loc = NULL;
             }
 
-            $schoolsAttended = $profile->school;
-            if ($profile->social_id) {
-                $social = $profile->social;
-            }
-
             $typeMask = ProfileFormController::$formArray[$profile->type];
             $profile->status == Profile::STATUS_ACTIVE ? $activate = NULL : $activate = 1;
 
             return $this->render('previewMissionary', [
                 'profile' => $profile,
-                'loc' => $loc,
                 'missionary' => $missionary,
-                'loc' => $loc,
-                'social' => $social,
                 'church' => $church,
-                'churchLink' => $churchLink,
-                'churchPlant' => $churchPlant,
-                'churchPlantLink' => $churchPlantLink,
-                'schoolsAttended' => $schoolsAttended,
                 'mission' => $mission,
                 'missionLink' => $missionLink,
+                'churchPlant' => $churchPlant,
+                'otherMinistryArray' => $otherMinistryArray,
+                'schoolsAttended' => $schoolsAttended,
+                'social' => $social,
+                'loc' => $loc,
                 'formList' => ProfileFormController::$formList,
                 'typeMask' => $typeMask,
                 'activate' => $activate]);
@@ -627,20 +502,8 @@ class PreviewController extends ProfileFormController
                 return $this->redirect(['/profile-mgmt/my-profiles']);
             }
 
-            $church = NULL;
-            $churchLink = NULL;
-            $social = NULL;
-            if ($profile->ministry_of && 
-                $church = $this->findActiveProfile($profile->ministry_of)) {
-                $churchLink = $church->org_name . ', ' . 
-                    $church->org_city . ', ' . $church->org_st_prov_reg;
-                $church->org_country == 'United States' ? NULL : 
-                    ($churchLink .= ', ' . $church->org_country);
-            }
-            if ($profile->social_id) {
-                $social = $profile->social;
-            }
-
+            $parentMinistry = $profile->ministryOf;
+            $social = $this->getSocial($profile);
             if ($profile->org_loc && $profile->show_map == Profile::MAP_PRIMARY) {
                 $loc = explode(',', $profile->org_loc);
             } else {
@@ -652,68 +515,9 @@ class PreviewController extends ProfileFormController
 
             return $this->render('previewOrg', [
                 'profile' => $profile,
-                'loc' => $loc,
+                'parentMinistry' => $parentMinistry,
                 'social' => $social,
-                'church' => $church,
-                'churchLink' => $churchLink,
-                'formList' => ProfileFormController::$formList,
-                'typeMask' => $typeMask,
-                'activate' => $activate]);
-        } else {
-            $this->redirect(['view-profile', 'id' => $id]);
-        }
-    }
-
-    /**
-     * Render special organization profile preview
-     * @return mixed
-     */
-    public function actionPreviewOrganization($id)
-    {
-        if (!$profile = $this->findProfile($id)) {
-            throw new NotFoundHttpException;
-        }
-        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
-            throw new NotFoundHttpException;
-        }
-        if ($profile->type == 'Special') {
-
-            if (isset($_POST['activate'])) {
-                return $this->redirect(['/profile-mgmt/activate', 'id' => $id]); 
-            } elseif (Yii::$app->request->post()) {
-                $profile->setUpdateDate();
-                return $this->redirect(['/profile-mgmt/my-profiles']);
-            }
-
-            $church = NULL;
-            $churchLink = NULL;
-            $social = NULL;
-            if ($profile->ministry_of && 
-                $church = $this->findActiveProfile($profile->ministry_of)) {
-                $churchLink = $church->org_name . ', ' . 
-                    $church->org_city . ', ' . $church->org_st_prov_reg;
-                $church->org_country == 'United States' ? NULL : 
-                    ($churchLink .= ', ' . $church->org_country);
-            }
-            if ($profile->social_id) {
-                $social = $profile->social;
-            }
-
-            if ($profile->org_loc && $profile->show_map == Profile::MAP_PRIMARY) {
-                $loc = explode(',', $profile->org_loc);
-            } else {
-                $loc = NULL;
-            }
-
-            $typeMask = ProfileFormController::$formArray[$profile->type];
-            $profile->status == Profile::STATUS_ACTIVE ? $activate = NULL : $activate = 1;
-
-            return $this->render('previewOrg', [
-                'profile' => $profile,
                 'loc' => $loc,
-                'social' => $social,
-                'church' => $church,
-                'churchLink' => $churchLink,
                 'formList' => ProfileFormController::$formList,
                 'typeMask' => $typeMask,
                 'activate' => $activate]);
@@ -744,22 +548,11 @@ class PreviewController extends ProfileFormController
             }
 
             $profile->getformattedNames();
-            $church = NULL;
-            $churchLink = NULL;
-            $social = NULL;
-            if ($profile->home_church && 
-                $church = $this->findActiveProfile($profile->home_church)) {
-                $churchLink = $church->org_name . ', ' . $church->org_city;
-                $church->org_st_prov_reg ? $churchLink .= ', ' . $church->org_st_prov_reg : NULL;
-                $church->org_country == 'United States' ? NULL : 
-                    ($churchLink .= ', ' . $church->org_country);
-            }
-            $schoolsAttended = $profile->school;
-            if ($profile->social_id) {
-                $social = $profile->social;
-            }
+            $church = $profile->homeChurch;
             $flwshipArray = $profile->fellowship;
-
+            $otherMinistryArray = Staff::getOtherMinistries($profile->id);
+            $schoolsAttended = $profile->school;
+            $social = $this->getSocial($profile);
             if ($profile->ind_loc && $profile->show_map == Profile::MAP_PRIMARY) {
                 $loc = explode(',', $profile->ind_loc);
             } elseif ($church && $church->org_loc && $profile->show_map == Profile::MAP_CHURCH) {
@@ -773,12 +566,12 @@ class PreviewController extends ProfileFormController
 
             return $this->render('previewPastor', [
                 'profile' => $profile,
-                'loc' => $loc,
-                'churchLink' => $churchLink,
                 'church' => $church,
-                'social' => $social,
-                'flwshipArray' => $flwshipArray,
+                'otherMinistryArray' => $otherMinistryArray,
                 'schoolsAttended' => $schoolsAttended,
+                'flwshipArray' => $flwshipArray,
+                'social' => $social,
+                'loc' => $loc,
                 'formList' => ProfileFormController::$formList,
                 'typeMask' => $typeMask,
                 'activate' => $activate]);
@@ -808,20 +601,8 @@ class PreviewController extends ProfileFormController
                 return $this->redirect(['/profile-mgmt/my-profiles']);
             }
 
-            $church = NULL;
-            $churchLink = NULL;
-            $social = NULL;
-            if ($profile->ministry_of && 
-                $church = $this->findActiveProfile($profile->ministry_of)) {
-                $churchLink = $church->org_name . ', ' . 
-                    $church->org_city . ', ' . $church->org_st_prov_reg;
-                $church->org_country == 'United States' ? NULL : 
-                    ($churchLink .= ', ' . $church->org_country);
-            }
-            if ($profile->social_id) {
-                $social = $profile->social;
-            }
-
+            $parentMinistry = $profile->ministryOf;
+            $social = $this->getSocial($profile);
             if ($profile->org_loc && $profile->show_map == Profile::MAP_PRIMARY) {
                 $loc = explode(',', $profile->org_loc);
             } else {
@@ -833,10 +614,9 @@ class PreviewController extends ProfileFormController
 
             return $this->render('previewOrg', [
                 'profile' => $profile,
-                'loc' => $loc,
+                'parentMinistry' => $parentMinistry,
                 'social' => $social,
-                'church' => $church,
-                'churchLink' => $churchLink,
+                'loc' => $loc,
                 'formList' => ProfileFormController::$formList,
                 'typeMask' => $typeMask,
                 'activate' => $activate]);
@@ -866,25 +646,11 @@ class PreviewController extends ProfileFormController
                 return $this->redirect(['/profile-mgmt/my-profiles']);
             }
 
-            $church = NULL;
-            $churchLink = NULL;
-            $social = NULL;
-            $accreditation = NULL;
-            if ($profile->ministry_of && 
-                $church = $this->findActiveProfile($profile->ministry_of)) {
-                $churchLink = $church->org_name . ', ' . 
-                    $church->org_city . ', ' . $church->org_st_prov_reg;
-                $church->org_country == 'United States' ? NULL : 
-                    ($churchLink .= ', ' . $church->org_country);
-            }
-            if ($profile->social_id) {
-                $social = $profile->social;
-            }
+            $parentMinistry = $profile->ministryOf;
             $schoolLevel = $profile->schoolLevel;                                                   // Create array of previously selected school levels
             usort($schoolLevel, [$this, 'level_sort']);                                             // Sort the multidimensional array
-            
             $accreditations = $profile->accreditation;
-
+            $social = $this->getSocial($profile);
             if ($profile->org_loc && $profile->show_map == Profile::MAP_PRIMARY) {
                 $loc = explode(',', $profile->org_loc);
             } elseif ($church && $church->org_loc && $profile->show_map == Profile::MAP_MINISTRY) {
@@ -898,12 +664,11 @@ class PreviewController extends ProfileFormController
 
             return $this->render('previewSchool', [
                 'profile' => $profile, 
-                'loc' => $loc,
-                'social' => $social,
                 'schoolLevel' => $schoolLevel,
-                'church' => $church,
-                'churchLink' => $churchLink,
+                'parentMinistry' => $parentMinistry,
                 'accreditations' => $accreditations,
+                'social' => $social,
+                'loc' => $loc,
                 'formList' => ProfileFormController::$formList,
                 'typeMask' => $typeMask,
                 'activate' => $activate]);
@@ -932,21 +697,9 @@ class PreviewController extends ProfileFormController
                 $profile->setUpdateDate();
                 return $this->redirect(['/profile-mgmt/my-profiles']);
             }
-        
-            $church = NULL;
-            $churchLink = NULL;
-            $social = NULL;
-            if ($profile->ministry_of && 
-                $church = $this->findActiveProfile($profile->ministry_of)) {
-                $churchLink = $church->org_name . ', ' . 
-                    $church->org_city . ', ' . $church->org_st_prov_reg;
-                $church->org_country == 'United States' ? NULL : 
-                    ($churchLink .= ', ' . $church->org_country);
-            }
-            if ($profile->social_id) {
-                $social = $profile->social;
-            }
 
+            $parentMinistry = $profile->ministryOf;
+            $social = $this->getSocial($profile);
             if ($profile->show_map == Profile::MAP_PRIMARY && !empty($profile->org_loc)) {
                 $loc = explode(',', $profile->org_loc);
             } else {
@@ -958,10 +711,9 @@ class PreviewController extends ProfileFormController
 
             return $this->render('previewOrg', [
                 'profile' => $profile,
-                'loc' => $loc,
+                'parentMinistry' => $parentMinistry,
                 'social' => $social,
-                'church' => $church,
-                'churchLink' => $churchLink,
+                'loc' => $loc,
                 'formList' => ProfileFormController::$formList,
                 'typeMask' => $typeMask,
                 'activate' => $activate]);
@@ -992,37 +744,11 @@ class PreviewController extends ProfileFormController
             }
 
             $profile->getformattedNames();
-            $ministry = NULL;
-            $ministryLink = NULL;
-            $church = NULL;
-            $churchLink = NULL;
-            $social = NULL;
-            $fellowship = NULL;
-            $flwshipLink = NULL;
-
-            if ($profile->ministry_of && 
-                $ministry = $this->findActiveProfile($profile->ministry_of)) {
-                $ministryLink = $ministry->org_name . ', ' . $ministry->org_city;
-                $ministry->org_st_prov_reg  ? ($ministryLink .= ', ' . $ministry->org_st_prov_reg) : NULL;
-                $ministry->org_country == 'United States' ? NULL : 
-                    ($ministryLink .= ', ' . $ministry->org_country);
-            }
-            if($profile->home_church && 
-                $church = $this->findActiveProfile($profile->home_church)) {
-                $churchLink = $church->org_name . ', ' . $church->org_city;
-                $church->org_st_prov_reg ? ($churchLink .= ', ' . $church->org_st_prov_reg) : NULL;
-                $church->org_country == 'United States' ? NULL : 
-                    ($churchLink .= ', ' . $church->org_country);
-            }
-            $schoolsAttended = $profile->school;                                                    // relational db call
-            if ($profile->social_id) {
-                $social = $profile->social;
-            }
-            if ($profile->flwship_id) {                                                             // Retrieve fellowship
-                $fellowship = $this->findFellowship($profile->flwship_id);                              
-                $flwshipLink = $this->findActiveProfile($fellowship->profile_id);                   // Only link to active profiles
-            }
-
+            $parentMinistry = $profile->ministryOf;
+            $church = $profile->homeChurch;
+            $otherMinistryArray = Staff::getOtherMinistries($profile->id);
+            $schoolsAttended = $profile->school;
+            $social = $this->getSocial($profile);
             if ($profile->ind_loc && $profile->show_map == Profile::MAP_PRIMARY) {
                 $loc = explode(',', $profile->ind_loc);
             } elseif ($ministry && $ministry->org_loc && $profile->show_map == Profile::MAP_MINISTRY) {
@@ -1036,15 +762,12 @@ class PreviewController extends ProfileFormController
 
             return $this->render('previewStaff', [
                 'profile' => $profile,
-                'loc' => $loc,
-                'social' => $social,
-                'fellowship' => $fellowship,
-                'flwshipLink' => $flwshipLink,
-                'ministry' => $ministry,
-                'ministryLink' => $ministryLink,
                 'church' => $church,
-                'churchLink' => $churchLink,
+                'parentMinistry' => $parentMinistry,
+                'otherMinistryArray' => $otherMinistryArray,
                 'schoolsAttended' => $schoolsAttended,
+                'social' => $social,
+                'loc' => $loc,
                 'formList' => ProfileFormController::$formList,
                 'typeMask' => $typeMask,
                 'activate' => $activate]);
@@ -1059,6 +782,36 @@ class PreviewController extends ProfileFormController
      */
     private function level_sort($a,$b) {
        return $a['id']>$b['id'];
+    }
+
+    /**
+     * Returns a social object.
+     * @param string $id
+     * @return model $social
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function getSocial($profile)
+    {
+        if ($profile->social_id) {
+            if ($social = $profile->social && !(
+                empty($social->sermonaudio) &&
+                empty($social->facebook) &&
+                empty($social->linkedin) &&
+                empty($social->twitter) &&
+                empty($social->google) &&
+                empty($social->rss) &&
+                empty($social->youtube) &&
+                empty($social->vimeo) &&
+                empty($social->pinterest) &&
+                empty($social->tumblr) &&
+                empty($social->soundcloud) &&
+                empty($social->instagram) &&
+                empty($social->flickr)
+            )) {
+                return $social;
+            }
+        }
+        return NULL;
     }
 
 }                     

@@ -40,7 +40,17 @@ class ServerController extends Controller
     }
 
     /**
-     * Displays Stats.
+     * PHP Info
+     *
+     * @return string
+     */
+    public function actionPhpinfo()
+    {
+        return $this->render('phpinfo');
+    }
+
+    /**
+     * Cron job log
      *
      * @return string
      */

@@ -73,7 +73,7 @@ return [
                 '<a
                 ction>'=>'site/<action>',
                 'markdown/<controller:\w+>/<action:\w+>' => 'markdown/<controller>/<action>',
-                '<action:association|fellowship|camp|chaplain|church|evangelist|mission-agency|missionary|music|special-ministry|pastor|print|school|staff>/<city:[A-Za-z0-9\-]+>/<name:[A-Za-z0-9\-]+>/<id:\d+>' => 'profile/<action>',
+                '<action:association|fellowship|camp|chaplain|church|evangelist|mission-agency|missionary|music|special-ministry|pastor|print|school|staff>/<urlLoc:[A-Za-z0-9\-]+>/<name:[A-Za-z0-9\-]+>/<id:\d+>' => 'profile/<action>',
                 '<controller:\w+>/<action:[A-Za-z\-]+>/<id:\d+>' => '<controller>/<action>',
                 '<controller:\w+>/<action:[A-Za-z\-]+>' => '<controller>/<action>',
             ],

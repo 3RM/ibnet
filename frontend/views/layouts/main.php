@@ -48,7 +48,7 @@ $title="IBNet | Independent Baptist Network";
 <div class="wrap" id="main-wrap">
     <?php
     NavBar::begin([
-        'brandLabel' => '<span class="fullname">IBNet | Independent Baptist Network</span> <span class="abbreviated">IBNet</span>',
+        'brandLabel' =>  '<span class="abbreviated">IBNet</span><span class="fullname">IBNet | Independent Baptist Network</span>',
         'brandUrl' => Yii::$app->homeUrl,
         'options' => [
             'class' => 'navbar-inverse navbar-fixed-top',
@@ -89,7 +89,7 @@ $title="IBNet | Independent Baptist Network";
         <p class="pull-left"><?= HTML::a('Terms', ['/site/terms']) ?> </p>
         <p class="pull-left"><?= HTML::a('Beliefs', ['/site/beliefs']) ?> </p>
 
-        <p class="pull-right">Designed by <a href="http://ifbdesign.com" target="_blank">IFBDesign</a></p>
+        <p class="pull-right">Designed by <a href="http://ifbdesign.com" target="_blank">IFBDesign</a> & <a href="https://ibnet.org" target="_blank">IBNet</a></p>
     </div>
 </footer>
 

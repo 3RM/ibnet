@@ -52,40 +52,84 @@ $this->title = 'My Account';
                 <div class = "col-md-8">
                     <div class="panel panel-default">
                         <div class="panel-heading">Timeline Events</div>
-                        <table class="table table-hover">
-                            <?php foreach ($events as $event) { 
-                                if ($event->deleted != 1) { ?>
-                                    <tr>
-                                        <td nowrap>
-                                            <?= Yii::$app->formatter->asDate($event->date, 'php:F j, Y') ?>
-                                        </td>
-                                        <td>
-                                            <?= $event->title ?>
-                                        </td>
-                                        <td>
-                                            <?= $event->description ?>
-                                        </td>
-                                        <td>
-                                            <?= Html::submitButton(Html::icon('remove'), [
+                        <table class="table">
+                        <?php foreach ($events as $event) { 
+                            if ($event->edit) { ?>
+                                <tr>
+                                    <td colspan="3" class="edit-event">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <?= $form->field($event, 'date')
+                                                    ->widget(DatePicker::classname(), [
+                                                        'name' => 'date',
+                                                        'value' => 'Event Date...',
+                                                        'removeButton' => false,
+                                                        'pluginOptions' => [
+                                                            'autoclose'=>true,
+                                                            'format' => 'mm/dd/yyyy'
+                                                        ]
+                                                ]) ?>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <?= $form->field($event, 'title')->textInput(['maxlength' => true, 'placeholder' => 'Max 50 characters...',]) ?> 
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <?= $form->field($event, 'description')->textarea(['maxlength' => true, 'rows' => 2, 'placeholder' => 'Max 1000 characters...',]) ?> 
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <?= Html::submitButton('Save', ['method' => 'POST',
+                                                    'class' => 'btn btn-form btn-sm',
+                                                    'name' => 'edit-save',
+                                                    'value' => $event->id,
+                                                ]) ?>
+                                                <?= Html::a('Cancel', ['/profile-mgmt/settings', 'id' => $profile->id], ['class' => 'btn btn-form btn-sm']) ?>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>   
+                            <?php } else { ?>
+                                <tr>
+                                    <td nowrap>
+                                        <?= Yii::$app->formatter->asDate($event->date, 'php:F j, Y') ?>
+                                    </td>
+                                    <td>
+                                        <?= $event->title ?>
+                                    </td>
+                                    <td>
+                                        <?= $event->description ?>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3" class="action-buttons">
+                                        <?php if ($action != 'edit' &&  $action != 'add') { ?>
+                                            <?= Html::submitButton('edit', [
+                                                'method' => 'POST',
+                                                'class' => 'btn btn-form btn-sm',
+                                                'name' => 'edit',
+                                                'value' => $event->id,
+                                            ]) ?>
+                                            <?= Html::submitButton('Remove', [
                                                 'method' => 'POST',
                                                 'class' => 'btn btn-form btn-sm',
                                                 'name' => 'remove',
                                                 'value' => $event->id,
                                             ]) ?>
-                                        </td>
-                                    </tr>                               
-                                <?php }
-                                } ?>
+                                        <?php } ?>
+                                    </td>
+                                </tr>
+                            <?php }                           
+                        } ?>
                         </table>
                     </div>
                 </div>
             </div>
-
         <?php } ?>
 
-
-        <?php if ($add) { ?>
-
+        <?php if ($action == 'add') { ?>
             <div class="row">
                 <div class="col-md-3">
                     <?= $form->field($history, 'date')
@@ -110,17 +154,16 @@ $this->title = 'My Account';
             </div>
             <div class="row">
                 <div class="col-md-2">
-                    <?= HTML::submitbutton('Save Event', [
+                    <?= HTML::submitbutton('Save', [
                         'method' => 'POST',
                         'class' => 'btn btn-form btn-sm',
-                        //'name' => 'submit',
+                        'name' => 'save',
                     ]) ?>
+                    <?= Html::a('Cancel', ['/profile-mgmt/settings', 'id' => $profile->id], ['class' => 'btn btn-form btn-sm']) ?>
                 </div>
             </div>
             <br>
-
         <?php } else { ?>
-
             <div class="row">
                 <div class="col-md-8">
                     <?= HTML::submitbutton(Html::icon('plus') . ' Add Event', [
@@ -130,9 +173,7 @@ $this->title = 'My Account';
                     ]) ?>
                 </div>
             </div>
-
             <br>
-
         <?php } ?>
     </div>
 

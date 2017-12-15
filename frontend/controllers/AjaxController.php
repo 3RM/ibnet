@@ -5,11 +5,12 @@ use common\models\profile\Mail;
 use common\models\profile\Profile;
 use common\models\profile\Social;
 use common\models\Utility;
+use common\models\User;
 use frontend\controllers\ProfileFormController;
 use frontend\models\Box3Content;
 use Yii;
 use yii\base\Security;
-use yii\helpers\Html;
+use yii\bootstrap\Html;
 use yii\web\Controller;
 use yii\web\Response;
 
@@ -18,6 +19,54 @@ use yii\web\Response;
  */
 class AjaxController extends Controller
 {
+
+    /**
+     * Process "like" link.
+     *
+     * @return mixed
+     */
+    public function actionLike($iLike, $likeCount, $pid)
+    {
+        if (Yii::$app->request->isAjax) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+
+            if (!Yii::$app->user->isGuest) {
+                $profile = Profile::findOne($pid);
+                $user = User::findOne(Yii::$app->user->identity->id);
+                if ($iLike) {
+                    $profile->unlink('like', $user, $delete = true);
+                    $iLike = false;
+                    $likeCount--;
+                    $likes = $likeCount > 0 ? '<span class="badge">' . $likeCount . '</span>' : NULL;
+                    $body = $likes ?
+                        $likes . Html::a(Html::icon('heart'), ['ajax/like', 'iLike' => $iLike, 'likeCount' => $likeCount, 'pid' => $profile->id], [
+                            'id' => 'like-id', 
+                            'data-on-done' => 'likeDone', 
+                            'class' => 'ind-icon']) :
+                        Html::a(Html::icon('heart-empty'), ['ajax/like', 'iLike' => $iLike, 'likeCount' => $likeCount, 'pid' => $profile->id], [
+                            'id' => 'like-id', 
+                            'data-on-done' => 'likeDone', 
+                            'class' => 'ind-icon']);
+                } else {
+                    $profile->link('like', $user);
+                    $iLike = true;
+                    $likeCount++;
+                    $body = '<span class="badge">' . $likeCount . '</span>' . Html::a(Html::icon('heart'), ['ajax/like', 'iLike' => $iLike, 'likeCount' => $likeCount, 'pid' => $profile->id], [
+                        'id' => 'like-id', 
+                        'data-on-done' => 'likeDone', 
+                        'class' => 'ind-icon heart']);
+                    Mail::sendLike($profile, $user);
+                }
+            }
+
+            $response = array(
+                'body' => $body,
+                'success' => true,
+            );
+
+            return $response;
+        }
+    }
 
     /**
      * Retrieve next new profile for content box 3 on index page.
@@ -36,6 +85,7 @@ class AjaxController extends Controller
                 'body' => $box3Content,
                 'success' => true,
             );
+
             return $response;
         }
     }

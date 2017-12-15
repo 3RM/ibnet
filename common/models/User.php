@@ -8,6 +8,7 @@ use Yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
+use yii\helpers\Html;
 use yii\helpers\Url;
 
 /**
@@ -383,15 +384,12 @@ class User extends ActiveRecord implements
      */
     public function getCommentatorUrl()
     {
-        if ($profiles = Profile::find()
+        if ($profile = Profile::find()
             ->where(['user_id' => $this->id])
             ->andWhere(['status' => Profile::STATUS_ACTIVE])
-            ->all()) {
-            foreach ($profiles as $profile) {
-                if ($profile->category == Profile::CATEGORY_IND) {
-                    return Url::to(['/profile/view-profile-by-id', 'id' => $profile->id]);
-                }
-            }
+            ->andWhere(['category' => Profile::CATEGORY_IND])
+            ->one()) {
+                return Url::to(['profile/' . ProfileController::$profilePageArray[$profile->type], 'urlLoc' => $profile->url_loc, 'name' => $profile->url_name, 'id' => $profile->id], 'https');
         }
         
         return false;
@@ -402,18 +400,10 @@ class User extends ActiveRecord implements
      */
     public function getCommentatorChurch()
     {
-        $user = Yii::$app->user->identity;
-        $church = ProfileController::findActiveProfile($user->home_church);
-        return $church->org_name;
+        $church = ProfileController::findActiveProfile($this->home_church);
+        return Html::a($church->org_name, ['/profile/church',
+            'urlLoc' => $church->url_loc, 
+            'name' => $church->url_name, 
+            'id' => $church->id]);
     }
-
-    /**
-     * @return string|false
-     */
-    public function getCommentatorChurchUrl()
-    {
-        $user = Yii::$app->user->identity;
-        return Url::to(['/profile/view-profile-by-id', 'id' => $user->home_church]);
-    }
-
 }

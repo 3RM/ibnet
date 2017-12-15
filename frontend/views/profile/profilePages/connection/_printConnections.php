@@ -4,46 +4,66 @@ use common\models\profile\Profile;
 use frontend\controllers\ProfileController;
 use yii\bootstrap\Html;
 ?>
+	
+<h3>Connections</h3>
+<hr>
 
-<div class="container">
-	
-	<h3>Connections</h3>
-	<hr>
-	
-	<div class="connection-container">
-		<?php
-		if ($parentMinistry) {
+<?php
+if ($parentMinistry) {
+	echo '<div class="connection-container">';
+		echo '<div class="connection">';
+			echo (empty($parentMinistry->image2) ? Html::img('@web/images/content/profile-logo.png'): Html::img($parentMinistry->image2)); 
+			echo '<div class="title">';
+				echo Html::a($parentMinistry->org_name . '&nbsp' . Html::icon('link', ['class' => 'internal-link']), [ProfileController::$profilePageArray[$parentMinistry->type], 'urlLoc' => $parentMinistry->url_loc, 'name' => $parentMinistry->url_name, 'id' => $parentMinistry->id]);
+				echo Html::tag('span', '<br>Parent Ministry', ['class' => 'subTitle']);
+			echo '</div>';
+		echo '</div>';
+	echo '</div>';
+	if ($parentMinistry->type == 'Church' && $pastor) {
+		echo '<div class="connection-container">';
 			echo '<div class="connection">';
-				echo '<div class="image">' . (empty($parentMinistry->image2) ? Html::img('@web/images/Profile_Image_4.jpg', ['class' => 'img-circle']): Html::img($parentMinistry->image2, ['class' => 'img-circle'])) . '</div>'; 
-				echo '<div class="title">';
-					echo Html::a($parentMinistry->org_name, [ProfileController::$profilePageArray[$parentMinistry->type], 'city' => $parentMinistry->url_city, 'name' => $parentMinistry->url_name, 'id' => $parentMinistry->id]);
-					echo Html::tag('span', '<br>Parent Ministry', ['class' => 'subTitle']);
+				echo (empty($pastor->image2) ? Html::img('@web/images/content/profile-logo.png'): Html::img($pastor->image2)); 
+					echo Html::a($pastor->getFormattedNames()->formattedNames . '&nbsp' . Html::icon('link', ['class' => 'internal-link']), [ProfileController::$profilePageArray[$pastor->type], 'urlLoc' => $pastor->url_loc, 'name' => $pastor->url_name, 'id' => $pastor->id]);
+					echo Html::tag('span', '<br>' . $pastor->sub_type . ' of ' . $church->org_name, ['class' => 'subTitle']);
 				echo '</div>';
 			echo '</div>';
-
-			if ($parentMinistry->type == 'Church' && $pastor) {
-				echo '<div class="connection">';
-					echo '<div class="image">' . (empty($pastor->image2) ? Html::img('@web/images/user.png', ['class' => 'img-circle']): Html::img($pastor->image2, ['class' => 'img-circle'])) . '</div>'; 
-						echo Html::a($pastor->getFormattedNames()->formattedNames, [ProfileController::$profilePageArray[$pastor->type], 'city' => $pastor->url_city, 'name' => $pastor->url_name, 'id' => $pastor->id]);
-						echo Html::tag('span', '<br>' . $pastor->sub_type . ' of ' . $church->org_name, ['class' => 'subTitle']);
-					echo '</div>';
+		echo '</div>';
+	}
+}
+if ($staffArray) {
+	foreach ($staffArray as $staff) {
+		echo '<div class="connection-container">';
+			echo '<div class="connection">';
+				echo (empty($staff->image2) ? Html::img('@web/images/content/profile-logo.png'): Html::img($staff->image2)); 
+					echo Html::a($staff->getFormattedNames()->formattedNames . '&nbsp' . Html::icon('link', ['class' => 'internal-link']), [ProfileController::$profilePageArray[$staff->type], 'urlLoc' => $staff->url_loc, 'name' => $staff->url_name, 'id' => $staff->id]);
+					echo Html::tag('span', '<br>Staff: ' . $staff->titleM, ['class' => 'subTitle']);
 				echo '</div>';
-			}
-		}
-		if ($staffArray) {
-			foreach ($staffArray as $staff) {
-				echo '<div class="connection">';
-					echo '<div class="image">' . (empty($staff->image2) ? Html::img('@web/images/user.png', ['class' => 'img-circle']): Html::img($staff->image2, ['class' => 'img-circle'])) . '</div>'; 
-						echo Html::a($staff->getFormattedNames()->formattedNames, [ProfileController::$profilePageArray[$staff->type], 'city' => $staff->url_city, 'name' => $staff->url_name, 'id' => $staff->id]);
-						echo Html::tag('span', '<br>Staff: ' . $staff->titleM, ['class' => 'subTitle']);
-					echo '</div>';
+			echo '</div>';
+		echo '</div>';
+	}
+}
+if ($likeArray) {
+	foreach ($likeArray as $like) {
+		echo '<div class="connection-container">';
+			echo '<div class="connection">';
+				if ($like instanceof Profile) {
+					echo (empty($like->image2) ? Html::img('@web/images/content/profile-logo.png') : Html::img($like->image2)); 
+				echo '<div class="title">';
+					echo Html::a($like->getFormattedNames()->formattedNames . '&nbsp' . Html::icon('link', ['class' => 'internal-link']), [ProfileController::$profilePageArray[$like->type], 'urlLoc' => $like->url_loc, 'name' => $like->url_name, 'id' => $like->id]);
+					echo Html::tag('span', '<br>Friend of the ministry', ['class' => 'subTitle']);
 				echo '</div>';
-			}
-		}
-		if (empty($parentMinistry) && empty($staffArray)) {
-			echo '<em>No connections found.</em>';
-		}
-		?>
-	</div>
-
-</div>
+				} else {
+					echo (empty($like->usr_image) ? Html::img('@web/images/content/user.png') : Html::img($like->usr_image)); 
+					echo '<div class="title">';
+						echo $like->screen_name;
+						echo Html::tag('span', '<br>Friend of the ministry', ['class' => 'subTitle']);
+					echo '</div>';
+				}
+			echo '</div>';
+		echo '</div>';
+	}
+}
+if (empty($parentMinistry) && empty($staffArray) && empty($likeArray)) {
+	echo '<em>No connections found.</em>';
+}
+?>

@@ -49,7 +49,7 @@ $this->title = 'My Account';
         <div class="row top-margin-28">
             <div class="col-md-2 top-margin center">
                 <?= empty($userP->usr_image) ?
-                    Html::img('@web/images/user.png', ['class' => 'img-circle']) :
+                    Html::img('@web/images/content/user.png', ['class' => 'img-circle']) :
                     Html::img($userP->usr_image, ['class' => 'img-circle']); ?>
             </div>
             <div class="col-md-8" style="padding-left:60px">

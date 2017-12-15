@@ -93,7 +93,7 @@ class Mail extends \yii\db\ActiveRecord
                     $title = 'New Link to your Church Profile';
                 $msg = Html::a($linkingProfile->ind_first_name . ' ' . $linkingProfile->ind_last_name, 
                     Url::toRoute(['profile/' . ProfileController::$profilePageArray[$linkingProfile->type], 
-                        'city' => $linkingProfile->url_city, 
+                        'urlLoc' => $linkingProfile->url_loc, 
                         'name' => $linkingProfile->url_name, 
                         'id' => $linkingProfile->id], 'https'));
                 $dir == 'UL'? 
@@ -101,7 +101,7 @@ class Mail extends \yii\db\ActiveRecord
                     $msg .= ' has just linked to ';
                 $msg .= Html::a($profile->org_name, 
                     Url::toRoute(['profile/' . ProfileController::$profilePageArray[$profile->type], 
-                        'city' => $profile->url_city, 
+                        'urlLoc' => $profile->url_loc, 
                         'name' => $profile->url_name, 
                         'id' => $profile->id], 'https')) . '.';
                 $dir == 'UL'?
@@ -130,13 +130,13 @@ class Mail extends \yii\db\ActiveRecord
                 if ($linkingProfile->category == Profile::CATEGORY_IND) {
                     $msg = Html::a($linkingProfile->ind_first_name . ' ' . $linkingProfile->ind_last_name, 
                         Url::toRoute(['profile/' . ProfileController::$profilePageArray[$linkingProfile->type], 
-                            'city' => $linkingProfile->url_city, 
+                            'urlLoc' => $linkingProfile->url_loc, 
                             'name' => $linkingProfile->url_name, 
                             'id' => $linkingProfile->id], 'https'));
                 } else {
                     $msg = Html::a($linkingProfile->org_name, 
                         Url::toRoute(['profile/' . ProfileController::$profilePageArray[$linkingProfile->type], 
-                            'city' => $linkingProfile->url_city, 
+                            'urlLoc' => $linkingProfile->url_loc, 
                             'name' => $linkingProfile->url_name, 
                             'id' => $linkingProfile->id], 'https'));
                 }
@@ -145,7 +145,7 @@ class Mail extends \yii\db\ActiveRecord
                     $msg .= ' has just linked to ';
                 $msg .= Html::a($profile->org_name, 
                     Url::toRoute(['profile/' . ProfileController::$profilePageArray[$profile->type], 
-                        'city' => $profile->url_city, 
+                        'urlLoc' => $profile->url_loc, 
                         'name' => $profile->url_name, 
                         'id' => $profile->id], 'https')) . '.';
                 if ($linkingProfile->category == Profile::CATEGORY_IND && $profile->type == 'Church') {
@@ -176,7 +176,7 @@ class Mail extends \yii\db\ActiveRecord
                     $title = 'Staff Status Confirmed';
                 $msg = Html::a($linkingProfile->org_name, 
                     Url::toRoute(['profile/' . ProfileController::$profilePageArray[$linkingProfile->type], 
-                        'city' => $linkingProfile->url_city, 
+                        'urlLoc' => $linkingProfile->url_loc, 
                         'name' => $linkingProfile->url_name, 
                         'id' => $linkingProfile->id], 'https'));
                 $dir == 'UL'? 
@@ -184,7 +184,7 @@ class Mail extends \yii\db\ActiveRecord
                     $msg .= ' has just confirmed your status as staff for your profile "';
                 $msg .= Html::a($profile->profile_name, 
                     Url::toRoute(['profile/' . ProfileController::$profilePageArray[$profile->type], 
-                        'city' => $profile->url_city, 
+                        'urlLoc' => $profile->url_loc, 
                         'name' => $profile->url_name, 
                         'id' => $profile->id], 'https')) . '".';
                 break;
@@ -196,7 +196,7 @@ class Mail extends \yii\db\ActiveRecord
                     $title = 'Staff Status Confirmed';
                 $msg = Html::a($linkingProfile->org_name, 
                     Url::toRoute(['profile/' . ProfileController::$profilePageArray[$linkingProfile->type], 
-                        'city' => $linkingProfile->url_city, 
+                        'urlLoc' => $linkingProfile->url_loc, 
                         'name' => $linkingProfile->url_name, 
                         'id' => $linkingProfile->id], 'https'));
                 $dir == 'UL'? 
@@ -204,7 +204,7 @@ class Mail extends \yii\db\ActiveRecord
                     $msg .= ' has just confirmed your status as Senior Pastor for your profile "';
                 $msg .= Html::a($profile->profile_name, 
                     Url::toRoute(['profile/' . ProfileController::$profilePageArray[$profile->type], 
-                        'city' => $profile->url_city, 
+                        'urlLoc' => $profile->url_loc, 
                         'name' => $profile->url_name, 
                         'id' => $profile->id], 'https')) . '".';
                 break;
@@ -216,7 +216,7 @@ class Mail extends \yii\db\ActiveRecord
                     $title = 'New Linked Minsitry';
                 $msg = Html::a($linkingProfile->org_name, 
                     Url::toRoute(['profile/' . ProfileController::$profilePageArray[$linkingProfile->type], 
-                        'city' => $linkingProfile->url_city, 
+                        'urlLoc' => $linkingProfile->url_loc, 
                         'name' => $linkingProfile->url_name, 
                         'id' => $linkingProfile->id], 'https'));
                 $dir == 'UL'? 
@@ -224,7 +224,7 @@ class Mail extends \yii\db\ActiveRecord
                     $msg .= ' has just added ';
                 $msg .= Html::a($profile->org_name, 
                     Url::toRoute(['profile/' . ProfileController::$profilePageArray[$profile->type], 
-                        'city' => $profile->url_city, 
+                        'urlLoc' => $profile->url_loc, 
                         'name' => $profile->url_name, 
                         'id' => $profile->id], 'https'));
                 $msg .= ' as a church program.';
@@ -238,12 +238,12 @@ class Mail extends \yii\db\ActiveRecord
                 $linkingProfile->category == Profile::CATEGORY_IND ?
                     $msg = Html::a($linkingProfile->ind_first_name . ' ' . $linkingProfile->ind_last_name, 
                         Url::toRoute(['profile/' . ProfileController::$profilePageArray[$linkingProfile->type], 
-                            'city' => $linkingProfile->url_city, 
+                            'urlLoc' => $linkingProfile->url_loc, 
                             'name' => $linkingProfile->url_name, 
                             'id' => $linkingProfile->id], 'https')) :
                     $msg = Html::a($linkingProfile->org_name, 
                         Url::toRoute(['profile/' . ProfileController::$profilePageArray[$linkingProfile->type], 
-                            'city' => $linkingProfile->url_city, 
+                            'urlLoc' => $linkingProfile->url_loc, 
                             'name' => $linkingProfile->url_name, 
                             'id' => $linkingProfile->id], 'https'));
                 if ($linkingProfile->category == Profile::CATEGORY_IND) {
@@ -257,7 +257,7 @@ class Mail extends \yii\db\ActiveRecord
                 }                
                 $msg .= Html::a($profile->org_name, 
                     Url::toRoute(['profile/' . ProfileController::$profilePageArray[$profile->type], 
-                        'city' => $profile->url_city, 
+                        'urlLoc' => $profile->url_loc, 
                         'name' => $profile->url_name, 
                         'id' => $profile->id], 'https'));
                 $linkingProfile->category == Profile::CATEGORY_IND ?
@@ -273,7 +273,7 @@ class Mail extends \yii\db\ActiveRecord
                 $msg = 'Missionary ';
                 $msg .= Html::a($linkingProfile->ind_first_name . ' ' . $linkingProfile->ind_last_name, 
                     Url::toRoute(['profile/' . ProfileController::$profilePageArray[$linkingProfile->type], 
-                        'city' => $linkingProfile->url_city, 
+                        'urlLoc' => $linkingProfile->url_loc, 
                         'name' => $linkingProfile->url_name, 
                         'id' => $linkingProfile->id], 'https'));
                 $dir == 'UL'? 
@@ -281,7 +281,7 @@ class Mail extends \yii\db\ActiveRecord
                     $msg .= ' has just linked to the ';
                 $msg .= Html::a($profile->org_name, 
                     Url::toRoute(['profile/' . ProfileController::$profilePageArray[$profile->type], 
-                        'city' => $profile->url_city, 
+                        'urlLoc' => $profile->url_loc, 
                         'name' => $profile->url_name, 
                         'id' => $profile->id], 'https')) . ' profile.';
                 break;
@@ -293,7 +293,7 @@ class Mail extends \yii\db\ActiveRecord
                     $title = 'New Linked Profile';
                 $msg = Html::a($linkingProfile->ind_first_name . ' ' . $linkingProfile->ind_last_name, 
                     Url::toRoute(['profile/' . ProfileController::$profilePageArray[$linkingProfile->type], 
-                        'city' => $linkingProfile->url_city, 
+                        'urlLoc' => $linkingProfile->url_loc, 
                         'name' => $linkingProfile->url_name, 
                         'id' => $linkingProfile->id], 'https'));
                 $dir == 'UL'? 
@@ -301,7 +301,7 @@ class Mail extends \yii\db\ActiveRecord
                     $msg .= ' has just identified ';
                 $msg .= Html::a($profile->org_name, 
                     Url::toRoute(['profile/' . ProfileController::$profilePageArray[$profile->type], 
-                        'city' => $profile->url_city, 
+                        'urlLoc' => $profile->url_loc, 
                         'name' => $profile->url_name, 
                         'id' => $profile->id], 'https'));
                 $dir == 'UL' ?
@@ -346,7 +346,7 @@ class Mail extends \yii\db\ActiveRecord
             Html::a('here', 
                 Url::toRoute([
                     'profile/' . ProfileController::$profilePageArray[$profile->type], 
-                    'city' => $profile->url_city, 
+                    'urlLoc' => $profile->url_loc, 
                     'name' => $profile->url_name,
                     'id' => $profile->id,
                     'p' => 'comments', 
@@ -363,6 +363,70 @@ class Mail extends \yii\db\ActiveRecord
             ->setFrom([\yii::$app->params['adminEmail']])
             ->setTo($user->email)
             ->setSubject('IBNet | New Comment')
+            ->send();
+
+        return true;
+    }
+
+    /**
+     * Notify a profile owner of new like
+     * 
+     * @return boolean
+     */
+    public function sendLike($profile, $likedBy)
+    {
+        if ($likedBy->emailPrefLinks != 1) {
+            return true;
+        }
+        $profileOwner = User::findOne($profile->user_id);
+        if ($likedBy->id == $profileOwner->id) {                                            // Don't send message to self
+            return true;
+        }
+        if ($likedByProfile =  Profile::find()
+                ->where(['user_id' => $likedBy->id])
+                ->andWhere(['status' => Profile::STATUS_ACTIVE])
+                ->andWhere(['category' => Profile::CATEGORY_IND])
+                ->one()) {
+            if (empty($likedByProfile->spouse_first_name)) {
+                $name = $likedByProfile->ind_first_name . ' ' . $likedByProfile->ind_last_name;
+                $pronoun = ' themself ';
+                $verb = ' has ';
+                $noun = ' a friend ';
+            } else {
+                $name = $likedByProfile->ind_first_name . ' & ' . $likedByProfile->spouse_first_name . ' ' . $likedByProfile->ind_last_name;
+                $pronoun = ' themselves ';
+                $verb = ' have ';
+                $noun = ' friends ';
+            }
+        } else {
+            $name = $likedBy->screen_name;
+            $pronoun = 'themself';
+            $verb = ' has ';
+            $noun = ' a friend';
+        }
+        $title = '<b>New Connection</b>';
+        $msg = $name . ' ' . $verb . ' identified ' . $pronoun . ' as ' . $noun . ' of your ministry on profile "'
+           . $profile->profile_name . '". Click ' . 
+            Html::a('here', 
+                Url::toRoute([
+                    'profile/' . ProfileController::$profilePageArray[$profile->type], 
+                    'urlLoc' => $profile->url_loc, 
+                    'name' => $profile->url_name,
+                    'id' => $profile->id,
+                    'p' => 'connections', 
+                    '#' => 'p'
+                ], ['target' => '_blank'])
+            ) . ' to see it.';
+        
+        Yii::$app
+            ->mailer
+            ->compose(
+                ['html' => 'notification-html'], 
+                ['title' => $title, 'message' => $msg]
+            )
+            ->setFrom([\yii::$app->params['adminEmail']])
+            ->setTo($profileOwner->email)
+            ->setSubject('IBNet | New Connection')
             ->send();
 
         return true;

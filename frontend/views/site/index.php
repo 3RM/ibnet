@@ -20,13 +20,13 @@ $this->title = '';
                 <?= $form->field($searchModel, 'term')->textInput([
                     'maxlength' => true, 
                     'class' => 'form-control',
-                    'placeholder' => 'Type search term and hit enter',
+                    'placeholder' => 'Find churches, organizations and individuals ...',
                     'autocomplete' => 'off',
                 ])->label('') ?>
                 <div class="input-group-btn">
                     <?= Html::submitButton('', [
                         'method' => 'POST',
-                        'class' => 'btn btn-default',
+                        'class' => 'btn btn-default search-icon',
                         'name' => 'search',
                     ]) ?>
                 </div>
@@ -37,21 +37,25 @@ $this->title = '';
     </div>
 </div>
 <div class="clearsearch"></div>
-<div class="wrap">
+
+<div class="header-img">
+</div>
+
+<div class="header-wh">
+    <p>Looking for that blessed hope, and the glorious appearing of the great God and our Saviour Jesus Christ; Who gave himself for us, that he might redeem us from all iniquity, and purify unto himself a peculiar people, zealous of good works. Titus 2:13-14</p>
+</div>
+<div class="header-wh-mb">
+    <p>Looking for that blessed hope, and the glorious appearing of the great God and our Saviour Jesus Christ; Ttus 2:13</p>
+</div>
+<div class="header-wh-sm">
+    <p>Looking for that blessed hope,<br>Titus 2:13</p>
+</div>
+
+<div class="wrap bg-gray">
     <div class="container">
         <div class="site-index">
-            <div class="row">
-              <div class="col-md-6 center">
-                <?= Html::a(Html::img('@web/images/main.jpg', ['class' => 'responsive']), 'https://vimeo.com/215343913', ['data-fancybox' => true]); ?>
-              </div>
-              <div class="col-md-6">
-                  <h3>What is IBNet?</h3>
-                  <p>IBNet is a growing online community of independent Baptists.  It is a church-finder.  It helps you identify IB ministries.  It aids you in connecting with others of like faith and practice.  It gives you a place to highlight your ministry.  It catalogs ministry connections, making it easier than ever to discern the lay of the land among your ministry partners.  It keeps you informed of what is happening among independent Baptists elsewhere.   It is a platform for promoting a Baptist worldview.    In short, IBNet is everything you need and expect in an online community of Baptists.</p>
-                  <p class="line-height-sm"><?= Html::a('Register &#187', ['/site/register']) ?></p>
-                  <p class="line-height-sm"><?= Html::a('How-to-videos &#187', ['/site/how-to']) ?></p>
-              </div>
-            </div>
-            <div class="row top-margin-60">
+            
+            <div class="row top-margin-40">
               <div class="col-sm-6 col-md-4">
                 <div class="thumbnail">
                   <?= Html::a(Html::img('@web/images/' . 'blog-coming-soon.jpg', ['class' => 'img-thumbnail']), ['/site/blog']) ?>
@@ -92,5 +96,3 @@ $this->title = '';
           </div>
     </div>
 </div>
-<script src="jquery.fancybox.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.0.47/jquery.fancybox.min.css" />
