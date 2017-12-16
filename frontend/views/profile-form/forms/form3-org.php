@@ -57,6 +57,13 @@ $this->title = $title;
         </div>
 
         <div class="row">
+            <div class="col-md-6">
+                <p><?= Html::icon('map-marker') ?> Input GPS coordinates if your address doesn't show up on Google maps:</p>
+                <p><?= $form->field($profile, 'org_loc')->textInput(['maxlength' => true]) ?></p>
+            </div>
+        </div>
+
+        <div class="row">
             <div class="col-md-11">
                 <p><?php if ($profile->show_map == Profile::MAP_CHURCH) {
                         echo Html::icon('map-marker') . ' Your profile currently shows a map of your home church address.';

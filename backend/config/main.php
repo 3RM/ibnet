@@ -5,14 +5,12 @@ $params = array_merge(
     require(__DIR__ . '/params.php'),
     require(__DIR__ . '/params-local.php')
 );
-
 return [
     'id' => 'app-backend',
     'basePath' => dirname(__DIR__),
     'controllerNamespace' => 'backend\controllers',
     'name' => '',
     'bootstrap' => ['log'],
-
     'modules' => [
         'gridview'=> [
             'class'=>'\kartik\grid\Module',
@@ -21,7 +19,6 @@ return [
             'class' => '\kartik\datecontrol\Module',
         ],
     ],
-
     'components' => [
         'request' => [
             'csrfParam' => '_csrf-backend',

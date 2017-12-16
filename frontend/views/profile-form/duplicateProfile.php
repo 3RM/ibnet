@@ -23,7 +23,7 @@ $this->title = 'Duplicate Profile?';
 						'/profile/view-profile',
 			   			'id' => $duplicate->id,
 			   			'name' => $duplicate->url_name,
-			   			'city' => $duplicate->url_city,
+			   			'urlLoc' => $duplicate->url_loc,
 			   		],
 			   		['target' => '_blank']) ?>
 					<?= $duplicate->ind_address1 . ', '
@@ -37,7 +37,7 @@ $this->title = 'Duplicate Profile?';
 						'/profile/view-profile',
 			   			'id' => $duplicate->id,
 			   			'name' => $duplicate->url_name,
-			   			'city' => $duplicate->url_city,
+			   			'urlLoc' => $duplicate->url_loc,
 			   		],
 			   		['target' => '_blank']) ?>
 					<?= $duplicate->org_address1 . ', '

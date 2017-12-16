@@ -110,6 +110,7 @@ class Profile extends \yii\db\ActiveRecord
 
     /**
      * @const int $MAP_* Map choices to determine which map to display on profile
+     * *_GPS indicates user entered GPS coordinates
      * Default is NULL
      */
     const MAP_PRIMARY = 10;
@@ -281,9 +282,9 @@ class Profile extends \yii\db\ActiveRecord
     // i2: Image 2
             'i2' => ['image2'],
     // lo-org: Location Organization
-            'lo-org' => ['org_address1', 'org_address2', 'org_city', 'org_st_prov_reg', 'org_zip', 'org_country', 'map', 'org_po_address1', 'org_po_address2', 'org_po_box', 'org_po_city', 'org_po_st_prov_reg', 'org_po_zip', 'org_po_country', 'url_loc'],
+            'lo-org' => ['org_address1', 'org_address2', 'org_city', 'org_st_prov_reg', 'org_zip', 'org_country', 'map', 'org_loc', 'org_po_address1', 'org_po_address2', 'org_po_box', 'org_po_city', 'org_po_st_prov_reg', 'org_po_zip', 'org_po_country', 'url_loc'],
     // lo-ind: Location Individual
-            'lo-ind' => ['ind_address1', 'ind_address2', 'ind_city', 'ind_st_prov_reg', 'ind_zip', 'ind_country', 'map', 'ind_po_address1', 'ind_po_address2', 'ind_po_box', 'ind_po_city', 'ind_po_st_prov_reg', 'ind_po_zip', 'ind_po_country', 'url_loc'],
+            'lo-ind' => ['ind_address1', 'ind_address2', 'ind_city', 'ind_st_prov_reg', 'ind_zip', 'ind_country', 'map', 'ind_loc', 'ind_po_address1', 'ind_po_address2', 'ind_po_box', 'ind_po_city', 'ind_po_st_prov_reg', 'ind_po_zip', 'ind_po_country', 'url_loc'],
     // co: Contact
             'co' => ['phone', 'email', 'email_pvt', 'website'],
     // co: Contact - Forwarding Email
@@ -467,11 +468,12 @@ class Profile extends \yii\db\ActiveRecord
             }", 'message' => 'Zip code is required for a US address.', 'on' => 'lo-org'],
             [['org_address1', 'org_address2', 'org_st_prov_reg', 'org_zip', 'org_country', 'org_po_address1', 'org_po_address2', 'org_po_box', 'org_po_st_prov_reg', 'org_po_zip', 'org_po_country'], 'default', 'value' => NULL, 'on' => 'lo-org'],
             [['org_address1', 'org_address2', 'org_city', 'org_po_address1', 'org_po_address2', 'org_po_city'], 'string', 'max' => 60, 'on' => 'lo-org'],
+            [['org_loc'], 'string', 'max' => 24, 'on' => 'lo-org'],
             [['org_po_box'], 'string', 'max' => 6, 'on' => 'lo-org'],
             [['org_st_prov_reg', 'org_po_st_prov_reg'], 'string', 'max' => 50, 'on' => 'lo-org'],
             [['org_zip', 'org_po_zip'], 'string', 'max' => 20, 'on' => 'lo-org'],
-            [['org_address1', 'org_address2', 'org_city', 'org_st_prov_reg', 'org_zip', 'org_po_address1', 'org_po_address2', 'org_po_city', 'org_po_st_prov_reg', 'org_po_zip'], 'filter', 'filter' => 'strip_tags', 'skipOnEmpty' => true, 'on' => 'lo-org'],
-            [['org_address1', 'org_address2', 'org_city', 'org_st_prov_reg', 'org_zip', 'org_po_address1', 'org_po_address2', 'org_po_city', 'org_po_st_prov_reg', 'org_po_zip'], 'trim', 'skipOnEmpty' => true, 'on' => 'lo-org'],
+            [['org_address1', 'org_address2', 'org_city', 'org_st_prov_reg', 'org_zip', 'org_po_address1', 'org_po_address2', 'org_po_city', 'org_po_st_prov_reg', 'org_po_zip', 'org_loc'], 'filter', 'filter' => 'strip_tags', 'skipOnEmpty' => true, 'on' => 'lo-org'],
+            [['org_address1', 'org_address2', 'org_city', 'org_st_prov_reg', 'org_zip', 'org_po_address1', 'org_po_address2', 'org_po_city', 'org_po_st_prov_reg', 'org_po_zip', 'org_loc'], 'trim', 'skipOnEmpty' => true, 'on' => 'lo-org'],
             [['org_address1'], 'validatePhysicalAddress', 'on' => 'lo-org'],
             [['org_po_address1'], 'validateMailingAddress', 'on' => 'lo-org'],
             [['org_po_box'], 'validateMailingAddress', 'on' => 'lo-org'],
@@ -516,11 +518,12 @@ class Profile extends \yii\db\ActiveRecord
             }", 'message' => 'Zip code is required for a US address.', 'on' => 'lo-ind'],
             [['ind_address1', 'ind_address2', 'ind_st_prov_reg', 'ind_zip', 'ind_country', 'ind_po_address1', 'ind_po_address2', 'ind_po_box', 'ind_po_st_prov_reg', 'ind_po_zip', 'ind_po_country'], 'default', 'value' => NULL, 'on' => 'lo-ind'],
             [['ind_address1', 'ind_address2', 'ind_city', 'ind_po_address1', 'ind_po_address2', 'ind_po_city'], 'string', 'max' => 60, 'on' => 'lo-ind'],
+            [['ind_loc'], 'string', 'max' => 24, 'on' => 'lo-ind'],
             [['ind_po_box'], 'string', 'max' => 6, 'on' => 'lo-ind'],
             [['ind_st_prov_reg', 'ind_po_st_prov_reg'], 'string', 'max' => 50, 'on' => 'lo-ind'],
             [['ind_zip', 'ind_po_zip'], 'string', 'max' => 20, 'on' => 'lo-ind'],
-            [['ind_address1', 'ind_address2', 'ind_city', 'ind_st_prov_reg', 'ind_zip', 'ind_po_address1', 'ind_po_address2', 'ind_po_city', 'ind_po_st_prov_reg', 'ind_po_zip'], 'filter', 'filter' => 'strip_tags', 'skipOnEmpty' => true, 'on' => 'lo-ind'],
-            [['ind_address1', 'ind_address2', 'ind_city', 'ind_st_prov_reg', 'ind_zip', 'ind_po_address1', 'ind_po_address2', 'ind_po_city', 'ind_po_st_prov_reg', 'ind_po_zip'], 'trim', 'skipOnEmpty' => true, 'on' => 'lo-ind'],
+            [['ind_address1', 'ind_address2', 'ind_city', 'ind_st_prov_reg', 'ind_zip', 'ind_po_address1', 'ind_po_address2', 'ind_po_city', 'ind_po_st_prov_reg', 'ind_po_zip', 'ind_loc'], 'filter', 'filter' => 'strip_tags', 'skipOnEmpty' => true, 'on' => 'lo-ind'],
+            [['ind_address1', 'ind_address2', 'ind_city', 'ind_st_prov_reg', 'ind_zip', 'ind_po_address1', 'ind_po_address2', 'ind_po_city', 'ind_po_st_prov_reg', 'ind_po_zip', 'ind_loc'], 'trim', 'skipOnEmpty' => true, 'on' => 'lo-ind'],
             [['ind_address1'], 'validatePhysicalAddress', 'on' => 'lo-ind'],
             [['ind_po_address1'], 'validateMailingAddress', 'on' => 'lo-ind'],
             [['ind_po_box'], 'validateMailingAddress', 'on' => 'lo-ind'],
@@ -727,6 +730,7 @@ class Profile extends \yii\db\ActiveRecord
                 'org_st_prov_reg' => 'State/Providence/Region',
                 'org_zip' => 'Postal Code',
                 'org_country' => 'Country',
+                'org_loc' => 'GPS Coordinates',
                 'map' => 'Show Google Map of this address on Profile',
                 'org_po_address1' => 'Street Address 1',
                 'org_po_address2' => 'Street Address 2',
@@ -747,6 +751,7 @@ class Profile extends \yii\db\ActiveRecord
                 'ind_st_prov_reg' => 'State/Providence/Region',
                 'ind_zip' => 'Postal Code',
                 'ind_country' => 'Country',
+                'ind_loc' => 'GPS Coordinates',
                 'map' => 'Show a Google Map of this address on my Profile',
                 'ind_po_address1' => 'Street Address 1',
                 'ind_po_address2' => 'Street Address 2',
@@ -1061,20 +1066,32 @@ class Profile extends \yii\db\ActiveRecord
                     $this->ind_country = $this->ind_po_country;
                 }
             
-                $this->ind_address1 ? $address = $this->ind_address1 . ',+' : $address = '';        // Assemble international address string for geocoding (123+Main+St,+Mullingar,+Westmeath,+Ireland)
-                $address .= $this->ind_city . ',+';
-                $address .= $this->ind_st_prov_reg . ',+';
-                $address .= $this->ind_country;
-                $address = preg_replace('/\s+/', '+', $address);                                    // Replace all spaces with "+"
+                $oldAddr = $this->getOldAttribute('ind_address1') 
+                    . $this->getOldAttribute('ind_address2')
+                    . $this->getOldAttribute('ind_city')
+                    . $this->getOldAttribute('ind_st_prov_reg')
+                    . $this->getOldAttribute('ind_country');
+                $addr = $this->ind_address1
+                    . $this->ind_address2
+                    . $this->ind_city
+                    . $this->ind_st_prov_reg
+                    . $this->ind_country;
+                if ($this->ind_loc == NULL || ($addr != $oldAddr)) {
+                    $this->ind_address1 ? $address = $this->ind_address1 . ',+' : $address = '';    // Assemble international address string for geocoding (123+Main+St,+Mullingar,+Westmeath,+Ireland)
+                    $address .= $this->ind_city . ',+';
+                    $address .= $this->ind_st_prov_reg . ',+';
+                    $address .= $this->ind_country;
+                    $address = preg_replace('/\s+/', '+', $address);                                // Replace all spaces with "+"
 
-                $geocoder = new GoogleGeocoder();
-                try{
-                    $result = $geocoder->getLatLngOfAddress($address);
-                } catch(Exception $e){
-                    //Something went wrong!
-                    echo '$e->getMessage()'; die;
+                    $geocoder = new GoogleGeocoder();
+                    try{
+                        $result = $geocoder->getLatLngOfAddress($address);
+                    } catch(Exception $e){
+                        //Something went wrong!
+                        echo '$e->getMessage()'; die;
+                    }
+                    $this->ind_loc = $result['lat'] . ',' . $result['lng'];
                 }
-                $this->ind_loc = $result['lat'] . ',' . $result['lng'];
 
                 if ($this->ind_country == 'United States') {                                        // Convert US states to abbreviations
                     $state = State::find()
@@ -1100,16 +1117,28 @@ class Profile extends \yii\db\ActiveRecord
                     $this->org_zip = $this->org_po_zip;
                     $this->org_country = $this->org_po_country;
                 }
-            
-                $this->org_address1 ? $address = $this->org_address1 . ',+' : $address = '';        // Assemble international address string for geocoding (123+Main+St,+Mullingar,+Westmeath,+Ireland)
-                $address .= $this->org_city . ',+';
-                $address .= $this->org_st_prov_reg . ',+';
-                $address .= $this->org_country;
-                $address = preg_replace('/\s+/', '+', $address);                                    // Replace all spaces with "+"
 
-                $geocoder = new GoogleGeocoder();
-                $result = $geocoder->getLatLngOfAddress($address);
-                $this->org_loc = $result['lat'] . ',' . $result['lng'];
+                $oldAddr = $this->getOldAttribute('org_address1') 
+                    . $this->getOldAttribute('org_address2')
+                    . $this->getOldAttribute('org_city')
+                    . $this->getOldAttribute('org_st_prov_reg')
+                    . $this->getOldAttribute('org_country');
+                $addr = $this->org_address1
+                    . $this->org_address2
+                    . $this->org_city
+                    . $this->org_st_prov_reg
+                    . $this->org_country;
+                if ($this->org_loc == NULL || ($addr != $oldAddr)) {
+                    $this->org_address1 ? $address = $this->org_address1 . ',+' : $address = '';    // Assemble international address string for geocoding (123+Main+St,+Mullingar,+Westmeath,+Ireland)
+                    $address .= $this->org_city . ',+';
+                    $address .= $this->org_st_prov_reg . ',+';
+                    $address .= $this->org_country;
+                    $address = preg_replace('/\s+/', '+', $address);                                // Replace all spaces with "+"
+
+                    $geocoder = new GoogleGeocoder();
+                    $result = $geocoder->getLatLngOfAddress($address);
+                    $this->org_loc = $result['lat'] . ',' . $result['lng'];
+                }
             
                 if ($this->org_country == 'United States') {                                        // Convert US states to abbreviations
                     $state = State::find()

@@ -12,7 +12,7 @@ use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-$this->title = $profile->formattedNames;
+$this->title = $profile->org_name;
 ?>
 
 <div class="my-profiles">

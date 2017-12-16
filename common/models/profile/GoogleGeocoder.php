@@ -410,7 +410,7 @@ class GoogleGeocoder{
             $status = $decodedArr['status'];
             if($status == 'ZERO_RESULTS'){
                 // throw new HTTPException('No results found!');
-                Yii::$app->session->setFlash('danger', 'The address you entered on the "Location" form did not return valid map coordinates.  Your profile will not be able to display a map for the address you entered.');
+                Yii::$app->session->setFlash('danger', 'The address you entered on the "Location" form did not return valid map coordinates.  If you want to display your location on the map, try inputing GPS coordinates on the same form.');
             }
             if($status == 'OVER_QUERY_LIMIT'){
                 // throw new HTTPException('You have reached your query limit quota!');

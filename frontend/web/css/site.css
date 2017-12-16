@@ -1017,6 +1017,8 @@ margin: 0;
     }
     .browse-card {
         height: auto;
+        display: flex;
+        flex-direction: column;
     }
     #br {
         display: none;
