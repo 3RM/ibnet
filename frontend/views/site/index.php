@@ -12,35 +12,26 @@ $count = $session->get('count');
 $this->title = '';
 ?>
 
-<div class="wrap search">
-    <div class="container">
+<div class="header-container">
+    <div class="header-img">
+        <?= Html::img('@web/images/content/ibnet-large.png') ?>
+        <div id="search-box" class="input-group">
             <?php $form = ActiveForm::begin(['id' => 'search-form']); ?>
-            <!-- Search Box -->
-            <div class="input-group row">
-                <?= $form->field($searchModel, 'term')->textInput([
-                    'maxlength' => true, 
-                    'class' => 'form-control',
-                    'placeholder' => 'Find churches, organizations and individuals ...',
-                    'autocomplete' => 'off',
-                ])->label('') ?>
-                <div class="input-group-btn">
-                    <?= Html::submitButton('', [
-                        'method' => 'POST',
-                        'class' => 'btn btn-default search-icon',
-                        'name' => 'search',
-                    ]) ?>
-                </div>
-            </div>
-            <!-- End Search Box -->
-
+            <?= $form->field($searchModel, 'term')->textInput([
+                'maxlength' => true, 
+                  'class' => 'form-control',
+                'placeholder' => 'Find churches, organizations and individuals ...',
+                'autocomplete' => 'off',
+            ])->label('') ?>
+            <?= Html::submitButton('', [
+                'method' => 'POST',
+                'class' => 'btn btn-default search-icon',
+                'name' => 'search',
+            ]) ?>
             <?php $form = ActiveForm::end(); ?>
+        </div>
     </div>
 </div>
-<div class="clearsearch"></div>
-
-<div class="header-img">
-</div>
-
 <div class="header-wh">
     <p>Looking for that blessed hope, and the glorious appearing of the great God and our Saviour Jesus Christ; Who gave himself for us, that he might redeem us from all iniquity, and purify unto himself a peculiar people, zealous of good works. Titus 2:13-14</p>
 </div>

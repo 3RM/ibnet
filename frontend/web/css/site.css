@@ -362,7 +362,7 @@ div.required label.control-label:after {
   position: absolute;
   margin-top: 56px;
   width: 380px;
-  margin-left: 50%;
+  margin-left: 55%;
 }
  .input-group {
     margin: 0 auto;
@@ -1029,11 +1029,19 @@ margin: 0;
 /* iPhones (portrait and landscape) ----------- */
 
 @media only screen and (max-width: 480px) {
-    #search-box {
-      margin-left: calc(50% - 162px);
+    #search-form {
+      width: 70%;
     }
-    .search-icon {
-      display: none;
+    #search-form .form-group {
+      float: left;
+      width: 80%;
+    }
+    #search-form .input-group-btn {
+      float: right;
+      width: 20%;
+    }
+    #search-box {
+      margin-left: calc(50% - 123px);
     }
     .header-wh-mb {
         display: none;
