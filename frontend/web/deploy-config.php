@@ -28,7 +28,7 @@ define('SECRET_ACCESS_TOKEN', 'HD$937DFJ$fhNz');
  *
  * @var string
  */
-define('REMOTE_REPOSITORY', 'git@github.com:mcki0127/ibnet.git');
+define('REMOTE_REPOSITORY', 'ibnet:mcki0127/ibnet.git');
 
 /**
  * The branch that's being deployed.

@@ -20,7 +20,7 @@ $title="IBNet | Independent Baptist Network";
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?= Html::csrfMetaTags() ?>
     <title><?= $this->title == NULL ? $title : $this->title . ' - ' . $title ?></title>
-    <meta name="description" content="IBNet is a place for Independent Baptist churches, ministries, and individuals to connect.  Now it’s easier than ever to reach out, share ideas, and much more.">
+    <meta name="description" content="IBNet is a place for independent Baptist churches, ministries, and individuals to connect.  Now it’s easier than ever to reach out, share ideas, and much more.">
     <?php $this->head() ?>
     <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
 
@@ -48,7 +48,7 @@ $title="IBNet | Independent Baptist Network";
 <div class="index-wrap crop" id="main-wrap">
     <?php
     NavBar::begin([
-        'brandLabel' =>  '<span class="abbreviated">IBNet</span><span class="fullname">IBNet | Independent Baptist Network</span>',
+        'brandLabel' =>  '<span class="abbreviated">IBNet</span><span class="fullname">IBNet | for independent Baptists everywhere</span>',
         'brandUrl' => Yii::$app->homeUrl,
         'options' => [
             'class' => 'navbar-inverse navbar-fixed-top',
