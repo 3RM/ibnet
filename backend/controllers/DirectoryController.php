@@ -119,7 +119,7 @@ class DirectoryController extends Controller
      */
     public function actionReviewAss($id)
     {
-        $model = association::findOne($id);
+        $model = Association::findOne($id);
         $model->updateAttributes(['reviewed' => 1]);
         return $this->redirect(['association']);
     }
@@ -131,7 +131,7 @@ class DirectoryController extends Controller
      */
     public function actionReviewFlwship($id)
     {
-        $model = fellowship::findOne($id);
+        $model = Fellowship::findOne($id);
         $model->updateAttributes(['reviewed' => 1]);
         return $this->redirect(['fellowship']);
     }
@@ -526,6 +526,36 @@ class DirectoryController extends Controller
         ];
 
         return $this->render('missionary', [
+            'searchModel' => $searchModel, 
+            'dataProvider' => $dataProvider,
+            'gridColumns' => $gridColumns,
+        ]);
+    }
+
+    /**
+     * Displays missionary table
+     *
+     * @return string
+     */
+    public function actionMissionaryUpdate()
+    {
+        $searchModel = new MissionaryUpdateSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->get());
+        $gridColumns = [
+            'id',
+            'missionary_id',
+            'created_at',
+            'title',
+            'mailchimp_url',
+            'pdf',
+            'youtube_url',
+            'vimeo_url',
+            'description',
+            'from_date',
+            'to_date',
+        ];
+
+        return $this->render('missionaryUpdate', [
             'searchModel' => $searchModel, 
             'dataProvider' => $dataProvider,
             'gridColumns' => $gridColumns,

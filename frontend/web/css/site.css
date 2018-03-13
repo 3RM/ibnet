@@ -866,6 +866,106 @@ margin: 0;
   background-repeat: no-repeat;
   display: inline-block;
 }
+.repo-url {
+  width: 60%;
+  padding: 2%;
+  margin: 0 auto;
+}
+#repository_link {
+  background-color: inherit;
+}
+.repo-links {
+  font-size: 0.9em;
+  width: 60%;
+  margin: -20px auto 0 auto;
+  padding: 0 10%;
+}
+.repo-links a {
+  float: right;
+}
+.repo-url-refresh {
+  background-color: transparent;
+  border: transparent;
+  color: #337ab7;
+  padding: 0 0 10px 0;
+}
+button.repo-url-refresh:hover {
+  text-decoration: underline;
+  color: #23527c;
+}
+button.repo-url-refresh:focus {
+  outline: none;
+}
+.repo-form {
+  width: 50%;
+  margin: 50px auto;
+  padding: 20px;
+  border: 6px solid #eee;
+  border-radius: 20px;
+}
+.repo-form button {
+  margin-top: 15px;
+  width: 50%;
+  float: right;
+}
+.repo-form h2 {
+  display: inline-block;
+}
+.select2 .select2-container .select2-container--krajee {
+  border-radius: 10px !important;
+}
+#mc-link {
+  float: right;
+  margin: 25px 10px 0;
+}
+.repo-update-table {
+    width: 70%;
+    margin: 0 auto;
+}
+.repo-table-icon {
+  font-size: 2.5em;
+  color: #31708f;
+  margin: 10px;
+}
+.repo-table-expires {
+  font-size: 0.8em;
+  color: #db9e26;
+  margin: -10px 0 10px 0;
+}
+.repo-table-buttons {
+  display: flex;
+  justify-content: flex-end;
+}
+.repo-table-buttons button {
+  margin: 0 2px;
+}
+div[id^="visible-result-"] {
+  margin: 12px 0 0 65%;
+  font-size: 1.1em;
+}
+a.update-visible {
+  color: #00b100;
+}
+img.repo-thumb {
+  width: 100%;
+  margin-bottom: 15px;
+  border: 2px solid black;
+}
+table.table td.repo-edit-update {
+  padding: 5% 10%;
+  box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+}
+table.table .edit-buttons a,
+table.table .edit-buttons button {
+  float: right;
+  margin: 20px 4px;
+}
+.mailchimp {
+  margin: 70px 20%;
+}
+img.mc-icon {
+  margin: 10px;
+}
 
  /*
   * 404 

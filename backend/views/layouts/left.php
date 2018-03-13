@@ -84,6 +84,7 @@ use yii\helpers\Html;
                         'items' => [
                             ['label' => 'PHP Info', 'icon' => 'file-code-o', 'url' => ['/server/phpinfo'],],
                             ['label' => 'Cron Jobs', 'icon' => 'clock-o', 'url' => ['/server/cron'],],
+                            ['label' => 'Clear Yii Cache', 'icon' => 'minus-circle', 'url' => ['/server/cron'],],
                         ],
                     ],
                     ['label' => 'Login', 'url' => ['site/login'], 'visible' => Yii::$app->user->isGuest],

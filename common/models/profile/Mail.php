@@ -36,13 +36,39 @@ class Mail extends \yii\db\ActiveRecord
     }
 
     /**
+     * User: A new Mailchimp update has been added to the missionary update page
+     * 
+     * @return boolean
+     */
+    public function sendMailchimp($email, $repoKey, $id)
+    {       
+        $repoUrl = Url::toRoute(['//site/login', 'url' => Url::toRoute(['/missionary/update-repository'], 'https')], 'https');
+        $updateUrl = Url::toRoute(['missionary/update', 'repository_key' => $repoKey, 'id' => $id], 'https');
+        $msg = 'Your recent Mailchimp campaign has been synced to your IBNet Missionary Updates page.  Visit your Updates admin page ' . 
+            Html::a('here', $repoUrl) . ' or your Updates page ' . Html::a('here', $updateUrl) . 
+            '.<br><br>Administrator<br><b>IBNet</b> | https://ibnet.org';
+        Yii::$app
+            ->mailer
+            ->compose(
+                ['html' => 'notification-html'], 
+                ['title' => 'New Missionary Update', 'message' => $msg]
+            )
+            ->setFrom([\yii::$app->params['adminEmail']])
+            ->setTo($email)
+            ->setSubject('IBNet Mailchimp Sync')
+            ->send();
+
+        return true;
+    }
+
+    /**
      * Send user notification of forwarding email activation
      * 
      * @return boolean
      */
     public function sendForwardingEmailNotif($email)
     {
-        $msg = 'Your forwarding email ' . $email . ' has been set up.<br><br>Administrator<br><b>IBNet</b> | Https://ibnet.org';
+        $msg = 'Your forwarding email ' . $email . ' has been set up.<br><br>Administrator<br><b>IBNet</b> | https://ibnet.org';
         Yii::$app
             ->mailer
             ->compose(

@@ -108,15 +108,14 @@ class Staff extends \yii\db\ActiveRecord
      */
     public function getSrPastor($id)
     {
-       
         if ($staff = self::find()
             ->where(['ministry_id' => $id])
             ->andWhere(['sr_pastor' => 1])
             ->andWhere(['confirmed' => 1])
             ->one()) {
-            return $pastor = $staff->profile;
-        } else {
-            return NULL;
+            $pastor = $staff->profile;
+            return $pastor->status == Profile::STATUS_ACTIVE ? $pastor : NULL;
         }
+        return NULL;
     }
 }

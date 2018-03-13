@@ -24,6 +24,10 @@ return [
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],
+        'mailchimp' => [
+            'class' => 'sammaye\yiichimp\Chimp',
+            'apikey' => '',
+        ],  
         'formatter' => [
             'dateFormat' => 'MM-dd-yyyy',
         ],

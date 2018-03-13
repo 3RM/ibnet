@@ -10,7 +10,7 @@ $this->title = '';
 
     <div class="body-content">
 
-        
+        <?= 'Your IP: ' . Yii::$app->request->userIP; ?>
         
 
     </div>

@@ -446,6 +446,7 @@ class PreviewController extends ProfileFormController
             $churchPlant = $missionary->churchPlant;
             $mission = $missionary->missionAgcy;
             $missionLink = $this->findActiveProfile($mission->profile_id);
+            $updates = $missionary->getPublicUpdate();
             $otherMinistryArray = Staff::getOtherMinistries($profile->id);
             $schoolsAttended = $profile->school;
             $social = $this->getSocial($profile);
@@ -469,6 +470,7 @@ class PreviewController extends ProfileFormController
                 'mission' => $mission,
                 'missionLink' => $missionLink,
                 'churchPlant' => $churchPlant,
+                'updates' => $updates,
                 'otherMinistryArray' => $otherMinistryArray,
                 'schoolsAttended' => $schoolsAttended,
                 'social' => $social,

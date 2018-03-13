@@ -88,7 +88,8 @@ $this->title = $profile->formattedNames;
 
 		<?= empty($missionary) ? NULL : $this->render('../profile/profilePages/cards/_card-missionary', ['profile' => $profile, 'missionary' => $missionary, 'church' => $church, 'churchLink' => $churchLink, 'mission' => $mission]) ?>
 		<?= empty($churchPlant) ? NULL : $this->render('../profile/profilePages/cards/_card-churchplant', ['churchPlant' => $churchPlant]) ?>
-		<?= empty($otherMinistryArray) ? NULL : $this->render('../profile/profilePages/cards/_card-otherministries', ['otherMinistryArray' => $otherMinistryArray]) ?>
+		<?= empty($updates) ? NULL : $this->render('cards/_card-missionary-updates', ['updates' => $updates]) ?>
+        <?= empty($otherMinistryArray) ? NULL : $this->render('../profile/profilePages/cards/_card-otherministries', ['otherMinistryArray' => $otherMinistryArray]) ?>
         <?= empty($schoolsAttended) ? NULL : $this->render('../profile/profilePages/cards/_card-school', ['schoolsAttended' => $schoolsAttended]) ?>
 		<?= $this->render('../profile/profilePages/cards/_card-distinctives', ['profile' => $profile]) ?>
 		<?= $this->render('../profile/profilePages/cards/_card-contact-ind', ['profile' => $profile]) ?>

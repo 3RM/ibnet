@@ -39,6 +39,8 @@ class User extends ActiveRecord implements
     const STATUS_DELETED = 0;
     const STATUS_ACTIVE = 10;
 
+    const IS_MISSIONARY = 1;
+
 
     /**
      * @inheritdoc

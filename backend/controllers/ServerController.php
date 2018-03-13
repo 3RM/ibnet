@@ -92,7 +92,7 @@ class ServerController extends Controller
                 'attribute' => 'last_execution_time',
                 'format' => 'raw',
                 'value' => function ($model) {                      
-                    return Yii::$app->formatter->asDecimal($model->last_execution_time, 5) * 1000 . ' ms';
+                    return isset($model->last_execution_time) ? Yii::$app->formatter->asDecimal($model->last_execution_time, 5) * 1000 . ' ms' : NULL;
                 },
             ],
         ];

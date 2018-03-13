@@ -356,10 +356,10 @@ class SiteController extends Controller
      *
      * @return mixed
      */
-    public function actionBlog()
-    {
-        return $this->render('blog');
-    }
+    // public function actionBlog()
+    // {
+    //     return $this->render('blog');
+    // }
 
     /**
      * Displays Grand Opening page.

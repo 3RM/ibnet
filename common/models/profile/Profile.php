@@ -4,6 +4,7 @@ namespace common\models\profile;
 
 use borales\extensions\phoneInput\PhoneInputBehavior;
 use borales\extensions\phoneInput\PhoneInputValidator;
+use common\models\missionary\Missionary;
 use common\models\profile\Country;
 use common\models\profile\FormsCompleted;
 use common\models\profile\GoogleGeocoder;
@@ -1916,6 +1917,13 @@ class Profile extends \yii\db\ActiveRecord
             $user->updateAttributes(['ind_act_profiles' => $indProfiles]);
         }
 
+        if ($this->type == 'Missionary') {
+            $user = Yii::$app->user->identity;
+            $user->updateAttributes(['is_missionary' => 1]);
+            $missionary = $this->missionary;
+            $missionary->generateRepositoryKey();
+        }
+
         $events = $this->history;                                                                   // Enter first timeline event as "Joined IBNet"
         $e = false;
         foreach ($events as $event) {
@@ -2217,7 +2225,7 @@ class Profile extends \yii\db\ActiveRecord
     }
 
     /**
-     * Links a profile to a list of approved mission agencies
+     * Returns a linked missionary record
      * @return \yii\db\ActiveQuery
      */
     public function getMissionary()
@@ -2628,10 +2636,18 @@ class Profile extends \yii\db\ActiveRecord
      */
     public function getformattedNames()
     {
-        if ($this->spouse_first_name != NULL) {
-            $this->formattedNames = $this->ind_first_name . ' (& ' . $this->spouse_first_name . ') ' . $this->ind_last_name;
+        if ($this->type == 'Missionary') {
+            if ($this->spouse_first_name != NULL) {
+                $this->formattedNames = $this->ind_first_name . ' & ' . $this->spouse_first_name . ' ' . $this->ind_last_name;
+            } else {
+                $this->formattedNames = $this->ind_first_name . ' ' . $this->ind_last_name;
+            }
         } else {
-            $this->formattedNames = $this->ind_first_name . ' ' . $this->ind_last_name;
+            if ($this->spouse_first_name != NULL) {
+                $this->formattedNames = $this->ind_first_name . ' (& ' . $this->spouse_first_name . ') ' . $this->ind_last_name;
+            } else {
+                $this->formattedNames = $this->ind_first_name . ' ' . $this->ind_last_name;
+            }
         }
         return $this;
     }

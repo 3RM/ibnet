@@ -10,29 +10,25 @@ $this->title = 'IBNet Search';
 ?>
 
 <div class="wrap search">
-    <div class="container">
-
-        <?php $form = ActiveForm::begin(['id' => 'search-form']); ?>
-        <div class="input-group row">
-
-            <?= $form->field($searchModel, 'term')->textInput([
-    			'maxlength' => true, 
-    			'class' => 'form-control',
-    			'autocomplete' => 'off'
-    		])->label('') ?>
-
-        	<div class="input-group-btn">
-        	    	
-    	    	<?= Html::submitButton('', [
-    	     	   'method' => 'POST',
-    	     	   'class' => 'btn btn-default',
-    	     	   'name' => 'search'
-    	 	   ]) ?>
-
-    		</div>
+    <div class="header-container">
+        <div class="header-img">
+            <?= Html::img('@web/images/content/ibnet-large.png') ?>
+            <div id="search-box" class="input-group">
+                <?php $form = ActiveForm::begin(['id' => 'search-form']); ?>
+                <?= $form->field($searchModel, 'term')->textInput([
+                    'maxlength' => true, 
+                    'class' => 'form-control',
+                    'autocomplete' => 'off',
+                ])->label('') ?>
+                <?= Html::submitButton('', [
+                    'method' => 'POST',
+                    'class' => 'btn btn-default search-icon',
+                    'name' => 'search',
+                ]) ?>
+                <?php $form = ActiveForm::end(); ?>
+            </div>
         </div>
-	   <?php $form = ActiveForm::end(); ?>
-	</div>
+    </div>
 </div>
 <div class="clearsearch"></div> 
 <div class="wrap">

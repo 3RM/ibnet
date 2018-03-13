@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use common\models\missionary\Missionary;
 use common\models\profile\Association;
 use common\models\profile\Country;
 use common\models\profile\Fellowship;
@@ -10,7 +11,6 @@ use common\models\Profile\Mail;
 use common\models\profile\MissHousing;
 use common\models\profile\MissHousingVisibility;
 use common\models\profile\MissionAgcy;
-use common\models\profile\Missionary;
 use common\models\profile\Profile;
 use common\models\profile\ProfileForm;
 use common\models\profile\School;

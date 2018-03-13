@@ -17,18 +17,36 @@ $this->title = 'My Account';
         <div class="row">
         <h1><?= $this->title ?></h1>
 
-        <?= Tabs::widget([
-            'items' => [
-                [
-                    'label' => 'Dashboard',
-                    'url' => ['/site/dashboard'],
+        <?= $isMissionary ? 
+            Tabs::widget([
+                'items' => [
+                    [
+                        'label' => 'Dashboard',
+                        'url' => ['/site/dashboard'],
+                    ],
+                    [
+                        'label' => 'Profiles',  
+                        'active' => true,
+                    ],
+                    [
+                        'label' => 'Updates',
+                        'url' => ['/missionary/update-repository'],
+                    ],
                 ],
-                [
-                    'label' => 'Profiles',  
-                    'active' => true,
+            ]) :
+            Tabs::widget([
+                'items' => [
+                    [
+                        'label' => 'Dashboard',
+                        'url' => ['/site/dashboard'],
+                    ],
+                    [
+                        'label' => 'Profiles',  
+                        'active' => true,
+                    ],
                 ],
-            ],
-        ]); ?>
+            ]);
+        ?>
         </div>
     </div>
 </div>

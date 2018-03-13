@@ -24,7 +24,7 @@ return [
         ],
         'gridview' =>  [
             'class' => '\kartik\grid\Module'
-        ], 
+        ],
     ],
 
     'components' => [
@@ -40,25 +40,15 @@ return [
             // this is the name of the session cookie used for login on the frontend
             'name' => 'advanced-frontend',
         ],
-        // 'log' => [
-        //     'traceLevel' => YII_DEBUG ? 3 : 0,
-        //     'targets' => [
-        //         [
-        //             'class' => 'yii\log\FileTarget',
-        //             'levels' => ['error', 'warning'],
-        //         ],
-        //         [
-        //             'class' => 'yii\log\EmailTarget',
-        //             'levels' => ['error'],
-        //             'categories' => ['yii\db\*'],  //Process all categories initially until application is stable, then process only db category
-        //             'message' => [
-        //                'from' => ['admin@ibnet.org'],
-        //                'to' => ['admin@ibnet.org'],
-        //                'subject' => 'ERROR at ibnet.org',
-        //             ],
-        //         ],
-        //     ],
-        // ],
+        'log' => [
+            'traceLevel' => YII_DEBUG ? 3 : 0,
+            'targets' => [
+                [
+                    'class' => 'yii\log\FileTarget',
+                    'levels' => ['error', 'warning'],
+                ],
+            ],
+        ],
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
@@ -70,8 +60,8 @@ return [
                 '' => 'site/index',
                 'sitemap.xml' => 'sitemap/sitemap-google-index',
                 'sitemap.<p:\d+>.xml.gz' => 'sitemap/sitemap-google-urlset',
-                '<a
-                ction>'=>'site/<action>',
+                'missionary/update/<repository_key:[A-Za-z0-9\-\_]+>/<id:\d+>' => 'missionary/update',
+                '<action>'=>'site/<action>',
                 'markdown/<controller:\w+>/<action:\w+>' => 'markdown/<controller>/<action>',
                 '<action:association|fellowship|camp|chaplain|church|evangelist|mission-agency|missionary|music|special-ministry|pastor|print|school|staff>/<urlLoc:[A-Za-z0-9\-]+>/<name:[A-Za-z0-9\-]+>/<id:\d+>' => 'profile/<action>',
                 '<controller:\w+>/<action:[A-Za-z\-]+>/<id:\d+>' => '<controller>/<action>',

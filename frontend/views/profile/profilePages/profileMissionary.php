@@ -43,6 +43,7 @@ $this->title = $profile->formattedNames;
 
 		<?= empty($missionary) ? NULL : $this->render('cards/_card-missionary', ['profile' => $profile, 'missionary' => $missionary, 'church' => $church, 'churchLink' => $churchLink, 'mission' => $mission]) ?>
 		<?= empty($churchPlant) ? NULL : $this->render('cards/_card-churchplant', ['churchPlant' => $churchPlant]) ?>
+		<?= empty($updates) ? NULL : $this->render('cards/_card-missionary-updates', ['updates' => $updates]) ?>
 		<?= empty($otherMinistryArray) ? NULL : $this->render('cards/_card-otherministries', ['otherMinistryArray' => $otherMinistryArray]) ?>
 		<?= empty($schoolsAttended) ? NULL : $this->render('cards/_card-school', ['schoolsAttended' => $schoolsAttended]) ?>
 		<?= $this->render('cards/_card-distinctives', ['profile' => $profile]) ?>

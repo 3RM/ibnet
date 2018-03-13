@@ -1,5 +1,6 @@
 <?php
 
+use common\models\User;
 use common\widgets\Alert;
 use kartik\checkbox\CheckboxX;
 use kartik\select2\Select2;
@@ -19,18 +20,36 @@ $this->title = 'My Account';
         <div class="row">
             <h1><?= Html::encode($this->title) ?></h1>
 
-            <?= Tabs::widget([
-                'items' => [
-                    [
-                        'label' => 'Dashboard',
-                        'active' => true,
+            <?= $userP->is_missionary == User::IS_MISSIONARY ?
+                Tabs::widget([
+                    'items' => [
+                        [
+                            'label' => 'Dashboard',
+                            'active' => true,
+                        ],
+                        [
+                            'label' => 'Profiles',  
+                            'url' => ['//profile-mgmt/my-profiles'],
+                        ],
+                        [
+                            'label' => 'Updates',
+                            'url' => ['//missionary/update-repository'],
+                        ],
                     ],
-                    [
-                        'label' => 'Profiles',  
-                        'url' => ['//profile-mgmt/my-profiles'],
+                ]) :
+                Tabs::widget([
+                    'items' => [
+                        [
+                            'label' => 'Dashboard',
+                            'active' => true,
+                        ],
+                        [
+                            'label' => 'Profiles',  
+                            'url' => ['//profile-mgmt/my-profiles'],
+                        ],
                     ],
-                ],
-            ]); ?>
+                ]); 
+            ?>
         </div>
     </div>
 </div>

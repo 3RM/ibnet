@@ -4,10 +4,10 @@ namespace frontend\controllers;
 
 use common\models\User;
 use common\models\Utility;
+use common\models\missionary\Missionary;
 use common\models\profile\Association;
 use common\models\profile\Fellowship;
 use common\models\profile\MissionAgcy;
-use common\models\profile\Missionary;
 use common\models\profile\Profile;
 use common\models\profile\ProfileBrowse;
 use common\models\profile\ProfileSearch;
@@ -625,7 +625,7 @@ class ProfileController extends Controller
 
         if ($profile && $profile->type == 'Church') {
             $profile->getformattedNames();
-            if (!$pastor = Staff::getSrPastor($profile->id)) {
+            if (!($pastor = Staff::getSrPastor($profile->id))) {
                 $pastor = NULL;
             } else {
                 $pastor = $pastor->getformattedNames();
@@ -964,6 +964,7 @@ class ProfileController extends Controller
             $churchPlant = $missionary->churchPlant;
             $mission = $missionary->missionAgcy;
             $missionLink = $this->findActiveProfile($mission->profile_id);
+            $updates = $missionary->getPublicUpdate();
             $otherMinistryArray = Staff::getOtherMinistries($profile->id);
             $schoolsAttended = $profile->school;
             $social = $this->getSocial($profile);
@@ -1081,6 +1082,7 @@ class ProfileController extends Controller
                 'mission' => $mission,
                 'missionLink' => $missionLink,
                 'churchPlant' => $churchPlant,
+                'updates' => $updates,
                 'schoolsAttended' => $schoolsAttended,
                 'social' => $social,
                 'loc' => $loc,

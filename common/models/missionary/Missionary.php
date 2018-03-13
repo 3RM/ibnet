@@ -1,11 +1,16 @@
 <?php
 
-namespace common\models\profile;
+namespace common\models\missionary;
 
 use common\models\profile\MissionAgcy;
+use common\models\profile\Profile;
 use common\models\SendMail;
 use common\models\User;
+use common\models\Utility;
+use common\models\missionary\MailchimpList;
+use common\models\missionary\MissionaryUpdate;
 use Yii;
+use yii\helpers\Url;
 use yii\web\UploadedFile;
 
 /**
@@ -18,9 +23,17 @@ use yii\web\UploadedFile;
 
 class Missionary extends \yii\db\ActiveRecord
 {
+    
+    /**
+     * @var string $select User selected ministry from AJAX dropdown
+     */
+    public $select;
 
-    public $select;                  // User selected ministry from AJAX dropdown
-    public $showMap;                // Accepts checkbox selection for map display on missionary church plant form
+    /**
+     * @var string $showMap Accepts checkbox selection for map display on missionary church plant form
+     */
+    public $showMap;
+
 
     /**
      * @inheritdoc
@@ -187,6 +200,130 @@ class Missionary extends \yii\db\ActiveRecord
     }
 
     /**
+     * Generate new repository key and save to missionary record
+     *
+     * @return mixed
+     */
+    public function generateRepositoryKey()
+    {
+        $randomString = Utility::generateUniqueRandomString($this, 'repository_key', 32);
+        $this->updateAttributes(['repository_key' => $randomString]);
+        
+        return true;
+    }
+
+    /**
+     * Get Mailchimp mailing lists via MC api
+     *
+     * @return array
+     */
+    public function getMCLists()
+    {
+        $client = new \sammaye\mailchimp\Chimp();
+        $client->apikey = $this->mc_token;
+        $res = $client->get('/lists');
+        return $res->lists;
+    }
+
+    /**
+     * Set Mailchimp webhooks via MC api
+     *
+     * @return boolean
+     */
+    public function setMCWebhook($listId)
+    {
+        if (empty($this->mc_key)) {
+            $string = Utility::generateUniqueRandomString($this, 'mc_key', 12);
+            $this->updateAttributes(['mc_key' => $string]);
+        }
+        $this->deleteAllMCWebhooks();                                                               // Remove all active webhooks
+        $url = Url::to(['missionary/chimp-request', 'id' => $this->id, 'mc_key' => $this->mc_key], 'https');
+        $client = new \sammaye\mailchimp\Chimp();
+        $client->apikey = $this->mc_token;
+        $res = $client->post('/lists/' . $listId . '/webhooks', [
+            'url' => $url, 
+            'events' => ['campaign' => true], 
+            'sources' => ['user' => true, 'admin' => true, 'api' => true]
+        ]);
+        return true;
+    }
+
+    /**
+     * Get Mailchimp webhooks via MC api
+     *
+     * @return boolean
+     */
+    public function getMCWebhooks($listId)
+    {
+        $client = new \sammaye\mailchimp\Chimp();
+        $client->apikey = $this->mc_token;
+        $res = $client->get('/lists/' . $listId . '/webhooks');
+        return $res->webhooks;
+    }
+
+    /**
+     * Delete Mailchimp webhooks via MC api
+     *
+     * @return boolean
+     */
+    public function deleteMCWebhook($listId, $webhookId)
+    {
+        $client = new \sammaye\mailchimp\Chimp();
+        $client->apikey = $this->mc_token;
+        $res = $client->delete('/lists/' . $listId . '/webhooks/' . $webhookId);
+        return true;
+    }
+
+    /**
+     * Get Mailchimp campaign via MC api
+     *
+     * @return array
+     */
+    public function getMCCampaign($campaignId)
+    {
+        $client = new \sammaye\mailchimp\Chimp();
+        $client->apikey = $this->mc_token;
+        $res = $client->get('/campaigns/' . $campaignId);
+        return $res;
+    }
+
+    /**
+     * Delete all Mailchimp webhooks via MC api
+     *
+     * @return boolean
+     */
+    public function deleteAllMCWebhooks()
+    {
+        $url = Url::to(['missionary/chimp-request', 'id' => $this->id, 'mc_key' => $this->mc_key], 'https');
+
+        if ($lists = $this->getMCLists()) {
+            foreach ($lists as $list) {
+                if ($webhooks = $this->getMCWebhooks($list->id)) {
+                    foreach ($webhooks as $webhook) {
+                        if ($webhook->url == $url) {
+                            $this->deleteMCWebhook($list->id, $webhook->id);
+                        }
+                    }
+                }
+                
+            }
+        }
+        return true;
+    }
+
+     /**
+     * Unsync Mailchimp from missionary account
+     *
+     * @return boolean
+     */
+    public function unsyncMC()
+    {
+        $this->deleteAllMCWebhooks();
+        $this->updateAttributes(['mc_token' => NULL, 'mc_key' => NULL]);
+        return true;
+    }
+
+    /**
      * @return \yii\db\ActiveQuery
      */
     public function getProfile()
@@ -210,4 +347,30 @@ class Missionary extends \yii\db\ActiveRecord
         return $this->hasOne(Profile::className(), ['id' => 'cp_pastor_at']);
     }
 
+    /**
+     * @return Array
+     */
+    public function getUpdate()
+    {
+        return MissionaryUpdate::find()
+            ->where(['missionary_id' => $this->id])
+            ->andwhere(['deleted' => 0])
+            ->andwhere('to_date >= NOW()')
+            ->orderBy(['created_at' => SORT_DESC])
+            ->all();
+    }
+
+    /**
+     * @return Array
+     */
+    public function getPublicUpdate()
+    {
+        return MissionaryUpdate::find()
+            ->where(['missionary_id' => $this->id])
+            ->andwhere(['deleted' => 0])
+            ->andWhere(['visible' => 1])
+            ->andwhere('to_date >= NOW()')
+            ->orderBy(['created_at' => SORT_DESC])
+            ->all();
+    }
 }

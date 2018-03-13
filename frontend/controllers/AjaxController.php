@@ -1,8 +1,10 @@
 <?php
 namespace frontend\controllers;
 
+use common\models\missionary\MissionaryUpdate;
 use common\models\profile\Mail;
 use common\models\profile\Profile;
+use common\models\profile\ProfileSearch;
 use common\models\profile\Social;
 use common\models\Utility;
 use common\models\User;
@@ -19,7 +21,7 @@ use yii\web\Response;
  */
 class AjaxController extends Controller
 {
-
+  
     /**
      * Process "like" link.
      *
@@ -168,6 +170,46 @@ class AjaxController extends Controller
                     'success' => true,
                 ];
 
+        }
+    }
+
+    /**
+     * Toggle visible switch in missionary update table
+     *
+     * @return mixed
+     */
+    public function actionUpdateVisible($id)
+    {
+        if (Yii::$app->request->isAjax) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+
+            $body = '';
+            if ($update = MissionaryUpdate::findOne($id)) {
+                if ($update->visible) {
+                    $update->updateAttributes(['visible' => 0]);
+                } else {
+                    $update->updateAttributes(['visible' => 1]);
+                }
+                $body = $update->visible ? 
+                    Html::a(Html::icon('eye-open'), ['ajax/update-visible', 'id' => $update->id], [
+                        'id' => 'visible-' . $update->id, 
+                        'data-on-done' => 'visibleDone', 
+                        'class' => 'update-visible'
+                    ]) : 
+                    Html::a(Html::icon('eye-close'), ['ajax/update-visible', 'id' => $update->id], [
+                        'id' => 'visible-' . $update->id, 
+                        'data-on-done' => 'visibleDone', 
+                    ]);
+                $response = [
+                    'body' => $body,
+                    'updateId' => $update->id,
+                    'success' => true,
+                ];
+            } else {
+                $response = ['success' => false];
+            }
+
+            return $response;
         }
     }
 }

@@ -81,7 +81,7 @@ var ajaxCallbacks = {
         $('#like-result').html(response.body);
     },
 
-     'nextDone': function (response) {
+    'nextDone': function (response) {
         // This is called by the link attribute 'data-on-done' => 'nextDone'
         $('#box3Content').html(response.body);
     },
@@ -93,5 +93,10 @@ var ajaxCallbacks = {
         if (response.success == true) {
             window.location.reload();
         }
+    },
+
+    'visibleDone': function (response) {
+        // This is called by the link attribute 'data-on-done' => 'likeDone'
+        $('#visible-result-'+response.updateId).html(response.body);
     },
 }

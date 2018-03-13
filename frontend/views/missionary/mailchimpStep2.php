@@ -1,0 +1,83 @@
+<?php
+
+use common\widgets\Alert;
+use kartik\select2\Select2;
+use yii\bootstrap\Html;
+use yii\bootstrap\Tabs;
+use yii\helpers\Url;
+use yii\widgets\ActiveForm;
+
+
+/* @var $this yii\web\View */
+/* @var $profilemodel app\models\Profile */
+
+\Eddmash\Clipboard\ClipboardAsset::register($this);
+$this->title = 'My Account';
+?>
+<div class="wrap my-profiles">
+    <div class="container">
+        <div class="row">
+        <h1><?= $this->title ?></h1>
+
+        <?= Tabs::widget([
+                'items' => [
+                    [
+                        'label' => 'Dashboard',
+                        'url' => ['/site/dashboard'],
+                    ],
+                    [
+                        'label' => 'Profiles',  
+                        'url' => ['//profile-mgmt/my-profiles'],
+                    ],
+                    [
+                        'label' => 'Updates',
+                        'active' => true,
+                    ],
+                ],
+            ]);
+        ?>
+        </div>
+    </div>
+</div>
+<div class="clearprofiles"></div>
+<?= Alert::widget() ?>
+
+<div class="container">
+	<h1>MailChimp Setup</h1>
+	<h2>Step 2 of 2</h2>
+
+	<?php if ($msg == NULL) { ?>
+		
+		<p>Select which of your Mailchimp mailing lists you would like to sync to IBNet:</p>
+		<?php $form = ActiveForm::begin(); ?>
+    	<div class="row">
+    	    <div class = "col-md-4">
+				<?= $form->field($mcList, 'select')->widget(Select2::classname(), [
+    			    'data' => $listArray,
+    			    'theme' => 'krajee',
+    			    'options' => [
+    			        'placeholder' => 'Select mailing list(s) ...', 
+    			        'multiple' => true,
+    			    ],
+    			    'pluginOptions' => ['allowClear' => true],
+    			]) ?>
+    	    </div>
+    	</div>
+    	<div class="row">
+    	    <div class = "col-md-4">
+                <?= Html::a('Cancel', ['missionary/update-repository'], ['class' => 'btn btn-primary top-margin']) ?>
+    	        <?= Html::submitButton('Submit', ['class' => 'btn btn-primary top-margin']) ?>
+    	    </div>
+    	</div>
+    	<?php $form = ActiveForm::end(); ?>
+    
+    <?php } else { ?>
+
+        <div class="top-margin">
+    	   <p><?= $msg ?></p>
+        </div>
+    	<?= Html::a('OK', ['missionary/update-repository'], ['class' => 'btn btn-primary top-margin']) ?>
+
+    <?php } ?>
+
+</div>
