@@ -12,11 +12,11 @@ use yii\widgets\ActiveForm;
 $this->title = 'Small Picture';
 ?>
 
-<div class="wrap profile-form">
+<?= $this->render('_profileFormHeader', ['profile' => $profile, 'pp' => $pp]) ?>
 
-    <?= $this->render('_profileFormHeader', ['profile' => $profile, 'pp' => $pp]) ?>
+<div class="wrap profile-form">
     
-    <div class="container-form">
+    <div class="forms-container">
 
         <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
 

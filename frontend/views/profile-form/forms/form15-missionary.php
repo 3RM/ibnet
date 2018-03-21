@@ -1,6 +1,6 @@
 <?php
 
-use common\models\profile\Missionary;
+use common\models\missionary\Missionary;
 use common\models\profile\MissionAgcy;
 use common\models\profile\Profile; 
 use common\models\Utility;
@@ -15,11 +15,11 @@ use yii\widgets\ActiveForm;
 $this->title = 'Mission Agency & Packet';
 ?>
 
+<?= $this->render('_profileFormHeader', ['profile' => $profile, 'pp' => $pp]) ?>
+
 <div class="wrap profile-form">
 
-    <?= $this->render('_profileFormHeader', ['profile' => $profile, 'pp' => $pp]) ?>
-
-    <div class="container-form">
+    <div class="forms-container">
 
         <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
 

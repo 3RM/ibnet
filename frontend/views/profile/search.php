@@ -9,7 +9,7 @@ Url::remember();
 $this->title = 'IBNet Search';
 ?>
 
-<div class="wrap search">
+<div class="search">
     <div class="header-container">
         <div class="header-img">
             <?= Html::img('@web/images/content/ibnet-large.png') ?>

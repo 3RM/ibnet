@@ -13,26 +13,21 @@ $this->title = 'Profile Forms Menu';
 $progress = $profile->getProgress();
 ?>
 
-<div class="wrap profile-form">
-
-    <div class="my-profiles">
-        <div class="row">
-            <div class="container">
-                <h1><?= $this->title ?></h1>
-                <div class = "col-md-4">
-                    <div class="progress" >
-                        <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="<?= $progressPercent ?>" aria-valuemin="0" aria-valuemax="100" style="width:<?= $progressPercent ?>%"><span style="color:#444"><?= $progressPercent ?>%</span>
-                            <span class="sr-only"><?= $progressPercent ?>% Complete</span>
-                        </div>
-                    </div>
+<div class="account-header-container">
+    <div class="account-header acc-forms-header">
+        <h1><?= Html::encode($this->title) ?></h1>
+        <div class = "col-md-4">
+            <div class="progress" >
+                <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="<?= $progressPercent ?>" aria-valuemin="0" aria-valuemax="100" style="width:<?= $progressPercent ?>%"><span style="color:#444"><?= $progressPercent ?>%</span>
+                    <span class="sr-only"><?= $progressPercent ?>% Complete</span>
                 </div>
             </div>
         </div>
     </div>
-    <div class="clearprofiles"></div>
+</div>
 
+<div class="wrap profile-form">
     <div class="container">
-
         <div class="row">
             <p>Continue where you left off or revise a completed form:</p>
         </div>

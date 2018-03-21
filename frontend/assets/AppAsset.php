@@ -14,14 +14,15 @@ class AppAsset extends AssetBundle
     public $css = [
         'css/site.css',
         'css/profilePages.css',
+        'css/userArea.css',
         'css/pushmenu.css',
         'css/glyphicons.css',
         'css/glyphicons-social.css',
+        'css/glyphicons-filetypes.css',
     ];
     public $js = [
         'js/site.js',
         'js/pushmenu.js',
-        //'js/ajax.js'
     ];
     public $depends = [
         'yii\web\YiiAsset',

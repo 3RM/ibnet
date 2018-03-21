@@ -52,13 +52,21 @@ class ProfileMgmtController extends ProfileController
      */
     public function actionMyProfiles()
     {
+        if (isset($_POST['trash'])) {
+            $this->redirect(['trash', 'id' => $_POST['trash']]);
+        }
+
         $profileArray = Profile::getProfileArray();
         foreach ($profileArray as $profile) {
             if ($profile->category == Profile::CATEGORY_ORG) {
                 $profile->unconfirmed = Staff::checkUnconfirmed($profile->id);
+            } else {
+                $profile->getformattedNames();
             }
+            $profile->events = ($profile->history != NULL);
         }
-        return $this->render('myProfiles', ['profileArray' => $profileArray]);
+        $isMissionary = (Yii::$app->user->identity->is_missionary == User::IS_MISSIONARY);
+        return $this->render('myProfiles', ['profileArray' => $profileArray, 'isMissionary' => $isMissionary]);
     }
 
     /**
@@ -297,14 +305,16 @@ class ProfileMgmtController extends ProfileController
     }
 
     /**
-     * Profile Settings
+     * Profile History
      * @param string $id
      * @return mixed
      */
-    public function actionSettings($id) 
+    public function actionHistory($id, $a = NULL) 
     {
         $profile = $this->findProfile($id); 
-        $profile->scenario = 'settings';
+        $profile->scenario = 'history';
+
+        $isMissionary = (Yii::$app->user->identity->is_missionary == User::IS_MISSIONARY);
 
         $history = new History();
         if (isset($_POST['add'])) {
@@ -322,14 +332,17 @@ class ProfileMgmtController extends ProfileController
                 if ($event->id == $_POST['edit']) {
                     $events[$i]['edit'] = 1;
                     $events[$i]['date'] = Yii::$app->formatter->asDate($event->date, 'MM/dd/yyyy');
+                    $a = $event->id;
                 }
                 $i++;
             }
-            return $this->render('settings', [
+            return $this->render('history', [
                 'profile' => $profile,
                 'history' => $history,
                 'events' => $events,
-                'action' => $action]);
+                'action' => $action,
+                'isMissionary' => $isMissionary,
+                'a' => $a]);
 
         } elseif (isset($_POST['edit-save'])) {
             $event = History::findOne($_POST['edit-save']);
@@ -338,31 +351,34 @@ class ProfileMgmtController extends ProfileController
                 $event->date = strtotime($event->date);
                 $event->save();
             }
-            $this->redirect(['settings', 'id' => $profile->id]);
+            return $this->redirect(['history', 'id' => $profile->id, 'a' => $event->id]);
 
         } elseif (isset($_POST['cancel'])) {
             $events = $profile->history;
-            return $this->render('settings', [
+            return $this->render('history', [
                 'profile' => $profile,
                 'history' => $history,
                 'events' => $events,
-                'action' => $action]);
+                'action' => $action,
+                'isMissionary' => $isMissionary]);
 
         } elseif ($history->load(Yii::$app->request->Post()) && 
             $history->validate()) {
             $history->profile_id = $profile->id;
             $history->date = strtotime($history->date);
             $history->save();
-            $this->redirect(['settings', 'id' => $profile->id]);
+            $this->redirect(['history', 'id' => $profile->id, 'isMissionary' => $isMissionary, 'a' => $history->id]);
         }
 
         $events = $profile->history;
 
-        return $this->render('settings', [
+        return $this->render('history', [
             'profile' => $profile,
             'history' => $history,
             'events' => $events,
-            'action' => $action]);                              
+            'action' => $action,
+            'isMissionary' => $isMissionary,
+            'a' => $a]);                              
     }
 
 }                     

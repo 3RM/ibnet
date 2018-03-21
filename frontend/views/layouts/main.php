@@ -63,7 +63,7 @@ $title="IBNet | Independent Baptist Network";
     if (Yii::$app->user->isGuest) {
         $menuItems[] = ['label' => 'Login', 'url' => ['/site/login']];
     } else {
-        $menuItems[] = ['label' => 'My Account', 'url' => ['/site/dashboard']];
+        $menuItems[] = ['label' => 'My Account', 'url' => ['/site/settings']];
         $menuItems[] = [
                 'label' => 'Logout (' . Yii::$app->user->identity->first_name . ')',
                 'url' => ['/site/logout'],

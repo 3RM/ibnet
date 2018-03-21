@@ -28,7 +28,7 @@ class MissionaryController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'except' => ['update'],
+                'except' => ['update', 'chimp-request'],
                 'rules' => [
                     [
                         'allow' => false,
@@ -63,13 +63,16 @@ class MissionaryController extends Controller
     {
         $user = Yii::$app->user->identity;
         if (!$user->is_missionary) {
-            $this->redirect('/site/dashboard');
+            $this->redirect('/site/settings');
         }
 
         $profile = Profile::find()
             ->where(['user_id' => $user->id])
             ->andWhere(['type' => 'Missionary'])
+            ->andWhere('`status` != ' . Profile::STATUS_TRASH)
+            ->andWhere('`status` != ' . Profile::STATUS_NEW)
             ->one();
+        $profileActive = $profile->status == Profile::STATUS_ACTIVE ? true : false;
         $missionary = $profile->missionary;
         $updates = $missionary->update;
         $newUpdate = New MissionaryUpdate(); 
@@ -121,7 +124,7 @@ class MissionaryController extends Controller
         $mcSynced = $missionary->mc_token ? true : false;
 
         return $this->render('repositoryAdmin', [
-            'profile' => $profile,
+            'profileActive' => $profileActive,
             'missionary' => $missionary,
             'repo_url' => $repo_url,
             'updates' => $updates, 
@@ -182,7 +185,7 @@ class MissionaryController extends Controller
     {
         $user = Yii::$app->user->identity;
         if (!$user->is_missionary) {
-            $this->redirect('/site/dashboard');
+            $this->redirect('/site/settings');
         }
 
         $profile = Profile::find()
@@ -225,7 +228,7 @@ class MissionaryController extends Controller
     public function actionMailchimpComplete()
     {
         if (!Yii::$app->user->identity->is_missionary) {
-            $this->redirect('/site/dashboard');
+            $this->redirect('/site/settings');
         }
 
         $code = Yii::$app->getRequest()->get('code');
@@ -254,7 +257,7 @@ class MissionaryController extends Controller
     {
         $user = Yii::$app->user->identity;
         if (!$user->is_missionary) {
-            $this->redirect('/site/dashboard');
+            $this->redirect('/site/settings');
         }
 
         $profile = Profile::find()
@@ -293,13 +296,14 @@ class MissionaryController extends Controller
      * When Mailchimp notifies of sent campaign, save relevant data in db for posting to update page
      */
     public function actionChimpRequest($id, $mc_key)
-    { 
+    {  
         $request = Yii::$app->request;
         if ($request->isPost &&
             ($request->userAgent == 'MailChimp.com') &&
             ($request->getBodyParam('type') == 'campaign') &&
             ($missionary = Missionary::findOne($id)) && 
             ($mc_key == $missionary->mc_key)) {
+            $profile = $missionary->profile;
             $campaign = $missionary->getMCCampaign($_POST['data']['id']);
             $update = New MissionaryUpdate();
             $update->missionary_id = $missionary->id;
@@ -308,10 +312,10 @@ class MissionaryController extends Controller
             $update->mailchimp_url = $campaign->archive_url;
             $update->from_date = new Expression('CURDATE()');
             $update->to_date = new Expression('DATE_ADD(CURDATE(), INTERVAL 1 YEAR)');
+            $update->profile_inactive = ($profile->status == Profile::STATUS_INACTIVE ? 1 : 0);     // If profile is not active, save mailchimp upate but mark inactive
             if ($update->validate()) {
                 $update->save();
             }
-            $profile = $missionary->profile;
             $user = $profile->user;
             Mail::sendMailchimp($user->email, $missionary->repository_key, $missionary->id);        // email user       
         }

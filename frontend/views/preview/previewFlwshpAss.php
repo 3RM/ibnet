@@ -14,35 +14,8 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 $this->title = $profile->org_name;
 ?>
-<div class="my-profiles">
-    <div class="row">
-        <div class="container">
-        	<?= $activate ? 
-        		'<h1>' . Html::icon('edit') . ' Preview & Activate</h1>' :
-            	'<h1>' . Html::icon('edit') . ' Preview & Edit</h1>' ?>
-            <div id="open" class="progress-menu"><?= Html::a(Html::icon('menu-hamburger') . ' Open Edit Menu', '#') ?></div>
-            <br />
-            <br />
-            <?php $profile->status == Profile::STATUS_ACTIVE ? 
-            	print('<p class="progress-menu">' . Html::a(Url::toRoute(['profile/' . ProfileController::$profilePageArray[$profile->type], 'urlLoc' => $profile->url_loc, 'name' => $profile->url_name, 'id' => $profile->id], 'https') . ' ' . Html::icon('new-window'), ['profile/' . ProfileController::$profilePageArray[$profile->type],	'urlLoc' => $profile->url_loc, 'name' => $profile->url_name, 'id' => $profile->id], ['target' => '_blank']) . '</p>') :
-            	NULL; ?>
-            <?php $form = ActiveForm::begin(); ?>
-            <?= $activate ?
-            	Html::submitButton('Activate', [
-            		'method' => 'POST',
-            		'class' => 'btn btn-preview pull-right',
-            		'name' => 'activate',
-        		]) :
-            	Html::submitButton('Finished', [
-            		'method' => 'POST',
-            		'class' => 'btn btn-preview pull-right',
-            		'name' => 'finished',
-        		]) ?>
-        	<?php ActiveForm::end(); ?>
-        </div>
-    </div>
-</div>
-<div class="clearprofiles"></div>
+
+<?= $this->render('_previewHeader', ['profile' => $profile, 'activate' => $activate]) ?>
 
 <div id="pm_menu" class="pm_close">
 	<h2>Edit Menu</h2>
@@ -59,7 +32,7 @@ $this->title = $profile->org_name;
 </div>
 <br />
 
-<div class="profile">
+<div class="profile preview-profile">
 	<div class="profile-main">
 
 		<div class="img1"><?= empty($profile->image1) ? Html::img('@web/images/content/banner6.jpg', ['alt' => 'Header Image']) : Html::img($profile->image1, ['alt' => 'Header Image']) ?></div>

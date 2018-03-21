@@ -49,7 +49,7 @@ $title="IBNet | Independent Baptist Network";
 <div class="wrap" id="main-wrap">
     <?php
     NavBar::begin([
-        'brandLabel' =>  '<span class="abbreviated">IBNet</span><span class="fullname">IBNet | for Independent Baptists everywhere</span><br><span style="color:red; font-size:0.5em">Development Server</span>',
+        'brandLabel' =>  '<span class="abbreviated">IBNet</span><span class="fullname">IBNet | for Independent Baptists everywhere</span>',
         'brandUrl' => Yii::$app->homeUrl,
         'options' => [
             'class' => 'navbar-inverse navbar-fixed-top',
@@ -64,7 +64,7 @@ $title="IBNet | Independent Baptist Network";
     if (Yii::$app->user->isGuest) {
         $menuItems[] = ['label' => 'Login', 'url' => ['/site/login']];
     } else {
-        $menuItems[] = ['label' => 'My Account', 'url' => ['/site/dashboard']];
+        $menuItems[] = ['label' => 'My Account', 'url' => ['/site/settings']];
         $menuItems[] = [
                 'label' => 'Logout (' . Yii::$app->user->identity->first_name . ')',
                 'url' => ['/site/logout'],

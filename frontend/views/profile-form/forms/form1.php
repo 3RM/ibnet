@@ -12,11 +12,11 @@ use yii\widgets\ActiveForm;
 $this->title = 'Large Picture';
 ?>
 
+<?= $this->render('_profileFormHeader', ['profile' => $profile, 'pp' => $pp]) ?>
+
 <div class="wrap profile-form">
 
-    <?= $this->render('_profileFormHeader', ['profile' => $profile, 'pp' => $pp]) ?>
-
-    <div class="container-form">
+    <div class="forms-container">
 
         <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
 
@@ -26,7 +26,7 @@ $this->title = 'Large Picture';
 
             <h2>Upload:</h2>
 
-            <div style="width:800px">
+            <div class="forms-image1-widget">
                 <?= $form->field($profile, 'image1')->widget(\sadovojav\cutter\Cutter::className(), [
                     'cropperOptions' => [
                         'viewMode' => 1,    
@@ -47,32 +47,32 @@ $this->title = 'Large Picture';
 
             <p><?= HTML::submitbutton(Html::img('@web/images/content/banner1.jpg'), [
                     'method' => 'POST',
-                    'class' => 'btn btn-banner',
+                    'class' => 'btn forms-btn-banner',
                     'name' => 'banner1',
                 ]) ?></p>
             <p><?= HTML::submitbutton(Html::img('@web/images/content/banner2.jpg'), [
                     'method' => 'POST',
-                    'class' => 'btn btn-banner',
+                    'class' => 'btn forms-btn-banner',
                     'name' => 'banner2',
                 ]) ?></p>
             <p><?= HTML::submitbutton(Html::img('@web/images/content/banner3.jpg'), [
                     'method' => 'POST',
-                    'class' => 'btn btn-banner',
+                    'class' => 'btn forms-btn-banner',
                     'name' => 'banner3',
                 ]) ?></p>
             <p><?= HTML::submitbutton(Html::img('@web/images/content/banner4.jpg'), [
                     'method' => 'POST',
-                    'class' => 'btn btn-banner',
+                    'class' => 'btn forms-btn-banner',
                     'name' => 'banner4',
                 ]) ?></p>
             <p><?= HTML::submitbutton(Html::img('@web/images/content/banner5.jpg'), [
                     'method' => 'POST',
-                    'class' => 'btn btn-banner',
+                    'class' => 'btn forms-btn-banner',
                     'name' => 'banner5',
                 ]) ?></p>
             <p><?= HTML::submitbutton(Html::img('@web/images/content/banner6.jpg'), [
                     'method' => 'POST',
-                    'class' => 'btn btn-banner',
+                    'class' => 'btn forms-btn-banner',
                     'name' => 'banner6',
                 ]) ?></p>
         </div>

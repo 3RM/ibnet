@@ -1,11 +1,9 @@
 <?php
 
 use common\models\User;
-use common\widgets\Alert;
 use kartik\checkbox\CheckboxX;
 use kartik\select2\Select2;
 use yii\bootstrap\Html;
-use yii\bootstrap\Tabs;
 use yii\grid\GridView;
 use yii\helpers\Url;
 use yii\web\JsExpression;
@@ -13,73 +11,25 @@ use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $dataProvider yii\data\ActiveDataProvider */
-$this->title = 'My Account';
 ?>
-<div class="wrap my-profiles">
-    <div class="container">
-        <div class="row">
-            <h1><?= Html::encode($this->title) ?></h1>
+<?= $this->render('_userAreaHeader', ['menuItems' => $menuItems, 'active' => 'settings']) ?>
+<div class="container">
+    <?= $this->render('../site/_userAreaLeftNav', ['active' => 'settings']) ?>
 
-            <?= $userP->is_missionary == User::IS_MISSIONARY ?
-                Tabs::widget([
-                    'items' => [
-                        [
-                            'label' => 'Dashboard',
-                            'active' => true,
-                        ],
-                        [
-                            'label' => 'Profiles',  
-                            'url' => ['//profile-mgmt/my-profiles'],
-                        ],
-                        [
-                            'label' => 'Updates',
-                            'url' => ['//missionary/update-repository'],
-                        ],
-                    ],
-                ]) :
-                Tabs::widget([
-                    'items' => [
-                        [
-                            'label' => 'Dashboard',
-                            'active' => true,
-                        ],
-                        [
-                            'label' => 'Profiles',  
-                            'url' => ['//profile-mgmt/my-profiles'],
-                        ],
-                    ],
-                ]); 
-            ?>
+    <div class="right-content">
+        <h2>Personal Settings</h2>
+        <div class="personal-settings">
+            <?= empty($userP->usr_image) ?
+                Html::img('@web/images/content/user.png', ['class' => 'img-circle']) :
+                Html::img($userP->usr_image, ['class' => 'img-circle']); ?>
+            <div class="personal-info">
+                <p class="lead"><b>Screen Name:</b> <?= $userP->screen_name ?></p>
+                <p class="lead"><b>Home Church:</b> <?= $home_church ?></p>
+                <p class="lead"><b>Primary Role:</b> <?= $userP->role ?></p>
+                <p class="lead"><b>Joined:</b> <?= Yii::$app->formatter->asDate($userP->created_at, 'php:F Y') ?></p>
+            </div> 
         </div>
-    </div>
-</div>
-<div class="clearprofiles"></div>
-<?= Alert::widget() ?>
-
-<div class="profile-owner-index dashboard">
-    <div class="container">
-
-        <div class="row top-margin">
-            <div class="col-md-4">
-                <h2>Personal Settings</h2>
-            </div>
-        </div>
-
-        <div class="row top-margin-28">
-            <div class="col-md-2 top-margin center">
-                <?= empty($userP->usr_image) ?
-                    Html::img('@web/images/content/user.png', ['class' => 'img-circle']) :
-                    Html::img($userP->usr_image, ['class' => 'img-circle']); ?>
-            </div>
-            <div class="col-md-8" style="padding-left:60px">
-                <h4 class="lead"><b>Screen Name:</b> <?= $userP->screen_name ?></h4>
-                <h4 class="lead"><b>Home Church:</b> <?= $home_church ?></h4>
-                <h4 class="lead"><b>Primary Role:</b> <?= $userP->role ?></h4>
-                <h4 class="lead"><b>Joined:</b> <?= Yii::$app->formatter->asDate($userP->created_at, 'php:F Y') ?></h4>
-            </div>
-        </div>
-                
-        <div class="row">
+        <div class="settings-form-link">
             <a href="#personal-settings" id="personal-settings">edit<span class="glyphicon glyphicon-triangle-bottom small"></span></a>
         </div>
 
@@ -87,10 +37,9 @@ $this->title = 'My Account';
             'action' => 'personal-settings', 
             'options' => ['enctype' => 'multipart/form-data']
         ]); ?>
-
         <div class="row edit-personal" style="display: none;">
-            <div class="col-md-6 personal">
-                
+            <div class="col-md-6 settings-form">
+                    
                 <?= $form->field($userP, 'screen_name')->textInput(['maxlength' => true]) ?>
                 <?php echo $form->field($userP, 'home_church')->widget(Select2::classname(), [ 
                     'options' => ['placeholder' => 'Search by name or city...'],
@@ -123,7 +72,6 @@ $this->title = 'My Account';
                         }'),
                     ],
                 ]); ?>
-                <!-- <p class="small"><?= Html::icon('info-sign') ?> You must identify a home church before you can post comments on this site.</p> -->
                 
                 <?= $form->field($userP, 'role')->widget(Select2::classname(), [
                     'data' => $list,
@@ -158,53 +106,37 @@ $this->title = 'My Account';
             </div>
         </div>
         <?php $form = ActiveForm::end(); ?>
-
-
-
-
-
+        <div class="top-margin">&nbsp;</div>
 
         <hr>
 
+        <h2>Account Settings</h2>
 
-
-
-
-
-
-        <div class="row top-margin">
-            <div class="col-md-4">
-                <h2>Account Settings</h2>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-4 top-margin">
-                <h4><b>Username:</b> <?= $userA->username ?></h4>
-                <h4><b>Email:</b> <?= $userA->email ?></h4>
-                <h4><b>Password:</b> <span class="pwd"></span></h4>
-                <h4><b>Email Preferences:</b> 
-                        <span class="fa fa-check-square-o"></span>
-                    <?= $userA->emailPrefProfile ? 
-                        '<span class="fa fa-check-square-o"></span>' : '<span class="fa fa-square-o"></span>' ?>
-                    <?= $userA->emailPrefLinks ?
-                        '<span class="fa fa-check-square-o"></span>' : '<span class="fa fa-square-o"></span>' ?>
-                    <?= $userA->emailPrefComments ?
-                        '<span class="fa fa-check-square-o"></span>' : '<span class="fa fa-square-o"></span>' ?>
-                    <?= $userA->emailPrefFeatures ?
-                        '<span class="fa fa-check-square-o"></span>' : '<span class="fa fa-square-o"></span>' ?>
-                </h4>
-            </div>
-        </div>
+        
+            <h4><b>Username:</b> <?= $userA->username ?></h4>
+            <h4><b>Email:</b> <?= $userA->email ?></h4>
+            <h4><b>Password:</b> <span class="pwd"></span></h4>
+            <h4><b>Email Preferences:</b> 
+                <span class="fa fa-check-square-o"></span>
+                <?= $userA->emailPrefProfile ? 
+                    '<span class="fa fa-check-square-o"></span>' : '<span class="fa fa-square-o"></span>' ?>
+                <?= $userA->emailPrefLinks ?
+                    '<span class="fa fa-check-square-o"></span>' : '<span class="fa fa-square-o"></span>' ?>
+                <?= $userA->emailPrefComments ?
+                    '<span class="fa fa-check-square-o"></span>' : '<span class="fa fa-square-o"></span>' ?>
+                <?= $userA->emailPrefFeatures ?
+                    '<span class="fa fa-check-square-o"></span>' : '<span class="fa fa-square-o"></span>' ?>
+            </h4>
+     
                 
-        <div class="row top-margin">
+        <div class="settings-form-link">
             <a href="#account-settings" id="account-settings">edit<span class="glyphicon glyphicon-triangle-bottom small"></span></a>
         </div>
 
         <?php $form = ActiveForm::begin(['action' => 'account-settings']); ?>
 
         <div class="row edit-account" style="display: none;">
-            <div class="col-md-6 account">
+            <div class="col-md-6 settings-form">
 
                 <h3 class="top-margin-10">Login ID</h3>
 
@@ -270,14 +202,8 @@ $this->title = 'My Account';
                 <?= Html::submitButton('Save', ['class' => 'btn btn-primary', 'name' => 'personal']) ?>
             </div>
         </div>
-
-        <?php $form = ActiveForm::end(); ?>
-        
-        <div class="row">
-            <div class="col-md-12">
-                <p>&nbsp;</p>
-            </div>
-        </div>
+        <?php $form = ActiveForm::end(); ?>  
+              
     </div>
 </div>
 

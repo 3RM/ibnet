@@ -29,9 +29,6 @@ h2 {
 	margin: 40px 0; 
 	position: relative; 
 }
-#timeline p { 
-	margin: -15px 0 15px; 
-}
 .date { 
 	margin-top: -10px; 
 	top: 50%; 
@@ -90,7 +87,7 @@ h2 {
 .content p { 
 	max-height: 0; 
 	color: transparent; 
-	text-align: justify; 
+	margin: -15px 0 15px;
 	padding-top: 15px;
 }
 label { 
@@ -102,8 +99,19 @@ label {
 	transition: transform 0.2s linear; 
 	padding-left: 4%;
 }
+.title-mb {
+	display: none;
+	font-size: 1.3em;   
+}
+.date-mb {
+	display: none;
+	font-size: 0.8em;
+}
 .radio { 
 	display: none; 
+}
+.content img {
+	width: 0px;
 }
 .radio:checked + .relative label { 
 	cursor: auto; 
@@ -113,18 +121,25 @@ label {
 	background: #dc9f27; 
 }
 .radio:checked ~ .content { 
-	max-height: 800px; 
+	max-height: 9999px; 
 	transform: translateX(20px); 
 	transition: max-height 0.4s linear, border-color 0.5s linear, transform 0.2s linear; 
 	box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
 	background-color: #fff;
 }
 .radio:checked ~ .content p { 
-	max-height: 1000px; 
-	padding-top: 20px;
+	max-height: 9999px; 
 	color: #555; 
 	transition: color 0.3s linear 0.3s; 
-	overflow: hidden;
+}
+.radio:checked ~ .content img {
+	width: 200px;
+	height: auto;
+	transition: width 0.4s linear, border-color 0.5s linear, transform 0.2s linear; 
+	float: left;
+	margin: 0 3% 0 0;
+  	border: 2px solid #555555;
+  	border-radius: 5px;
 }
 
 /* mobile phones */
@@ -142,20 +157,20 @@ label {
   		font-size: 1.1em; 
  		white-space: nowrap; 
   		text-overflow: ellipsis; 
-  		overflow: hidden; display: 
-  		block; transform: translateX(18px); 
+  		overflow: hidden; 
+  		display: block; 
+  		transform: translateX(18px); 
+  		padding: 0px;
   	}
-  	/*.content {
-   		padding-top: 45px;
-  		border-color: #555; 
-  	}*/
+  	.radio:checked + .relative label { 
+		display: none;
+	}
   	.content:before, .content:after { 
   		border: solid transparent; 
   		bottom: 100%; 
   	}
   	.content:before { 
-  		border-bottom-color: 
-  		inherit; 
+  		border-bottom-color: inherit; 
   		border-width: 17px; 
   		top: -16px; 
   		left: 50px; 
@@ -168,9 +183,28 @@ label {
   		left: 50px; 
   		margin-left: -20px; 
   	}
+  	.radio:checked ~ .content img {
+  		float: none;
+  		width: 200px;
+  		height: auto;
+		transition: width 0.4s linear, border-color 0.5s linear, transform 0.2s linear;
+  	}
+  	.radio:checked ~ .content .title-mb {
+     	color: #605f5f;
+     	display: block;
+  		font-size: 1.6em; 
+ 		white-space: nowrap; 
+  		text-overflow: ellipsis; 
+  		overflow: hidden; 
+  	}
+  	.radio:checked ~ .content .date-mb {
+     	color: #dc9f27;
+     	display: block;
+     	margin-bottom: 15px;
+  	}
   	.content p { 
-  		font-size: 0.9em; 
-  		line-height: 1.4; 
+  		font-size: 0.9em;
+  		margin-top: -35px;
   	}
   	.circle, .date { 
   		display: none; 

@@ -3,6 +3,8 @@
 use common\widgets\Alert;
 use kartik\select2\Select2;
 use yii\bootstrap\Html;
+use yii\bootstrap\Nav;
+use yii\bootstrap\NavBar;
 use yii\bootstrap\Tabs;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
@@ -13,33 +15,32 @@ use yii\widgets\ActiveForm;
 
 \Eddmash\Clipboard\ClipboardAsset::register($this);
 $this->title = 'My Account';
+$menuItems = [
+    ['label' => '<span class="glyphicons glyphicons-settings"></span> Settings', 'url' => ['/site/settings']],
+    ['label' => '<span class="glyphicons glyphicons-vcard"></span> Profiles', 'url' => ['/profile-mgmt/my-profiles']],
+    ['label' => '<span class="glyphicons glyphicons-direction"></span> Updates', 'url' => ['/missionary/update-repository'], ['visible' => Yii::$app->user->identity->is_missionary]],
+];
 ?>
-<div class="wrap my-profiles">
-    <div class="container">
-        <div class="row">
-        <h1><?= $this->title ?></h1>
-
-        <?= Tabs::widget([
-                'items' => [
-                    [
-                        'label' => 'Dashboard',
-                        'url' => ['/site/dashboard'],
-                    ],
-                    [
-                        'label' => 'Profiles',  
-                        'url' => ['//profile-mgmt/my-profiles'],
-                    ],
-                    [
-                        'label' => 'Updates',
-                        'active' => true,
-                    ],
+<div class="account-header-container">
+    <div class="account-header acc-update-header">
+        <h1><?= Html::encode($this->title) ?></h1>
+        <div class="visible-xs">
+            <?php 
+            NavBar::begin([
+                'options' => [
+                    'id' => 'account0',
+                    'class' => 'navbar-inverse account-nav no-transition',
                 ],
             ]);
-        ?>
+            echo Nav::widget([
+                'options' => ['class' => 'navbar-nav navbar-right'],
+                'items' => $menuItems,
+                'encodeLabels' => false,
+            ]);
+            NavBar::end(); ?>
         </div>
     </div>
 </div>
-<div class="clearprofiles"></div>
 <?= Alert::widget() ?>
 
 <div class="container">

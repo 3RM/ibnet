@@ -16,11 +16,11 @@ use yii\widgets\ActiveForm;
 $this->title = $title;
 ?>
 
+<?= $this->render('_profileFormHeader', ['profile' => $profile, 'pp' => $pp]) ?>
+
 <div class="wrap profile-form">
 
-    <?= $this->render('_profileFormHeader', ['profile' => $profile, 'pp' => $pp]) ?>
-
-    <div class="container-form">
+    <div class="forms-container">
         
         <?php $form = ActiveForm::begin(); ?>
 

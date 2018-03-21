@@ -235,6 +235,12 @@ class Profile extends \yii\db\ActiveRecord
      */
     public $unconfirmed;
 
+     /**
+     * @var bool $events Indicates if a profile has associated timeline events
+     */
+    public $events;
+
+
     /**
      * @inheritdoc
      */
@@ -1922,6 +1928,7 @@ class Profile extends \yii\db\ActiveRecord
             $user->updateAttributes(['is_missionary' => 1]);
             $missionary = $this->missionary;
             $missionary->generateRepositoryKey();
+            $missionary->setUpdatesActive();                                                        // Set any mailchimp updates that were generated while the profile was inactive to active status
         }
 
         $events = $this->history;                                                                   // Enter first timeline event as "Joined IBNet"
@@ -2138,8 +2145,7 @@ class Profile extends \yii\db\ActiveRecord
     public function getProfileArray()
     {
         $id = Yii::$app->user->identity->id;
-        return Profile::find()     
-            ->select('id, type, category, profile_name, created_at, renewal_date, status')
+        return Profile::find()
             ->where(['user_id' => $id])
             ->andwhere('status != ' . self::STATUS_TRASH)
             ->orderBy('id ASC')
@@ -2741,6 +2747,7 @@ class Profile extends \yii\db\ActiveRecord
     /**
      * Delete an image file on the server
      * @param string $name
+     * @param string $imageLink
      * @return string
      */
     public function deleteOldImg($img, $imageLink=NULL)

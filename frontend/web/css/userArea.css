@@ -1,0 +1,702 @@
+/*************
+ * Title:    IBNet User Area Design
+ * Designer: Steve McKinley
+ * Website:  https://www.ibnet.org
+ *
+ ************/
+
+/*
+ * Account
+--------------------------------- */
+.account-header-container {
+  height: 280px;
+}
+.account-header {
+}
+.acc-settings-header, .acc-profiles-header, .acc-update-header, .acc-forms-header, .acc-preview-header {
+  height: 100%;
+  margin-top: -165px;
+  /* Stretch image outside of containing div */
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+}
+
+.acc-settings-header {
+  background: url(../images/content/settings-header.jpg);
+  border-bottom: 1px solid #bbb;
+}
+.acc-profiles-header {
+  background: url(../images/content/profiles-header.jpg);
+  border-bottom: 1px solid #bbb;
+}
+.acc-preview-header {
+  background: url(../images/content/profile-preview-header.jpg);
+  border-bottom: 1px solid #1b3e66;
+}
+.acc-forms-header {
+  background: url(../images/content/profile-forms-header.jpg);
+  border-bottom: 1px solid #1b3e66;
+}
+.acc-update-header {
+  background: url(../images/content/update-header.jpg);
+  border-bottom: 1px solid #bbb;
+}
+.account-header h1 {
+  position: relative;
+  top: 195px;
+  left: 10%;
+  color: #d1d3d4;
+  text-shadow: 1px 1px #696969;
+}
+.account-nav {
+  top: 125px;
+  background-color: transparent;
+  border: none;
+}
+#account0-collapse {
+  border-color: #525252; 
+  background-color: #808080;
+  border-bottom-right-radius: 15px;
+  border-bottom-left-radius: 15px;
+}
+#account0 .navbar-header button {
+  background-color: #808080;
+  border-color: #525252;
+}
+#account0 nav.navbar.shrink {
+  padding: 1px 20px; 
+}
+.navbar li a {
+  font-size: 1.3em;
+  -webkit-transition: all 0.4s ease;
+  transition: all 0.4s ease;
+}
+.left-nav {
+  float: left;
+  width: 160px;
+  margin-left: -15px;
+  padding:40px 0;
+}
+.left-nav ul {
+  padding: 0;
+  margin: 0;
+}
+.left-nav li {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  padding: 10px;
+  list-style: none;
+  background-color: #f7f7f7;
+  border-right: 5px solid #f7f7f7;
+  border-bottom: 1px solid #bbb;
+  border-radius: 6px;
+  color: #808080;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.left-nav li:hover {
+  width: 150px;
+  background-color: #365f89;
+  border-right: 5px solid #365f89;
+  color: #fff;
+  -webkit-transition: width 0.5s; /* Safari */
+  transition: width 0.5s;
+  justify-content: center;
+}
+.left-nav a {
+  text-decoration: none;
+}
+.left-nav li.active {
+  background-color: #365f89;
+  border-right: 5px solid #365f89;
+  color: #fff;
+}
+li.active .underline {
+  border-bottom: 5px solid #dc9f27;
+  padding-bottom: 6px;
+}
+.right-content {
+  float: right;
+  width: 80%;
+  padding: 40px 0;
+}
+.right-content h2 {
+  margin-bottom: 40px;
+}
+
+/*
+ * Account - Settings
+--------------------------------- */
+.personal-settings {
+  display: flex;
+}
+.personal-settings img {
+  margin: 0 20px 20px;
+  height: 150px;
+  width: 150px;
+}
+.personal-info {
+  float: right;
+  margin-top: -7px;
+}
+.personal-info p {
+  margin: 10px 0;
+}
+.settings-form-link a {
+  color: #dc9f27;
+}
+.settings-form {
+  padding: 20px;
+  border: 1px solid #F0F0F0;
+}
+.settings .update {
+  background-color: #F6F6F6;
+  padding: 20px;
+  border: 1px solid #F0F0F0;
+  border-radius: 10px;
+}
+.settings .form-group button {
+  float: right;
+}
+.pwd {
+  height: 18px;
+  width: 126px;
+  background: url(../images/pwd.jpg) center left;
+  background-repeat: no-repeat;
+  display: inline-block;
+}
+
+/*
+ * Account - Profiles
+--------------------------------- */
+.profile-card {
+  width: 80%;
+  height: 200px;
+  margin: 80px 0;
+}
+.profile-card-header {
+  width: 100%;
+  color: #fff;
+}
+.profile-title {
+  height: 40px;
+  width: 70%;
+  float: left;
+  background-color: #365f89;
+  border-right: 1px solid #000;
+  border-top-left-radius: 10px;
+  padding: 8px 10px;
+}
+.profile-status {
+  height: 40px;
+  width: 30%;
+  float: right;
+  background-color: #000;
+  border-top-right-radius: 10px;
+  padding: 8px 10px;
+  text-align: right;
+}
+.profile-card-body {
+  width: 100%;
+  height: 180px;
+}
+.profile-info {
+  width: 70%;
+  height: 100%;
+  float: left;
+  border-left: 1px solid #bbb;
+  border-right: 1px solid #bbb;
+  border-bottom: 2px solid #bbb;
+  border-bottom-left-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  padding: 10px 2%;
+}
+.profile-info .picture-name {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.profile-info img {
+  float: left;
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  margin: 5px 4.166667% 5px 0; /* 20px/480px */
+}
+.profile-info h1 {
+  font-weight: normal;
+  font-size: 1.4em;
+  margin-top: 10px;
+}
+.profile-info .picture-name a {
+  color: inherit;
+  text-decoration: none;
+}
+.profile-info .notification {
+  height: 28%;
+  position: relative;
+  border-top: 1px solid #bbb;
+  padding: 4% 0;
+}
+.profile-info .notification p {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+  line-height: 1em;
+}
+.profile-links {
+  width: 30%;
+  height: 100%;
+  float: right;
+  border-right: 1px solid #bbb;
+  border-bottom: 2px solid #bbb;
+  border-bottom-right-radius: 10px;
+  background-color: #efefef;
+  padding: 10px 2%;
+}
+.profile-links p.date {
+  font-size: 0.9em;
+  margin: 0px;
+}
+.profile-links p.date.last {
+  margin-bottom: 10px;
+}
+.profile-links p {
+  margin: 5px;
+}
+.glyphicons.glyphicons-history:before {
+  padding: 2px 0 0 0 !important;
+}
+#timeline-form-heading {
+  background-color: #2a4b6d;
+  color: #fff;
+}
+.timeline-form {
+  width: 50%;
+  margin: 50px 0;
+  padding: 20px;
+  border: 6px solid #eee;
+  border-radius: 20px;
+}
+.event-desc-img img {
+  float: left;
+  margin: 0 3% 0 0;
+  border: 2px solid gray;
+  border-radius: 5px;
+}
+
+/*
+ * Account - Profile Forms
+--------------------------------- */
+.forms-header-menu {
+  position: relative;
+  top: 200px;
+  left: 8%;
+  width: 40%;
+}
+.forms-container {
+  padding: 20px 15px 0px;
+}
+.forms-image1-widget {
+  width: 800px;
+}
+.form-btn-banner {
+  background-color: #d4d4d4;
+  padding: 5px;
+  margin: 10px 0;
+}
+.forms-btn-banner:hover {
+  background-color: #2a4b6d;
+}
+.forms-btn-banner img {
+  width: 600px;
+  border-radius: 5px;
+}
+.progress-menu {
+  float: left; 
+  margin-right: 10pt;
+}
+.progress-menu a {
+  color: #d1d3d4;
+}
+.account-preview-header-container {
+  height: 340px;
+} 
+.preview-header-container {
+  position: relative;
+  height: 200px;
+  width: 80%;
+  margin: 0 auto;
+  top: 180px;
+}
+.preview-header-container h1 {
+  top: 0;
+  left: 0;
+}
+.preview-edit-menu {
+  position: relative;
+  top: 10px;
+  width: 200px;
+}
+.preview-edit-menu a {
+  color: #d1d3d4;
+  text-shadow: 1px 1px #696969;
+}
+.preview-profile-link a {
+  color: #d1d3d4;
+  position: relative;
+  top: 30px;
+}
+.preview-btn {
+    color: #fff;
+    background-color: #dc9f27;
+    border: 0px solid #000;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    padding: 10px 30px;
+    text-align: center;
+    -webkit-transition: all 0.7s ease;
+    transition: all 0.7s ease;
+    top: -20px;
+    position: relative;
+  }
+  .preview-btn:hover {
+    background-color: #4caf50;
+    color: #fff;
+  }
+  .preview-profile {
+    top: -22px;
+  }
+
+
+/*
+ * Account - Updates Repository
+--------------------------------- */
+.repo-url {
+  width: 50%;
+  padding: 2% 0;
+}
+#repository_link {
+  background-color: inherit;
+}
+.repo-links {
+  font-size: 0.9em;
+  width: 50%;
+  margin: -20px 0 0;
+  padding: 0 5%;
+}
+.repo-links a {
+  float: right;
+}
+.repo-url-refresh {
+  width: 120px;
+  background-color: transparent;
+  border: transparent;
+  color: #337ab7;
+  padding: 0 0 10px 0;
+}
+button.repo-url-refresh:hover {
+  text-decoration: underline;
+  color: #23527c;
+}
+button.repo-url-refresh:focus {
+  outline: none;
+}
+.repo-form {
+  width: 50%;
+  margin: 50px 0;
+  padding: 20px;
+  border: 6px solid #eee;
+  border-radius: 20px;
+}
+.repo-form button {
+  margin-top: 15px;
+  width: 50%;
+  float: right;
+}
+.repo-form h2 {
+  display: inline-block;
+}
+.repo-form-warning h4 {
+  margin: 80px 0;
+  color: #ef9a00;
+}
+.select2 .select2-container .select2-container--krajee {
+  border-radius: 10px !important;
+}
+#mc-link {
+  float: right;
+  margin: 25px 10px 0;
+}
+.repo-update-table {
+  width: 80%;
+  overflow-x: auto;
+}
+.repo-table-icon {
+  font-size: 2.5em;
+  color: #31708f;
+  margin: 10px;
+}
+.repo-table-expires {
+  font-size: 0.8em;
+  color: #db9e26;
+  margin: -10px 0 10px 0;
+}
+.repo-table-buttons {
+  display: flex;
+  justify-content: flex-end;
+}
+.repo-table-buttons button {
+  margin: 0 2px;
+}
+.update-container {
+  width: 90%;
+}
+div[id^="visible-result-"] {
+  font-size: 1.1em;
+  padding: 20px 10px;
+  display: flex;
+  justify-content: flex-end;
+}
+a.update-visible {
+  color: #00b100;
+}
+img.repo-thumb {
+  width: 100%;
+  margin-bottom: 15px;
+  border: 2px solid black;
+}
+.update-container {
+  width: 60%;
+  margin: 0 auto;
+  padding: 4%;
+  border: 6px solid #eee;
+  border-radius: 20px;
+}
+table.table .edit-buttons a,
+table.table .edit-buttons button {
+  float: right;
+  margin: 20px 4px;
+}
+.mailchimp {
+  margin: 70px 20%;
+}
+img.mc-icon {
+  margin: 10px;
+}
+
+
+/*
+ * Misc
+--------------------------------- */
+.no-transition {
+  -webkit-transition: height 0.12s !important;
+  -moz-transition: height 0.12s !important;
+  -ms-transition: height 0.12s !important;
+  -o-transition: height 0.12s !important;
+  transition: height 0.12s !important;
+}
+
+
+
+
+/*
+ * Media Queries
+---------------------------------------------------------------------------------------------------- */
+
+/* UHD (landscape) ----------- */
+@media only screen and (min-device-width: 1920px) {
+    .acc-settings-header {
+      background: url(../images/content/settings-header-uw.jpg);
+    }
+    .acc-preview-header {
+      background: url(../images/content/profile-preview-header-uw.jpg);
+    }
+    .acc-profiles-header {
+      background: url(../images/content/profiles-header-uw.jpg);
+    }
+    .acc-forms-header {
+      background: url(../images/content/profile-forms-header-uw.jpg);
+    }
+    .acc-update-header {
+      background: url(../images/content/update-header-uw.jpg);
+    }    
+    .account-header h1 {
+      left: 24%;
+    } 
+}
+
+/* Desktops, laptops and iPads (landscape) ----------- */
+@media only screen and (max-width: 1200px) {
+
+}
+
+@media only screen and (max-width: 1024px) {
+  .right-content {
+    width: 75%;
+    margin-right: 4%;
+  }
+  .profile-card {
+    width: 100%;
+  }
+  .repo-url {
+    width: 70%;
+  }
+  .repo-links {
+    width: 70%;
+  }
+  .repo-form {
+    width: 70%;
+  }
+  .repo-update-table {
+    width: 100%;
+  }
+  .update-container {
+    width: 90%;
+  }
+  #missionaryupdate-pdf {
+    padding: 0;
+  }
+}
+
+/* iPads (portrait) ----------- */
+
+@media only screen and (max-width: 768px) {
+    .acc-settings-header {
+      background: url(../images/content/settings-header-mb.jpg);
+    }
+    .acc-profiles-header {
+      background: url(../images/content/profiles-header-mb.jpg);
+    }
+    .acc-preview-header {
+      background: url(../images/content/profile-preview-header-mb.jpg);
+    }
+    .acc-forms-header {
+      background: url(../images/content/profile-forms-header-mb.jpg);
+    }
+    .acc-update-header {
+      background: url(../images/content/update-header-mb.jpg);
+    }
+    .left-nav {
+      display: none;
+    }
+    #account0 {
+      z-index: 1000;
+      position: relative;
+    }
+    .right-content {
+      float: none;
+      width: 100%;
+      padding: 40px 0;
+    }
+    .personal-settings {
+      flex-direction: column;
+    }
+    .profile-card {
+      margin: 100px 0;
+    }
+    .profile-card-body {
+      height: 220px;
+    }
+    .profile-info img {
+      width: 60px;
+      height: 60px;
+    }
+    .profile-info h1 {
+      font-size: 1em;
+    }
+    .profile-info p {
+      font-size: 0.7em;
+    }
+    .profile-links p {
+      font-size: 0.7em;
+    }
+    .profile-links .link-btn {
+      font-size: 0.7em;
+    }
+    .forms-header-menu {
+      width: 70%;
+    }
+    .forms-container h2 {
+      font-size: 1.6em;
+    }
+    .forms-image1-widget {
+      width: 100%;
+    }
+    .forms-btn-banner img {
+      width: 100%;
+      border-radius: 5px;
+    }
+    .preview-edit-menu {
+      top: 0;
+    }
+    .preview-profile-link a {
+      top: 10px;
+    }
+    .preview-btn {
+      top: -5px;
+      padding: 6px 20px;
+    }
+    .repo-url {
+      width: 100%;
+    }
+    .repo-links {
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    .repo-links a {
+      float: none;
+    }
+    .repo-form {
+      width: 100%;
+    }
+    .repo-form h2 {
+      margin-bottom: 10px;
+    }
+    #mc-link {
+      float: none;
+      margin-top: 0;
+      margin: 0 0 20px 0;
+    }
+    img.mc-icon {
+      margin: 0;
+      width: 20px;
+    }
+    .repo-update-table td {
+      padding: 6px;
+    }
+    .repo-table-icon {
+      font-size: 1em;
+    }
+    .repo-table-buttons {
+      flex-direction: column;
+      margin: 2px;
+    }
+    #missionaryupdate-pdf {
+      width: 200px;
+      padding: 0;
+    }
+}
+
+/* iPhones (portrait and landscape) ----------- */
+
+@media only screen and (max-width: 480px) {
+
+}

@@ -14,7 +14,7 @@ if ($events != NULL) {
 ?>
 
 <?= Yii::$app->user->id == $profile->user_id ? 
-	'You can add events to your timeline in your ' . Html::a('profile settings', ['profile-mgmt/settings', 'id' => $profile->id], ['target' => '_blank']) . '</em>' : 
+	'You can add events to your timeline on your ' . Html::a('profile history page', ['profile-mgmt/history', 'id' => $profile->id], ['target' => '_blank']) . '</em>' : 
 	NULL; ?>
 
 <ul id='timeline'>
@@ -28,7 +28,12 @@ if ($events != NULL) {
 	    <span class='circle'></span>
 	  </div>
 	  <div class='content'>
-	  	<?= $event->description ? '<p>' . $event->description . '</p>' : NULL; ?>
+	  	<p>
+	  		<?= '<span class="title-mb">' . $event->title . '</span>' ?>
+	  		<?= '<span class="date-mb">' . Yii::$app->formatter->asDate($event->date, 'php:F j, Y') . '</span>' ?>
+	  		<?= $event->event_image ? Html::img($event->event_image)  : NULL ?>
+	  		<?= $event->description ? $event->description : NULL ?>
+	  	</p>
 	  </div>
 	</li>
 
@@ -39,6 +44,6 @@ if ($events != NULL) {
 
 <?php } else {
 	echo Yii::$app->user->id == $profile->user_id ?
-		'<em>No events recorded.  You can add events to your timeline in your ' . Html::a('profiles settings', ['profile-mgmt/settings', 'id' => $profile->id], ['target' => '_blank']) . '</em>' :
+		'<em>No events recorded.  You can add events to your timeline on your ' . Html::a('profiles history page', ['profile-mgmt/history', 'id' => $profile->id], ['target' => '_blank']) . '</em>' :
 		'<em>No events recorded.</em>';
 } ?>

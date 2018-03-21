@@ -47,7 +47,7 @@ class SiteController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['logout', 'signup'],
+                'only' => ['logout', 'signup', 'settings'],
                 'rules' => [
                     [
                         'actions' => ['signup'],
@@ -55,7 +55,7 @@ class SiteController extends Controller
                         'roles' => ['?'],
                     ],
                     [
-                        'actions' => ['logout'],
+                        'actions' => ['logout', 'settings'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -565,7 +565,7 @@ class SiteController extends Controller
      * User profile and account management area
      * @return mixed
      */
-    public function actionDashboard()
+    public function actionSettings()
     {
         $userP = Yii::$app->user->identity;                                                         // Personal user settings
         $userP->scenario = 'personal';
@@ -584,7 +584,7 @@ class SiteController extends Controller
         }
         $list = ArrayHelper::map(Role::find()->all(), 'role', 'role', 'type');
 
-        return $this->render('dashboard', [
+        return $this->render('settings', [
             'userP' => $userP,
             'userA' => $userA,
             'account' => $account,
@@ -621,7 +621,7 @@ class SiteController extends Controller
                 }
             }
         }
-        return $this->redirect(['dashboard']);
+        return $this->redirect(['settings']);
 
     }
 
@@ -635,6 +635,6 @@ class SiteController extends Controller
             $user->validate(); 
             $user->save();
         }
-        return $this->redirect(['dashboard']);
+        return $this->redirect(['settings']);
     }
 }

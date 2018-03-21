@@ -16,11 +16,11 @@ use yii\widgets\ActiveForm;
 $this->title = 'Church Plant';
 ?>
 
+<?= $this->render('_profileFormHeader', ['profile' => $profile, 'pp' => $pp]) ?>
+
 <div class="wrap profile-form">
 
-    <?= $this->render('_profileFormHeader', ['profile' => $profile, 'pp' => $pp]) ?>
-
-    <div class="container-form">
+    <div class="forms-container">
 
         <?php if (Yii::$app->session->hasFlash('success')) {                                                // Show info message to alert that church plant profile is currently inactive
             echo '<br>';

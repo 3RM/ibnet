@@ -13,13 +13,13 @@ use yii\widgets\ActiveForm;
 $this->title = 'Education Levels Offered';
 ?>
 
-<div class="wrap profile-form">
+<?= $this->render('_profileFormHeader', ['profile' => $profile, 'pp' => $pp]) ?>
 
-    <?php $form = ActiveForm::begin(); ?>
+<div class="wrap profile-form">
 
     <?= $this->render('_profileFormHeader', ['profile' => $profile, 'pp' => $pp]) ?>
 
-    <div class="container-form">
+    <div class="forms-container">
 
         <div class="row">
             <div class="col-md-8">

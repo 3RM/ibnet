@@ -2,9 +2,10 @@
 
 namespace common\models\missionary;
 
+use common\models\SendMail;
 use common\models\profile\MissionAgcy;
 use common\models\profile\Profile;
-use common\models\SendMail;
+use common\models\profile\Staff;
 use common\models\User;
 use common\models\Utility;
 use common\models\missionary\MailchimpList;
@@ -354,10 +355,29 @@ class Missionary extends \yii\db\ActiveRecord
     {
         return MissionaryUpdate::find()
             ->where(['missionary_id' => $this->id])
-            ->andwhere(['deleted' => 0])
-            ->andwhere('to_date >= NOW()')
+            ->andWhere(['deleted' => 0])
+            ->andWhere('to_date >= NOW()')
+            ->andWhere(['profile_inactive' => 0])
             ->orderBy(['created_at' => SORT_DESC])
             ->all();
+    }
+
+    /**
+     * @return Array
+     */
+    public function setUpdatesActive()
+    {
+        $updates = MissionaryUpdate::find()
+            ->where(['missionary_id' => $this->id])
+            ->andWhere(['deleted' => 0])
+            ->andWhere('to_date >= NOW()')
+            ->andWhere(['profile_inactive' => 1])
+            ->orderBy(['created_at' => SORT_DESC])
+            ->all();
+        foreach ($updates as $update) {
+            $update->updateAttributes(['profile_inactive' => 0]);
+        }
+        return true;
     }
 
     /**
