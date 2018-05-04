@@ -314,8 +314,6 @@ class ProfileMgmtController extends ProfileController
         $profile = $this->findProfile($id); 
         $profile->scenario = 'history';
 
-        $isMissionary = (Yii::$app->user->identity->is_missionary == User::IS_MISSIONARY);
-
         $history = new History();
         if (isset($_POST['add'])) {
             $action = 'add';
@@ -341,7 +339,6 @@ class ProfileMgmtController extends ProfileController
                 'history' => $history,
                 'events' => $events,
                 'action' => $action,
-                'isMissionary' => $isMissionary,
                 'a' => $a]);
 
         } elseif (isset($_POST['edit-save'])) {
@@ -359,15 +356,14 @@ class ProfileMgmtController extends ProfileController
                 'profile' => $profile,
                 'history' => $history,
                 'events' => $events,
-                'action' => $action,
-                'isMissionary' => $isMissionary]);
+                'action' => $action]);
 
         } elseif ($history->load(Yii::$app->request->Post()) && 
             $history->validate()) {
             $history->profile_id = $profile->id;
             $history->date = strtotime($history->date);
             $history->save();
-            $this->redirect(['history', 'id' => $profile->id, 'isMissionary' => $isMissionary, 'a' => $history->id]);
+            $this->redirect(['history', 'id' => $profile->id, 'a' => $history->id]);
         }
 
         $events = $profile->history;
@@ -377,7 +373,6 @@ class ProfileMgmtController extends ProfileController
             'history' => $history,
             'events' => $events,
             'action' => $action,
-            'isMissionary' => $isMissionary,
             'a' => $a]);                              
     }
 

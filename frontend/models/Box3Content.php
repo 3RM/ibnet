@@ -1,7 +1,7 @@
 <?php
 namespace frontend\models;
 
-use common\models\profile\Missionary;
+use common\models\missionary\Missionary;
 use common\models\profile\Profile;
 use common\models\Utility;
 use yii;

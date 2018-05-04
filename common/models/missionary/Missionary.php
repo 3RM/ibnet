@@ -2,7 +2,7 @@
 
 namespace common\models\missionary;
 
-use common\models\SendMail;
+use common\models\profile\Mail;
 use common\models\profile\MissionAgcy;
 use common\models\profile\Profile;
 use common\models\profile\Staff;
@@ -62,10 +62,10 @@ class Missionary extends \yii\db\ActiveRecord
             [['field', 'status'], 'required', 'on' => 'fi'],
             [['select', 'showMap'], 'safe', 'on' => 'cp'],
             [['mission_agcy_id'], 'required', 'on' => 'ma-missionary'],
-            [['packet'], 'file', 'extensions' => 'pdf', 'mimeTypes' => 'application/pdf', 'maxFiles' => 1, 'maxSize' => 1024 * 6000, 'skipOnEmpty' => true, 'on' => 'ma-missionary'],
+            [['packet'], 'file', 'extensions' => 'pdf', 'mimeTypes' => 'application/pdf', 'maxFiles' => 1, 'maxSize' => 1024 * 4000, 'skipOnEmpty' => true, 'on' => 'ma-missionary'],
             
             [['mission_agcy_id'], 'safe', 'on' => 'ma-chaplain'],
-            [['packet'], 'file', 'extensions' => 'pdf', 'mimeTypes' => 'application/pdf', 'maxFiles' => 1, 'maxSize' => 1024 * 6000, 'skipOnEmpty' => true, 'on' => 'ma-chaplain'],
+            [['packet'], 'file', 'extensions' => 'pdf', 'mimeTypes' => 'application/pdf', 'maxFiles' => 1, 'maxSize' => 1024 * 4000, 'skipOnEmpty' => true, 'on' => 'ma-chaplain'],
         ];
     }
 
@@ -181,13 +181,13 @@ class Missionary extends \yii\db\ActiveRecord
             $oldMA = MissionAgcy::findOne($this->getOldAttribute('mission_agcy_id'));
             if ($oldMA && ($oldMAProfile = $oldMA->linkedProfile)) {
                 $oldMAProfileOwner = User::findOne($oldMAProfile->user_id);
-                SendMail::sendProfileLink($missionary, $oldMAProfile, $oldMAProfileOwner, 'MA', 'UL');  // Notify mission agency profile owner of unlink
+                Mail::sendLink($missionary, $oldMAProfile, $oldMAProfileOwner, 'MA', 'UL');         // Notify mission agency profile owner of unlink
             }
             
             $mA = $this->missionAgcy;
             if ($mA && ($mAProfile = $mA->linkedProfile)) {
                 $mAProfileOwner = User::findOne($mAProfile->user_id);
-                SendMail::sendProfileLink($missionary, $mAProfile, $mAProfileOwner, 'MA', 'L');     // Notify mission agency profile owner of link
+                Mail::sendLink($missionary, $mAProfile, $mAProfileOwner, 'MA', 'L');                // Notify mission agency profile owner of link
             }
         }
         

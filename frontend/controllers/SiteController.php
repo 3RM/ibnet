@@ -3,6 +3,7 @@ namespace frontend\controllers;
 
 use common\models\AccountSettings;
 use common\models\LoginForm;
+use common\models\Mail AS SiteMail;
 use common\models\profile\Mail;
 use common\models\profile\Profile;
 use common\models\profile\ProfileBrowse;
@@ -356,10 +357,10 @@ class SiteController extends Controller
      *
      * @return mixed
      */
-    // public function actionBlog()
-    // {
-    //     return $this->render('blog');
-    // }
+    public function actionBlog()
+    {
+        return $this->render('blog');
+    }
 
     /**
      * Displays Grand Opening page.
@@ -391,40 +392,12 @@ class SiteController extends Controller
         $model = new RegisterForm();
         if ($model->load(Yii::$app->request->post())) {
             if ($user = $model->register()) {                
-                $this->actionSendVerificationEmail($user->username);
+                SiteMail::sendVerificationEmail($user->username);
+                SiteMail::sendAdminNewUser($user->username);                                        // Send admin notice of new user registration
                 return $this->render('completeRegistration');
             }
         }
         return $this->render('register', ['model' => $model]);
-    }
-
-    /**
-     * Sends user an email with a link to verify their email address.
-     *
-     * @return boolean
-     */
-    public function actionSendVerificationEmail($username)
-    {
-        $user = User::findByUsername($username);
-        $user->generateNewEmailToken();
-        $link = Yii::$app->urlManager->createAbsoluteUrl([
-            'site/registration-complete', 
-            'token' => $user->new_email_token]);
-        if (Yii::$app->mailer
-            ->compose(
-                ['html' => 'notification-html'],
-                [
-                    'title' => 'Complete your registration with IBNet.org', 
-                    'message' => 'Follow this link to complete your registration: ' . $link,
-                ])
-            ->setFrom(Yii::$app->params['adminEmail'])
-            ->setTo($user->new_email)
-            ->setSubject(Yii::$app->params['emailSubject'])
-            ->send()) {
-
-            return $this->render('about');
-        }
-        return false;
     }
 
     /**
@@ -434,13 +407,11 @@ class SiteController extends Controller
      */
     public function actionResendVerificationEmail($username)
     {
-        if ($this->actionSendVerificationEmail($username)) {
+        if (SiteMail::sendVerificationEmail($username)) {
             Yii::$app->session->setFlash('success', 'A new email was sent with a link to verify your 
                 email address.');
-
-            return $this->redirect('login');
         }
-        // throw an error
+        return $this->redirect('login');
     }
 
     /**
@@ -610,13 +581,13 @@ class SiteController extends Controller
                 $church = ProfileController::findActiveProfile($user->home_church);
                 $churchProfOwner = User::findOne($church->user_id);
                 if ($churchProfOwner && $churchProfOwner->emailPrefLinks == 1) {
-                    Mail::sendLink($user, $church, $churchProfOwner, 'CM', 'L');
+                    Mail::sendLink($user, $church, $churchProfOwner, 'PSHC', 'L');
                 }
                 if ($oldId) {
                     $oldChurch = ProfileController::findActiveProfile($oldId);
                     $oldChurchProfOwner = User::findOne($oldChurch->user_id);
                     if ($oldChurchProfOwner && $oldChurchProfOwner->emailPrefLinks == 1) {
-                        Mail::sendLink($user, $oldChurch, $oldChurchProfOwner, 'CM', 'UL');
+                        Mail::sendLink($user, $oldChurch, $oldChurchProfOwner, 'PSHC', 'UL');
                     }
                 }
             }

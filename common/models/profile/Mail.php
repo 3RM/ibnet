@@ -140,7 +140,26 @@ class Mail extends \yii\db\ActiveRecord
                         . ' where you can manage all church staff.';
                 break;
 
-            case 'PM':                                                                              // Parent Ministry
+            case 'PSHC':                                                                              // Personal Settings Home Church
+                $subject = 'IBNet Church Profile: Church Member Link';
+                $name = $user->screen_name ? 
+                    $linkingProfile->screen_name :
+                    $linkingProfile->first_name . ' ' . $linkingProfile->last_name;
+                $dir == 'UL' ?
+                    $title = 'A Link to your Church Profile has Changed' :
+                    $title = 'New Link to your Church Profile';
+                $msg = $name;
+                $dir == 'UL'? 
+                    $msg .= ' has just unlinked from ' :
+                    $msg .= ' has just linked to ';
+                $msg .= Html::a($profile->org_name, 
+                    Url::toRoute(['profile/' . ProfileController::$profilePageArray[$profile->type], 
+                        'urlLoc' => $profile->url_loc, 
+                        'name' => $profile->url_name, 
+                        'id' => $profile->id], 'https')) . ' as a church member.';
+                break;
+
+            case 'PM':                                                                                  // Parent Ministry
                 $profile->type == 'Church' ?
                     $subject = 'IBNet Church Profile: Updated Link' :
                     $subject = 'IBNet Ministry Profile: Updated Link';

@@ -28,7 +28,7 @@ class MissionaryController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'except' => ['update', 'chimp-request'],
+                'except' => ['update', 'chimp-request', 'new-feature'],
                 'rules' => [
                     [
                         'allow' => false,
@@ -52,6 +52,14 @@ class MissionaryController extends Controller
             $this->enableCsrfValidation = 0;
         }
         return parent::beforeAction($action);
+    }
+
+    /**
+     * Video to introduce Missionary Update Feature
+     */
+    public function actionNewFeature()
+    {
+        return $this->render('updateFeature');
     }
 
     /**
@@ -108,6 +116,7 @@ class MissionaryController extends Controller
             $missionary->generateRepositoryKey();
             Yii::$app->session->setFlash('success', 'A new Url has been created.  
                     You can rest assured that your updates are secure.');
+            $a = NULL;
 
         } elseif ($newUpdate->load(Yii::$app->request->Post())) {
             $newUpdate->missionary_id = $missionary->id;

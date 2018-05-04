@@ -559,7 +559,7 @@ class ProfileFormController extends ProfileController
     
             if ($profile->scenario == 'lo-ind') {
                 $title = 'Street or Mailing Address';
-                $list = ArrayHelper::map(Country::find()->where('id>1')->andWhere(['RAN' => 0])->all(), 'printable_name', 'printable_name');
+                $list = ArrayHelper::map(Country::find()->where('id>1')->all(), 'printable_name', 'printable_name');
                 return $this->render($fm . '-ind', [
                     'profile' => $profile, 
                     'title' => $title, 
@@ -569,7 +569,7 @@ class ProfileFormController extends ProfileController
                 $profile->type == 'Special Ministry' ?
                     $title = 'Minsitry Address' :
                     $title = $profile->type . ' Address';
-                $list = ArrayHelper::map(Country::find()->where('id>1')->andWhere(['RAN' => 0])->all(), 'printable_name', 'printable_name');
+                $list = ArrayHelper::map(Country::find()->where('id>1')->all(), 'printable_name', 'printable_name');
 
                 return $this->render($fm . '-org', [
                     'profile' => $profile, 

@@ -46,7 +46,7 @@ $this->title = 'Missions';
         <br>
 
         <h3>Mission Policy and/or Mission Questionnaire</h3>
-        <p><?= HTML::icon('info-sign') ?> Upload one PDF file (max size 6MB).  If you have two documents, combine them into one PDF file.</p>
+        <p><?= HTML::icon('info-sign') ?> Upload one PDF file (max size 4MB).  If you have two documents, combine them into one PDF file.</p>
         <div class="row">
             <div class="col-md-8">
                 <?= $form->field($profile, 'packet')->fileInput()->label('') ?>

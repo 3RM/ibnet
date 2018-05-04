@@ -69,6 +69,7 @@ class User extends ActiveRecord implements
     public function scenarios() {
         return[
             'all' => ['status'],
+            'passwordReset' => ['password_reset_token'],
             'personal' => ['screen_name', 'home_church', 'role', 'usr_image'],
             'account' => ['newUsername', 'newEmail', 'newPassword', 'emailPrefProfile', 'emailPrefLinks', 'emailPrefComments',   'emailPrefFeatures'],
         ];
@@ -82,6 +83,8 @@ class User extends ActiveRecord implements
         return [
             ['status', 'default', 'value' => self::STATUS_ACTIVE, 'on' => 'all'],
             ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_DELETED], 'on' => 'all'],
+
+            ['password_reset_token', 'safe', 'on' => 'passwordReset'],
 
             ['usr_image', 'image', 'extensions' => 'jpg, jpeg, gif, png', 'mimeTypes' => 'image/jpeg, image/png', 'maxFiles' => 1, 'maxSize' => 1024 * 4000, 'skipOnEmpty' => true, 'on' => 'personal'],
             [['screen_name', 'home_church', 'role'], 'default', 'value' => NULL,'on' => 'personal'],

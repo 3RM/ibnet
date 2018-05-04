@@ -670,7 +670,7 @@ class ProfileController extends Controller
                     $stf->titleM = $names[$i];
                     $i++;
                 }
-
+// Utility::pp($ministryArray);
             // ========================= Fellowships ===========================
                 $flwships = $profile->fellowship;
                 $flwshipIds = ArrayHelper::getColumn($flwships, 'profile_id');

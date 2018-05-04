@@ -230,12 +230,12 @@ class Profile extends \yii\db\ActiveRecord
      */
     public $staff;
 
-     /**
+    /**
      * @var array $unconfirmed Ids of any unconfirmed staff profiles associated with an organization
      */
     public $unconfirmed;
 
-     /**
+    /**
      * @var bool $events Indicates if a profile has associated timeline events
      */
     public $events;
@@ -876,7 +876,7 @@ class Profile extends \yii\db\ActiveRecord
 
     // as-school: Associations - School ('select')
             case 'as-school':
-            return ['select' => 'Acreditation or Association'];
+            return ['select' => 'Accreditation or Association'];
             break;
 
     // as-ind: Associations - Individual ('select', 'name', 'acronym')
@@ -2190,7 +2190,7 @@ class Profile extends \yii\db\ActiveRecord
      */
     public function getMinistry()
     {
-        return $array = $this->find()->where(['ministry_of' => $this->id])->andWhere(['status' => self::STATUS_ACTIVE])->all();
+        return $array = $this->find()->where(['ministry_of' => $this->id])->andWhere('type != "Staff"')->andWhere(['status' => self::STATUS_ACTIVE])->all();
     }
 
     /**
@@ -2741,7 +2741,8 @@ class Profile extends \yii\db\ActiveRecord
      */
     public function urlName($name)
     {
-        return preg_replace("/[^a-zA-Z0-9-]/", "", str_replace(' ', '-', strtolower(trim($name))));
+        $convertName = Utility::convert_accent_characters($name);
+        return preg_replace("/[^a-zA-Z0-9-]/", "", str_replace(' ', '-', strtolower(trim($convertName))));
     }
 
     /**

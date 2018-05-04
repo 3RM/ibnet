@@ -96,6 +96,7 @@ use yii\widgets\ActiveForm;
                         ]
                     ]); ?>
                 </div>
+                <p style="margin-top:-20px">Max 4MB</p>
 
                 <?= Html::submitButton('Save', [
                     'method' => 'post',

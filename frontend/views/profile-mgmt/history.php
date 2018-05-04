@@ -67,6 +67,7 @@ $this->title = 'My Account';
                             ]
                         ]); ?>
                     </div>
+                    <p style="margin:-20px 0 20px; font-size:0.8em">Image will be resized to 200px width.  Max 4MB.</p>
                 </div>
             </div>
             <div class="row">

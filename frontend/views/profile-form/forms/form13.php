@@ -17,10 +17,10 @@ $this->title = 'Education Levels Offered';
 
 <div class="wrap profile-form">
 
-    <?= $this->render('_profileFormHeader', ['profile' => $profile, 'pp' => $pp]) ?>
-
     <div class="forms-container">
 
+        <?php $form = ActiveForm::begin(); ?>
+       
         <div class="row">
             <div class="col-md-8">
                 <?= $form->field($profile, 'select')->widget(Select2::classname(), [                 // see customization options here: http://demos.krajee.com/widget-details/select2
@@ -37,7 +37,6 @@ $this->title = 'Education Levels Offered';
         </div>
 
         <?= $this->render('_profileFormFooter', ['profile' => $profile]) ?>
-
         <?php ActiveForm::end(); ?>
 
     </div>

@@ -11,7 +11,7 @@ use yii\helpers\Url;
 			<?= $update->description ? '<p>' . $update->description . '</p>' : NULL ?>
 			
 			<div class="update-links">
-				<span class="update-ind-icon"><?= $update->pdf ? Html::a(Html::icon('download-alt'), Url::to($update->pdf), ['target' => '_blank']) : NULL ?></span>
+				<?= $update->pdf ? '<span class="update-ind-icon">' . Html::a(Html::icon('download-alt'), Url::to($update->pdf), ['target' => '_blank']) . '</span>' : NULL ?>
 				<span class="update-ind-icon"><?= Html::a(Html::icon('new-window'), $update->mailchimp_url, ['target' => '_blank']) ?></span>
 			</div>
 

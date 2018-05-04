@@ -57,6 +57,7 @@ $menuItems = [
         <h2>Step 1 of 2</h2>
         
         <p>Click on Freddie below.  You will be taken to MailChimp to login.  Upon successful login, you will be sent back here to complete the setup.</p>
+        <p><?= Html::icon('info-sign') ?> You may experience a "server error" on this step or the next if you're on a slow internet connection.  If you experience this error, please try again and on a faster connection when possible.</p>
         <div class="mailchimp"><?= Html::a(Html::img('@images/content/freddie.png'), ['missionary/mailchimp-authorize']) ?></div>
 
         <?php $form = ActiveForm::begin(); ?>

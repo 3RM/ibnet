@@ -403,7 +403,7 @@ li.active .underline {
   float: right;
 }
 .repo-url-refresh {
-  width: 120px;
+  width: 140px;
   background-color: transparent;
   border: transparent;
   color: #337ab7;
@@ -425,7 +425,7 @@ button.repo-url-refresh:focus {
 }
 .repo-form button {
   margin-top: 15px;
-  width: 50%;
+  width: 35%;
   float: right;
 }
 .repo-form h2 {

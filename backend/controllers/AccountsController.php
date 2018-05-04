@@ -190,9 +190,12 @@ class AccountsController extends Controller
      *
      * @return string
      */
-    public function actionDelete()
+    public function actionDelete($id)
     {
-        return $this->render('delete');
+        if ($user = User::findOne($id)) {
+            $user->delete();
+        }
+        return $this->redirect(['users']);
     }
 
     /**

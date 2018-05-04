@@ -76,7 +76,7 @@ class MissionaryUpdate extends \yii\db\ActiveRecord
             [['youtube_url', 'vimeo_url'], 'url', 'defaultScheme' => 'http', 'skipOnEmpty' =>true],
             [['title'], 'string', 'max' => 60, 'message' => 'Your text exceeds 60 characters.'],
             [['description'], 'string', 'max' => 1500, 'message' => 'Your text exceeds 1500 characters.'],
-            [['active', 'profile_inactive'], 'safe'],
+            [['active', 'profile_inactive', 'thumbnail'], 'safe'],
         ];
     }
 
@@ -88,6 +88,7 @@ class MissionaryUpdate extends \yii\db\ActiveRecord
         return [
             'title' => 'Title',
             'active' => 'Keep active for:',
+            'editActive' => 'Keep active for:',
             'pdf' => 'PDF',
 
         ];

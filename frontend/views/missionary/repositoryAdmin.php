@@ -58,10 +58,10 @@ AjaxAsset::register($this);
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-12">
                         <?= $form->field($newUpdate, 'pdf')->fileInput() ?>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-12">
                         <?= Html::submitButton('Save', ['class' => 'btn btn-primary', 'name' => 'save']) ?>
                     </div>
                 </div>

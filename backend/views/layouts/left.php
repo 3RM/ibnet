@@ -76,6 +76,7 @@ use yii\helpers\Html;
                             ['label' => 'Flagged', 'icon' => 'flag', 'url' => ['/directory/flagged'],],
                         ],
                     ],
+                    ['label' => 'Mail', 'icon' => 'envelope', 'url' => '/campaign/mailchimp'],
                     ['label' => 'Database', 'icon' => 'database', 'url' => ['/database/db']],
                     [
                         'label' => 'Server', 

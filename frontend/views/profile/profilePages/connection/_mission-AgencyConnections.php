@@ -13,8 +13,10 @@ if ($parentMinistry) {
 	echo '<div class="connection-container">';
 		echo '<div class="connection">';
 			echo (empty($parentMinistry->image2) ? Html::img('@web/images/content/profile-logo.png'): Html::img($parentMinistry->image2)); 
-			echo Html::a($parentMinistry->org_name . '&nbsp' . Html::icon('link', ['class' => 'internal-link']), [ProfileController::$profilePageArray[$parentMinistry->type], 'urlLoc' => $parentMinistry->url_loc, 'name' => $parentMinistry->url_name, 'id' => $parentMinistry->id]);
-			echo Html::tag('span', '<br>Parent Ministry', ['class' => 'subTitle']);
+			echo '<div class="title">';
+				echo Html::a($parentMinistry->org_name . '&nbsp' . Html::icon('link', ['class' => 'internal-link']), [ProfileController::$profilePageArray[$parentMinistry->type], 'urlLoc' => $parentMinistry->url_loc, 'name' => $parentMinistry->url_name, 'id' => $parentMinistry->id]);
+				echo Html::tag('span', '<br>Parent Ministry', ['class' => 'subTitle']);
+			echo '</div>';
 		echo '</div>';
 	echo '</div>';
 }

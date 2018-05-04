@@ -49,7 +49,7 @@ $this->title = 'Mission Agency & Packet';
         <div class="row">
             <div class="col-md-8">
                 <h3>Missionary Information Packet</h3>
-                <p><?= HTML::icon('info-sign') ?> Upload one PDF file (max 6MB).</p>
+                <p><?= HTML::icon('info-sign') ?> Upload one PDF file (max 4MB).</p>
                 <?= $form->field($missionary, 'packet')->fileInput() ?>
             </div>
         </div>
