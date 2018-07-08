@@ -31,7 +31,7 @@ class SocialSearch extends \common\models\profile\Social
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
-    		        'pageSize' => 10,
+    		        'pageSize' => 100,
     		    ],
         ]);
 

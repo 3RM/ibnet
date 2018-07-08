@@ -71,7 +71,9 @@ class LoginForm extends Model
     {
         if (!$this->hasErrors()) {
             $user = $this->getUser();
-            if (!$user || !$user->validatePassword($this->password)) {
+            if ($user && $user->status == User::STATUS_BANNED) {
+                $this->addError($attribute, 'Your account has been banned.');
+            } else if (!$user || !$user->validatePassword($this->password)) {
                 $this->addError($attribute, 'Incorrect username/email or password.');
             }
         }

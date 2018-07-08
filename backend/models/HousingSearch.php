@@ -31,7 +31,7 @@ class HousingSearch extends \common\models\profile\MissHousing
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
-    		    'pageSize' => 10,
+    		    'pageSize' => 100,
     		],
         ]);
 

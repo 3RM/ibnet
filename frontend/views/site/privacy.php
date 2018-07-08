@@ -11,7 +11,7 @@ Url::remember();
 <div class="site-about">
     <h1><?= $this->title ?></h1>
     
-    <p>Last updated: February 20, 2017</p>
+    <p>Updated: May 25, 2018</p>
     <p>This privacy policy discloses the privacy practices for http://www.ibnet.org. This privacy policy applies solely to information collected by this web site. It will notify you of the following:</p>
     <ol>
         <li>What personally identifiable information is collected from you through the web site, how it is used and with whom it may be shared.</li>
@@ -26,7 +26,6 @@ Url::remember();
     <p>Unless you ask us not to, we may contact you via your preferred contact method in reference to your account maintenance, any profile maintenance, new features or services, or changes to this Privacy Policy.</P>
     <p>We use PayPal for all donation transactions.  We will never ask for, or store, any of your personal financial information.</p>
     <p>We will never request your login information.  Should your account require maintenance, we will contact you via email or your preferred contact method and ask you to login to our site to complete the required maintenance.</P>
-
 
     <h2>Registration</h2>
     <p>In order to post listings to the directory on our site and to use certain features, a user must first complete the registration form. During registration a user is required to give certain information (such as name and email address). This information is used to contact you about maintenance and new features and services on our site in which you have expressed interest.</p>
@@ -57,6 +56,20 @@ Url::remember();
     <p>Overall, cookies help us provide you with a better website by enabling us to monitor which pages you find useful and which you do not. A cookie in no way gives us access to your computer or any information about you, other than the data you choose to share with us.</p>
     <p>You can choose to accept or decline cookies. Most web browsers automatically accept cookies, but you can usually modify your browser setting to decline cookies if you prefer. This may prevent you from taking full advantage of the website.</p>
 
+    <h2>Account Cancellation / Data Erasure</h2>
+    <p>Your account will be canceled and all data permanently erased from our system at your request.  The request must come from your registration email, or you must prove your identity using some other accepted form of identification, such as a driver's license.</p>
+
+    <h2>General Data Protection Regulation (GDPR)</h2>
+    <p>Our privacy policy and practices comply with the EU GDPR regulation that went into effect May 25, 2018.  This regulation grants you the following rights:</p>
+    <ul>
+        <li>The right to acces the personal information we hold about you</li>
+        <li>The right to have your personal information sent directly to yourself or another organisation</li>
+        <li>The right to have inaccuracies corrected</li>
+        <li>The right to object, inlcuding in relation to direct marketing</li>
+        <li>The right to restrict the processing of information</li>
+        <li>The right to have information erased</li>
+    </ul>
+    <p>To request, update, or erase any data that is not manageable via the user interface, please email: admin@ibnet.org.</p>
 
     <h2>Changes</h2>
     <p>Our Privacy Policy may change from time to time and all updates will be posted on this page.</p>

@@ -9,10 +9,10 @@ use backend\models\HousingSearch;
 use backend\models\AssociationSearch;
 use backend\models\FellowshipSearch;
 use common\models\Utility;
+use common\models\missionary\Missionary;
 use common\models\profile\Association;
 use common\models\profile\Fellowship;
 use common\models\profile\Mail;
-use common\models\profile\Missionary;
 use common\models\profile\MissHousing;
 use common\models\profile\Profile;
 use common\models\profile\Social;
@@ -137,7 +137,7 @@ class DirectoryController extends Controller
     }
 
     /**
-     * Displays Accounts.
+     * Displays a detail view of single profile.
      *
      * @return string
      */
@@ -146,15 +146,6 @@ class DirectoryController extends Controller
         $searchModel = new ProfileSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->get());
         $gridColumns = [
-            [
-                'attribute' => '',
-                'format' => 'raw',
-                'value' => function ($model) {                      
-                    return $model->status === Profile::STATUS_ACTIVE ? 
-                        Html::a(Html::icon('new-window'), ['frontend/profile/view-profile-by-id', 'id' => $model->id], ['target' => '_blank']) :
-                        '';
-                },
-            ],
             [
                 'attribute' => '',
                 'format' => 'raw',
@@ -228,15 +219,15 @@ class DirectoryController extends Controller
                         $model->created_at;
                 }, 
             ],
-            [
-                'attribute' => 'last_update',
-                'format' => 'raw',
-                'value' => function ($model) {                      
-                    return $model->status === Profile::STATUS_TRASH ? 
-                        '<span style="color: #CCC;">' . $model->last_update . '</span>' : 
-                        $model->last_update;
-                }, 
-            ],
+            // [
+            //     'attribute' => 'last_update',
+            //     'format' => 'raw',
+            //     'value' => function ($model) {                      
+            //         return $model->status === Profile::STATUS_TRASH ? 
+            //             '<span style="color: #CCC;">' . $model->last_update . '</span>' : 
+            //             $model->last_update;
+            //     }, 
+            // ],
             [
                 'attribute' => 'renewal_date',
                 'format' => 'raw',
@@ -246,15 +237,15 @@ class DirectoryController extends Controller
                         $model->renewal_date;
                 }, 
             ],
-            [
-                'attribute' => 'inactivation_date',
-                'format' => 'raw',
-                'value' => function ($model) {                      
-                    return $model->status === Profile::STATUS_TRASH ? 
-                        '<span style="color: #CCC;">' . $model->inactivation_date . '</span>' : 
-                        $model->inactivation_date;
-                }, 
-            ],
+            // [
+            //     'attribute' => 'inactivation_date',
+            //     'format' => 'raw',
+            //     'value' => function ($model) {                      
+            //         return $model->status === Profile::STATUS_TRASH ? 
+            //             '<span style="color: #CCC;">' . $model->inactivation_date . '</span>' : 
+            //             $model->inactivation_date;
+            //     }, 
+            // ],
             [
                 'attribute' => 'status',
                 'format' => 'raw',
@@ -265,6 +256,8 @@ class DirectoryController extends Controller
                         return '<span style="color:green">Active</span>';
                     } elseif ($model->status == Profile::STATUS_INACTIVE) {
                         return '<span style="color: orange;">Inactive</span>';  
+                    } elseif ($model->status == Profile::STATUS_EXPIRED) {
+                        return '<span style="color: red;">Expired</span>';  
                     } elseif ($model->status == Profile::STATUS_TRASH) {
                         return '<span style="color: #CCC;">Trash</span>';    
                     }             
@@ -273,6 +266,7 @@ class DirectoryController extends Controller
             [
                 'class' => '\kartik\grid\ActionColumn',
                 'header' => 'Actions',
+                'deleteOptions' => ['label' => '', 'icon' => '']
             ],
         ];
 
@@ -321,7 +315,9 @@ class DirectoryController extends Controller
                     } elseif ($model->status == Profile::STATUS_ACTIVE) {
                         return '<span style="color:green">Active</span>';
                     } elseif ($model->status == Profile::STATUS_INACTIVE) {
-                        return '<span style="color: orange;">Inactive</span>';  
+                        return '<span style="color: orange;">Inactive</span>'; 
+                    } elseif ($model->status == Profile::STATUS_EXPIRED) {
+                        return '<span style="color: red;">Expired</span>';  
                     } elseif ($model->status == Profile::STATUS_TRASH) {
                         return '<span style="color: #CCC;">Trash</span>';    
                     }             
@@ -517,6 +513,15 @@ class DirectoryController extends Controller
         $searchModel = new MissionarySearch();
         $dataProvider = $searchModel->search(Yii::$app->request->get());
         $gridColumns = [
+            [
+                'attribute' => 'profile_id',
+                'format' => 'raw',
+                'value' => function ($model) {                      
+                     return Html::a($model->profile->id, ['/directory/view', 'id' => $model->profile->id]);
+                },
+                'hAlign'=>'center',
+                'vAlign' => 'middle',
+            ],
             'id',
             'mission_agcy_id',
             'field',
@@ -712,7 +717,9 @@ class DirectoryController extends Controller
                     } elseif ($model['status'] == Profile::STATUS_ACTIVE) {
                         return '<span style="color:green">Active</span>';
                     } elseif ($model['status'] == Profile::STATUS_INACTIVE) {
-                        return '<span style="color: orange;">Inactive</span>';  
+                        return '<span style="color: orange;">Inactive</span>'; 
+                    } elseif ($model->status == Profile::STATUS_EXPIRED) {
+                        return '<span style="color: red;">Expired</span>';  
                     } else {
                         return '<span style="color: #CCC;">Trash</span>';    
                     }             
@@ -775,6 +782,7 @@ class DirectoryController extends Controller
      */
     public function actionForwarding()
     {
+
        $query = Profile::find()
             ->where(['email_pvt_status' => Profile::PRIVATE_EMAIL_PENDING])
             ->indexBy('id');
@@ -784,6 +792,9 @@ class DirectoryController extends Controller
                 'pageSize' => 10,
             ],
         ]);
+        foreach($dataProvider->getModels() as $model) {                                             // Set model scenarios
+            $model->scenario = 'co-befe';
+        }
         $gridColumns = [
             [
                 'attribute' => 'id',
@@ -808,7 +819,9 @@ class DirectoryController extends Controller
                     } elseif ($model['status'] == Profile::STATUS_ACTIVE) {
                         return '<span style="color:green">Active</span>';
                     } elseif ($model['status'] == Profile::STATUS_INACTIVE) {
-                        return '<span style="color: orange;">Inactive</span>';  
+                        return '<span style="color: orange;">Inactive</span>'; 
+                    } elseif ($model->status == Profile::STATUS_EXPIRED) {
+                        return '<span style="color: red;">Expired</span>';  
                     } else {
                         return '<span style="color: #CCC;">Trash</span>';    
                     }             

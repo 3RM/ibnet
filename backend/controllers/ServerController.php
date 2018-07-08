@@ -104,4 +104,33 @@ class ServerController extends Controller
         ]);
     }
 
+    /**
+     * Yii Cache
+     *
+     * @return string
+     */
+    public function actionCache()
+    {
+
+        if (isset($_POST['backendClear'])) {
+            $sizeBefore = Utility::getTotalSize(Yii::$app->cache->cachePath);
+            Yii::$app->cache->flush();
+            $sizeAfter = Utility::getTotalSize(Yii::$app->cache->cachePath);
+            
+            Yii::$app->session->setFlash('success', 
+                'Yii backend cache flushed successfully. Size before: ' . $sizeBefore . 'B. Size after: ' . $sizeAfter . 'B.');
+        
+        } elseif (isset($_POST['frontendClear'])) {
+            $sizeBefore = Utility::getTotalSize(Yii::$app->cacheFrontend->cachePath);
+            Yii::$app->cacheFrontend->flush();
+            $sizeAfter = Utility::getTotalSize(Yii::$app->cacheFrontend->cachePath);
+            
+            Yii::$app->session->setFlash('success', 
+                'Yii frontend cache flushed successfully. Size before: ' . $sizeBefore . 'B. Size after: ' . $sizeAfter . 'B.');
+        
+        }
+
+        return $this->render('cache');
+    }
+
 }

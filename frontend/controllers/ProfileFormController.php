@@ -7,12 +7,12 @@ use common\models\profile\Association;
 use common\models\profile\Country;
 use common\models\profile\Fellowship;
 use common\models\profile\FormsCompleted;
-use common\models\Profile\Mail;
 use common\models\profile\MissHousing;
 use common\models\profile\MissHousingVisibility;
 use common\models\profile\MissionAgcy;
 use common\models\profile\Profile;
 use common\models\profile\ProfileForm;
+use common\models\profile\ProfileMail;
 use common\models\profile\School;
 use common\models\profile\ServiceTime;
 use common\models\profile\Social;
@@ -21,7 +21,7 @@ use common\models\profile\SubType;
 use common\models\profile\Type;
 use common\models\User;
 use common\models\Utility;
-use frontend\controllers\MailController;
+use frontend\controllers\ProfileMailController;
 use kartik\markdown\MarkdownEditor;
 use Yii;
 use yii\db\Query;
@@ -678,7 +678,7 @@ class ProfileFormController extends ProfileController
 
                 $staffProfile = $this->findProfile($staff->staff_id);
                 $staffProfileOwner = User::findOne($staffProfile->user_id);
-                MailController::initSendLink($profile, $staffProfile, $staffProfileOwner, 'SF', 'L');   // Notify staff profile owner of unconfirmed status
+                ProfileMailController::initSendLink($profile, $staffProfile, $staffProfileOwner, 'SF', 'L');   // Notify staff profile owner of unconfirmed status
             
             }
             return $this->redirect(['form' . $fmNum, 'id' => $profile->id]);                        // Refresh page
@@ -690,7 +690,7 @@ class ProfileFormController extends ProfileController
 
                 $staffProfile = $this->findProfile($staff->staff_id);
                 $staffProfileOwner = User::findOne($staffProfile->user_id);
-                MailController::initSendLink($profile, $staffProfile, $staffProfileOwner, 'SF', 'UL'); // Notify staff profile owner of unconfirmed status
+                ProfileMailController::initSendLink($profile, $staffProfile, $staffProfileOwner, 'SF', 'UL'); // Notify staff profile owner of unconfirmed status
 
             }
             return $this->redirect(['form' . $fmNum, 'id' => $profile->id]);                        // Refresh page
@@ -947,11 +947,14 @@ class ProfileFormController extends ProfileController
             $progressPercent = $profile->getProgressPercent(self::$formArray[$profile->type]) :
             $progressPercent = NULL;
 
-        if (isset($_POST['remove']) && $profile->handleFormHCR()) {
+        if (isset($_POST['edit'])) {
             return $this->render($fm, [
                 'profile' => $profile,
                 'churchLink' => $churchLink,
-                'pp' => $progressPercent]);
+                'pp' => $progressPercent,
+                'edit' => 1]);
+
+        } elseif (isset($_POST['update'])) {
 
         } elseif (isset($_POST['cancel'])) {
             return $this->redirect(['/preview/view-preview', 'id' => $id]); 
@@ -959,9 +962,9 @@ class ProfileFormController extends ProfileController
         } elseif (isset($_POST['exit'])) {
             return $this->redirect(['/profile-mgmt/my-profiles']); 
 
-        } elseif ($profile->load(Yii::$app->request->Post()) && 
-            $profile->handleFormHC() && 
-            $profile->setProgress($fmNum)) {
+        } elseif ($profile->load(Yii::$app->request->Post())) {
+            $profile->handleFormHC(); 
+            $profile->setProgress($fmNum);
             return isset($_POST['save']) ?
                 $this->redirect(['/preview/view-preview', 'id' => $id]) :
                 $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);    
@@ -1137,14 +1140,14 @@ class ProfileFormController extends ProfileController
                 
                 $ministryProfile = $this->findProfile($staff->ministry_id);
                 $ministryProfileOwner = User::findOne($ministryProfile->user_id);
-                MailController::initSendLink($profile, $ministryProfile, $ministryProfileOwner, 'PM', 'UL'); // Notify individual ministry profile owner of unlink
+                ProfileMailController::initSendLink($profile, $ministryProfile, $ministryProfileOwner, 'PM', 'UL'); // Notify individual ministry profile owner of unlink
                 
                 $staff->delete();
             } else {
 
                 $ministryProfile = $profile->ministryOf;
                 $ministryProfileOwner = User::findOne($ministryProfile->user_id);
-                MailController::initSendLink($profile, $ministryProfile, $ministryProfileOwner, 'PM', 'UL'); // Notify organization ministry profile owner of unlink
+                ProfileMailController::initSendLink($profile, $ministryProfile, $ministryProfileOwner, 'PM', 'UL'); // Notify organization ministry profile owner of unlink
 
             }
             $profile->updateAttributes(['ministry_of' => NULL]);
@@ -1154,8 +1157,8 @@ class ProfileFormController extends ProfileController
         } elseif (isset($_POST['removeM']) && $staff = Staff::findOne($_POST['removeM'])) {
             
             $ministryProfile = $this->findProfile($staff->ministry_id);                             // Notify ministry profile owner of unlink
-            $ministryProfileOwner = User::findOne($ministryProfile->user_id);                               //
-            MailController::initSendLink($profile, $ministryProfile, $ministryProfileOwner, 'PM', 'UL');    //
+            $ministryProfileOwner = User::findOne($ministryProfile->user_id);
+            ProfileMailController::initSendLink($profile, $ministryProfile, $ministryProfileOwner, 'PM', 'UL');
             
             $staff->delete();
             return $this->redirect(['form' . $fmNum, 'id' => $profile->id]);                        // Refresh page
@@ -1873,7 +1876,7 @@ class ProfileFormController extends ProfileController
 
         $profile->load(Yii::$app->request->Post());
     
-        if (Mail::sendForwardingEmailRqst($id, $profile->email, $profile->email_pvt)) {             // Send request to admin
+        if (ProfileMail::sendForwardingEmailRqst($id, $profile->email, $profile->email_pvt)) {         // Send request to admin
             Yii::$app->session->setFlash('success', 
                 'Your new email is pending and should be visible on your profile within 48 hours.  
                 You may proceed with creating or updating your profile.');

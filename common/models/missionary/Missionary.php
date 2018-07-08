@@ -2,7 +2,7 @@
 
 namespace common\models\missionary;
 
-use common\models\profile\Mail;
+use common\models\profile\ProfileMail;
 use common\models\profile\MissionAgcy;
 use common\models\profile\Profile;
 use common\models\profile\Staff;
@@ -181,13 +181,13 @@ class Missionary extends \yii\db\ActiveRecord
             $oldMA = MissionAgcy::findOne($this->getOldAttribute('mission_agcy_id'));
             if ($oldMA && ($oldMAProfile = $oldMA->linkedProfile)) {
                 $oldMAProfileOwner = User::findOne($oldMAProfile->user_id);
-                Mail::sendLink($missionary, $oldMAProfile, $oldMAProfileOwner, 'MA', 'UL');         // Notify mission agency profile owner of unlink
+                ProfileMail::sendLink($missionary, $oldMAProfile, $oldMAProfileOwner, 'MA', 'UL');  // Notify mission agency profile owner of unlink
             }
             
             $mA = $this->missionAgcy;
             if ($mA && ($mAProfile = $mA->linkedProfile)) {
                 $mAProfileOwner = User::findOne($mAProfile->user_id);
-                Mail::sendLink($missionary, $mAProfile, $mAProfileOwner, 'MA', 'L');                // Notify mission agency profile owner of link
+                ProfileMail::sendLink($missionary, $mAProfile, $mAProfileOwner, 'MA', 'L');     // Notify mission agency profile owner of link
             }
         }
         

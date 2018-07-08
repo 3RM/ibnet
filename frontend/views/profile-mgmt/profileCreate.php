@@ -31,7 +31,8 @@ $this->title = 'Profile Type';
             'labelOptions' => ['class' => 'col-lg-2 control-label'],
         ],
     ]); ?>
-            
+    
+    <p><?= HTML::icon('info-sign') ?> In order to activate an individual profile (e.g. pastor, evangelist, missionary, etc.), your home church must aleady have an active profile in the directory.</p>        
     <p><?= HTML::icon('info-sign') ?> The profile name is used only for your own personal reference.  It will not appear on the public profile page.</p>
 
     <div class="row">

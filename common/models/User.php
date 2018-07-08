@@ -1,6 +1,7 @@
 <?php
 namespace common\models;
 
+use backend\models\Assignment;
 use common\models\profile\Profile;
 use frontend\controllers\ProfileController;
 use sadovojav\cutter\behaviors\CutterBehavior;
@@ -38,6 +39,7 @@ class User extends ActiveRecord implements
 
     const STATUS_DELETED = 0;
     const STATUS_ACTIVE = 10;
+    const STATUS_BANNED = 20;
 
     const IS_MISSIONARY = 1;
 
@@ -68,10 +70,10 @@ class User extends ActiveRecord implements
 
     public function scenarios() {
         return[
-            'all' => ['status'],
             'passwordReset' => ['password_reset_token'],
             'personal' => ['screen_name', 'home_church', 'role', 'usr_image'],
             'account' => ['newUsername', 'newEmail', 'newPassword', 'emailPrefProfile', 'emailPrefLinks', 'emailPrefComments',   'emailPrefFeatures'],
+            'backend' => ['first_name', 'last_name', 'email', 'new_email', 'new_email_token', 'username', 'auth_key', 'password_hash', 'password_reset_token', 'created_at', 'updated_at', 'last_login', 'status', 'screen_name', 'home_church', 'role', 'ind_act_profiles', 'email_pref_links', 'emailPrefComments', 'emailPrefFeatures', 'emailPrefBlog', 'is_missionary', 'reviewed'],
         ];
     }
 
@@ -81,9 +83,6 @@ class User extends ActiveRecord implements
     public function rules()
     {
         return [
-            ['status', 'default', 'value' => self::STATUS_ACTIVE, 'on' => 'all'],
-            ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_DELETED], 'on' => 'all'],
-
             ['password_reset_token', 'safe', 'on' => 'passwordReset'],
 
             ['usr_image', 'image', 'extensions' => 'jpg, jpeg, gif, png', 'mimeTypes' => 'image/jpeg, image/png', 'maxFiles' => 1, 'maxSize' => 1024 * 4000, 'skipOnEmpty' => true, 'on' => 'personal'],
@@ -98,6 +97,12 @@ class User extends ActiveRecord implements
             ['newPassword', 'string', 'max' => 20, 'on' => 'account'],
             ['currentPassword', 'validateCurrentPass', 'on' => 'account'],
             [['emailPrefProfile', 'emailPrefLinks', 'emailPrefComments', 'emailPrefFeatures'], 'safe', 'on' => 'account'],
+
+            ['username', 'unique', 'targetClass' => '\common\models\User', 'message' => 'This username has already been taken.', 'on' => 'backend'],
+            ['username', 'string', 'min' => 4, 'max' => 255, 'on' => 'backend'],
+            ['newEmail', 'email', 'message' => 'Please provide a valid email address.', 'on' => 'backend'],
+            ['newPassword', 'string', 'max' => 20, 'on' => 'backend'],
+            [['first_name', 'last_name', 'email', 'new_email_token', 'auth_key', 'password_hash', 'password_reset_token', 'created_at', 'updated_at', 'last_login', 'status', 'screen_name', 'home_church', 'role', 'ind_act_profiles', 'emailPrefProfile', 'emailPrefLinks', 'emailPrefComments', 'emailPrefFeatures', 'is_missionary', 'reviewed'], 'safe', 'on' => 'backend'],
         ];
     }
 

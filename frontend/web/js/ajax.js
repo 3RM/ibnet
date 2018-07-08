@@ -1,3 +1,40 @@
+function handleAjaxForm(e) {
+ 
+    e.preventDefault();
+ 
+    var
+        $link = $(e.target),
+        callUrl = $link.attr('action');
+        formId = $link.data('formId'),
+        onDone = $link.data('onDone'),
+        onFail = $link.data('onFail'),
+        onAlways = $link.data('onAlways'),
+        postData = { _csrf: $('_csrf').val(), username: $('#username').val(), password: $('#password').val() };
+ 
+    ajaxRequest = $.ajax({
+        type: "post",
+        dataType: 'json',
+        url: callUrl,
+        data: postData
+    });
+ 
+    // Assign done handler
+    if (typeof onDone === "string" && ajaxCallbacks.hasOwnProperty(onDone)) {
+        ajaxRequest.done(ajaxCallbacks[onDone]);
+    }
+ 
+    // Assign fail handler
+    if (typeof onFail === "string" && ajaxCallbacks.hasOwnProperty(onFail)) {
+        ajaxRequest.fail(ajaxCallbacks[onFail]);
+    }
+ 
+    // Assign always handler
+    if (typeof onAlways === "string" && ajaxCallbacks.hasOwnProperty(onAlways)) {
+        ajaxRequest.always(ajaxCallbacks[onAlways]);
+    }
+ 
+}
+
 function handleAjaxLink(e) {
  
     e.preventDefault();
@@ -76,19 +113,22 @@ function handleAjaxSpanLink(e) {
 
 var ajaxCallbacks = {
 
+    'loginDone': function (response) {
+        $('#login-result').html(response.body);
+        if (response.success == true) {
+            window.location.reload();
+        }
+    },
+
     'likeDone': function (response) {
-        // This is called by the link attribute 'data-on-done' => 'likeDone'
         $('#like-result').html(response.body);
     },
 
     'nextDone': function (response) {
-        // This is called by the link attribute 'data-on-done' => 'nextDone'
         $('#box3Content').html(response.body);
     },
 
     'emailDone': function (response) {
-        // This is called by the link attribute 'data-on-done' => 'emailDone'
-        //console.dir(response);
         $('#email-result').html(response.body);
         if (response.success == true) {
             window.location.reload();
@@ -96,7 +136,6 @@ var ajaxCallbacks = {
     },
 
     'visibleDone': function (response) {
-        // This is called by the link attribute 'data-on-done' => 'likeDone'
         $('#visible-result-'+response.updateId).html(response.body);
     },
 }

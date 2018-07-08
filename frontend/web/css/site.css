@@ -26,8 +26,9 @@
  *
  *
  *
- * Design Modified by: Steve McKinley 12/2/17
- * -----browse page
+ * Design Modified by: Steve McKinley
+ * -----browse page 12/2/17
+ * -----footer 3/30/18
  ************/
 
 @import url(https://fonts.googleapis.com/css?family=PT+Sans:400,700|Source+Sans+Pro:400,300,700);
@@ -53,12 +54,6 @@ body {
 
 .index-wrap > .container {
     padding: 50px 15px 20px;
-}
-
-.footer {
-    height: 80px;
-    background-color: #2c2b2a;
-    padding-top: 30px;
 }
 
 .jumbotron {
@@ -299,7 +294,85 @@ button:focus {outline: none !important;}
 }
 .navbar-inverse .navbar-nav > li > a:hover {
   color: #dc9f27;
+}
+a.navbar-user {
+  padding: 7px 0 0 20px !important;
+}
+a.navbar-user, 
+a.navbar-user:hover,
+a.navbar-user:focus,
+a.navbar-guest,
+a.navbar-guest:hover,
+a.navbar-guest:focus {
+  background-color: transparent !important;
+}
+.navbar-user img {
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
 }  
+.navbar-guest img {
+  height: 35px;
+  width: 35px;
+  margin-top: -6px;
+  border-radius: 50%;
+  margin-left: 5px;
+  opacity: 0.3;
+  filter: alpha(opacity=30); /* For IE8 and earlier */
+}
+.navbar-guest img:hover,
+.navbar-guest img:focus,
+li.dropdown.open img {
+  opacity: 1;
+  filter: alpha(opacity=100); /* For IE8 and earlier */
+}
+.dropdown-menu {
+  width: 215px;
+  padding: 10px;
+  text-align: center;
+  border-radius: 10px !important;
+  background-color: #eeec;
+}
+.dropdown-menu:before {
+  content: ' ';
+  height: 0;
+  position: absolute;
+  width: 0;
+  left:13px;
+  border: 10px solid transparent;
+  border-bottom-color: #eeec;
+  margin-top: -30px;
+  margin-left: 160px;
+}
+.dropdown-menu hr {
+  border-top-color: #bbb;
+}
+#dropdown-menu-user {
+  top: 130%;
+  right: -12px;
+}
+.dropdown-menu button,
+a.register-link,
+#dropdown-menu-user a {
+  width: 100%;
+  font-size: 1.2em;
+  margin: 2px 0;
+}
+#navbar-login-form input {
+  height: 40px;
+  width: 100%;
+  margin: 5px 0;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  border-radius: 10px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+  outline: none !important;
+}
+#login-result a {
+  font-size: 1em;
+}
 .abbreviated {
   display: none;
 }
@@ -382,6 +455,9 @@ nav.shrink .navbar-toggle {
   padding: 4px 5px;
   margin: 8px 15px 8px 0;
 }
+nav.shrink a.navbar-user {
+  padding: 3px 0 0 20px !important;
+}
 .header-wh, .header-wh-mb, .header-wh-sm {
   height: 50px;
   background-color: white;
@@ -409,17 +485,40 @@ nav.shrink .navbar-toggle {
  /*
   * Footer 
   *-----------------------------*/
- .footer p {
-   color: #fff;
- }
- .footer p a {
-   color: #dc9f27;
- }
- .footer .pull-left {
-    float: left !important;
-    margin: 0 5px;
+.footer {
+  height: 100px;
+  background-color: #2c2b2a;
+  margin-top: 20px;
+  color: #fff;
+  font-size: 0.9em;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0 10px;
 }
-
+.footer-container {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0 -25px 0;
+}
+.footer a {
+  color: #dc9f27;
+}
+.footer-links a {
+  margin: 0 10px;
+}
+.footer-social .social {
+  color: #444;
+  float: right;
+  margin: 0 5px;
+  font-size: 1.2em;
+}
+.footer-social .social:hover {
+  color: #dc9f27;
+}
 .cd-top {
   display: inline-block;
   height: 40px;
@@ -465,6 +564,79 @@ nav.shrink .navbar-toggle {
   * Pages 
   *-----------------------------*/
 
+
+/*
+  * Index
+  *-----------------------------*/
+.new-profile {
+  width: 100%;
+  margin: 60px auto;
+  background-color: #fff;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+} 
+.new-profile h3 {
+  margin: 5px 0 0;
+}
+.new-profile p {
+  margin: 0;
+}
+.new-profile img {
+  position: relative;
+  top: -28px;
+  float: left;
+  margin: 0 25px 40px 0;
+}
+.new-profile a.get-started {
+  float: right;
+  margin: 10px 0 40px 0;
+  border-radius: 10px;
+  background-color: #008000;
+  color: #fff;
+}  
+.blog-container {
+  display: flex;
+  margin: 20px 0;
+}
+.blog-card {
+  min-height: 400px;
+  width: 30.666667%;
+  margin: 0 2%;
+  padding: 10px;
+  background-color: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+  overflow: hidden;
+}
+.blog-card:hover {
+  box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+}
+.blog-card:first-child {
+  margin-left: 0;
+}
+.blog-card:last-child {
+  margin-right: 0;
+}
+.blog-card a {
+  color: inherit;
+}
+.blog-card a:hover {
+  text-decoration: none;
+}
+.blog-card img {
+  width: 100%;
+}
+.blog-card p {
+  font-size: 0.9em;
+}
+.blog-card .comments {
+  float: right;
+  font-size: 0.8em;
+  color: #bbb
+}
+.blog-card .comments .glyphicons {
+  margin-right: -6px;
+}
 
 /*
   * Browse
@@ -584,6 +756,22 @@ nav.shrink .navbar-toggle {
 /*
  * Register
  *-------------------------------*/
+.site-register {
+  border-radius: 20px;
+  margin: 40px auto;
+  width: 550px;
+  padding: 20px;
+  background-color: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+.site-register p {
+  font-size: 0.9em;
+}
+.site-register button {
+  position: relative;
+  left: 15px;
+  top: -20px;
+}
 .profile-create {
   background-color: #2a4b6d;
   width: 100vw;
@@ -881,6 +1069,14 @@ button.link-btn:hover {
 /* iPads (portrait) ----------- */
 
 @media only screen and (max-width: 768px) {
+    #menuLogin hr,
+    #menuLogin h4,
+    .dropdown-menu:before {
+      display: none;
+    }
+    #dropdown-menu-user {
+      width: 60%;
+    }
     .header-img {
       background: url(../images/content/landscape-header-mb.jpg);
     }
@@ -912,11 +1108,33 @@ button.link-btn:hover {
     #mb {
       display: block;
     }
+    .footer {
+      height: 220px;
+    }
+    .footer .container {
+      display: flex;
+      flex-direction: column;
+    }
+    .footer .social {
+      top: 0;
+    }
+    .footer .designed-by {
+      float: none;
+    }
+    .site-register {
+      width: 100%;
+    }
+    .site-register button {
+      top: 0px;
+    }
 }
 
 /* iPhones (portrait and landscape) ----------- */
 
 @media only screen and (max-width: 480px) {
+    #dropdown-menu-user {
+      width: 100%;
+    }
     #search-form {
       width: 70%;
     }
@@ -936,6 +1154,25 @@ button.link-btn:hover {
     }
     .header-wh-sm {
       display: block;
+    }
+    .new-profile img {
+      margin-bottom: 10px;
+      float: none;
+      top: -23px;
+    }
+    .blog-container {
+      flex-direction: column;
+      margin: 0;
+    }
+    .blog-card {
+      width: 100%;
+      margin: 15px 0;
+    }
+    .blog-card:first-child {
+      margin-left: 0;
+    }
+    .blog-card:last-child {
+      margin-right: 0;
     }
 }
 

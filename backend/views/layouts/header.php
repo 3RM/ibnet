@@ -22,18 +22,18 @@ use yii\helpers\Html;
             <ul class="nav navbar-nav">
 
                 <!-- Messages: style can be found in dropdown.less-->
-                <li class="dropdown messages-menu">
+                <!-- <li class="dropdown messages-menu">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                         <i class="fa fa-envelope-o"></i>
                         <span class="label label-success">4</span>
                     </a>
                     <ul class="dropdown-menu">
                         <li class="header">You have 4 messages</li>
-                        <li>
+                        <li>-->
                             <!-- inner menu: contains the actual data -->
-                            <ul class="menu">
-                                <li><!-- start message -->
-                                    <a href="#">
+                            <!--<ul class="menu">
+                                <li>--><!-- start message -->
+                                    <!--<a href="#">
                                         <div class="pull-left">
                                             <img src="<?= $directoryAsset ?>/img/user2-160x160.jpg" class="img-circle"
                                                  alt="User Image"/>
@@ -44,9 +44,9 @@ use yii\helpers\Html;
                                         </h4>
                                         <p>Why not buy a new awesome theme?</p>
                                     </a>
-                                </li>
+                                </li>-->
                                 <!-- end message -->
-                                <li>
+                                <!--<li>
                                     <a href="#">
                                         <div class="pull-left">
                                             <img src="<?= $directoryAsset ?>/img/user3-128x128.jpg" class="img-circle"
@@ -102,17 +102,17 @@ use yii\helpers\Html;
                         </li>
                         <li class="footer"><a href="#">See All Messages</a></li>
                     </ul>
-                </li>
-                <li class="dropdown notifications-menu">
+                </li>-->
+                <!--<li class="dropdown notifications-menu">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                         <i class="fa fa-bell-o"></i>
                         <span class="label label-warning">10</span>
                     </a>
                     <ul class="dropdown-menu">
                         <li class="header">You have 10 notifications</li>
-                        <li>
+                        <li> -->
                             <!-- inner menu: contains the actual data -->
-                            <ul class="menu">
+                            <!--<ul class="menu">
                                 <li>
                                     <a href="#">
                                         <i class="fa fa-users text-aqua"></i> 5 new members joined today
@@ -144,7 +144,7 @@ use yii\helpers\Html;
                         </li>
                         <li class="footer"><a href="#">View all</a></li>
                     </ul>
-                </li>
+                </li> -->
                 <!-- Forwarding Email Request: style can be found in dropdown.less -->
                 <li class="dropdown tasks-menu">
                     <?= ($cntH = Profile::find()->where(['email_pvt_status' => Profile::PRIVATE_EMAIL_PENDING])->count()) ?

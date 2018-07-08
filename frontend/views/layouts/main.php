@@ -3,6 +3,7 @@
 /* @var $this \yii\web\View */
 /* @var $content string */
 
+use frontend\assets\AjaxAsset;
 use frontend\assets\AppAsset;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
@@ -10,6 +11,7 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 
 AppAsset::register($this);
+AjaxAsset::register($this);
 $title="IBNet | Independent Baptist Network";
 ?>
 <?php $this->beginPage() ?>
@@ -46,52 +48,14 @@ $title="IBNet | Independent Baptist Network";
 </script>
 
 <div class="wrap" id="main-wrap">
-    <?php
-    NavBar::begin([
-        'brandLabel' =>  '<span class="abbreviated">IBNet</span><span class="fullname">IBNet | for independent Baptists everywhere</span>',
-        'brandUrl' => Yii::$app->homeUrl,
-        'options' => [
-            'class' => 'navbar-inverse navbar-fixed-top',
-        ],
-    ]);
-    $menuItems = [
-        ['label' => 'Search', 'url' => ['/site/index']],
-        ['label' => 'Browse', 'url' => ['/profile/browse']],
-        ['label' => 'About', 'url' => ['/site/about']],
-        ['label' => 'Contact', 'url' => ['/site/contact']],
-    ];
-    if (Yii::$app->user->isGuest) {
-        $menuItems[] = ['label' => 'Login', 'url' => ['/site/login']];
-    } else {
-        $menuItems[] = ['label' => 'My Account', 'url' => ['/site/settings']];
-        $menuItems[] = [
-                'label' => 'Logout (' . Yii::$app->user->identity->first_name . ')',
-                'url' => ['/site/logout'],
-                'linkOptions' => ['data-method' => 'post']
-        ];
-    }
-    echo Nav::widget([
-        'options' => ['class' => 'navbar-nav navbar-right'],
-        'items' => $menuItems,
-    ]);
-    NavBar::end();
-    ?>
+    <?= $this->render('_navbar') ?>
     <div class="clearfix"></div>
     <div class="container">
         <?= $content ?>
     </div>
 </div>
 
-<footer class="footer">
-    <div class="container">
-        <p class="pull-left">&copy; Independent Baptist Network <?php echo date('Y') ?> </p>
-        <p class="pull-left"><?= HTML::a('Privacy', ['/site/privacy']) ?> </p>
-        <p class="pull-left"><?= HTML::a('Terms', ['/site/terms']) ?> </p>
-        <p class="pull-left"><?= HTML::a('Beliefs', ['/site/beliefs']) ?> </p>
-
-        <p class="pull-right">Designed by <a href="http://ifbdesign.com" target="_blank">IFBDesign</a> & <a href="https://ibnet.org" target="_blank">IBNet</a></p>
-    </div>
-</footer>
+<?= $this->render('_footer') ?>
 
 <?php $this->endBody() ?>
 <a href="#0" class="cd-top">Top</a>

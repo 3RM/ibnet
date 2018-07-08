@@ -1,14 +1,21 @@
 <?php
 namespace backend\controllers;
 
+use backend\models\Assignment;
+use backend\models\AssignmentSearch;
+use backend\models\Permission;
+use backend\models\Role;
+use backend\models\Rule;
 use backend\models\UserSearch;
 use common\models\Utility;
 use common\models\User;
+use kartik\grid\EditableColumnAction;
 use Yii;
 use yii\bootstrap\Html;
 use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 
 /**
@@ -70,9 +77,13 @@ class AccountsController extends Controller
                 'attribute' => 'status',
                 'format' => 'raw',
                 'value' => function ($model) {  
-                    return $model->status == User::STATUS_ACTIVE ?
-                        '<span style="color:green">Active</span>' :
-                        '<span style="color: #222222;">Deleted</span>';                 
+                    if ($model->status == User::STATUS_DELETED) {
+                        return '<span style="color:orange">Deleted</span>';
+                    } elseif ($model->status == User::STATUS_ACTIVE) {
+                        return '<span style="color:green">Active</span>';
+                    } elseif ($model->status == User::STATUS_BANNED) {
+                        return '<span style="color:red">Banned</span>';  
+                    }             
                 },
             ], 
             'username', 
@@ -164,9 +175,13 @@ class AccountsController extends Controller
             'screen_name',
             'home_church',
             'role',
-            'emailPrefProfile',
+            'ind_act_profiles',
             'emailPrefLinks',
+            'emailPrefComments',
             'emailPrefFeatures',
+            'emailPrefBlog',
+            'is_missionary',
+            'reviewed',
         ];
         
         return $this->render('view', [
@@ -180,9 +195,23 @@ class AccountsController extends Controller
      *
      * @return string
      */
-    public function actionUpdate()
+    public function actionUpdate($id)
     {
-        return $this->render('update');
+        $user = User::findOne($id);
+        $user->scenario = 'backend';
+
+        if (isset($_POST['cancel'])) {
+            return $this->redirect(['users']); 
+        } elseif ($user->load(Yii::$app->request->Post())) {
+            $user->email = ($user->email == '' || $user->email == NULL) ? NULL : $user->email;
+            $user->validate();
+            $user->save();
+            Yii::$app->session->setFlash('success', 'User record has been updated.');
+
+            return $this->redirect(['users']);
+        }
+
+        return $this->render('update', ['user' => $user]);
     }
 
     /**
@@ -199,23 +228,66 @@ class AccountsController extends Controller
     }
 
     /**
-     * Displays Assignments.
+     * Displays Auth Assignments.
      *
      * @return string
      */
-    public function actionAssignments()
+    public function actionAssignmentq()
     {
-        return $this->render('assignments');
+        $searchModel = new AssignmentSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->get());
+        $gridColumns = [
+            'user_id',
+            [
+                'class' => 'kartik\grid\EditableColumn',
+                'attribute' => 'item_name',
+                'editableOptions'=>[
+                    'inputType'=>\kartik\editable\Editable::INPUT_DROPDOWN_LIST,
+                    'data' => ['User', 'Admin'],
+                    'formOptions'=>['action' => ['updateUserRole']],
+                ],
+            ],
+            [
+                'attribute' => 'created_at',
+                'format' => 'raw',
+                'value' => function ($model) {                      
+                    return Yii::$app->formatter->asDate($model->created_at, 'php:Y-m-d');
+                },
+                'hAlign'=>'center',
+                'vAlign' => 'middle',
+                'width'=>'8%',
+                'headerOptions'=>['class'=>'kv-sticky-column'],
+                'contentOptions'=>['class'=>'kv-sticky-column'],
+            ],
+        ];
+
+        return $this->render('assignments', [
+            'searchModel' => $searchModel, 
+            'dataProvider' => $dataProvider,
+            'gridColumns' => $gridColumns,
+        ]);
     }
 
     /**
-     * Displays Roles.
+     * Displays Auth Roles.
      *
      * @return string
      */
-    public function actionRoles()
+    public function actionRole()
     {
-        return $this->render('roles');
+   
+        $dataProvider = new ActiveDataProvider([
+            'query' => Role::find(),
+            'pagination' => [
+                'pageSize' => 100,
+            ],
+        ]);
+        // $gridColumns = [];
+
+        return $this->render('roles', [
+            'dataProvider' => $dataProvider,
+            // 'gridColumns' => $gridColumns,
+        ]);
     }
 
     /**
@@ -223,9 +295,20 @@ class AccountsController extends Controller
      *
      * @return string
      */
-    public function actionPermissions()
+    public function actionPermission()
     {
-        return $this->render('permissions');
+        $dataProvider = new ActiveDataProvider([
+            'query' => Permission::find(),
+            'pagination' => [
+                'pageSize' => 100,
+            ],
+        ]);
+        // $gridColumns = [];
+
+        return $this->render('permissions', [
+            'dataProvider' => $dataProvider,
+            // 'gridColumns' => $gridColumns,
+        ]);
     }
 
     /**
@@ -233,8 +316,34 @@ class AccountsController extends Controller
      *
      * @return string
      */
-    public function actionRules()
+    public function actionRule()
     {
-        return $this->render('rules');
+        $dataProvider = new ActiveDataProvider([
+            'query' => Rule::find(),
+            'pagination' => [
+                'pageSize' => 100,
+            ],
+        ]);
+        // $gridColumns = [];
+
+        return $this->render('rules', [
+            'dataProvider' => $dataProvider,
+            // 'gridColumns' => $gridColumns,
+        ]);
+    }
+
+    /**
+     * Update editable columns in Gridview widget
+     *
+     * @return string
+     */
+    public function actions()
+    {
+        return ArrayHelper::merge(parent::actions(), [
+            'updateUserRole' => [                                                                       // identifier for the editable action
+                'class' => EditableColumnAction::className(),
+                'modelClass' => Assignment::className(),
+            ],
+        ]);
     }
 }

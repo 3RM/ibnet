@@ -72,328 +72,255 @@ class Box3Content extends Model
             
             $desc = preg_replace("/[^a-zA-Z0-9\s\.\,\?\!\"\-]/", "", $profile->description);
 
+            $content =     Html::img('@images/content/new.png');
+
             switch ($profile->type) {
 
                 case 'Association':
-                    $content = Html::a(Html::img('@web/images/association-new.jpg', ['class' => 'img-thumbnail']), ['profile/association',
-                        'urlLoc' => $profile->url_loc, 
-                        'name' => $profile->url_name, 
-                        'id' => $profile->id]);
-                    $content .= '<div class="caption">';
-                    $content .=     '<h3>';
-                    $content .=         Html::a($profile->org_name, ['profile/association',
-                                            'urlLoc' => $profile->url_loc, 
-                                            'name' => $profile->url_name, 
-                                            'id' => $profile->id]);
-                    $content .=     '</h3>';
-                    $content .=     '<h4>';
-                    $content .=         $profile->org_city;
-                    $content .=         ', ';
-                    $content .=         empty($profile->org_st_prov_reg) ? NULL : $profile->org_st_prov_reg;
-                    $content .=         $profile->org_country == 'United States' ? '' : ', ' . $profile->org_country;
-                    $content .=     '</h4>';
-                    $content .=     '<p>' . substr($desc, 0, 150) . '... </p>';
-                    $content .= '</div>';
+                    $content .= '<h3>';
+                    $content .=     Html::a($profile->org_name, ['profile/association',
+                                        'urlLoc' => $profile->url_loc, 
+                                        'name' => $profile->url_name, 
+                                        'id' => $profile->id]);
+                    $content .= '</h3>';
+                    $content .= '<p>';
+                    $content .=     $profile->org_city;
+                    $content .=     ', ';
+                    $content .=     empty($profile->org_st_prov_reg) ? NULL : $profile->org_st_prov_reg;
+                    $content .=     $profile->org_country == 'United States' ? '' : ', ' . $profile->org_country;
+                    $content .= '</h4>';
+                    $content .= '<p>' . Utility::trimText($desc, 50) . '</p>';
                     break;
                 
                 case 'Camp' :
-                    $content = Html::a(Html::img('@web/images/camp-new.jpg', ['class' => 'img-thumbnail']), ['profile/camp',
-                        'urlLoc' => $profile->url_loc, 
-                        'name' => $profile->url_name, 
-                        'id' => $profile->id]);
-                    $content .= '<div class="caption">';
-                    $content .=     '<h3>';
-                    $content .=         Html::a($profile->org_name, ['profile/camp',
-                                            'urlLoc' => $profile->url_loc, 
-                                            'name' => $profile->url_name, 
-                                            'id' => $profile->id]);
-                    $content .=     '</h3>';
-                    $content .=     '<h4>';
-                    $content .=         $profile->org_city;
-                    $content .=         ', ';
-                    $content .=         empty($profile->org_st_prov_reg) ? NULL : $profile->org_st_prov_reg;
-                    $content .=         $profile->org_country == 'United States' ? '' : ', ' . $profile->org_country;
-                    $content .=     '</h4>';
-                    $content .=     '<p>' . substr($desc, 0, 150) . '... </p>';
-                    $content .= '</div>';               
+                    $content .= '<h3>';
+                    $content .=     Html::a($profile->org_name, ['profile/camp',
+                                        'urlLoc' => $profile->url_loc, 
+                                        'name' => $profile->url_name, 
+                                        'id' => $profile->id]);
+                    $content .= '</h3>';
+                    $content .= '<p>';
+                    $content .=     $profile->org_city;
+                    $content .=     ', ';
+                    $content .=     empty($profile->org_st_prov_reg) ? NULL : $profile->org_st_prov_reg;
+                    $content .=     $profile->org_country == 'United States' ? '' : ', ' . $profile->org_country;
+                    $content .= '</p>';
+                    $content .= '<p>' . Utility::trimText($desc, 50) . '</p>';              
                     break;
 
                 case 'Chaplain' :
-                    $content = Html::a(Html::img('@web/images/chaplain-new.jpg', ['class' => 'img-thumbnail']), ['profile/chaplain',
-                        'urlLoc' => $profile->url_loc, 
-                        'name' => $profile->url_name, 
-                        'id' => $profile->id]);
-                    $content .= '<div class="caption">';
-                    $content .=     '<h3>';
-                    $content .=         Html::a($profile->getFormattedNames()->formattedNames, ['profile/chaplin',
-                                            'urlLoc' => $profile->url_loc, 
-                                            'name' => $profile->url_name, 
-                                            'id' => $profile->id]);
-                    $content .=     '</h3>';
-                    $content .=     '<h4>';
-                    $content .=         $profile->type;
-                    $content .=         ', ';
-                    $content .=         $profile->ind_city;
-                    $content .=         ', ';
-                    $content .=         empty($profile->ind_st_prov_reg) ? NULL : $profile->ind_st_prov_reg;
-                    $content .=         $profile->ind_country == 'United States' ? '' : ', ' . $profile->ind_country;
-                    $content .=     '</h4>';
-                    $content .=     '<p>' . substr($desc, 0, 150) . '... </p>';
-                    $content .= '</div>';
+                    $content .= '<h3>';
+                    $content .=     Html::a($profile->getFormattedNames()->formattedNames, ['profile/chaplin',
+                                        'urlLoc' => $profile->url_loc, 
+                                        'name' => $profile->url_name, 
+                                        'id' => $profile->id]);
+                    $content .= '</h3>';
+                    $content .= '<p>';
+                    $content .=     $profile->type;
+                    $content .=     ' &#8226 ';
+                    $content .=     $profile->ind_city;
+                    $content .=     ', ';
+                    $content .=     empty($profile->ind_st_prov_reg) ? NULL : $profile->ind_st_prov_reg;
+                    $content .=     $profile->ind_country == 'United States' ? '' : ', ' . $profile->ind_country;
+                    $content .= '</p>';
+                    $content .= '<p>' . Utility::trimText($desc, 50) . '</p>';
                     break;
 
                 case 'Church' :
-                    $content = Html::a(Html::img('@web/images/church-new.jpg', ['class' => 'img-thumbnail']), ['profile/church',
-                        'urlLoc' => $profile->url_loc, 
-                        'name' => $profile->url_name, 
-                        'id' => $profile->id]);
-                    $content .= '<div class="caption">';
-                    $content .=     '<h3>';
-                    $content .=         Html::a($profile->org_name, ['profile/church',
-                                            'urlLoc' => $profile->url_loc, 
-                                            'name' => $profile->url_name, 
-                                            'id' => $profile->id]);
-                    $content .=     '</h3>';
-                    $content .=     '<h4>';
-                    $content .=         $profile->org_city;
-                    $content .=         ', ';
-                    $content .=         empty($profile->org_st_prov_reg) ? NULL : $profile->org_st_prov_reg;
-                    $content .=         $profile->org_country == 'United States' ? '' : ', ' . $profile->org_country;
-                    $content .=     '</h4>';
-                    $content .=     '<p>Pastor ' . $profile->getFormattedNames()->formattedNames . '</p>';
-                    $content .=     '<p>' . substr($desc, 0, 150) . '... </p>';
-                    $content .= '</div>';               
+                    $content .= '<h3>';
+                    $content .=     Html::a($profile->org_name, ['profile/church',
+                                        'urlLoc' => $profile->url_loc, 
+                                        'name' => $profile->url_name, 
+                                        'id' => $profile->id]);
+                    $content .= '</h3>';
+                    $content .= '<p>';
+                    $content .=     $profile->org_city;
+                    $content .=     ', ';
+                    $content .=     empty($profile->org_st_prov_reg) ? NULL : $profile->org_st_prov_reg;
+                    $content .=     $profile->org_country == 'United States' ? '' : ', ' . $profile->org_country;
+                    $content .=     ' &#8226 ';
+                    $content .=     'Pastor ' . $profile->getFormattedNames()->formattedNames;
+                    $content .= '</p>';
+                    $content .= '<p>' . Utility::trimText($desc, 50) . '</p>';              
                     break;
 
                 case 'Evangelist' :
-                    $content = Html::a(Html::img('@web/images/evangelist-new.jpg', ['class' => 'img-thumbnail']), ['profile/evangelist',
-                        'urlLoc' => $profile->url_loc, 
-                        'name' => $profile->url_name, 
-                        'id' => $profile->id]);
-                    $content .= '<div class="caption">';
-                    $content .=     '<h3>';
-                    $content .=         Html::a($profile->getFormattedNames()->formattedNames, ['profile/evangelist',
-                                            'urlLoc' => $profile->url_loc, 
-                                            'name' => $profile->url_name, 
-                                            'id' => $profile->id]);
-                    $content .=     '</h3>';
-                    $content .=     '<h4>';
-                    $content .=         $profile->ind_city;
-                    $content .=         ', ';
-                    $content .=         $profile->ind_st_prov_reg;
-                    $content .=         $profile->ind_country == 'United States' ? '' : ', ' . $profile->ind_country;
-                    $content .=     '</h4>';
-                    $content .=     '<p>' . substr($desc, 0, 150) . '... </p>';
-                    $content .= '</div>';
+                    $content .= '<h3>';
+                    $content .=     Html::a($profile->getFormattedNames()->formattedNames, ['profile/evangelist',
+                                        'urlLoc' => $profile->url_loc, 
+                                        'name' => $profile->url_name, 
+                                        'id' => $profile->id]);
+                    $content .= '</h3>';
+                    $content .= '<p>';
+                    $content .=     $profile->type;
+                    $content .=     ' &#8226 ';
+                    $content .=     $profile->ind_city;
+                    $content .=     ', ';
+                    $content .=     $profile->ind_st_prov_reg;
+                    $content .=     $profile->ind_country == 'United States' ? '' : ', ' . $profile->ind_country;
+                    $content .= '</p>';
+                    $content .= '<p>' . Utility::trimText($desc, 50) . '</p>';
                     break;
 
                 case 'Fellowship' :
-                    $content = Html::a(Html::img('@web/images/fellowship-new.jpg', ['class' => 'img-thumbnail']), ['profile/fellowship',
-                        'urlLoc' => $profile->url_loc, 
-                        'name' => $profile->url_name, 
-                        'id' => $profile->id]);
-                    $content .= '<div class="caption">';
-                    $content .=     '<h3>';
-                    $content .=         Html::a($profile->org_name, ['profile/fellowship',
-                                            'urlLoc' => $profile->url_loc, 
-                                            'name' => $profile->url_name, 
-                                            'id' => $profile->id]);
-                    $content .=     '</h3>';
-                    $content .=     '<h4>';
-                    $content .=         $profile->org_city;
-                    $content .=         ', ';
-                    $content .=         empty($profile->org_st_prov_reg) ? NULL : $profile->org_st_prov_reg;
-                    $content .=         $profile->org_country == 'United States' ? '' : ', ' . $profile->org_country;
-                    $content .=     '</h4>';
-                    $content .=     '<p>' . substr($desc, 0, 150) . '... </p>';
-                    $content .= '</div>';
+                    $content .= '<h3>';
+                    $content .=     Html::a($profile->org_name, ['profile/fellowship',
+                                        'urlLoc' => $profile->url_loc, 
+                                        'name' => $profile->url_name, 
+                                        'id' => $profile->id]);
+                    $content .= '</h3>';
+                    $content .= '<p>';
+                    $content .=     $profile->org_city;
+                    $content .=     ', ';
+                    $content .=     empty($profile->org_st_prov_reg) ? NULL : $profile->org_st_prov_reg;
+                    $content .=     $profile->org_country == 'United States' ? '' : ', ' . $profile->org_country;
+                    $content .= '</p>';
+                    $content .= '<p>' . Utility::trimText($desc, 50) . '</p>';
                     break;
 
                 case 'Special Ministry' :
-                    $content = Html::a(Html::img('@web/images/special-new.jpg', ['class' => 'img-thumbnail']), ['profile/special-ministry',
-                        'urlLoc' => $profile->url_loc, 
-                        'name' => $profile->url_name, 
-                        'id' => $profile->id]);
-                    $content .= '<div class="caption">';
-                    $content .=     '<h3>';
-                    $content .=         Html::a($profile->org_name, ['profile/special-ministry',
-                                            'urlLoc' => $profile->url_loc, 
-                                            'name' => $profile->url_name, 
-                                            'id' => $profile->id]);
-                    $content .=     '</h3>';
-                    $content .=     '<h4>';
-                    $content .=         $profile->org_city;
-                    $content .=         ', ';
-                    $content .=         empty($profile->org_st_prov_reg) ? NULL : $profile->org_st_prov_reg;
-                    $content .=         $profile->org_country == 'United States' ? '' : ', ' . $profile->org_country;
-                    $content .=     '</h4>';
-                    $content .=     '<p>' . substr($desc, 0, 150) . '... </p>';
-                $content .= '</div>';
-                break;
+                    $content .= '<h3>';
+                    $content .=     Html::a($profile->org_name, ['profile/special-ministry',
+                                        'urlLoc' => $profile->url_loc, 
+                                        'name' => $profile->url_name, 
+                                        'id' => $profile->id]);
+                    $content .= '</h3>';
+                    $content .= '<p>';
+                    $content .=     $profile->org_city;
+                    $content .=     ', ';
+                    $content .=     empty($profile->org_st_prov_reg) ? NULL : $profile->org_st_prov_reg;
+                    $content .=     $profile->org_country == 'United States' ? '' : ', ' . $profile->org_country;
+                    $content .= '</p>';
+                    $content .= '<p>' . Utility::trimText($desc, 50) . '</p>';
+                    break;
 
                 case 'Mission Agency' :
-                    $content = Html::a(Html::img('@web/images/mission-new.jpg', ['class' => 'img-thumbnail']), ['profile/mission-agency',
-                        'urlLoc' => $profile->url_loc, 
-                        'name' => $profile->url_name, 
-                        'id' => $profile->id]);
-                    $content .= '<div class="caption">';
-                    $content .=     '<h3>';
-                    $content .=         Html::a($profile->org_name, ['profile/mission-agency',
-                                            'urlLoc' => $profile->url_loc, 
-                                            'name' => $profile->url_name, 
-                                            'id' => $profile->id]);
-                    $content .=     '</h3>';
-                    $content .=     '<h4>';
-                    $content .=         $profile->org_city;
-                    $content .=         ', ';
-                    $content .=         empty($profile->org_st_prov_reg) ? NULL : $profile->org_st_prov_reg;
-                    $content .=         $profile->org_country == 'United States' ? '' : ', ' . $profile->org_country;
-                    $content .=     '</h4>';
-                    $content .=     '<p>' . substr($desc, 0, 150) . '... </p>';
-                    $content .= '</div>';
+                    $content .= '<h3>';
+                    $content .=     Html::a($profile->org_name, ['profile/mission-agency',
+                                        'urlLoc' => $profile->url_loc, 
+                                        'name' => $profile->url_name, 
+                                        'id' => $profile->id]);
+                    $content .= '</h3>';
+                    $content .= '<p>';
+                    $content .=     $profile->org_city;
+                    $content .=     ', ';
+                    $content .=     empty($profile->org_st_prov_reg) ? NULL : $profile->org_st_prov_reg;
+                    $content .=     $profile->org_country == 'United States' ? '' : ', ' . $profile->org_country;
+                    $content .= '</p>';
+                    $content .= '<p>' . Utility::trimText($desc, 50) . '</p>';
                     break;
 
                 case 'Missionary' :
                     $names = isset($profile->spouse_first_name) ?
                         ($profile->ind_first_name . ' & ' . $profile->spouse_first_name . ' ' . $profile->ind_last_name) :
                         ($profile->ind_first_name . ' ' . $profile->ind_last_name);
-                    $content = Html::a(Html::img('@web/images/missionary-new.jpg', ['class' => 'img-thumbnail']), ['profile/missionary',
-                        'urlLoc' => $profile->url_loc, 
-                        'name' => $profile->url_name, 
-                        'id' => $profile->id]);
-                    $content .= '<div class="caption">';
-                    $content .=     '<h3>';
-                    $content .=         Html::a($names, ['profile/missionary',
-                                            'urlLoc' => $profile->url_loc, 
-                                            'name' => $profile->url_name, 
-                                            'id' => $profile->id]);
-                    $content .=     '</h3>';
+                    $content .= '<h3>';
+                    $content .=     Html::a($names, ['profile/missionary',
+                                        'urlLoc' => $profile->url_loc, 
+                                        'name' => $profile->url_name, 
+                                        'id' => $profile->id]);
+                    $content .= '</h3>';
                     if ($missionary) {
-                        $content .=     '<h4>';
-                        $content .=         $profile->spouse_first_name == NULL ? 
-                                                'Missionary to ' . $missionary->field . ', Status: ' . $missionary->status :
-                                                'Missionaries to ' . $missionary->field . ', Status: ' . $missionary->status;
-                        $content .=     '</h4>';
+                        $content .= '<p>';
+                        $content .=     $profile->spouse_first_name == NULL ? 
+                                            'Missionary to ' . $missionary->field . ', Status: ' . $missionary->status :
+                                            'Missionaries to ' . $missionary->field . ', Status: ' . $missionary->status;
+                        $content .= '</p>';
                     }
-                    $content .=     '<p>' . substr($desc, 0, 150) . '... </p>';
-                    $content .= '</div>';
+                    $content .= '<p>' . Utility::trimText($desc, 50) . '</p>';
                     break;
 
                 case 'Music Ministry' :
-                    $content = Html::a(Html::img('@web/images/music-new.jpg', ['class' => 'img-thumbnail']), ['profile/music',
-                        'urlLoc' => $profile->url_loc, 
-                        'name' => $profile->url_name, 
-                        'id' => $profile->id]);
-                    $content .= '<div class="caption">';
-                    $content .=     '<h3>';
-                    $content .=         Html::a($profile->org_name, ['profile/music',
-                                            'urlLoc' => $profile->url_loc, 
-                                            'name' => $profile->url_name, 
-                                            'id' => $profile->id]);
-                    $content .=     '</h3>';
-                    $content .=     '<h4>';
-                    $content .=         $profile->org_city;
-                    $content .=         ', ';
-                    $content .=         empty($profile->org_st_prov_reg) ? NULL : $profile->org_st_prov_reg;
-                    $content .=         $profile->org_country == 'United States' ? '' : ', ' . $profile->org_country;
-                    $content .=     '</h4>';
-                    $content .=     '<p>' . substr($desc, 0, 150) . '... </p>';
-                    $content .= '</div>';
+                    $content .= '<h3>';
+                    $content .=     Html::a($profile->org_name, ['profile/music',
+                                        'urlLoc' => $profile->url_loc, 
+                                        'name' => $profile->url_name, 
+                                        'id' => $profile->id]);
+                    $content .= '</h3>';
+                    $content .= '<p>';
+                    $content .=     $profile->type;
+                    $content .=     ' &#8226 ';
+                    $content .=     $profile->org_city;
+                    $content .=     ', ';
+                    $content .=     empty($profile->org_st_prov_reg) ? NULL : $profile->org_st_prov_reg;
+                    $content .=     $profile->org_country == 'United States' ? '' : ', ' . $profile->org_country;
+                    $content .= '</p>';
+                    $content .= '<p>' . Utility::trimText($desc, 50) . '</p>';
                     break;
 
                 case 'Pastor' :
-                    $content = Html::a(Html::img('@web/images/pastor-new.jpg', ['class' => 'img-thumbnail']), ['profile/pastor',
-                        'urlLoc' => $profile->url_loc, 
-                        'name' => $profile->url_name, 
-                        'id' => $profile->id]);
-                    $content .= '<div class="caption">';
-                    $content .=     '<h3>';
-                    $content .=         Html::a($profile->getFormattedNames()->formattedNames, ['profile/pastor',
-                                            'urlLoc' => $profile->url_loc, 
-                                            'name' => $profile->url_name, 
-                                            'id' => $profile->id]);
-                    $content .=     '</h3>';
+                    $content .= '<h3>';
+                    $content .=     Html::a($profile->getFormattedNames()->formattedNames, ['profile/pastor',
+                                        'urlLoc' => $profile->url_loc, 
+                                        'name' => $profile->url_name, 
+                                        'id' => $profile->id]);
+                    $content .= '</h3>';
                     if ($linkedProfile) {
-                        $content .=     '<h4>';
-                        $content .=         $linkedProfile->org_name . ', ' . $linkedProfile->org_city;
-                        $content .=         empty($linkedProfile->org_st_prov_reg) ? NULL : ', ' . $linkedProfile->org_st_prov_reg;
-                        $content .=         $linkedProfile->org_country == 'United States' ? '' : ', ' . $linkedProfile->org_country;
-                        $content .=     '</h4>';
+                        $content .= '<p>';
+                        $content .=     $profile->sub_type;
+                        $content .=     ' &#8226 ';
+                        $content .=     $linkedProfile->org_name . ', ' . $linkedProfile->org_city;
+                        $content .=     empty($linkedProfile->org_st_prov_reg) ? NULL : ', ' . $linkedProfile->org_st_prov_reg;
+                        $content .=     $linkedProfile->org_country == 'United States' ? '' : ', ' . $linkedProfile->org_country;
+                        $content .= '</p>';
                     }
-                    $content .=     '<p>' . substr($desc, 0, 150) . '... </p>';
-                    $content .= '</div>';
+                    $content .= '<p>' . Utility::trimText($desc, 50) . '</p>';
                     break;
 
                 case 'Print Ministry' :
-                    $content = Html::a(Html::img('@web/images/print-new.jpg', ['class' => 'img-thumbnail']), ['profile/print',
-                        'urlLoc' => $profile->url_loc, 
-                        'name' => $profile->url_name, 
-                        'id' => $profile->id]);
-                    $content .= '<div class="caption">';
-                    $content .=     '<h3>';
-                    $content .=         Html::a($profile->org_name, ['profile/print',
-                                            'url_loc' => $profile->url_loc, 
-                                            'name' => $profile->url_name, 
-                                            'id' => $profile->id]);
-                    $content .=     '</h3>';
-                    $content .=     '<h4>';
-                    $content .=         $profile->org_city;
-                    $content .=         ', ';
-                    $content .=         empty($profile->org_st_prov_reg) ? NULL : $profile->org_st_prov_reg;
-                    $content .=         $profile->org_country == 'United States' ? '' : ', ' . $profile->org_country;
-                    $content .=     '</h4>';
-                    $content .=     '<p>' . substr($desc, 0, 150) . '... </p>';
-                    $content .= '</div>';
+                    $content .= '<h3>';
+                    $content .=     Html::a($profile->org_name, ['profile/print',
+                                        'url_loc' => $profile->url_loc, 
+                                        'name' => $profile->url_name, 
+                                        'id' => $profile->id]);
+                    $content .= '</h3>';
+                    $content .= '<p>';
+                    $content .=     $profile->type;
+                    $content .=     ' &#8226 ';
+                    $content .=     $profile->org_city;
+                    $content .=     ', ';
+                    $content .=     empty($profile->org_st_prov_reg) ? NULL : $profile->org_st_prov_reg;
+                    $content .=     $profile->org_country == 'United States' ? '' : ', ' . $profile->org_country;
+                    $content .= '</p>';
+                   $content .= '<p>' . Utility::trimText($desc, 50) . '</p>';
                     break;
 
                 case 'School' :
-                    $content = Html::a(Html::img('@web/images/school-new.jpg', ['class' => 'img-thumbnail']), ['profile/school',
-                        'urlLoc' => $profile->url_loc, 
-                        'name' => $profile->url_name, 
-                        'id' => $profile->id]);
-                    $content .= '<div class="caption">';
-                    $content .=     '<h3>';
-                    $content .=         Html::a($profile->org_name, ['profile/school',
-                                            'urlLoc' => $profile->url_loc, 
-                                            'name' => $profile->url_name, 
-                                            'id' => $profile->id]);
-                    $content .=     '</h3>';
-                    $content .=     '<h4>';
-                    $content .=         $profile->org_city;
-                    $content .=         ', ';
-                    $content .=         empty($profile->org_st_prov_reg) ? NULL : $profile->org_st_prov_reg;
-                    $content .=         $profile->org_country == 'United States' ? '' : ', ' . $profile->org_country;
-                    $content .=     '</h4>';
-                    $content .=     '<p>' . substr($desc, 0, 150) . '... </p>';
-                    $content .= '</div>';
+                    $content .= '<h3>';
+                    $content .=     Html::a($profile->org_name, ['profile/school',
+                                        'urlLoc' => $profile->url_loc, 
+                                        'name' => $profile->url_name, 
+                                        'id' => $profile->id]);
+                    $content .= '</h3>';
+                    $content .= '<p>';
+                    $content .=     $profile->org_city;
+                    $content .=     ', ';
+                    $content .=     empty($profile->org_st_prov_reg) ? NULL : $profile->org_st_prov_reg;
+                    $content .=     $profile->org_country == 'United States' ? '' : ', ' . $profile->org_country;
+                    $content .= '</p>';
+                    $content .= '<p>' . Utility::trimText($desc, 50) . '</p>';
                     break;
 
                 case 'Staff' :
-                    $content = Html::a(Html::img('@web/images/staff-new.jpg', ['class' => 'img-thumbnail']), ['profile/staff',
-                        'urlLoc' => $profile->url_loc, 
-                        'name' => $profile->url_name, 
-                        'id' => $profile->id]);
-                    $content .= '<div class="caption">';
-                    $content .=     '<h3>';
-                    $content .=         Html::a($profile->getFormattedNames()->formattedNames, ['profile/staff',
-                                            'urlLoc' => $profile->url_loc, 
-                                            'name' => $profile->url_name, 
-                                            'id' => $profile->id]);
-                    $content .=     '</h3>';
+                    $content .= '<h3>';
+                    $content .=     Html::a($profile->getFormattedNames()->formattedNames, ['profile/staff',
+                                        'urlLoc' => $profile->url_loc, 
+                                        'name' => $profile->url_name, 
+                                        'id' => $profile->id]);
+                    $content .= '</h3>';
                     if ($staffMinistry) {
-                        $content .=     '<h4>';
-                        $content .=         $profile->title;
-                        $content .=         ' at ';
-                        $content .=         $staffMinistry->org_name;
-                        $content .=         ', ';
-                        $content .=         $profile->ind_city;
-                        $content .=         ', ';
-                        $content .=         empty($profile->ind_st_prov_reg) ? NULL : $profile->ind_st_prov_reg;
-                        $content .=         $profile->ind_country == 'United States' ? '' : ', ' . $profile->ind_country;
-                        $content .=     '</h4>';
+                        $content .= '<p>';
+                        $content .=     $profile->title;
+                        $content .=     ' at ';
+                        $content .=     $staffMinistry->org_name;
+                        $content .=     ', ';
+                        $content .=     $profile->ind_city;
+                        $content .=     ', ';
+                        $content .=     empty($profile->ind_st_prov_reg) ? NULL : $profile->ind_st_prov_reg;
+                        $content .=     $profile->ind_country == 'United States' ? '' : ', ' . $profile->ind_country;
+                        $content .= '</p>';
                     }
-                    $content .=     '<p>' . substr($desc, 0, 150) . '... </p>';
-                    $content .= '</div>';
+                    $content .= '<p>' . Utility::trimText($desc, 50) . '</p>';
                     break;
 
                 default:
@@ -403,13 +330,8 @@ class Box3Content extends Model
         } else {
 
             $i = 0;
-            $content = Html::img('@web/images/join.jpg', ['class' => 'img-thumbnail']);
-            $content .= '<div class="caption">';
-            $content .=     '<h3>Need a profile?  Create one!</h3>';
-            $content .=     '<p>Creating a profile for you or your ministry is easy and free.  Simply register to start creating your profile now.</p>';
-            $content .= '</div>';
-            $content .= '<p class="center">' . Html::a('Get Started &#187', ['site/register'], ['class' => 'btn btn-home', 'role' => 'button', 'style' => 'background-color: green']) . '</p>';
-        
+            $content  = '<h3>Create a Profile for your Church or Ministry</h3>';
+            $content .= '<p>Take advantage of all the benefits of IBNet. Simply register to start creating your profile now.  It\'s is easy and free.</p>';       
         }
 
         $session->set('i', $i);

@@ -1,5 +1,6 @@
 <?php
 
+use common\models\Utility;
 use frontend\assets\AjaxAsset;
 use yii\bootstrap\Html;
 use yii\helpers\Url;
@@ -42,48 +43,36 @@ $this->title = '';
     <p>Looking for that blessed hope,<br>Titus 2:13</p>
 </div>
 
-<div class="wrap bg-gray">
-    <div class="container">
-        <div class="site-index">
-            
-            <div class="row top-margin-40">
-              <div class="col-sm-6 col-md-4">
-                <div class="thumbnail">
-                  <?= Html::a(Html::img('@web/images/' . 'blog-coming-soon.jpg', ['class' => 'img-thumbnail']), ['/site/blog']) ?>
-                  <div class="caption">
-                    <h3>IBNet Blog - Coming Soon</h3>
-                    <p>Stay tuned for the upcoming launch of the new IBNet blog!  It will be a place where IBNet users can share relevant content.</p>
-                    <p class="center"><?= Html::a('View', ['/site/blog'], ['class' => 'btn btn-home', 'role' => 'button']) ?></p>
-                  </div>
-                </div>
-              </div>
-              <div class="col-sm-6 col-md-4">
-                <div class="thumbnail">
-                  <?= Html::a(Html::img('@web/images/' . 'grand-opening.jpg', ['class' => 'img-thumbnail']), ['/site/grand-opening']) ?>
-                  <div class="caption">
-                    <h3>Grand Opening</h3>
-                    <p>Welcome to the grand opening of the newly updated IBNet.org!  Find out what IBNet is all about and how it can benefit you and your ministry!</p>
-                    <p class="center"><?= Html::a('View', ['/site/grand-opening'], ['class' => 'btn btn-home', 'role' => 'button']) ?></p>
-                  </div>
-                </div>
-              </div>
-              <div class="col-sm-6 col-md-4">
-                <div class="thumbnail">
-                    <div id="box3Content"><?= $box3Content ?></div>
-                    <?php if ($count) { ?>
-                      <p class="center">
-                        <?= $count > 1 ? Html::a('Next New Profile &#187', ['ajax/next'], [
-                          'id' => 'next-id', 
-                          'data-on-done' => 'nextDone', 
-                          'class' => 'btn btn-home'
-                        ]) : 
-                        NULL; ?>
-                        <?php $this->registerJs("$('#next-id').click(handleAjaxLink);", \yii\web\View::POS_READY); ?>
-                      </p>
-                    <?php } ?>
-                </div>
-              </div>
-            </div>
-          </div>
-    </div>
+<div class="new-profile">
+    <?= Html::a('Get Started &#187', ['site/register'], ['class' => 'btn btn-home get-started']); ?>
+    <div id="box3Content"><?= $box3Content ?></div>
+    <?= $count > 1 ? Html::a('Next New Profile &#187', ['ajax/next'], [
+      'id' => 'next-id', 
+      'data-on-done' => 'nextDone', 
+      'class' => 'btn btn-home'
+    ]) : NULL; ?>
+    <?php $this->registerJs("$('#next-id').click(handleAjaxLink);", \yii\web\View::POS_READY); ?>
+</div>
+
+<div class="blog-container">
+    <?php for ($i=0; $i<3 ; $i++) { ?>
+        <?php $date = Yii::$app->formatter->asDate($posts[$i]['post_date'], 'php:F j, Y'); ?>
+        <div class="blog-card">
+          <?= Html::a(Html::img($posts[$i]['image_url']) .
+            '<h3>' . $posts[$i]['post_title'] . '</h3>' .
+            '<p>' . $date . ' &#8226 ' . $posts[$i]['author_name'] . '<span class="comments"><span class="glyphicons glyphicons-chat"></span> (' . ($comments[$posts[$i]['post_id']]['COUNT(comment_id)'] ? $comments[$posts[$i]['post_id']]['COUNT(comment_id)'] : 0) . ')</span></p>' .
+            '<p>' . Utility::trimText($posts[$i]['post_content'], 100) . '</p>', $posts[$i]['post_url']); ?>
+        </div>
+    <?php } ?>
+</div>
+<div class="blog-container">
+    <?php for ($i=3; $i<6 ; $i++) { ?>
+        <?php $date = Yii::$app->formatter->asDate($posts[$i]['post_date'], 'php:F j, Y'); ?>
+        <div class="blog-card">
+          <?= Html::a(Html::img($posts[$i]['image_url']) .
+            '<h3>' . $posts[$i]['post_title'] . '</h3>' .
+            '<p>' . $date . ' &#8226 ' . $posts[$i]['author_name'] . '<span class="comments"><span class="glyphicons glyphicons-chat"></span> (' . ($comments[$posts[$i]['post_id']]['COUNT(comment_id)'] ? $comments[$posts[$i]['post_id']]['COUNT(comment_id)'] : 0) . ')</span></p>' .
+            '<p>' . Utility::trimText($posts[$i]['post_content'], 100) . '</p>', $posts[$i]['post_url']); ?>
+        </div>
+    <?php } ?>
 </div>

@@ -1,6 +1,7 @@
 <?php
 namespace backend\controllers;
 
+use backend\models\Mailchimp;
 use common\models\Utility;
 use Yii;
 use yii\bootstrap\Html;
@@ -45,9 +46,8 @@ class CampaignController extends Controller
      */
     public function actionMailchimp()
     {
-        if (Yii::$app->request->post()) {
-            $user = Yii::$app->user->identity;
-            $user->refreshFeatureList('8b62bd54b8');        // New Feature at IBNet
+        if (isset($_POST['feature'])) {
+            Mailchimp::buildFeatureList();
         }
 
         return $this->render('mailchimp');

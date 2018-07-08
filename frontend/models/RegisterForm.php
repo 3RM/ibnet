@@ -69,7 +69,7 @@ class RegisterForm extends Model
         $user->first_name = $this->first_name;
         $user->last_name = $this->last_name;
         $user->new_email = $this->email;
-        $user->new_email_token = Yii::$app->security->generateRandomString();
+        $user->new_email_token = Yii::$app->security->generateRandomString() . '_' . time();
         $user->username = $this->username;
         $user->setPassword($this->password);
         $user->generateAuthKey();

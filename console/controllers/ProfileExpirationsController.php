@@ -47,6 +47,7 @@ class ProfileExpirationsController extends Controller
                 foreach ($expiredProfiles as $profile) {
                     $user = User::findOne($profile->user_id);
                     $profile->inactivate();                                                         // Set profile inactive
+                    $profile->updateAttributes(['profile_status' => Profile::STATUS_EXPIRED]);
                     Mail::sendExpiredNotice($user, $profile);
                 }
                 

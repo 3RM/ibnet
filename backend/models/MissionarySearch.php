@@ -2,12 +2,12 @@
 
 namespace backend\models;
 
-use common\models\profile\Missionary;
+use common\models\missionary\Missionary;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
-class MissionarySearch extends \common\models\profile\Missionary
+class MissionarySearch extends \common\models\missionary\Missionary
 {
     public function rules()
     { 
@@ -31,7 +31,7 @@ class MissionarySearch extends \common\models\profile\Missionary
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
-    		    'pageSize' => 10,
+    		    'pageSize' => 100,
     		],
         ]);
 

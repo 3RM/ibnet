@@ -30,7 +30,7 @@ class ProfileTrackingController extends Controller
             return Controller::EXIT_CODE_ERROR;
         } else {
             foreach ($dates as $date) {
-                $type = Yii::$app->db->createCommand('SELECT type,COUNT(*) as count FROM profile WHERE status=10 GROUP BY sub_type ORDER BY count DESC')
+                $type = Yii::$app->db->createCommand('SELECT type,COUNT(*) as count FROM profile WHERE status=10 GROUP BY type ORDER BY count DESC')
                     ->queryAll();
                 $sub_type = Yii::$app->db->createCommand('SELECT sub_type,COUNT(*) as count FROM profile WHERE status=10 GROUP BY sub_type ORDER BY count DESC')
                     ->queryAll();
@@ -40,6 +40,7 @@ class ProfileTrackingController extends Controller
                 $stat->users = User::find()->where(['status' => User::STATUS_ACTIVE])->count();
                 $stat->type_array = serialize($type);
                 $stat->sub_type_array = serialize($sub_type);
+                $stat->expired = Profile::find()->where(['status' => Profile::STATUS_EXPIRED])->andWhere('inactivation_date=DATE_SUB(CURDATE(), INTERVAL 7 DAY)'))->count();
                 $stat->save();
             }
             $command->finish();

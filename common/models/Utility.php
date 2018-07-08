@@ -197,6 +197,49 @@ class Utility
 
 
     /**
+     * Get size of a server directory
+     * 
+     * @param mixed $dir
+     * @return boolean TRUE if it is a valid string. FALSE if it isn't.
+     */
+    static function getTotalSize($dir)
+    {
+        $dir = rtrim(str_replace('\\', '/', $dir), '/');
+    
+        if (is_dir($dir) === true) {
+            $totalSize = 0;
+            $os        = strtoupper(substr(PHP_OS, 0, 3));
+            // If on a Unix Host (Linux, Mac OS)
+            if ($os !== 'WIN') {
+                $io = popen('/usr/bin/du -sb ' . $dir, 'r');
+                if ($io !== false) {
+                    $totalSize = intval(fgets($io, 80));
+                    pclose($io);
+                    return $totalSize;
+                }
+            }
+            // If on a Windows Host (WIN32, WINNT, Windows)
+            if ($os === 'WIN' && extension_loaded('com_dotnet')) {
+                $obj = new \COM('scripting.filesystemobject');
+                if (is_object($obj)) {
+                    $ref       = $obj->getfolder($dir);
+                    $totalSize = $ref->size;
+                    $obj       = null;
+                    return $totalSize;
+                }
+            }
+            // If System calls did't work, use slower PHP 5
+            $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir));
+            foreach ($files as $file) {
+                $totalSize += $file->getSize();
+            }
+            return $totalSize;
+        } else if (is_file($dir) === true) {
+            return filesize($dir);
+        }
+    }
+
+    /**
      * Converts all UTF-8 accent characters to ASCII characters.
      *
      * Extracted from https://github.com/rap2hpoutre/convert-accent-characters/blob/master/src/convert_accent_characters.php
@@ -212,46 +255,10 @@ class Utility
         }
         $chars = [
             // Decompositions for Latin-1 Supplement
-            'ª' => 'a',
-            'º' => 'o',
-            'À' => 'A',
-            'Á' => 'A',
-            'Â' => 'A',
-            'Ã' => 'A',
-            'Ä' => 'A',
-            'Å' => 'A',
-            'Æ' => 'AE',
-            'Ç' => 'C',
-            'È' => 'E',
-            'É' => 'E',
-            'Ê' => 'E',
-            'Ë' => 'E',
-            'Ì' => 'I',
-            'Í' => 'I',
-            'Î' => 'I',
-            'Ï' => 'I',
-            'Ð' => 'D',
-            'Ñ' => 'N',
-            'Ò' => 'O',
-            'Ó' => 'O',
-            'Ô' => 'O',
-            'Õ' => 'O',
-            'Ö' => 'O',
-            'Ù' => 'U',
-            'Ú' => 'U',
-            'Û' => 'U',
-            'Ü' => 'U',
-            'Ý' => 'Y',
-            'Þ' => 'TH',
-            'ß' => 's',
-            'à' => 'a',
-            'á' => 'a',
-            'â' => 'a',
-            'ã' => 'a',
-            'ä' => 'a',
-            'å' => 'a',
-            'æ' => 'ae',
-            'ç' => 'c',
+            'ª' => 'a', 'º'=>'o', 'À' => 'A', 'Á' => 'A', 'Â' => 'A', 'Ã' => 'A', 'Ä' => 'A', 'Å' => 'A', 'Æ' => 'AE', 'Ç' => 'C',
+            'È' => 'E', 'É' => 'E', 'Ê' => 'E', 'Ë' => 'E', 'Ì' => 'I', 'Í' => 'I', 'Î' => 'I', 'Ï' => 'I', 'Ð' => 'D', 'Ñ' => 'N',
+            'Ò' => 'O', 'Ó' => 'O', 'Ô' => 'O', 'Õ' => 'O', 'Ö' => 'O', 'Ù' => 'U', 'Ú' => 'U', 'Û' => 'U', 'Ü' => 'U', 'Ý' => 'Y',
+            'Þ' => 'TH', 'ß' => 's', 'à' => 'a', 'á' => 'a', 'â' => 'a', 'ã' => 'a', 'ä' => 'a', 'å' => 'a', 'æ' => 'ae', 'ç' => 'c',
             'è' => 'e',
             'é' => 'e',
             'ê' => 'e',

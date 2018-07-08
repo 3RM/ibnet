@@ -17,7 +17,7 @@ $this->title = 'Registration Complete';
 	<div class="container registration-complete">
 	    <h2>Success! Thank You for Registering.</h2>
 
-	    <?= HTML::a('My Account', Url::to(['/site/dashboard']), ['class' => 'btn-link']) ?>
+	    <?= HTML::a('My Account', Url::to(['/site/settings']), ['class' => 'btn-link']) ?>
 	</div>
 
 </div>

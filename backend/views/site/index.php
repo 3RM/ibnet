@@ -9,8 +9,6 @@ $this->title = '';
 <div class="site-index">
 
     <div class="body-content">
-
-        <?= 'Your IP: ' . Yii::$app->request->userIP; ?>
         
 
     </div>

@@ -7,7 +7,7 @@ use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
-class MissionaryUpdateSearch extends \common\models\profile\MissionaryUpdate
+class MissionaryUpdateSearch extends \common\models\missionary\MissionaryUpdate
 {
     public function rules()
     { 
@@ -31,7 +31,7 @@ class MissionaryUpdateSearch extends \common\models\profile\MissionaryUpdate
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
-    		    'pageSize' => 10,
+    		    'pageSize' => 100,
     		],
         ]);
 

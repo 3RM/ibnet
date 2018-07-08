@@ -3,6 +3,7 @@ namespace common\models;
 
 use common\models\User;
 use common\models\Utility;
+use common\models\profile\Profile;
 use yii;
 use yii\base\Model;
 use yii\helpers\Html;
@@ -117,6 +118,62 @@ class Mail extends \yii\db\ActiveRecord
         $user = User::findByUsername($username);
         $title = 'New User Registration';
         $msg = 'A new user has registered at IBNet: ' . $user->first_name . ' ' . $user->last_name;
+
+        Yii::$app
+            ->mailer
+            ->compose(
+                ['html' => 'notification-html'], 
+                ['title' => $title, 'message' => $msg]
+            )
+            ->setFrom([\yii::$app->params['adminEmail']])
+            ->setTo([\yii::$app->params['adminEmail']])
+            ->setSubject(Yii::$app->params['emailSubject'])
+            ->send();
+
+        return true;
+    }
+
+    /**
+     * Admin: send admin notice of new profile creation
+     * 
+     * @return boolean
+     */
+    public function sendAdminNewCreatedProfile($id)
+    {   
+        $profile = Profile::findOne($id);
+        $title = 'Newly Created Profile';
+        $name = $profile->category == Profile::CATEGORY_IND ?
+            $profile->ind_first_name . ' ' . $profile->ind_last_name :
+            $profile->org_name;
+        $msg = 'A profile was just created: ' . $name;
+
+        Yii::$app
+            ->mailer
+            ->compose(
+                ['html' => 'notification-html'], 
+                ['title' => $title, 'message' => $msg]
+            )
+            ->setFrom([\yii::$app->params['adminEmail']])
+            ->setTo([\yii::$app->params['adminEmail']])
+            ->setSubject(Yii::$app->params['emailSubject'])
+            ->send();
+
+        return true;
+    }
+
+    /**
+     * Admin: send admin notice of newly activated profile
+     * 
+     * @return boolean
+     */
+    public function sendAdminActiveProfile($id)
+    {   
+        $profile = Profile::findOne($id);
+        $title = 'Newly Activated Profile';
+        $name = $profile->category == Profile::CATEGORY_IND ?
+            $profile->ind_first_name . ' ' . $profile->ind_last_name :
+            $profile->org_name;
+        $msg = 'A profile was just activated: ' . $name;
 
         Yii::$app
             ->mailer

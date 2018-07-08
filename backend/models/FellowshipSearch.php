@@ -31,7 +31,7 @@ class FellowshipSearch extends \common\models\profile\Fellowship
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
-    		    'pageSize' => 10,
+    		    'pageSize' => 100,
     		],
         ]);
 

@@ -3,10 +3,11 @@ namespace frontend\controllers;
 
 use common\models\AccountSettings;
 use common\models\LoginForm;
-use common\models\Mail AS SiteMail;
-use common\models\profile\Mail;
+use common\models\Mail;
+use common\models\blog\WpPosts;
 use common\models\profile\Profile;
 use common\models\profile\ProfileBrowse;
+use common\models\profile\ProfileMail;
 use common\models\profile\ProfileSearch;
 use common\models\Role;
 use common\models\User;
@@ -244,12 +245,18 @@ class SiteController extends Controller
 
             $content = new Box3Content();
             $box3Content = $content->getBox3Content();
-            
+
+            $posts = WpPosts::getPosts();
+            $postIds = ArrayHelper::getColumn($posts, 'post_id');
+            $comments = WpPosts::getComments($postIds);
+        
             $this->layout = 'bg-gray';
             return $this->render('/site/index', [
                 'searchModel' => $searchModel, 
                 'term' => $term,
                 'box3Content' => $box3Content,
+                'posts' => $posts,
+                'comments' => $comments,
                 'count' => $count
             ]);
         }
@@ -307,6 +314,12 @@ class SiteController extends Controller
         }
     }
 
+    public function actionTestVerification()
+    {
+
+        return $this->render('test-verification');
+    }
+
     /**
      * Logs out the current user.
      *
@@ -353,36 +366,6 @@ class SiteController extends Controller
     }
 
     /**
-     * Displays blog coming soon page.
-     *
-     * @return mixed
-     */
-    public function actionBlog()
-    {
-        return $this->render('blog');
-    }
-
-    /**
-     * Displays Grand Opening page.
-     *
-     * @return mixed
-     */
-    public function actionGrandOpening()
-    {
-        return $this->render('grandOpening');
-    }
-
-    /**
-     * Displays How-To-Videos page.
-     *
-     * @return mixed
-     */
-    public function actionHowTo()
-    {
-        return $this->render('how-to');
-    }
-
-    /**
      * Registers user.
      *
      * @return mixed
@@ -392,11 +375,12 @@ class SiteController extends Controller
         $model = new RegisterForm();
         if ($model->load(Yii::$app->request->post())) {
             if ($user = $model->register()) {                
-                SiteMail::sendVerificationEmail($user->username);
-                SiteMail::sendAdminNewUser($user->username);                                        // Send admin notice of new user registration
+                Mail::sendVerificationEmail($user->username);
+                Mail::sendAdminNewUser($user->username);                                            // Send admin notice of new user registration
                 return $this->render('completeRegistration');
             }
         }
+        $this->layout = 'bg-gray';
         return $this->render('register', ['model' => $model]);
     }
 
@@ -407,7 +391,7 @@ class SiteController extends Controller
      */
     public function actionResendVerificationEmail($username)
     {
-        if (SiteMail::sendVerificationEmail($username)) {
+        if (Mail::sendVerificationEmail($username)) {
             Yii::$app->session->setFlash('success', 'A new email was sent with a link to verify your 
                 email address.');
         }
@@ -581,13 +565,13 @@ class SiteController extends Controller
                 $church = ProfileController::findActiveProfile($user->home_church);
                 $churchProfOwner = User::findOne($church->user_id);
                 if ($churchProfOwner && $churchProfOwner->emailPrefLinks == 1) {
-                    Mail::sendLink($user, $church, $churchProfOwner, 'PSHC', 'L');
+                    ProfileMail::sendLink($user, $church, $churchProfOwner, 'PSHC', 'L');
                 }
                 if ($oldId) {
                     $oldChurch = ProfileController::findActiveProfile($oldId);
                     $oldChurchProfOwner = User::findOne($oldChurch->user_id);
                     if ($oldChurchProfOwner && $oldChurchProfOwner->emailPrefLinks == 1) {
-                        Mail::sendLink($user, $oldChurch, $oldChurchProfOwner, 'PSHC', 'UL');
+                        ProfileMail::sendLink($user, $oldChurch, $oldChurchProfOwner, 'PSHC', 'UL');
                     }
                 }
             }

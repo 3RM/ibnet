@@ -150,7 +150,7 @@ class ProfileMgmtController extends ProfileController
                 }
             
             } else {
-                $missing = json_encode($missing);
+                $missing = json_encode($missingArray);
                 return $this->redirect(['profile-form/missing-forms', 
                     'id' => $profile->id, 
                     'missing' => $missing,

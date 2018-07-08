@@ -26,12 +26,14 @@ use yii\widgets\ActiveForm;
                             <?= Profile::$icon[$profile->type] . '"' . $profile->profile_name . '"' ?>
                         </div>
                         <div class="profile-status">
-                            <?php if ($profile->status == 0) {
+                            <?php if ($profile->status == Profile::STATUS_NEW) {
                                 echo '<p><span style="color:#337ab7"> New</p>';
-                            } elseif ($profile->status == 10) {
+                            } elseif ($profile->status == Profile::STATUS_ACTIVE) {
                                 echo '<p><span style="color:green"> Active</span></p>';
-                            } elseif ($profile->status == 20) {
+                            } elseif ($profile->status == Profile::STATUS_INACTIVE) {
                                 echo '<p><span style="color:orange"> Inactive</p>';
+                            } elseif ($profile->status == Profile::STATUS_EXPIRED) {
+                                echo '<p><span style="color:red"> Expired</p>';
                             } ?> 
                         </div>
                     </div>
@@ -53,6 +55,8 @@ use yii\widgets\ActiveForm;
                                 echo '<div class="notification"><p>This profile is set to expire soon. ' . Html::a('Click here', ['preview/view-preview', 'id' => $profile->id]) . ' and hit the update button to keep it active.</p></div>';
                             } elseif (time() > (strtotime($profile->renewal_date) - 1209600) && ($profile->status == Profile::STATUS_ACTIVE)) {               // Profile will expire in two weeks
                                 echo '<div class="notification"><p>Your profile is in the expiration grace period. ' . Html::a('Click here', ['preview/view-preview', 'id' => $profile->id]) . ' and hit the update button to keep it active.</p></div>';
+                            } elseif ($profile->status == Profile::STATUS_EXPIRED) {
+                                echo '<div class="notification"><p>Your profile is expired due to inactivity.  To keep it active, simply review and update as necessary at least once per year. ' .  Html::a('Click here', ['profile-mgmt/continue-activate', 'id' => $profile->id]) . ' to reactive it.</p></div>';
                             } elseif ($profile->unconfirmed) {
                                 echo '<div class="notification"><p>You have unconfirmed staff. ' . Html::a('Click here', ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['sf']-1, 'id' => $profile->id]) . ' to review.</p></div>';
                             } elseif (!$profile->events) {
@@ -77,7 +81,7 @@ use yii\widgets\ActiveForm;
                                     echo Yii::$app->formatter->asDate($profile->renewal_date) . '</p>';
                                 }
                             } ?>
-                            <?= (($profile->status == Profile::STATUS_NEW) || ($profile->status == Profile::STATUS_INACTIVE)) ?
+                            <?= (($profile->status == Profile::STATUS_NEW) || ($profile->status == Profile::STATUS_INACTIVE) || ($profile->status == Profile::STATUS_EXPIRED)) ?
                                 '<p>' . Html::a(Html::icon('ok-circle') . ' Activate', ['profile-mgmt/continue-activate', 'id' => $profile->id]) . '</p>': 
                                 '<p>' . Html::a(Html::icon('edit') . ' Edit', ['preview/view-preview', 'id' => $profile->id]) . '</p>';
                             ?>

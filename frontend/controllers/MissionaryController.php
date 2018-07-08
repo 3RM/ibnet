@@ -6,7 +6,7 @@ use common\models\missionary\MailchimpList;
 use common\models\missionary\Missionary;
 use common\models\missionary\MissionaryUpdate;
 use common\models\profile\Profile;
-use common\models\profile\Mail;
+use common\models\profile\ProfileMail;
 use Yii;
 use yii\db\Expression;
 use yii\filters\AccessControl;
@@ -326,7 +326,7 @@ class MissionaryController extends Controller
                 $update->save();
             }
             $user = $profile->user;
-            Mail::sendMailchimp($user->email, $missionary->repository_key, $missionary->id);        // email user       
+            ProfileMail::sendMailchimp($user->email, $missionary->repository_key, $missionary->id);        // email user       
         }
         die;
     }

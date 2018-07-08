@@ -68,7 +68,7 @@
   border-color: #525252;
 }
 #account0 nav.navbar.shrink {
-  padding: 1px 20px; 
+     padding: 1px 20px; 
 }
 .navbar li a {
   font-size: 1.3em;
@@ -117,6 +117,9 @@
   background-color: #365f89;
   border-right: 5px solid #365f89;
   color: #fff;
+}
+.left-nav-linktext {
+  margin-left: 4px;
 }
 li.active .underline {
   border-bottom: 5px solid #dc9f27;
@@ -553,6 +556,19 @@ img.mc-icon {
   .profile-card {
     width: 100%;
   }
+  .profile-card-body {
+    height: 200px;
+    font-size: 0.9em;
+  }
+  .profile-info p {
+    font-size: 0.9em;
+  }
+  .profile-links p {
+    font-size: 0.9em;
+  }
+  .profile-links .link-btn {
+    font-size: 0.9em;
+  }
   .repo-url {
     width: 70%;
   }
@@ -595,7 +611,7 @@ img.mc-icon {
       display: none;
     }
     #account0 {
-      z-index: 1000;
+      z-index: 10000;
       position: relative;
     }
     .right-content {
@@ -693,10 +709,15 @@ img.mc-icon {
       width: 200px;
       padding: 0;
     }
+    .timeline-form {
+      width: 75%;
+    }
 }
 
 /* iPhones (portrait and landscape) ----------- */
 
 @media only screen and (max-width: 480px) {
-
+  .timeline-form {
+    width: 100%;
+  }
 }

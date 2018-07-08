@@ -32,6 +32,10 @@ return [
             // this is the name of the session cookie used for login on the backend
             'name' => 'advanced-backend',
         ],
+        'cacheFrontend' => [
+            'class' => 'yii\caching\FileCache',
+            'cachePath' => '/var/www/vhosts/ibnet.org/httpdocs/frontend/runtime/cache'
+        ],
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
             'targets' => [

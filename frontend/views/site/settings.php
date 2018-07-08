@@ -127,6 +127,8 @@ use yii\widgets\ActiveForm;
                     '<span class="fa fa-check-square-o"></span>' : '<span class="fa fa-square-o"></span>' ?>
                 <?= $userA->emailPrefFeatures ?
                     '<span class="fa fa-check-square-o"></span>' : '<span class="fa fa-square-o"></span>' ?>
+                <?= $userA->emailPrefBlog ?
+                    '<span class="fa fa-check-square-o"></span>' : '<span class="fa fa-square-o"></span>' ?>
             </h4>
      
                 
@@ -191,6 +193,15 @@ use yii\widgets\ActiveForm;
                     ]
                 ])->label(false) ?>
                 <?= $form->field($userA, 'emailPrefFeatures')->widget(CheckboxX::classname(), [
+                    'initInputType' => CheckboxX::INPUT_CHECKBOX,
+                    'autoLabel' => true,
+                    'pluginOptions'=>[
+                        'theme' => 'krajee-flatblue',
+                        'enclosedLabel' => true,
+                        'threeState'=>false, 
+                    ]
+                ])->label(false) ?>
+                <?= $form->field($userA, 'emailPrefBlog')->widget(CheckboxX::classname(), [
                     'initInputType' => CheckboxX::INPUT_CHECKBOX,
                     'autoLabel' => true,
                     'pluginOptions'=>[

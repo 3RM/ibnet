@@ -64,6 +64,45 @@ $profile->type == 'Missionary' ?
                 </div>
             </div>
 
+        <?php } elseif ($edit) { ?>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <p><?= HTML::icon('info-sign') ?> Your home church must have a listing in this directory.</p>
+                    <?php echo $form->field($profile, 'selectM')->widget(Select2::classname(), [ 
+                        'options' => ['placeholder' => 'Search by name or city...'],
+                        'initValueText' => 'Search ...', 
+                        'pluginOptions' => [
+                            'allowClear' => true,
+                            'minimumInputLength' => 3,
+                            'language' => [
+                                'errorLoading' => new JsExpression("function () { return 'Waiting for results...'; }"),
+                            ],
+                            'ajax' => [
+                                'url' => Url::to(['church-list-ajax', 'chId' => $chId]),
+                                'dataType' => 'json',
+                                'data' => new JsExpression('function(params) { return {q:params.term}; }')
+                            ],
+                            'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
+                            'templateResult' => new JsExpression('function(profile) { 
+                                if(profile.org_city > "" && profile.org_st_prov_reg > "") {
+                                    return profile.text+", "+profile.org_city+", "+profile.org_st_prov_reg;
+                                } else {
+                                    return profile.text;
+                                };
+                            }'),
+                            'templateSelection' => new JsExpression('function (profile) { 
+                                if(profile.org_city > "" && profile.org_st_prov_reg > "") {
+                                    return profile.text+", "+profile.org_city+", "+profile.org_st_prov_reg;
+                                } else {
+                                    return profile.text;
+                                };
+                            }'),
+                        ],
+                    ]); ?>
+                </div>
+            </div>
+
         <?php } else { ?>
 
             <div class="row">
@@ -73,10 +112,10 @@ $profile->type == 'Missionary' ?
                         <table class="table table-hover">
                             <td><?= $churchLabel ?> <b><?= $churchLink->org_name . ', ' . $churchLink->org_city . ', ' . $churchLink->org_st_prov_reg ?></b></td>
                             <td>
-                                <?= Html::submitButton(HTML::icon('remove'), [
+                                <?= Html::submitButton(HTML::icon('edit'), [
                                     'method' => 'POST',
                                     'class' => 'btn btn-form btn-sm',
-                                    'name' => 'remove',
+                                    'name' => 'edit',
                                 ]) ?>
                             </td>
                         </table>
