@@ -27,13 +27,13 @@ use yii\widgets\ActiveForm;
                         </div>
                         <div class="profile-status">
                             <?php if ($profile->status == Profile::STATUS_NEW) {
-                                echo '<p><span style="color:#337ab7"> New</p>';
+                                echo '<p><span style="color:#337ab7">New</span></p>';
                             } elseif ($profile->status == Profile::STATUS_ACTIVE) {
-                                echo '<p><span style="color:green"> Active</span></p>';
+                                echo '<p><span style="color:green">Active</span></p>';
                             } elseif ($profile->status == Profile::STATUS_INACTIVE) {
-                                echo '<p><span style="color:orange"> Inactive</p>';
+                                echo '<p><span style="color:orange">Inactive</span></p>';
                             } elseif ($profile->status == Profile::STATUS_EXPIRED) {
-                                echo '<p><span style="color:red"> Expired</p>';
+                                echo '<p><span style="color:red">Expired</span></p>';
                             } ?> 
                         </div>
                     </div>
@@ -61,6 +61,8 @@ use yii\widgets\ActiveForm;
                                 echo '<div class="notification"><p>You have unconfirmed staff. ' . Html::a('Click here', ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['sf']-1, 'id' => $profile->id]) . ' to review.</p></div>';
                             } elseif (!$profile->events) {
                                 echo '<div class="notification"><p>Add ministry highlights to your timeline ' . Html::a('here', ['profile-mgmt/history', 'id' => $profile->id]) . '.</p></div>';
+                            } elseif ((!$profile->homeChurch) && ($profile->category == Profile::CATEGORY_IND) && ($profile->status == Profile::STATUS_ACTIVE)) {
+                                echo '<div class="notification" style="color:red"><p>Your home church\'s profile has gone inactive.  Reactivate your home church profile to keep this profile active.</p></div>';
                             } ?>
                         </div>
                         <div class="profile-links">

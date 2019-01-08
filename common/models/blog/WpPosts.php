@@ -98,6 +98,7 @@ class WpPosts extends Model
 		$query->select('COUNT(comment_id), comment_post_id')
 			->from('wp_comments')
 			->where('comment_post_id IN(' . implode(',',$postIds) .')')
+			->andWhere(['comment_approved' => 1])
 			->groupBy('comment_post_id');
 		$array = $query->all(\Yii::$app->dbblog);
 		

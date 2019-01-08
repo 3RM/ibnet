@@ -14,6 +14,7 @@ use frontend\models\Box3Content;
 use Yii;
 use yii\base\Security;
 use yii\bootstrap\Html;
+use yii\helpers\Inflector;
 use yii\web\Controller;
 use yii\web\Response;
 
@@ -205,8 +206,8 @@ class AjaxController extends Controller
         }
 
         $profile->category == Profile::CATEGORY_IND ?
-            $profile->email = Profile::urlName($profile->ind_last_name) . $profile->id . '@ibnet.org' :
-            $profile->email = Profile::urlName($profile->org_name) . $profile->id . '@ibnet.org';
+            $profile->email = Inflector::slug($profile->ind_last_name) . $profile->id . '@ibnet.org' :
+            $profile->email = Inflector::slug($profile->org_name) . $profile->id . '@ibnet.org';
 
         $profile->email_pvt_status = Profile::PRIVATE_EMAIL_PENDING;
         $profile->save();

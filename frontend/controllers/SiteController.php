@@ -405,18 +405,24 @@ class SiteController extends Controller
      */
     public function actionRegistrationComplete($token=null)
     {
-        if (!empty($token)) {
-            if (($user = User::findByNewEmailToken($token)) && ($user->isNewEmailTokenValid($token))) {
+        if (!empty($token) && $user = User::findByNewEmailToken($token)) {                          // Complete user registration
+            if ($user->isNewEmailTokenValid($token)) {
                 $user->updateAttributes([
                     'new_email_token' => NULL,
                     'email' => $user->new_email,
                     'new_email' => NULL]);
                 Yii::$app->getUser()->login($user);
-                return $this->render('registrationComplete');
+                $user->scenario = 'emailPref';
+                return $this->render('registrationComplete', ['user' => $user]);
             }
-            return $this->render('registeredAlready');
+        } elseif ($user = Yii::$app->user->identity) {                                              // Check for logged in user
+            if ($user->load(Yii::$app->request->Post()) &&                                          // Load post data from email preferences
+                $user->validate() && 
+                $user->save()) {
+                return $this->redirect('settings');
+            }
         }
-        return $this->goHome();
+        return $this->render('invalidToken');                                                   // No posted data; already registered
     }
 
     /**

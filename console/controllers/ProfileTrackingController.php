@@ -40,7 +40,7 @@ class ProfileTrackingController extends Controller
                 $stat->users = User::find()->where(['status' => User::STATUS_ACTIVE])->count();
                 $stat->type_array = serialize($type);
                 $stat->sub_type_array = serialize($sub_type);
-                $stat->expired = Profile::find()->where(['status' => Profile::STATUS_EXPIRED])->andWhere('inactivation_date=DATE_SUB(CURDATE(), INTERVAL 7 DAY)'))->count();
+                $stat->expired = Profile::find()->where(['status' => Profile::STATUS_EXPIRED])->andWhere('inactivation_date=DATE_SUB(CURDATE(), INTERVAL 7 DAY)')->count();
                 $stat->save();
             }
             $command->finish();

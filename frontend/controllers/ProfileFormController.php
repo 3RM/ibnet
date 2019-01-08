@@ -27,6 +27,7 @@ use Yii;
 use yii\db\Query;
 use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Inflector;
 use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\HttpException;
@@ -633,8 +634,8 @@ class ProfileFormController extends ProfileController
             }
 
             $profile->category == Profile::CATEGORY_IND ?
-                $ibnetEmail = Profile::urlName($profile->ind_last_name) . $profile->id . '@ibnet.org' :
-                $ibnetEmail = Profile::urlName($profile->org_name) . $profile->id . '@ibnet.org';
+                $ibnetEmail = Inflector::slug($profile->ind_last_name) . $profile->id . '@ibnet.org' :
+                $ibnetEmail = Inflector::slug($profile->org_name) . $profile->id . '@ibnet.org';
 
             $profile->status != Profile::STATUS_ACTIVE ?
                 $progressPercent = $profile->getProgressPercent(self::$formArray[$profile->type]) :
@@ -1871,8 +1872,8 @@ class ProfileFormController extends ProfileController
         $profile->scenario = '';
 
         $profile->category == Profile::CATEGORY_IND ?
-            $profile->email = Profile::urlName($profile->ind_last_name) . $profile->id . '@ibnet.org' :
-            $profile->email = Profile::urlName($profile->org_name) . $profile->id . '@ibnet.org';
+            $profile->email = Inflector::slug($profile->ind_last_name) . $profile->id . '@ibnet.org' :
+            $profile->email = Inflector::slug($profile->org_name) . $profile->id . '@ibnet.org';
 
         $profile->load(Yii::$app->request->Post());
     

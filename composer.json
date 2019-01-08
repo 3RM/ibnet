@@ -41,8 +41,7 @@
         "kartik-v/yii2-widget-datepicker": "@dev",
         "dektrium/yii2-rbac": "1.0.0-alpha@dev",
         "eddmash/yii2-clipboard": "@dev",
-        "sammaye/yii2-yiichimp": "^1.0",
-        "yiisoft/yii2-authclient": "^2.0@dev"
+        "sammaye/yii2-yiichimp": "^1.0"
     },
     "require-dev": {
         "yiisoft/yii2-codeception": "*",

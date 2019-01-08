@@ -2,7 +2,6 @@
 namespace common\models;
 
 use common\models\User;
-use common\models\Utility;
 use common\models\profile\Profile;
 use yii;
 use yii\base\Model;
@@ -10,7 +9,7 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 
 
-class Mail extends \yii\db\ActiveRecord
+class Mail extends Model
 {
     /**
      * User: Sends user an email with a link to verify user email address.
@@ -134,28 +133,30 @@ class Mail extends \yii\db\ActiveRecord
     }
 
     /**
-     * Admin: send admin notice of new profile creation
+     * User: send weekly notification of new blog postings
      * 
      * @return boolean
      */
-    public function sendAdminNewCreatedProfile($id)
+    public function sendWeeklyBlog($user, $posts)
     {   
-        $profile = Profile::findOne($id);
-        $title = 'Newly Created Profile';
-        $name = $profile->category == Profile::CATEGORY_IND ?
-            $profile->ind_first_name . ' ' . $profile->ind_last_name :
-            $profile->org_name;
-        $msg = 'A profile was just created: ' . $name;
+        $title = 'This Week\'s Blog Posts';
+        $msg = 'Read the latest articles from the IBNet Blog: ';
+        $emailPrefLink = Html::a('click here', \Yii::$app->params['frontendUrl'] . '/site/login?url=' . \Yii::$app->params['frontendUrl'] . '/site/settings/#account-settings', ['target' => '_blank']);
 
         Yii::$app
             ->mailer
             ->compose(
-                ['html' => 'notification-html'], 
-                ['title' => $title, 'message' => $msg]
+                ['html' => 'weekly-blog-html'], 
+                [
+                    'title' => $title, 
+                    'message' => $msg, 
+                    'posts' => $posts, 
+                    'emailPrefLink' => $emailPrefLink
+                ]
             )
-            ->setFrom([\yii::$app->params['adminEmail']])
-            ->setTo([\yii::$app->params['adminEmail']])
-            ->setSubject(Yii::$app->params['emailSubject'])
+            ->setFrom([\Yii::$app->params['blogDigestEmail']])
+            ->setTo($user->email)
+            ->setSubject('IBNet Blog')
             ->send();
 
         return true;

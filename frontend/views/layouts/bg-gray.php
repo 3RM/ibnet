@@ -12,7 +12,7 @@ use yii\helpers\Url;
 
 AppAsset::register($this);
 AjaxAsset::register($this);
-$title="IBNet | Independent Baptist Network</span>";
+$title="IBNet | Independent Baptist Network";
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -32,8 +32,6 @@ $title="IBNet | Independent Baptist Network</span>";
     <link rel="manifest" href="/manifest.json">
     <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#dc9f27">
     <meta name="theme-color" content="#ffffff">
-
-
 </head>
 <body class="<?= Html::encode($this->title) ?>">
 <?php $this->beginBody() ?>

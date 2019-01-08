@@ -2229,7 +2229,7 @@ class Profile extends \yii\db\ActiveRecord
      */
     public function getHomeChurch()
     {
-        return $this->hasOne(Profile::className(), ['id' => 'home_church']);
+        return $this->hasOne(Profile::className(), ['id' => 'home_church'])->where(['status' => self::STATUS_ACTIVE]);
     }
 
     /**

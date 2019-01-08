@@ -65,12 +65,6 @@ return [
                 '<controller:\w+>/<action:[A-Za-z\-]+>' => '<controller>/<action>',
             ],
         ],
-        // 'urlManagerBackend' => [
-        //     'class' => 'yii\web\urlManager',
-        //     'baseUrl' => '/yourapp/backend/web',
-        //     'enablePrettyUrl' => true,
-        //     'showScriptName' => true,
-        // ],
     ],  
     'params' => $params,
 ];

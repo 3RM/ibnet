@@ -58,10 +58,10 @@ $this->title = '';
     <?php for ($i=0; $i<3 ; $i++) { ?>
         <?php $date = Yii::$app->formatter->asDate($posts[$i]['post_date'], 'php:F j, Y'); ?>
         <div class="blog-card">
-          <?= Html::a(Html::img($posts[$i]['image_url']) .
+          <?= '<div class="blog-crop">' . Html::a(Html::img($posts[$i]['image_url']) . '</div>' .
             '<h3>' . $posts[$i]['post_title'] . '</h3>' .
-            '<p>' . $date . ' &#8226 ' . $posts[$i]['author_name'] . '<span class="comments"><span class="glyphicons glyphicons-chat"></span> (' . ($comments[$posts[$i]['post_id']]['COUNT(comment_id)'] ? $comments[$posts[$i]['post_id']]['COUNT(comment_id)'] : 0) . ')</span></p>' .
-            '<p>' . Utility::trimText($posts[$i]['post_content'], 100) . '</p>', $posts[$i]['post_url']); ?>
+            '<p>' . $posts[$i]['author_name'] . ' &#8226 ' . $date . '<span class="comments"><span class="glyphicons glyphicons-chat"></span> (' . ($comments[$posts[$i]['post_id']]['COUNT(comment_id)'] ? $comments[$posts[$i]['post_id']]['COUNT(comment_id)'] : 0) . ')</span></p>' .
+            '<p>' . Utility::trimText($posts[$i]['post_content'], 300, " ") . '</p>', $posts[$i]['post_url']); ?>
         </div>
     <?php } ?>
 </div>
@@ -69,10 +69,10 @@ $this->title = '';
     <?php for ($i=3; $i<6 ; $i++) { ?>
         <?php $date = Yii::$app->formatter->asDate($posts[$i]['post_date'], 'php:F j, Y'); ?>
         <div class="blog-card">
-          <?= Html::a(Html::img($posts[$i]['image_url']) .
+          <?= '<div class="blog-crop">' . Html::a(Html::img($posts[$i]['image_url']) . '</div>' .
             '<h3>' . $posts[$i]['post_title'] . '</h3>' .
-            '<p>' . $date . ' &#8226 ' . $posts[$i]['author_name'] . '<span class="comments"><span class="glyphicons glyphicons-chat"></span> (' . ($comments[$posts[$i]['post_id']]['COUNT(comment_id)'] ? $comments[$posts[$i]['post_id']]['COUNT(comment_id)'] : 0) . ')</span></p>' .
-            '<p>' . Utility::trimText($posts[$i]['post_content'], 100) . '</p>', $posts[$i]['post_url']); ?>
+            '<p>' . $posts[$i]['author_name'] . ' &#8226 ' . $date . '<span class="comments"><span class="glyphicons glyphicons-chat"></span> (' . ($comments[$posts[$i]['post_id']]['COUNT(comment_id)'] ? $comments[$posts[$i]['post_id']]['COUNT(comment_id)'] : 0) . ')</span></p>' .
+            '<p>' . Utility::trimText($posts[$i]['post_content'], 300, " ") . '</p>', $posts[$i]['post_url']); ?>
         </div>
     <?php } ?>
 </div>

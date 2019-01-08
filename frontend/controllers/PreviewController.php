@@ -277,7 +277,7 @@ class PreviewController extends ProfileFormController
 
             $profile->getformattedNames();
             if (!$pastor = Staff::getSrPastor($profile->id)) {
-                $pastor = $profile->getformattedNames();
+                $pastor = NULL;
             } else {
                 $pastor = $pastor->getformattedNames();
             }

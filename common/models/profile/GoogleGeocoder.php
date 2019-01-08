@@ -21,19 +21,19 @@ class GoogleGeocoder{
     /**
      * Geocoder API URL.
      */
-    const GEOCODE_URL = 'http://maps.googleapis.com/maps/api/geocode/json';
+    const GEOCODE_URL = 'https://maps.googleapis.com/maps/api/geocode/json';
     
     /**
      * Directions API URL.
      */
-    const DIRECTIONS_URL = 'http://maps.googleapis.com/maps/api/directions/json';
+    const DIRECTIONS_URL = 'https://maps.googleapis.com/maps/api/directions/json';
     
     /**
-     * Your (optional) API key.
+     * Your API key.
      * 
      * @var string
      */
-    protected $apiKey = '';
+    protected $apiKey = 'AIzaSyBtE_w8tdgpSwEse8qTsEZoR-Vw776xg6I';
     
     /**
      * Parameters that can be used with the Google Directions API. You can 

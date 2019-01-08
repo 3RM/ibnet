@@ -382,7 +382,7 @@ a.register-link,
 }
 .header-img {
   height: 100%;
-  background: url(../images/content/landscape-header.jpg);
+  background: url(../images/content/fall-header.jpg);
   margin-top: 65px;
   /* Stretch image outside of containing div */
   width: 100vw;
@@ -598,6 +598,9 @@ nav.shrink a.navbar-user {
   display: flex;
   margin: 20px 0;
 }
+.blog-container h3 {
+  font-family: 'Old Standard TT';
+}
 .blog-card {
   min-height: 400px;
   width: 30.666667%;
@@ -625,6 +628,10 @@ nav.shrink a.navbar-user {
 }
 .blog-card img {
   width: 100%;
+}
+.blog-crop {
+  height: 206px;
+  overflow: hidden;
 }
 .blog-card p {
   font-size: 0.9em;
@@ -1021,7 +1028,7 @@ button.link-btn:hover {
 /* UHD (landscape) ----------- */
 @media only screen and (min-device-width: 1920px) {
     .header-img {
-      background: url(../images/content/landscape-header-uw.jpg);
+      background: url(../images/content/fall-header-uw.jpg);
     }
     .header-img:first-child img {
       left: 34%;
@@ -1035,6 +1042,9 @@ button.link-btn:hover {
     }
     .abbreviated {
         display: block;
+    }
+    .blog-crop {
+      height: 168px;
     }
 }
 
@@ -1064,6 +1074,9 @@ button.link-btn:hover {
       width: 350px;
       margin-left: calc(50% - 175px);
     }
+    .blog-crop {
+      height: 126px;
+    }
 }
 
 /* iPads (portrait) ----------- */
@@ -1078,7 +1091,7 @@ button.link-btn:hover {
       width: 60%;
     }
     .header-img {
-      background: url(../images/content/landscape-header-mb.jpg);
+      background: url(../images/content/fall-header-mb.jpg);
     }
     .header-img:first-child img {
       display: none;
@@ -1126,6 +1139,9 @@ button.link-btn:hover {
     }
     .site-register button {
       top: 0px;
+    }
+    .blog-crop {
+      height: unset;
     }
 }
 
