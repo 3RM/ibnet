@@ -513,6 +513,47 @@ img.mc-icon {
   -o-transition: height 0.12s !important;
   transition: height 0.12s !important;
 }
+.videoWrapper {
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 */
+  margin: -9px 0;
+  height: 0;
+}
+.videoWrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+#videoModal .modal-header {
+  display: none;
+}
+#videoModal .link-modal-body {
+  padding: 0;
+}
+.feature-video-container {
+  width: 50%;
+  height: 60px;
+  background-color: #eee;
+  border: 1px solid #b0bec5;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 40px;
+  padding: 10px 20px;
+}
+.feature-video-container button {
+  margin: 0;
+}
+.feature-video-container i {
+  font-size: 2em;
+  color: #546e7a;
+}
+.feature-video-container i:hover {
+  color: #e91e42;
+}
 
 
 

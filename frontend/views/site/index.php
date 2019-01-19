@@ -20,7 +20,7 @@ $this->title = '';
             <?php $form = ActiveForm::begin(['id' => 'search-form']); ?>
             <?= $form->field($searchModel, 'term')->textInput([
                 'maxlength' => true, 
-                  'class' => 'form-control',
+                'class' => 'form-control',
                 'placeholder' => 'Find churches, organizations and individuals ...',
                 'autocomplete' => 'off',
             ])->label('') ?>

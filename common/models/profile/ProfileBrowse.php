@@ -2,7 +2,6 @@
 
 namespace common\models\profile;
 
-use common\models\profile\GoogleGeocoder;
 use common\models\profile\Profile;
 use sammaye\solr\SolrDataProvider;
 use Yii;
@@ -15,10 +14,27 @@ use yii\db\Query;
  */
 class ProfileBrowse extends Profile
 {
+    
+    /**
+     * @var int $distance length of search radius
+     */
     public $distance;
+
+    /**
+     * @var string $location city, state search terms
+     */
     public $location;
+
+    /**
+     * @var float $lat Latitude returned by geocoder
+     */
     public $lat;
+
+    /**
+     * @var float $lng Longitude returned by geocoder
+     */
     public $lng;
+
 
     public function scenarios() {
         return[
@@ -108,19 +124,4 @@ class ProfileBrowse extends Profile
 
         return $dataProvider;
     }
-
-    /**
-     * Returns Latitude & Longitude for a given "city, state"
-     */
-    public function getLatLng($spatial)
-    {
-        $location = preg_replace('/\s+/', '+', $this->location);                                    // Replace all spaces with "+"
-        $geocoder = new GoogleGeocoder();
-        $result = $geocoder->getLatLngOfAddress($location);
-        $spatial['lat'] = $result['lat'];
-        $spatial['lng'] = $result['lng'];
- 
-        return $spatial;
-    }
-
 }

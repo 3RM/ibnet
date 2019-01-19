@@ -2,7 +2,7 @@
 
 namespace common\models\profile;
 
-use Yii;
+use Yii; use common\models\Utility;
 use yii\web\HttpException;
 
 /**
@@ -391,7 +391,7 @@ class GoogleGeocoder{
      * @return array Associative array containing lat, lng and location_type.
      */
     public function getLatLngOfAddress($address){
-        $res = $this->geocode($address);
+        $res = $this->geocode($address); //Utility::pp($res);
         return $this->getLatLngFromResult($res);
     }
     

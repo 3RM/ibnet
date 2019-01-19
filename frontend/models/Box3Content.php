@@ -30,7 +30,7 @@ class Box3Content extends Model
         if (!($profiles && $count && $i)) {
             $profiles = Profile::find()                                                             // Get new profiles for box 3 and add to session
                 ->select('*')
-                ->where(['status' => PROFILE::STATUS_ACTIVE])
+                ->where(['status' => PROFILE::STATUS_ACTIVE, 'has_been_inactivated' => NULL])
                 ->andwhere('created_at>DATE_SUB(NOW(), INTERVAL 14 DAY)')
                 ->orderBy('created_at DESC')
                 ->all();

@@ -372,6 +372,9 @@ class SiteController extends Controller
      */
     public function actionRegister()
     {
+        if (!Yii::$app->user->isGuest) {
+            return $this->redirect('already-registered');
+        }
         $model = new RegisterForm();
         if ($model->load(Yii::$app->request->post())) {
             if ($user = $model->register()) {                
@@ -382,6 +385,17 @@ class SiteController extends Controller
         }
         $this->layout = 'bg-gray';
         return $this->render('register', ['model' => $model]);
+    }
+
+    /**
+     * Displays about page.
+     *
+     * @return mixed
+     */
+    public function actionAlreadyRegistered()
+    {
+        $this->layout = 'bg-gray';
+        return $this->render('alreadyRegistered');
     }
 
     /**

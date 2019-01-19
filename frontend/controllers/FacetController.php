@@ -4,6 +4,7 @@ namespace frontend\controllers;
 
 use common\models\profile\Profile;
 use common\models\profile\ProfileBrowse;
+use frontend\models\GeoCoder;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -197,7 +198,9 @@ class FacetController extends Controller
 
         if ($browseModel->distance && $browseModel->location) {                                     // Add geo filterquery in the event of user spatial browse
             if (empty($browseModel->lat) || empty($browseModel->lng)) {
-                $spatial = $browseModel->getLatLng($spatial);
+                $res = GeoCoder::getCoordinates($browseModel->location, true);
+                $spatial['lat'] = $res['lat'];
+                $spatial['lng'] = $res['lng'];
             }
             $helper = $query->getHelper();
             $query->createFilterQuery('org_loc')->setQuery(

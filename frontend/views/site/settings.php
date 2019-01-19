@@ -23,7 +23,7 @@ use yii\widgets\ActiveForm;
                 Html::img('@web/images/content/user.png', ['class' => 'img-circle']) :
                 Html::img($userP->usr_image, ['class' => 'img-circle']); ?>
             <div class="personal-info">
-                <p class="lead"><b>Screen Name:</b> <?= $userP->screen_name ?></p>
+                <p class="lead"><b>Display Name:</b> <?= $userP->screen_name ?></p>
                 <p class="lead"><b>Home Church:</b> <?= $home_church ?></p>
                 <p class="lead"><b>Primary Role:</b> <?= $userP->role ?></p>
                 <p class="lead"><b>Joined:</b> <?= Yii::$app->formatter->asDate($userP->created_at, 'php:F Y') ?></p>

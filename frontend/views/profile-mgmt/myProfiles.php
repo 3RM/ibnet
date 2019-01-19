@@ -27,13 +27,13 @@ use yii\widgets\ActiveForm;
                         </div>
                         <div class="profile-status">
                             <?php if ($profile->status == Profile::STATUS_NEW) {
-                                echo '<p><span style="color:#337ab7">New</span></p>';
+                                echo '<p><span style="color:#337ab7"> New</p>';
                             } elseif ($profile->status == Profile::STATUS_ACTIVE) {
-                                echo '<p><span style="color:green">Active</span></p>';
+                                echo '<p><span style="color:green"> Active</span></p>';
                             } elseif ($profile->status == Profile::STATUS_INACTIVE) {
-                                echo '<p><span style="color:orange">Inactive</span></p>';
+                                echo '<p><span style="color:orange"> Inactive</p>';
                             } elseif ($profile->status == Profile::STATUS_EXPIRED) {
-                                echo '<p><span style="color:red">Expired</span></p>';
+                                echo '<p><span style="color:red"> Expired</p>';
                             } ?> 
                         </div>
                     </div>
@@ -43,8 +43,8 @@ use yii\widgets\ActiveForm;
                                 <?= empty($profile->image2) ? Html::img('@web/images/content/profile-logo.png', ['class' => '', 'alt' => 'Logo Image']) : Html::img($profile->image2, ['class' => '', 'alt' => 'Logo image']) ?>
                                 <?php if ($profile->status == Profile::STATUS_ACTIVE) {
                                     echo $profile->category == Profile::CATEGORY_IND ?
-                                        '<h1>' . Html::a($profile->formattedNames . '&nbsp' . Html::icon('new-window', ['class' => 'internal-link']), ['profile/' . ProfileController::$profilePageArray[$profile->type], 'id' => $profile->id, 'urlLoc' => $profile->url_loc, 'name' => $profile->url_name], ['target' => '_blank']) . '</h1>' :
-                                        '<h1>' . Html::a($profile->org_name . '&nbsp' . Html::icon('new-window', ['class' => 'internal-link']), ['profile/' . ProfileController::$profilePageArray[$profile->type], 'id' => $profile->id, 'urlLoc' => $profile->url_loc, 'name' => $profile->url_name], ['target' => '_blank']) . '</h1>';
+                                        '<h1>' . Html::a($profile->formattedNames . '&nbsp' . Html::icon('new-window', ['class' => 'internal-link']), ['profile/' . ProfileController::$profilePageArray[$profile->type], 'id' => $profile->id, 'urlLoc' => $profile->url_loc, 'name' => $profile->url_name], ['target' => '_blank', 'rel' => 'noopener noreferrer']) . '</h1>' :
+                                        '<h1>' . Html::a($profile->org_name . '&nbsp' . Html::icon('new-window', ['class' => 'internal-link']), ['profile/' . ProfileController::$profilePageArray[$profile->type], 'id' => $profile->id, 'urlLoc' => $profile->url_loc, 'name' => $profile->url_name], ['target' => '_blank', 'rel' => 'noopener noreferrer']) . '</h1>';
                                 } else {
                                     echo $profile->category == Profile::CATEGORY_IND ?
                                         '<h1>' . $profile->formattedNames . '</h1>' :
@@ -61,8 +61,6 @@ use yii\widgets\ActiveForm;
                                 echo '<div class="notification"><p>You have unconfirmed staff. ' . Html::a('Click here', ['profile-form/form-route', 'type' => $profile->type, 'fmNum' => ProfileFormController::$form['sf']-1, 'id' => $profile->id]) . ' to review.</p></div>';
                             } elseif (!$profile->events) {
                                 echo '<div class="notification"><p>Add ministry highlights to your timeline ' . Html::a('here', ['profile-mgmt/history', 'id' => $profile->id]) . '.</p></div>';
-                            } elseif ((!$profile->homeChurch) && ($profile->category == Profile::CATEGORY_IND) && ($profile->status == Profile::STATUS_ACTIVE)) {
-                                echo '<div class="notification" style="color:red"><p>Your home church\'s profile has gone inactive.  Reactivate your home church profile to keep this profile active.</p></div>';
                             } ?>
                         </div>
                         <div class="profile-links">
@@ -71,7 +69,7 @@ use yii\widgets\ActiveForm;
                                 '<p class="date"><b>Created</b>: --</p>' :
                                 '<p class="date"><b>Created</b>: ' . Yii::$app->formatter->asDate($profile->created_at) . '</p>';
                             ?>
-                            <?php if ($profile->renewal_date == NULL) {
+                            <?php if (($profile->renewal_date == NULL) || ($profile->status == Profile::STATUS_INACTIVE)) {
                                 echo '<p class="date last"><b>Update by</b>: --</p>';
                             } else {
                                 echo '<p class="date last"><b>Update by</b>: ';

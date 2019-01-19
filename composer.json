@@ -15,16 +15,14 @@
     "minimum-stability": "dev",
     "require": {
         "php": ">=5.4.0",
-        "fxp/composer-asset-plugin": "*",
-        "yiisoft/yii2": ">=2.0.7",
-        "yiisoft/yii2-bootstrap": "*",
-        "yiisoft/yii2-swiftmailer": "*",
+        "yiisoft/yii2": "~2.0.14",
+        "yiisoft/yii2-bootstrap": "~2.0.0",
+        "yiisoft/yii2-swiftmailer": "~2.0.0 || ~2.1.0",
         "sammaye/yii2-solr": "^1.1",
         "solarium/solarium": "^3.5",
         "sadovojav/yii2-image-cutter": "dev-master",
         "kartik-v/yii2-widget-select2": "@dev",
         "kartik-v/yii2-markdown": "dev-master",
-        "michelf/php-smartypants": "dev-lib",
         "johnitvn/yii2-rbac-plus": "*",
         "borales/yii2-phone-input": "=0.0.5",
         "ruskid/yii2-csv-importer": "dev-master",
@@ -41,24 +39,29 @@
         "kartik-v/yii2-widget-datepicker": "@dev",
         "dektrium/yii2-rbac": "1.0.0-alpha@dev",
         "eddmash/yii2-clipboard": "@dev",
-        "sammaye/yii2-yiichimp": "^1.0"
+        "sammaye/yii2-yiichimp": "^1.0",
+        "geocoder-php/google-maps-provider": "^4.0@dev",
+        "php-http/guzzle6-adapter": "^2.0@dev",
+        "php-http/message": "^1.6@dev"
     },
     "require-dev": {
-        "yiisoft/yii2-codeception": "*",
-        "yiisoft/yii2-debug": "*",
-        "yiisoft/yii2-gii": "*",
-        "yiisoft/yii2-faker": "*"
+        "yiisoft/yii2-debug": "~2.0.0",
+        "yiisoft/yii2-gii": "~2.0.0",
+        "yiisoft/yii2-faker": "~2.0.0",
+        "codeception/base": "^2.4.0",
+        "phpunit/phpunit": "~6.5.5",
+        "codeception/verify": "~1.0.0"
     },
-    "config": {
-        "process-timeout": 1800
-    },
-    "extra": {
-        "asset-installer-paths": {
-            "npm-asset-library": "vendor/npm",
-            "bower-asset-library": "vendor/bower"
+     "config": {
+        "process-timeout": 1800,
+        "platform": {
+            "php": "7.1.0"
+        },
+        "fxp-asset": {
+            "installer-paths": {
+                "npm-asset-library": "vendor/npm",
+                "bower-asset-library": "vendor/bower"
+            }
         }
-    },
-    "scripts": {
-        "post-install-cmd": "php init --env=Development --overwrite=n"
     }
 }

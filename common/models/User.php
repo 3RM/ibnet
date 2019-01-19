@@ -125,6 +125,7 @@ class User extends ActiveRecord implements
             'emailPrefLinks' => 'Tell me when someone links to or unlinks from my profiles',
             'emailPrefComments' => 'Tell me when someone comments on my profiles',
             'emailPrefFeatures' => 'Notify me of new or updated website features',
+            'emailPrefBlog' => 'Send me weekly blog digests',
         ];
     }
 

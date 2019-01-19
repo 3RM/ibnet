@@ -7,7 +7,6 @@ use borales\extensions\phoneInput\PhoneInputValidator;
 use common\models\missionary\Missionary;
 use common\models\profile\Country;
 use common\models\profile\FormsCompleted;
-use common\models\profile\GoogleGeocoder;
 use common\models\profile\ProfileHasLike;
 use common\models\profile\ProfileMail;
 use common\models\profile\State;
@@ -16,12 +15,14 @@ use common\models\User;
 use common\models\Utility;
 use frontend\controllers\ProfileController;
 use frontend\controllers\ProfileMailController;
+use frontend\models\GeoCoder;
 use sadovojav\cutter\behaviors\CutterBehavior;
 use yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Query;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Inflector;
 use yii\helpers\Url;
 use yii\web\UploadedFile;
 
@@ -1047,8 +1048,8 @@ class Profile extends \yii\db\ActiveRecord
         }
 
         $this->category == self::CATEGORY_IND ?                                                     // Update url name
-            $this->url_name = $this->urlName($this->ind_last_name) :
-            $this->url_name = $this->urlName($this->org_name);
+            $this->url_name = Inflector::slug($this->ind_last_name) :
+            $this->url_name = Inflector::slug($this->org_name);
 
     // ***************************** Save **************************************
         if ($this->validate() && $this->save() && $this->setUpdateDate()) {
@@ -1069,13 +1070,13 @@ class Profile extends \yii\db\ActiveRecord
     // ************************* Individual Address ******************************
             if ($this->category == self::CATEGORY_IND) {
 
-                if (empty($this->ind_city)) {                                                       // if physical address is empty, populate city, state, country, and zip from mailing address
+                // if physical address is empty, populate city, state, country, and zip from mailing address
+                if (empty($this->ind_city)) {
                     $this->ind_city = $this->ind_po_city;
                     $this->ind_st_prov_reg = $this->ind_po_st_prov_reg;
                     $this->ind_zip = $this->ind_po_zip;
                     $this->ind_country = $this->ind_po_country;
                 }
-            
                 $oldAddr = $this->getOldAttribute('ind_address1') 
                     . $this->getOldAttribute('ind_address2')
                     . $this->getOldAttribute('ind_city')
@@ -1087,23 +1088,16 @@ class Profile extends \yii\db\ActiveRecord
                     . $this->ind_st_prov_reg
                     . $this->ind_country;
                 if ($this->ind_loc == NULL || ($addr != $oldAddr)) {
-                    $this->ind_address1 ? $address = $this->ind_address1 . ',+' : $address = '';    // Assemble international address string for geocoding (123+Main+St,+Mullingar,+Westmeath,+Ireland)
+                    // Format address string for geocoding (123+Main+St,+Mullingar,+Westmeath,+Ireland)
+                    $this->ind_address1 ? $address = $this->ind_address1 . ',+' : $address = '';
                     $address .= $this->ind_city . ',+';
                     $address .= $this->ind_st_prov_reg . ',+';
                     $address .= $this->ind_country;
-                    $address = preg_replace('/\s+/', '+', $address);                                // Replace all spaces with "+"
+                    $this->ind_loc = GeoCoder::getCoordinates($address);
 
-                    $geocoder = new GoogleGeocoder();
-                    try{
-                        $result = $geocoder->getLatLngOfAddress($address);
-                    } catch(Exception $e){
-                        //Something went wrong!
-                        echo '$e->getMessage()'; die;
-                    }
-                    $this->ind_loc = $result['lat'] . ',' . $result['lng'];
                 }
-
-                if ($this->ind_country == 'United States') {                                        // Convert US states to abbreviations
+                // Convert US states to abbreviations
+                if ($this->ind_country == 'United States') {
                     $state = State::find()
                         ->where(['state' => $this->ind_st_prov_reg])
                         ->one();
@@ -1139,18 +1133,15 @@ class Profile extends \yii\db\ActiveRecord
                     . $this->org_st_prov_reg
                     . $this->org_country;
                 if ($this->org_loc == NULL || ($addr != $oldAddr)) {
-                    $this->org_address1 ? $address = $this->org_address1 . ',+' : $address = '';    // Assemble international address string for geocoding (123+Main+St,+Mullingar,+Westmeath,+Ireland)
+                    // Format address string for geocoding (123+Main+St,+Mullingar,+Westmeath,+Ireland)
+                    $this->org_address1 ? $address = $this->org_address1 . ',+' : $address = '';
                     $address .= $this->org_city . ',+';
                     $address .= $this->org_st_prov_reg . ',+';
                     $address .= $this->org_country;
-                    $address = preg_replace('/\s+/', '+', $address);                                // Replace all spaces with "+"
-
-                    $geocoder = new GoogleGeocoder();
-                    $result = $geocoder->getLatLngOfAddress($address);
-                    $this->org_loc = $result['lat'] . ',' . $result['lng'];
+                    $this->org_loc = GeoCoder::getCoordinates($address);
                 }
-            
-                if ($this->org_country == 'United States') {                                        // Convert US states to abbreviations
+                // Convert US states to abbreviations
+                if ($this->org_country == 'United States') {
                     $state = State::find()
                         ->where(['state' => $this->org_st_prov_reg])
                         ->one();
@@ -1175,8 +1166,8 @@ class Profile extends \yii\db\ActiveRecord
 
             if ($this->type != 'Missionary') {
                 $this->category == self::CATEGORY_IND ?                                              // Update Url location
-                $this->url_loc = $this->urlName($this->ind_city) :
-                $this->url_loc = $this->urlName($this->org_city);
+                $this->url_loc = Inflector::slug($this->ind_city) :
+                $this->url_loc = Inflector::slug($this->org_city);
             }
 
     // ***************************** Save **************************************
@@ -1911,13 +1902,13 @@ class Profile extends \yii\db\ActiveRecord
         $createDate = new Expression('CURDATE()');
 
         if ($this->category == self::CATEGORY_IND) {
-            $name = $this->urlName($this->ind_last_name);
+            $name = Inflector::slug($this->ind_last_name);
             $urlLoc = ($this->type == 'Missionary') ?
-                $this->urlName($this->missionary->field) :
-                $this->urlName($this->ind_city);
+                Inflector::slug($this->missionary->field) :
+                Inflector::slug($this->ind_city);
         } else {
-            $name = $this->urlName($this->org_name);
-            $urlLoc = $this->urlName($this->org_city);
+            $name = Inflector::slug($this->org_name);
+            $urlLoc = Inflector::slug($this->org_city);
         }
 
         ProfileMailController::dbSendLink($this->id);                                               // send link notifications to profile owners
@@ -1978,6 +1969,7 @@ class Profile extends \yii\db\ActiveRecord
                 'status' => Profile::STATUS_INACTIVE, 
                 'renewal_date' => NULL,
                 'inactivation_date' => new Expression('NOW()'),
+                'has_been_inactivated' => 1,
                 'edit' => self::EDIT_NO,
             ])) {
 
@@ -2744,17 +2736,6 @@ class Profile extends \yii\db\ActiveRecord
                 return $label = 'Home Church:';
             break;
         }
-    }
-
-    /**
-     * Return a url-friendly name
-     * @param string $name
-     * @return string
-     */
-    public function urlName($name)
-    {
-        $convertName = Utility::convert_accent_characters($name);
-        return preg_replace("/[^a-zA-Z0-9-]/", "", str_replace(' ', '-', strtolower(trim($convertName))));
     }
 
     /**
