@@ -13,5 +13,7 @@ return [
     'profileTransferTokenExpire' => 604800,		// 7 * 24 * 60 * 60 (1 week)
 
     // API Keys
-    'apiKey.Google' => 'AIzaSyBtE_w8tdgpSwEse8qTsEZoR-Vw776xg6I',
+    'apiKey.Google-client' => 'AIzaSyBtE_w8tdgpSwEse8qTsEZoR-Vw776xg6I',
+    'apiKey.Google-server' => 'AIzaSyBX5uu_ymFtKRdw-0uVJMa7CPUvMS-8Xmo',
+    'apiKey.Google-no-restrictions' => 'AIzaSyDvsfbC0RbT8TLJFYFxBiCYzWgUd51xDg8',
 ];

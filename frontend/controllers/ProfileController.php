@@ -562,7 +562,7 @@ class ProfileController extends Controller
             
             // ===================== Fellow Church Members =====================
                 $memberArray = User::find()
-                    ->where(['<>', 'screen_name', NULL])
+                    ->where(['IS NOT', 'screen_name', NULL])
                     ->andWhere(['ind_act_profiles' => NULL])
                     ->andWhere(['home_church' => $profile->home_church])
                     ->andWhere(['<>', 'id', $profile->user_id])
@@ -803,7 +803,7 @@ class ProfileController extends Controller
 
             // ===================== Fellow Church Members =====================
                 $memberArray = User::find()
-                    ->where(['<>', 'screen_name', NULL])
+                    ->where(['IS NOT', 'screen_name', NULL])
                     ->andWhere(['ind_act_profiles' => NULL])
                     ->andWhere(['home_church' => $profile->home_church])
                     ->andWhere(['<>', 'id', $profile->user_id])
@@ -1659,7 +1659,7 @@ class ProfileController extends Controller
 
             // ===================== Fellow Church Members =====================
                 $memberArray = User::find()
-                    ->where(['<>', 'screen_name', NULL])
+                    ->where(['IS NOT', 'screen_name', NULL])
                     ->andWhere(['ind_act_profiles' => NULL])
                     ->andWhere(['home_church' => $profile->home_church])
                     ->andWhere(['<>', 'id', $profile->user_id])

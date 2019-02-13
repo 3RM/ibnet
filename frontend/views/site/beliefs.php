@@ -41,7 +41,7 @@ Url::remember();
         <li>Priesthood of the believer</li>
         <li>Soul liberty</li>
         <li>Immersion and the Lord’s Supper, the only two ordinances</li>
-        <li>Separation of Church and State</li>
+        <li>Separation of church and state</li>
         <li>Separation: ethically and ecclesiastically <p>(After Dr. Richard Weeks. Read more <a href="http://www.mbu.edu/seminary/sunesis/the-logic-of-brapsis/" target="_blank">here</a>.)</p></li>
     </ul>
 

@@ -5,6 +5,7 @@ use tugmaks\GoogleMaps\Map;
 		<?php if(!empty($loc)) {
 			echo '<div class="map">';
 			echo Map::widget([
+				'apiKey'=> Yii::$app->params['apiKey.Google-client'],
 		  		'zoom' => 16,
 		  		'center' => $loc,
 		  		'width' => 80,

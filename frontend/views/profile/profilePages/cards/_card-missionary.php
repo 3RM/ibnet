@@ -16,8 +16,8 @@ use yii\bootstrap\Html;
 						<?php } ?>
 					</li>
 					<li>Status: <?= $missionary->status ?></li>
-					<li>Sending Church: <?= $church ? HTML::a($church->org_name . '&nbsp' . Html::icon('link', ['class' => 'internal-link']), ['church', 'id' => $church->id, 'urlLoc' => $church->url_loc, 'name' => $church->url_name]) : NULL ?></li>
-					<li>Mission Agency: <?= empty($missionLink) ? $mission->mission : HTML::a($missionLink->org_name . '&nbsp' . Html::icon('link', ['class' => 'internal-link']), ['mission-agency', 'id' => $missionLink->id, 'urlLoc' => $missionLink->url_loc, 'name' => $missionLink->url_name]) ?></li>
+					<li>Sending Church: <?= $church ? HTML::a($church->org_name . '&nbsp' . Html::icon('link', ['class' => 'internal-link']), ['profile/church', 'id' => $church->id, 'urlLoc' => $church->url_loc, 'name' => $church->url_name]) : NULL ?></li>
+					<li>Mission Agency: <?= empty($missionLink) ? $mission->mission : HTML::a($missionLink->org_name . '&nbsp' . Html::icon('link', ['class' => 'internal-link']), ['profile/mission-agency', 'id' => $missionLink->id, 'urlLoc' => $missionLink->url_loc, 'name' => $missionLink->url_name]) ?></li>
 				</ul>
 			</div>
 		</div>

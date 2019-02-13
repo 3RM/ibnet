@@ -585,5 +585,5 @@ $this->registerJs($script);
     // }
 
 </script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAJAUkH21aE3XnCYSgT0v5HHZpoupZ0Nz4&libraries=places&callback=initMap"
+<script src="https://maps.googleapis.com/maps/api/js?key=<?= Yii::$app->params['apiKey.Google-no-restrictions'] ?>&libraries=places&callback=initMap"
         async defer></script>

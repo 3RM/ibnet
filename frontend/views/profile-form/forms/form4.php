@@ -3,6 +3,7 @@
 use borales\extensions\phoneInput\PhoneInput;
 use common\models\profile\Profile;
 use frontend\assets\AjaxAsset;
+use frontend\assets\BoralesPhoneAsset;
 use richardfan\widget\JSRegister;
 use yii\bootstrap\Html;
 use yii\bootstrap\Modal;
@@ -13,6 +14,7 @@ use yii\widgets\ActiveForm;
 /* @var $model app\models\Profile */
 /* @var $form yii\widgets\ActiveForm */
 AjaxAsset::register($this);
+BoralesPhoneAsset::register($this);
 $this->title = 'Contact Information';
 ?>
 
@@ -114,7 +116,6 @@ $this->title = 'Contact Information';
                 <?= $form->field($social, 'facebook')->textInput(['maxlength' => true]) ?>
                 <?= $form->field($social, 'linkedin')->textInput(['maxlength' => true]) ?>
                 <?= $form->field($social, 'twitter')->textInput(['maxlength' => true]) ?>
-                <?= $form->field($social, 'google')->textInput(['maxlength' => true]) ?>
                 <?= $form->field($social, 'rss')->textInput(['maxlength' => true]) ?>
                 <?= $form->field($social, 'youtube')->textInput(['maxlength' => true]) ?>
                 <?= $form->field($social, 'vimeo')->textInput(['maxlength' => true]) ?>

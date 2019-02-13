@@ -13,7 +13,6 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 /* @var $profilemodel app\models\Profile */
 
-\Eddmash\Clipboard\ClipboardAsset::register($this);
 $this->title = 'My Account';
 $menuItems = [
     ['label' => '<span class="glyphicons glyphicons-settings"></span> Settings', 'url' => ['/site/settings']],

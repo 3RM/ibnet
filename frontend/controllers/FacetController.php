@@ -198,7 +198,7 @@ class FacetController extends Controller
 
         if ($browseModel->distance && $browseModel->location) {                                     // Add geo filterquery in the event of user spatial browse
             if (empty($browseModel->lat) || empty($browseModel->lng)) {
-                $res = GeoCoder::getCoordinates($browseModel->location, true);
+                $res = GeoCoder::getCoordinates($browseModel->location, Yii::$app->params['apiKey.Google-no-restrictions'], true);
                 $spatial['lat'] = $res['lat'];
                 $spatial['lng'] = $res['lng'];
             }

@@ -1093,7 +1093,7 @@ class Profile extends \yii\db\ActiveRecord
                     $address .= $this->ind_city . ',+';
                     $address .= $this->ind_st_prov_reg . ',+';
                     $address .= $this->ind_country;
-                    $this->ind_loc = GeoCoder::getCoordinates($address);
+                    $this->ind_loc = GeoCoder::getCoordinates($address, Yii::$app->params['apiKey.Google-server']);
 
                 }
                 // Convert US states to abbreviations
@@ -1138,7 +1138,7 @@ class Profile extends \yii\db\ActiveRecord
                     $address .= $this->org_city . ',+';
                     $address .= $this->org_st_prov_reg . ',+';
                     $address .= $this->org_country;
-                    $this->org_loc = GeoCoder::getCoordinates($address);
+                    $this->org_loc = GeoCoder::getCoordinates($address, Yii::$app->params['apiKey.Google-server']);
                 }
                 // Convert US states to abbreviations
                 if ($this->org_country == 'United States') {
