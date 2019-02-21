@@ -1,6 +1,7 @@
 <?php
 namespace frontend\models;
 
+use frontend\controllers\ProfileController;
 use common\models\missionary\Missionary;
 use common\models\profile\Profile;
 use common\models\Utility;
@@ -29,8 +30,7 @@ class Box3Content extends Model
 
         if (!($profiles && $count && $i)) {
             $profiles = Profile::find()                                                             // Get new profiles for box 3 and add to session
-                ->select('*')
-                ->where(['status' => PROFILE::STATUS_ACTIVE, 'has_been_inactivated' => NULL])
+                 ->where(['status' => PROFILE::STATUS_ACTIVE, 'has_been_inactivated' => NULL])
                 ->andwhere('created_at>DATE_SUB(NOW(), INTERVAL 14 DAY)')
                 ->orderBy('created_at DESC')
                 ->all();
@@ -56,18 +56,18 @@ class Box3Content extends Model
             }
 
             $linkedProfile = NULL;
-            if ($profile->type == 'Pastor') {
-                $linkedProfile = Profile::findOne($profile->home_church);
+            if ($profile->type == Profile::TYPE_PASTOR) {
+                $linkedProfile = $profile->homeChurch;
             }
 
             $missionary = NULL;
-            if ($profile->type == 'Missionary') {
-                $missionary = Missionary::findOne($profile->missionary_id);
+            if ($profile->type == Profile::TYPE_MISSIONARY) {
+                $missionary = $profile->missionary;
             }
 
             $staffMinistry = NULL;
-            if ($profile->type == 'Staff') {
-                $staffMinistry = Profile::findOne($profile->ministry_of);
+            if ($profile->type == Profile::TYPE_STAFF) {
+                $staffMinistry = $profile->parentMinistry;
             }
             
             $desc = preg_replace("/[^a-zA-Z0-9\s\.\,\?\!\"\-]/", "", $profile->description);
@@ -76,11 +76,11 @@ class Box3Content extends Model
 
             switch ($profile->type) {
 
-                case 'Association':
+                case Profile::TYPE_ASSOCIATION:
                     $content .= '<h3>';
-                    $content .=     Html::a($profile->org_name, ['profile/association',
+                    $content .=     Html::a($profile->org_name, ['profile/' . ProfileController::$profilePageArray[$profile->type],
                                         'urlLoc' => $profile->url_loc, 
-                                        'name' => $profile->url_name, 
+                                        'urlName' => $profile->url_name, 
                                         'id' => $profile->id]);
                     $content .= '</h3>';
                     $content .= '<p>';
@@ -89,14 +89,13 @@ class Box3Content extends Model
                     $content .=     empty($profile->org_st_prov_reg) ? NULL : $profile->org_st_prov_reg;
                     $content .=     $profile->org_country == 'United States' ? '' : ', ' . $profile->org_country;
                     $content .= '</h4>';
-                    $content .= '<p>' . Utility::trimText($desc, 50) . '</p>';
                     break;
                 
-                case 'Camp' :
+                case Profile::TYPE_CAMP :
                     $content .= '<h3>';
-                    $content .=     Html::a($profile->org_name, ['profile/camp',
+                    $content .=     Html::a($profile->org_name, ['profile/' . ProfileController::$profilePageArray[$profile->type],
                                         'urlLoc' => $profile->url_loc, 
-                                        'name' => $profile->url_name, 
+                                        'urlName' => $profile->url_name, 
                                         'id' => $profile->id]);
                     $content .= '</h3>';
                     $content .= '<p>';
@@ -104,15 +103,14 @@ class Box3Content extends Model
                     $content .=     ', ';
                     $content .=     empty($profile->org_st_prov_reg) ? NULL : $profile->org_st_prov_reg;
                     $content .=     $profile->org_country == 'United States' ? '' : ', ' . $profile->org_country;
-                    $content .= '</p>';
-                    $content .= '<p>' . Utility::trimText($desc, 50) . '</p>';              
+                    $content .= '</p>';             
                     break;
 
-                case 'Chaplain' :
+                case Profile::TYPE_CHAPLAIN :
                     $content .= '<h3>';
-                    $content .=     Html::a($profile->getFormattedNames()->formattedNames, ['profile/chaplin',
+                    $content .=     Html::a($profile->mainName, ['profile' . ProfileController::$profilePageArray[$profile->type],
                                         'urlLoc' => $profile->url_loc, 
-                                        'name' => $profile->url_name, 
+                                        'urlName' => $profile->url_name, 
                                         'id' => $profile->id]);
                     $content .= '</h3>';
                     $content .= '<p>';
@@ -123,14 +121,13 @@ class Box3Content extends Model
                     $content .=     empty($profile->ind_st_prov_reg) ? NULL : $profile->ind_st_prov_reg;
                     $content .=     $profile->ind_country == 'United States' ? '' : ', ' . $profile->ind_country;
                     $content .= '</p>';
-                    $content .= '<p>' . Utility::trimText($desc, 50) . '</p>';
                     break;
 
-                case 'Church' :
+                case Profile::TYPE_CHURCH :
                     $content .= '<h3>';
-                    $content .=     Html::a($profile->org_name, ['profile/church',
+                    $content .=     Html::a($profile->org_name, ['profile' . ProfileController::$profilePageArray[$profile->type],
                                         'urlLoc' => $profile->url_loc, 
-                                        'name' => $profile->url_name, 
+                                        'urlName' => $profile->url_name, 
                                         'id' => $profile->id]);
                     $content .= '</h3>';
                     $content .= '<p>';
@@ -139,16 +136,15 @@ class Box3Content extends Model
                     $content .=     empty($profile->org_st_prov_reg) ? NULL : $profile->org_st_prov_reg;
                     $content .=     $profile->org_country == 'United States' ? '' : ', ' . $profile->org_country;
                     $content .=     ' &#8226 ';
-                    $content .=     'Pastor ' . $profile->getFormattedNames()->formattedNames;
-                    $content .= '</p>';
-                    $content .= '<p>' . Utility::trimText($desc, 50) . '</p>';              
+                    $content .=     'Pastor ' . $profile->mainName;
+                    $content .= '</p>';            
                     break;
 
-                case 'Evangelist' :
+                case Profile::TYPE_EVANGELIST :
                     $content .= '<h3>';
-                    $content .=     Html::a($profile->getFormattedNames()->formattedNames, ['profile/evangelist',
+                    $content .=     Html::a($profile->mainName, ['profile/' . ProfileController::$profilePageArray[$profile->type],
                                         'urlLoc' => $profile->url_loc, 
-                                        'name' => $profile->url_name, 
+                                        'urlName' => $profile->url_name, 
                                         'id' => $profile->id]);
                     $content .= '</h3>';
                     $content .= '<p>';
@@ -159,14 +155,13 @@ class Box3Content extends Model
                     $content .=     $profile->ind_st_prov_reg;
                     $content .=     $profile->ind_country == 'United States' ? '' : ', ' . $profile->ind_country;
                     $content .= '</p>';
-                    $content .= '<p>' . Utility::trimText($desc, 50) . '</p>';
                     break;
 
-                case 'Fellowship' :
+                case Profile::TYPE_FELLOWSHIP :
                     $content .= '<h3>';
-                    $content .=     Html::a($profile->org_name, ['profile/fellowship',
+                    $content .=     Html::a($profile->org_name, ['profile/' . ProfileController::$profilePageArray[$profile->type],
                                         'urlLoc' => $profile->url_loc, 
-                                        'name' => $profile->url_name, 
+                                        'urlName' => $profile->url_name, 
                                         'id' => $profile->id]);
                     $content .= '</h3>';
                     $content .= '<p>';
@@ -175,14 +170,13 @@ class Box3Content extends Model
                     $content .=     empty($profile->org_st_prov_reg) ? NULL : $profile->org_st_prov_reg;
                     $content .=     $profile->org_country == 'United States' ? '' : ', ' . $profile->org_country;
                     $content .= '</p>';
-                    $content .= '<p>' . Utility::trimText($desc, 50) . '</p>';
                     break;
 
-                case 'Special Ministry' :
+                case Profile::TYPE_SPECIAL :
                     $content .= '<h3>';
-                    $content .=     Html::a($profile->org_name, ['profile/special-ministry',
+                    $content .=     Html::a($profile->org_name, ['profile/' . ProfileController::$profilePageArray[$profile->type],
                                         'urlLoc' => $profile->url_loc, 
-                                        'name' => $profile->url_name, 
+                                        'urlName' => $profile->url_name, 
                                         'id' => $profile->id]);
                     $content .= '</h3>';
                     $content .= '<p>';
@@ -191,14 +185,13 @@ class Box3Content extends Model
                     $content .=     empty($profile->org_st_prov_reg) ? NULL : $profile->org_st_prov_reg;
                     $content .=     $profile->org_country == 'United States' ? '' : ', ' . $profile->org_country;
                     $content .= '</p>';
-                    $content .= '<p>' . Utility::trimText($desc, 50) . '</p>';
                     break;
 
-                case 'Mission Agency' :
+                case Profile::TYPE_MISSION_AGCY :
                     $content .= '<h3>';
-                    $content .=     Html::a($profile->org_name, ['profile/mission-agency',
+                    $content .=     Html::a($profile->org_name, ['profile/' . ProfileController::$profilePageArray[$profile->type],
                                         'urlLoc' => $profile->url_loc, 
-                                        'name' => $profile->url_name, 
+                                        'urlName' => $profile->url_name, 
                                         'id' => $profile->id]);
                     $content .= '</h3>';
                     $content .= '<p>';
@@ -207,17 +200,13 @@ class Box3Content extends Model
                     $content .=     empty($profile->org_st_prov_reg) ? NULL : $profile->org_st_prov_reg;
                     $content .=     $profile->org_country == 'United States' ? '' : ', ' . $profile->org_country;
                     $content .= '</p>';
-                    $content .= '<p>' . Utility::trimText($desc, 50) . '</p>';
                     break;
 
-                case 'Missionary' :
-                    $names = isset($profile->spouse_first_name) ?
-                        ($profile->ind_first_name . ' & ' . $profile->spouse_first_name . ' ' . $profile->ind_last_name) :
-                        ($profile->ind_first_name . ' ' . $profile->ind_last_name);
+                case Profile::TYPE_MISSIONARY :
                     $content .= '<h3>';
-                    $content .=     Html::a($names, ['profile/missionary',
+                    $content .=     Html::a($profile->coupleName, ['profile/' . ProfileController::$profilePageArray[$profile->type],
                                         'urlLoc' => $profile->url_loc, 
-                                        'name' => $profile->url_name, 
+                                        'urlName' => $profile->url_name, 
                                         'id' => $profile->id]);
                     $content .= '</h3>';
                     if ($missionary) {
@@ -227,14 +216,13 @@ class Box3Content extends Model
                                             'Missionaries to ' . $missionary->field . ', Status: ' . $missionary->status;
                         $content .= '</p>';
                     }
-                    $content .= '<p>' . Utility::trimText($desc, 50) . '</p>';
                     break;
 
-                case 'Music Ministry' :
+                case Profile::TYPE_MUSIC :
                     $content .= '<h3>';
-                    $content .=     Html::a($profile->org_name, ['profile/music',
+                    $content .=     Html::a($profile->org_name, ['profile/' . ProfileController::$profilePageArray[$profile->type],
                                         'urlLoc' => $profile->url_loc, 
-                                        'name' => $profile->url_name, 
+                                        'urlName' => $profile->url_name, 
                                         'id' => $profile->id]);
                     $content .= '</h3>';
                     $content .= '<p>';
@@ -245,14 +233,13 @@ class Box3Content extends Model
                     $content .=     empty($profile->org_st_prov_reg) ? NULL : $profile->org_st_prov_reg;
                     $content .=     $profile->org_country == 'United States' ? '' : ', ' . $profile->org_country;
                     $content .= '</p>';
-                    $content .= '<p>' . Utility::trimText($desc, 50) . '</p>';
                     break;
 
-                case 'Pastor' :
+                case Profile::TYPE_PASTOR :
                     $content .= '<h3>';
-                    $content .=     Html::a($profile->getFormattedNames()->formattedNames, ['profile/pastor',
+                    $content .=     Html::a($profile->mainName, ['profile/' . ProfileController::$profilePageArray[$profile->type],
                                         'urlLoc' => $profile->url_loc, 
-                                        'name' => $profile->url_name, 
+                                        'urlName' => $profile->url_name, 
                                         'id' => $profile->id]);
                     $content .= '</h3>';
                     if ($linkedProfile) {
@@ -264,14 +251,13 @@ class Box3Content extends Model
                         $content .=     $linkedProfile->org_country == 'United States' ? '' : ', ' . $linkedProfile->org_country;
                         $content .= '</p>';
                     }
-                    $content .= '<p>' . Utility::trimText($desc, 50) . '</p>';
                     break;
 
-                case 'Print Ministry' :
+                case Profile::TYPE_PRINT :
                     $content .= '<h3>';
-                    $content .=     Html::a($profile->org_name, ['profile/print',
+                    $content .=     Html::a($profile->org_name, ['profile/' . ProfileController::$profilePageArray[$profile->type],
                                         'url_loc' => $profile->url_loc, 
-                                        'name' => $profile->url_name, 
+                                        'urlName' => $profile->url_name, 
                                         'id' => $profile->id]);
                     $content .= '</h3>';
                     $content .= '<p>';
@@ -282,14 +268,13 @@ class Box3Content extends Model
                     $content .=     empty($profile->org_st_prov_reg) ? NULL : $profile->org_st_prov_reg;
                     $content .=     $profile->org_country == 'United States' ? '' : ', ' . $profile->org_country;
                     $content .= '</p>';
-                   $content .= '<p>' . Utility::trimText($desc, 50) . '</p>';
                     break;
 
-                case 'School' :
+                case Profile::TYPE_SCHOOL :
                     $content .= '<h3>';
-                    $content .=     Html::a($profile->org_name, ['profile/school',
+                    $content .=     Html::a($profile->org_name, ['profile/' . ProfileController::$profilePageArray[$profile->type],
                                         'urlLoc' => $profile->url_loc, 
-                                        'name' => $profile->url_name, 
+                                        'urlName' => $profile->url_name, 
                                         'id' => $profile->id]);
                     $content .= '</h3>';
                     $content .= '<p>';
@@ -298,14 +283,13 @@ class Box3Content extends Model
                     $content .=     empty($profile->org_st_prov_reg) ? NULL : $profile->org_st_prov_reg;
                     $content .=     $profile->org_country == 'United States' ? '' : ', ' . $profile->org_country;
                     $content .= '</p>';
-                    $content .= '<p>' . Utility::trimText($desc, 50) . '</p>';
                     break;
 
-                case 'Staff' :
+                case Profile::TYPE_STAFF :
                     $content .= '<h3>';
-                    $content .=     Html::a($profile->getFormattedNames()->formattedNames, ['profile/staff',
+                    $content .=     Html::a($profile->mainName, ['profile/' . ProfileController::$profilePageArray[$profile->type],
                                         'urlLoc' => $profile->url_loc, 
-                                        'name' => $profile->url_name, 
+                                        'urlName' => $profile->url_name, 
                                         'id' => $profile->id]);
                     $content .= '</h3>';
                     if ($staffMinistry) {
@@ -314,13 +298,12 @@ class Box3Content extends Model
                         $content .=     ' at ';
                         $content .=     $staffMinistry->org_name;
                         $content .=     ', ';
-                        $content .=     $profile->ind_city;
+                        $content .=     $staffMinistry->org_city;
                         $content .=     ', ';
-                        $content .=     empty($profile->ind_st_prov_reg) ? NULL : $profile->ind_st_prov_reg;
-                        $content .=     $profile->ind_country == 'United States' ? '' : ', ' . $profile->ind_country;
+                        $content .=     empty($staffMinistry->org_st_prov_reg) ? NULL : $staffMinistry->org_st_prov_reg;
+                        $content .=     $staffMinistry->org_country == 'United States' ? '' : ', ' . $staffMinistry->org_country;
                         $content .= '</p>';
                     }
-                    $content .= '<p>' . Utility::trimText($desc, 50) . '</p>';
                     break;
 
                 default:

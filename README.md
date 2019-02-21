@@ -25,12 +25,12 @@ Want to Contribute?
 -------------------
 Contributions are welcome!
 
-###Clone this Repository
+### Fork this Repository
 This installation assumes Ubuntu server and php7.
 
 ### Configure the app
- * common/config/main-local.php (db and mailer)
- * frontend/config/main-local.php (set unique cookie validation key)
+ * Add common/config/main-local.php (db and mailer)
+ * Add frontend/config/main-local.php (set unique cookie validation key)
 
 ### Run Migrations
 ```
@@ -39,12 +39,14 @@ php yii migrate --migrationPath=@fedemotta/cronjob/migrations
 php yii migrate/up --migrationPath=@vendor/rmrevin/yii2-comments/migrations/
 php yii migrate --migrationPath=@vendor/uguranyum/yii2-icalender/migration --interactive=0
 ```
+A future update of this repository will include instructions for using fake data
 
 ### Send a pull request
+Make your updates and send a pull request.  All contributors are invited to review and discuss.
 
 
 Have Ideas for New Features and Improvements?
 -------------------
-Create a new issue
+Create a new issue.  The enhancement label will be added.
 
-Did you find a bug?  Create a new issue.
+Did you find a bug?  Create a new issue.  The bug label will be added.

@@ -1083,7 +1083,6 @@ class ProfileFormController extends ProfileController
             }
         }
         
-        $exclude = $profile->home_church;
         $profile->map = $profile->show_map == Profile::MAP_MINISTRY ? $profile->show_map : NULL;
         $pp = $profile->progressIfInactive;
         $more = false;
@@ -1126,7 +1125,6 @@ class ProfileFormController extends ProfileController
                     'profile' => $profile,
                     'initialData' => $initialData,
                     'otherMinistries' => $otherMinistries,
-                    'exclude' => $exclude,
                     'more' => $more,
                     'pp' => $pp]) :
                 $this->render($fm . '-other', [
