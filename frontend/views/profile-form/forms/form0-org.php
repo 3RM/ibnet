@@ -30,6 +30,8 @@ $this->title = 'Name and Description';
                 <?= $form->field($profile, 'description')->widget(MarkdownEditor::classname(), [
                         'height' => 200, 
                         'options' => ['smarty' => true],
+                        'showExport' => false,
+                        'footerMessage' => false,
                         'toolbar' => $toolbar
                     ]
                 ); ?>

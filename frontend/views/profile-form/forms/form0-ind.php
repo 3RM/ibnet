@@ -26,7 +26,7 @@ $this->title = 'Name & Description';
 
         <?php $form = ActiveForm::begin(); ?>
 
-        <?php if ($profile->type == 'Staff') { ?>
+        <?php if ($profile->type == Profile::TYPE_STAFF) { ?>
 
             <div class="row">
                 <div class="col-md-3">
@@ -54,6 +54,8 @@ $this->title = 'Name & Description';
                     <?= $form->field($profile, 'description')->widget(MarkdownEditor::classname(), [
                         'height' => 200,
                         'options' => ['smarty' => true],
+                        'showExport' => false,
+                        'footerMessage' => false,
                         'toolbar' => $toolbar
                     ]); ?>
                 </div>
@@ -84,7 +86,10 @@ $this->title = 'Name & Description';
                     <?= $form->field($profile, 'description')->widget(MarkdownEditor::classname(), [
                         'height' => 200,
                         'options' => ['smarty' => true],
-                        'toolbar' => $toolbar
+                        'footerMessage' => '',
+                        'showExport' => false,
+                        'showPreview' => true,
+                        'toolbar' => $toolbar,
                     ]); ?>
                 </div>
             </div>

@@ -14,7 +14,7 @@ use yii\widgets\ActiveForm;
 /* @var $model app\models\Profile */
 /* @var $form yii\widgets\ActiveForm */
 
-$this->title = 'Name and Description';
+$this->title = 'Name and Description'; //Utility::pp($profile->select);
 ?>
 
 <?= $this->render('_profileFormHeader', ['profile' => $profile, 'pp' => $pp]) ?>
@@ -24,38 +24,32 @@ $this->title = 'Name and Description';
     <div class="forms-container">
 
         <?php $form = ActiveForm::begin(); ?>
+
+        <p><?= Html::icon('info') ?> Choose a name from the list, or enter a new name below.</p>
           
-             <?php if ($profile->org_name == NULL) { ?>
-
-            <div class="row">
-                <div class="col-md-8">        
-                    <?= $form->field($profile, 'select')->widget(Select2::classname(), [
-                        'data' => $list,
-                        'language' => 'en',
-                        'theme' => 'krajee',
-                        'options' => ['placeholder' => 'Select ...'],
-                        'pluginOptions' => ['allowClear' => true],
-                    ]); ?>
-                    <?= $profile->select == NULL ? NULL : Html::activeHiddenInput($profile, 'name'); ?>
-                    <?= $profile->select == NULL ? NULL : Html::activeHiddenInput($profile, 'acronym'); ?>
-                </div>
+        <div class="row">
+            <div class="col-md-8">        
+                <?= $form->field($profile, 'select')->widget(Select2::classname(), [
+                    'data' => $list,
+                    'language' => 'en',
+                    'theme' => 'krajee',
+                    'options' => ['placeholder' => 'Select ...'],
+                    'pluginOptions' => ['allowClear' => true],
+                ]); ?>
+                <?= $profile->select == NULL ? NULL : Html::activeHiddenInput($profile, 'name'); ?>
+                <?= $profile->select == NULL ? NULL : Html::activeHiddenInput($profile, 'acronym'); ?>
             </div>
-
-        <?php } ?>
-
-        <?php if ($profile->select == NULL) { ?>
-
-            <div class="row">
-                <div class="col-md-5">
-                    <?= $form->field($profile, 'name')->textInput(['maxlength' => true]) ?>
-                    <?= $profile->org_name == NULL ? NULL : Html::activeHiddenInput($profile, 'select'); ?>
-                </div>
-                <div class="col-md-3">
-                    <?= $form->field($profile, 'acronym')->textInput(['maxlength' => true]) ?>
-                </div>
+        </div>
+    
+        <div class="row">
+            <div class="col-md-5">
+                <?= $form->field($profile, 'name')->textInput(['maxlength' => true]) ?>
+                <?= $profile->org_name == NULL ? NULL : Html::activeHiddenInput($profile, 'select'); ?>
             </div>
-
-        <?php } ?>
+            <div class="col-md-3">
+                <?= $form->field($profile, 'acronym')->textInput(['maxlength' => true]) ?>
+            </div>
+        </div>
 
         <div class="row">
             <div class="col-md-5">
@@ -84,6 +78,8 @@ $this->title = 'Name and Description';
                     MarkdownEditor::classname(), [
                         'height' => 200, 
                         'options' => ['smarty' => true],
+                        'showExport' => false,
+                        'footerMessage' => false,
                         'toolbar' => $toolbar
                     ]
                 ); ?>

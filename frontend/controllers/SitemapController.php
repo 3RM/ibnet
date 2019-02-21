@@ -44,7 +44,7 @@ class SitemapController extends Controller
                 'remap' => function ($model) {
                         /* @var $model Profile */
                         $url = Url::create([
-                            'loc' => \yii\helpers\Url::to(['/profile/' . ProfileController::$profilePageArray[$model->type], 'id' => $model->id, 'urlLoc' => $model->url_loc, 'name' => $model->url_name], true),
+                            'loc' => \yii\helpers\Url::to(['/profile/' . ProfileController::$profilePageArray[$model->type], 'id' => $model->id, 'urlLoc' => $model->url_loc, 'urlName' => $model->url_name], true),
                             'lastmod' => $model->last_modified,
                             'changefreq' => Url::CHANGEFREQ_MONTHLY,
                             'priority' => '0.7',
@@ -78,7 +78,7 @@ class SitemapController extends Controller
                     /* @var $model Profile */
                     //return Array will auto using $urlClass::create()
                     return [
-                        'loc' => \yii\helpers\Url::to(['/profile/' . ProfileController::$profilePageArray[$model->type], 'id' => $model->id, 'urlLoc' => $model->url_loc, 'name' => $model->url_name], true),
+                        'loc' => \yii\helpers\Url::to(['/profile/' . ProfileController::$profilePageArray[$model->type], 'id' => $model->id, 'urlLoc' => $model->url_loc, 'urlName' => $model->url_name], true),
                         'lastmod' => $model->last_modified,
                         'changefreq' => Url::CHANGEFREQ_MONTHLY,
                         'priority' => '0.7',

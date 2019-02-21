@@ -58,7 +58,7 @@ $this->title = 'Mission Agency & Packet';
             <div class="row">
                 <div class="col-md-8">
                     <p>You have one uploaded PDF file.</p>
-                    <?= Html::a(HTML::icon('download-alt'), ['profile-form/download', 'path' => $missionary->packet], ['class' => 'btn btn-form btn-sm', 'target' => '_blank']) ?>
+                    <?= Html::a(HTML::icon('download-alt'), ['profile-form/download', 'path' => $missionary->packet], ['class' => 'btn btn-form btn-sm', 'target' => '_blank', 'rel' => 'noopener noreferrer']) ?>
                     <?= Html::submitButton(HTML::icon('remove'), [
                         'method' => 'POST',
                         'class' => 'btn btn-form btn-sm',

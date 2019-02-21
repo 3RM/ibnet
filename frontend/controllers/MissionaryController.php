@@ -1,4 +1,10 @@
 <?php
+/**
+ * @link http://www.ibnet.org/
+ * @copyright  Copyright (c) IBNet (http://www.ibnet.org)
+ * @author Steve McKinley <steve@themckinleys.org>
+ */
+ 
 namespace frontend\controllers;
 
 use common\models\Utility;
@@ -55,22 +61,14 @@ class MissionaryController extends Controller
     }
 
     /**
-     * Video to introduce Missionary Update Feature
-     */
-    public function actionNewFeature()
-    {
-        return $this->render('updateFeature');
-    }
-
-    /**
      * Display Missionary Report Repository Admin page
      *
      * @return mixed
      */
-    public function actionUpdateRepository($a = NULL)                                               // $a stores link anchor
+    public function actionUpdateRepository($a = NULL) // $a stores link anchor
     {
         $user = Yii::$app->user->identity;
-        if (!$user->is_missionary) {
+        if (!$user->isMissionary) {
             $this->redirect('/site/settings');
         }
 
@@ -82,17 +80,16 @@ class MissionaryController extends Controller
             ->one();
         $profileActive = $profile->status == Profile::STATUS_ACTIVE ? true : false;
         $missionary = $profile->missionary;
-        $updates = $missionary->update;
+        $updates = $missionary->updatesAll;
         $newUpdate = New MissionaryUpdate(); 
 
         if (isset($_POST['remove'])) {
             $update = MissionaryUpdate::findOne($_POST['remove']);
             $update->updateAttributes(['deleted' => 1]);
-            $updates = $missionary->update;
+            $updates = $missionary->updates;
 
         } elseif (isset($_POST['edit'])) {
-            $i = 0;
-            foreach ($updates as $update) {
+            foreach ($updates as $i=>$update) {
                 if ($update->id == $_POST['edit']) {
                     $updates[$i]['edit'] = 1;
                     $a = $update->id;     
@@ -124,13 +121,15 @@ class MissionaryController extends Controller
             return $this->redirect(['update-repository', 'a' => $newUpdate->id]);
         }
 
-        $newUpdate->active = 12;                                                                    // Initialize attributes
+        // Initialize attributes
+        $newUpdate->active = 12;
         $newUpdate->title = date('F') . ' Update';
         $repo_url = Url::toRoute(['/missionary/update/', 
             'repository_key' => $missionary->repository_key, 
             'id' => $profile->id], 'https');
-        $active = $profile->status == Profile::STATUS_ACTIVE ? True : False;
+        $active = $profile->status == Profile::STATUS_ACTIVE ? true : false;
         $mcSynced = $missionary->mc_token ? true : false;
+        $displayNone = $missionary->viewed_update ? 'style="display:none"' : NULL;
 
         return $this->render('repositoryAdmin', [
             'profileActive' => $profileActive,
@@ -140,6 +139,7 @@ class MissionaryController extends Controller
             'newUpdate' => $newUpdate,
             'active' => $active,
             'mcSynced' => $mcSynced,
+            'displayNone' => $displayNone,
             'a' => $a,
         ]);
     }
@@ -151,28 +151,14 @@ class MissionaryController extends Controller
      */
     public function actionUpdate($repository_key, $id)
     {
-        $this->layout = 'main-nofollow';                                                            // Instruct search engines not to list page
+        // Instruct search engines not to list page
+        $this->layout = 'main-nofollow';
         $profile = Profile::findOne($id);
         $missionary = $profile->missionary;
         if ($missionary->repository_key == $repository_key) {
 
             $this->layout="bg-gray";
-            $profile->getformattedNames();
-            $updates = $missionary->getUpdate();
-
-            foreach ($updates as $update) {
-                if ($update->vimeo_url) {
-                    $url = 'https://vimeo.com/api/oembed.json?url=' . $update->vimeo_url;
-                    $res = Utility::get($url);
-                    $decoded = json_decode($res);
-                    $update->videoHtml = $decoded->html;
-                } elseif ($update->youtube_url) {
-                    $url = 'http://www.youtube.com/oembed?url=' . $update->youtube_url . '&format=json';
-                    $res = Utility::get($url);
-                    $decoded = json_decode($res);
-                    $update->videoHtml = $decoded->html;
-                }
-            }
+            $updates = $missionary->updates;
 
             return $this->render('updates', [
                 'profile' => $profile,
@@ -193,7 +179,7 @@ class MissionaryController extends Controller
     public function actionMailchimpStep1()
     {
         $user = Yii::$app->user->identity;
-        if (!$user->is_missionary) {
+        if (!$user->isMissionary) {
             $this->redirect('/site/settings');
         }
 
@@ -236,7 +222,7 @@ class MissionaryController extends Controller
      */
     public function actionMailchimpComplete()
     {
-        if (!Yii::$app->user->identity->is_missionary) {
+        if (!Yii::$app->user->identity->isMissionary) {
             $this->redirect('/site/settings');
         }
 
@@ -247,7 +233,8 @@ class MissionaryController extends Controller
         $token = $oauthClient->getAccessToken()->token;
         $dc = $oauthClient->userAttributes['dc'];
 
-        $profile = Profile::find()                                                                  // Store token-datacenter to db
+        // Store token-datacenter to db
+        $profile = Profile::find()
             ->where(['user_id' => Yii::$app->user->identity->id])
             ->andWhere(['type' => 'Missionary'])
             ->one();
@@ -265,7 +252,7 @@ class MissionaryController extends Controller
     public function actionMailchimpStep2()
     {
         $user = Yii::$app->user->identity;
-        if (!$user->is_missionary) {
+        if (!$user->isMissionary) {
             $this->redirect('/site/settings');
         }
 
@@ -274,7 +261,8 @@ class MissionaryController extends Controller
             ->andWhere(['type' => 'Missionary'])
             ->one();
         $missionary = $profile->missionary;
-        $mcList = new MailchimpList();                                                              // Generic model for capturing user input
+        // Generic model for capturing user input
+        $mcList = new MailchimpList();
     
         if ($mcList->load(Yii::$app->request->Post())) {
             $missionary->deleteAllMCWebhooks();
@@ -285,7 +273,8 @@ class MissionaryController extends Controller
                 updates page.</h4>';
         }
 
-        if ($res = $missionary->getMCLists()) {                                                     // Request mailing lists from Mailchimp
+        // Request mailing lists from Mailchimp
+        if ($res = $missionary->getMCLists()) {
             $listArray = \yii\helpers\ArrayHelper::map($res, 'id', 'name');
         } else {
             $msg = '<h4>You don\'t have any mailing lists.  Login to Mailchimp
@@ -321,12 +310,14 @@ class MissionaryController extends Controller
             $update->mailchimp_url = $campaign->archive_url;
             $update->from_date = new Expression('CURDATE()');
             $update->to_date = new Expression('DATE_ADD(CURDATE(), INTERVAL 1 YEAR)');
-            $update->profile_inactive = ($profile->status == Profile::STATUS_INACTIVE ? 1 : 0);     // If profile is not active, save mailchimp upate but mark inactive
+            // If profile is not active, save mailchimp upate but mark inactive
+            $update->profile_inactive = ($profile->status == Profile::STATUS_INACTIVE ? 1 : 0);
             if ($update->validate()) {
                 $update->save();
             }
+            // email user  
             $user = $profile->user;
-            ProfileMail::sendMailchimp($user->email, $missionary->repository_key, $missionary->id);        // email user       
+            ProfileMail::sendMailchimp($user->email, $missionary->repository_key, $missionary->id);     
         }
         die;
     }

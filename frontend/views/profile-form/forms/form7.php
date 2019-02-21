@@ -2,7 +2,7 @@
 
 use common\models\profile\Country;
 use common\models\profile\Profile;
-use common\models\profile\MissionaryStatus;
+use common\models\missionary\Missionary;
 use kartik\markdown\MarkdownEditor;
 use kartik\select2\Select2;
 use yii\bootstrap\Html;
@@ -40,7 +40,7 @@ $this->title = 'Missionary Field';
                     'pluginOptions' => ['allowClear' => true],
                 ]) ?>
                 <?= $form->field($missionary, 'status')->widget(Select2::classname(), [
-                    'data' => ArrayHelper::map(MissionaryStatus::find()->all(), 'status', 'status'),
+                    'data' => Missionary::STATUS,
                     'language' => 'en',
                     'theme' => 'krajee',
                     'hideSearch' => true,

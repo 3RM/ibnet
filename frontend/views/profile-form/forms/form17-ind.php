@@ -26,8 +26,8 @@ $this->title = 'Fellowship';
                 <p>Do you belong to a fellowship?</p>
                 <p><?= HTML::icon('info-sign') ?> If your fellowship or association is not listed, consider listing it!</p>
 
-                <?= $form->field($profile, 'select')->widget(Select2::classname(), [                 // see customization options here: http://demos.krajee.com/widget-details/select2
-                    'data' => ArrayHelper::map(Fellowship::find()->all(), 'id', 'fellowship'),
+                <?= $form->field($profile, 'select')->widget(Select2::classname(), [
+                    'data' => ArrayHelper::map(Fellowship::find()->all(), 'id', 'name'),
                     'language' => 'en',
                     'theme' => 'krajee',
                     'options' => [
@@ -45,6 +45,13 @@ $this->title = 'Fellowship';
             </div>
             <div class="col-md-2">    
                 <?= $form->field($profile, 'acronym')->textInput(['maxlength' => true])->label('Acronym') ?>
+            </div>
+            <div class="col-md-2">    
+                <?= HTML::submitbutton(Html::icon('plus') . ' Add', [
+                    'method' => 'POST',
+                    'class' => 'btn btn-form btn-sm btn-lower',
+                    'name' => 'add',
+                ]) ?>
             </div>
         </div>
 

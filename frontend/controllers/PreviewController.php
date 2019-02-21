@@ -1,12 +1,18 @@
 <?php
+/**
+ * @link http://www.ibnet.org/
+ * @copyright  Copyright (c) IBNet (http://www.ibnet.org)
+ * @author Steve McKinley <steve@themckinleys.org>
+ */
 
 namespace frontend\controllers;
 
-use common\models\profile\Association;
+use common\models\profile\Association; use common\models\Utility;
 use common\models\profile\Fellowship;
 use common\models\profile\Profile;
 use common\models\profile\Staff;
 use common\models\profile\Social;
+use common\rbac\PermissionProfile;
 use frontend\controllers\ProfileFormController;
 use Yii;
 use yii\filters\AccessControl;
@@ -15,9 +21,7 @@ use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 
-/**
- * ProfileController implements the CRUD actions for Profile model.
- */
+
 class PreviewController extends ProfileFormController
 {
     public $layout = 'bg-gray';
@@ -48,13 +52,12 @@ class PreviewController extends ProfileFormController
      */
     public function actionViewPreview($id, $city=NULL, $name=NULL)
     {
-        if (!$profile = $this->findProfile($id)) {
+        $profile = Profile::findProfile($id);
+        if (!\Yii::$app->user->can(PermissionProfile::UPDATE, ['profile' => $profile]) || !$profile->validType()) {
             throw new NotFoundHttpException;
         }
-        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
-            throw new NotFoundHttpException;
-        }
-        $previewPage = 'preview-' . ProfileController::$profilePageArray[$profile->type];                                     // Handle all other profile types
+        // Handle all other profile types
+        $previewPage = 'preview-' . ProfileController::$profilePageArray[$profile->type];
         if ($profile->edit != Profile::EDIT_YES) {
             $profile->updateAttributes(['edit' => Profile::EDIT_YES]);
         }
@@ -68,13 +71,11 @@ class PreviewController extends ProfileFormController
      */
     public function actionPreviewAssociation($id)
     {
-        if (!$profile = $this->findProfile($id)) {
+        $profile = Profile::findProfile($id);
+        if (!\Yii::$app->user->can(PermissionProfile::UPDATE, ['profile' => $profile]) || !$profile->validType()) {
             throw new NotFoundHttpException;
         }
-        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
-            throw new NotFoundHttpException;
-        }
-        if ($profile->type == 'Association') {
+        if ($profile->type == Profile::TYPE_ASSOCIATION) {
 
             if (isset($_POST['activate'])) {
                 return $this->redirect(['/profile-mgmt/activate', 'id' => $id]); 
@@ -83,12 +84,9 @@ class PreviewController extends ProfileFormController
                 return $this->redirect(['/profile-mgmt/my-profiles']);
             }
 
-            $social = $this->getSocial($profile);
-            if ($profile->org_loc && $profile->show_map == Profile::MAP_PRIMARY) {
-                $loc = explode(',', $profile->org_loc);
-            } else {
-                $loc = NULL;
-            }
+            $social = $profile->hasSocial;
+            $loc = ($profile->org_loc && ($profile->show_map == Profile::MAP_PRIMARY)) ? 
+                explode(',', $profile->org_loc) : NULL;
 
             $typeMask = ProfileFormController::$formArray[$profile->type];
             $profile->status == Profile::STATUS_ACTIVE ? $activate = NULL : $activate = 1;
@@ -111,13 +109,11 @@ class PreviewController extends ProfileFormController
      */
     public function actionPreviewFellowship($id)
     {
-        if (!$profile = $this->findProfile($id)) {
+        $profile = Profile::findProfile($id);
+        if (!\Yii::$app->user->can(PermissionProfile::UPDATE, ['profile' => $profile]) || !$profile->validType()) {
             throw new NotFoundHttpException;
         }
-        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
-            throw new NotFoundHttpException;
-        }
-        if ($profile->type == 'Fellowship') {
+        if ($profile->type == Profile::TYPE_FELLOWSHIP) {
 
             if (isset($_POST['activate'])) {
                 return $this->redirect(['/profile-mgmt/activate', 'id' => $id]); 
@@ -126,12 +122,9 @@ class PreviewController extends ProfileFormController
                 return $this->redirect(['/profile-mgmt/my-profiles']);
             }
 
-            $social = $this->getSocial($profile);
-            if ($profile->org_loc && $profile->show_map == Profile::MAP_PRIMARY) {
-                $loc = explode(',', $profile->org_loc);
-            } else {
-                $loc = NULL;
-            }
+            $social = $profile->hasSocial;
+            $loc = ($profile->org_loc && ($profile->show_map == Profile::MAP_PRIMARY)) ? 
+                explode(',', $profile->org_loc) : NULL;
 
             $typeMask = ProfileFormController::$formArray[$profile->type];
             $profile->status == Profile::STATUS_ACTIVE ? $activate = NULL : $activate = 1;
@@ -154,13 +147,11 @@ class PreviewController extends ProfileFormController
      */
     public function actionPreviewCamp($id)
     {
-        if (!$profile = $this->findProfile($id)) {
+        $profile = Profile::findProfile($id);
+        if (!\Yii::$app->user->can(PermissionProfile::UPDATE, ['profile' => $profile]) || !$profile->validType()) {
             throw new NotFoundHttpException;
         }
-        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
-            throw new NotFoundHttpException;
-        }
-        if ($profile->type == 'Camp') {
+        if ($profile->type == Profile::TYPE_CAMP) {
 
             if (isset($_POST['activate'])) {
                 return $this->redirect(['/profile-mgmt/activate', 'id' => $id]); 
@@ -169,13 +160,10 @@ class PreviewController extends ProfileFormController
                 return $this->redirect(['/profile-mgmt/my-profiles']);
             }
 
-            $parentMinistry = $profile->ministryOf;
-            $social = $this->getSocial($profile);
-            if ($profile->org_loc && $profile->show_map == Profile::MAP_PRIMARY) {
-                $loc = explode(',', $profile->org_loc);
-            } else {
-                $loc = NULL;
-            }
+            $parentMinistry = $profile->parentMinistry;
+            $social = $profile->hasSocial;
+            $loc = ($profile->org_loc && ($profile->show_map == Profile::MAP_PRIMARY)) ? 
+                explode(',', $profile->org_loc) : NULL;
 
             $typeMask = ProfileFormController::$formArray[$profile->type];
             $profile->status == Profile::STATUS_ACTIVE ? $activate = NULL : $activate = 1;
@@ -199,16 +187,14 @@ class PreviewController extends ProfileFormController
      */
     public function actionPreviewChaplain($id)
     {
-        if (!$profile = $this->findProfile($id)) {
-            throw new NotFoundHttpException;
-        }
-        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
+        $profile = Profile::findProfile($id);
+        if (!\Yii::$app->user->can(PermissionProfile::UPDATE, ['profile' => $profile]) || !$profile->validType()) {
             throw new NotFoundHttpException;
         }
         if (!$missionary = $profile->missionary) {
             throw new NotFoundHttpException;
         }
-        if ($profile->type == 'Chaplain') {
+        if ($profile->type == Profile::TYPE_CHAPLAIN) {
 
             if (isset($_POST['activate'])) {
                 return $this->redirect(['/profile-mgmt/activate', 'id' => $id]); 
@@ -217,14 +203,13 @@ class PreviewController extends ProfileFormController
                 return $this->redirect(['/profile-mgmt/my-profiles']);
             }
 
-            $profile->getformattedNames();
             $church = $profile->homeChurch;
-            $flwshipArray = $profile->fellowship;
-            $mission = $missionary->missionAgcy;
-            $missionLink = $this->findActiveProfile($mission->profile_id);
-            $otherMinistryArray = Staff::getOtherMinistries($profile->id);
-            $schoolsAttended = $profile->school;
-            $social = $this->getSocial($profile);
+            $fellowships = $profile->fellowships;
+            $missionAgcy = $missionary->missionAgcy;
+            $missionAgcyProfile = $missionAgcy ? $missionAgcy->linkedProfile : NULL;
+            $otherMinistries = $profile->otherMinistriesConfirmed;
+            $schoolsAttended = $profile->schoolsAttended;
+            $social = $profile->hasSocial;
             if ($profile->ind_loc && $profile->show_map == Profile::MAP_PRIMARY) {
                 $loc = explode(',', $profile->ind_loc);
             } elseif ($church &&  $church->org_loc && $profile->show_map == Profile::MAP_CHURCH) {
@@ -236,14 +221,14 @@ class PreviewController extends ProfileFormController
             $typeMask = ProfileFormController::$formArray[$profile->type];
             $profile->status == Profile::STATUS_ACTIVE ? $activate = NULL : $activate = 1;
 
-            return $this->render('previewEvangelist', [
+            return $this->render('previewEvangChaplain', [
                 'profile' => $profile,
                 'church' => $church,
                 'mission' => $mission,
                 'missionLink' => $missionLink,
-                'otherMinistryArray' => $otherMinistryArray,
+                'otherMinistries' => $otherMinistries,
                 'schoolsAttended' => $schoolsAttended,
-                'flwshipArray' => $flwshipArray,
+                'fellowships' => $fellowships,
                 'social' => $social,
                 'loc' => $loc,
                 'formList' => ProfileFormController::$formList,
@@ -260,13 +245,11 @@ class PreviewController extends ProfileFormController
      */
     public function actionPreviewChurch($id)
     {
-        if (!$profile = $this->findProfile($id)) {
+        $profile = Profile::findProfile($id);
+        if (!\Yii::$app->user->can(PermissionProfile::UPDATE, ['profile' => $profile]) || !$profile->validType()) {
             throw new NotFoundHttpException;
         }
-        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
-            throw new NotFoundHttpException;
-        }
-        if ($profile->type == 'Church') {
+        if ($profile->type == Profile::TYPE_CHURCH) {
 
             if (isset($_POST['activate'])) {
                 return $this->redirect(['/profile-mgmt/activate', 'id' => $id]); 
@@ -275,22 +258,15 @@ class PreviewController extends ProfileFormController
                 return $this->redirect(['/profile-mgmt/my-profiles']);
             }
 
-            $profile->getformattedNames();
-            if (!$pastor = Staff::getSrPastor($profile->id)) {
-                $pastor = NULL;
-            } else {
-                $pastor = $pastor->getformattedNames();
-            }
-            $ministryArray = $profile->ministry;
-            $programArray = $profile->program;
-            $flwshipArray = $profile->fellowship;
-            $assArray = $profile->association;
-            $social = $this->getSocial($profile);
-            if ($profile->org_loc && $profile->show_map == Profile::MAP_PRIMARY) {
-                $loc = explode(',', $profile->org_loc);
-            } else {
-                $loc = NULL;
-            }
+            $pastor = $profile->srPastorChurchConfirmed;
+            $ministries = $profile->ministries;
+            $programs = $profile->programs;
+            $fellowships = $profile->fellowships;
+            $associations = $profile->associations;
+            $social = $profile->hasSocial;
+
+            $loc = ($profile->org_loc && ($profile->show_map == Profile::MAP_PRIMARY)) ? 
+                explode(',', $profile->org_loc) : NULL;
 
             $typeMask = ProfileFormController::$formArray[$profile->type];
             $profile->status == Profile::STATUS_ACTIVE ? $activate = NULL : $activate = 1;
@@ -298,10 +274,10 @@ class PreviewController extends ProfileFormController
             return $this->render('previewChurch', [
                 'profile' => $profile,
                 'pastor' => $pastor,
-                'ministryArray' => $ministryArray,
-                'programArray' => $programArray,
-                'flwshipArray' => $flwshipArray,
-                'assArray' => $assArray,
+                'ministries' => $ministries,
+                'programs' => $programs,
+                'fellowships' => $fellowships,
+                'associations' => $associations,
                 'social' => $social,
                 'loc' => $loc,
                 'formList' => ProfileFormController::$formList,
@@ -318,13 +294,11 @@ class PreviewController extends ProfileFormController
      */
     public function actionPreviewEvangelist($id)
     {
-        if (!$profile = $this->findProfile($id)) {
+        $profile = Profile::findProfile($id);
+        if (!\Yii::$app->user->can(PermissionProfile::UPDATE, ['profile' => $profile]) || !$profile->validType()) {
             throw new NotFoundHttpException;
         }
-        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
-            throw new NotFoundHttpException;
-        }
-        if ($profile->type == 'Evangelist') {
+        if ($profile->type == Profile::TYPE_EVANGELIST) {
 
             if (isset($_POST['activate'])) {
                 return $this->redirect(['/profile-mgmt/activate', 'id' => $id]); 
@@ -333,19 +307,19 @@ class PreviewController extends ProfileFormController
                 return $this->redirect(['/profile-mgmt/my-profiles']);
             }
 
-            $profile->getformattedNames();
             $church = $profile->homeChurch;
-            $parentMinistry = $profile->ministryOf;
-            $otherMinistryArray = Staff::getOtherMinistries($profile->id);
-            $flwshipArray = $profile->fellowship;
-            $schoolsAttended = $profile->school;
-            $social = $this->getSocial($profile);
+            $parentMinistry = $profile->parentMinistry;
+            $otherMinistries = $profile->otherMinistriesConfirmed;
+            $fellowships = $profile->fellowships;
+            $schoolsAttended = $profile->schoolsAttended;
+            $social = $profile->hasSocial;
+
             if ($profile->ind_loc && $profile->show_map == Profile::MAP_PRIMARY) {
                 $loc = explode(',', $profile->ind_loc);
             } elseif ($church && $church->org_loc && $profile->show_map == Profile::MAP_CHURCH) {
                 $loc = explode(',', $church->org_loc);
-            } elseif ($ministry && $ministry->org_loc && $profile->show_map == Profile::MAP_MINISTRY) {
-                $loc = explode(',', $ministry->org_loc);
+            } elseif ($parentMinistry && $parentMinistry->org_loc && $profile->show_map == Profile::MAP_MINISTRY) {
+                $loc = explode(',', $parentMinistry->org_loc);
             } else {
                 $loc = NULL;
             }
@@ -353,11 +327,11 @@ class PreviewController extends ProfileFormController
             $typeMask = ProfileFormController::$formArray[$profile->type];
             $profile->status == Profile::STATUS_ACTIVE ? $activate = NULL : $activate = 1;
 
-            return $this->render('previewEvangelist', [
+            return $this->render('previewEvangChaplain', [
                 'profile' => $profile,
                 'church' => $church,
                 'parentMinistry' => $parentMinistry,
-                'otherMinistryArray' => $otherMinistryArray,
+                'otherMinistries' => $otherMinistries,
                 'schoolsAttended' => $schoolsAttended,
                 'fellowships' => $fellowships,
                 'social' => $social,
@@ -376,13 +350,11 @@ class PreviewController extends ProfileFormController
      */
     public function actionPreviewMissionAgency($id)
     {
-        if (!$profile = $this->findProfile($id)) {
+        $profile = Profile::findProfile($id);
+        if (!\Yii::$app->user->can(PermissionProfile::UPDATE, ['profile' => $profile]) || !$profile->validType()) {
             throw new NotFoundHttpException;
         }
-        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
-            throw new NotFoundHttpException;
-        }
-        if ($profile->type == 'Mission Agency') {
+        if ($profile->type == Profile::TYPE_MISSION_AGCY) {
 
             if (isset($_POST['activate'])) {
                 return $this->redirect(['/profile-mgmt/activate', 'id' => $id]); 
@@ -391,15 +363,11 @@ class PreviewController extends ProfileFormController
                 return $this->redirect(['/profile-mgmt/my-profiles']);
             }
 
-            $parentMinistry = $profile->ministryOf;
-            $social = $this->getSocial($profile);
-            if ($profile->org_loc && $profile->show_map == Profile::MAP_PRIMARY) {
-                $loc = explode(',', $profile->org_loc);
-            } elseif ($church && $church->org_loc && $profile->show_map == Profile::MAP_MINISTRY) {
-                $loc = explode(',', $church->org_loc);
-            } else {
-                $loc = NULL;
-            }
+            $parentMinistry = $profile->parentMinistry;
+            $social = $profile->hasSocial;
+
+            $loc = ($profile->org_loc && ($profile->show_map == Profile::MAP_PRIMARY)) ? 
+                explode(',', $profile->org_loc) : NULL;
 
             $typeMask = ProfileFormController::$formArray[$profile->type];
             $profile->status == Profile::STATUS_ACTIVE ? $activate = NULL : $activate = 1;
@@ -423,16 +391,14 @@ class PreviewController extends ProfileFormController
      */
     public function actionPreviewMissionary($id)
     {
-        if (!$profile = $this->findProfile($id)) {
-            throw new NotFoundHttpException;
-        }
-        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
+        $profile = Profile::findProfile($id);
+        if (!\Yii::$app->user->can(PermissionProfile::UPDATE, ['profile' => $profile]) || !$profile->validType()) {
             throw new NotFoundHttpException;
         }
         if (!$missionary = $profile->missionary) {
             throw new NotFoundHttpException;
         }
-        if ($profile->type == 'Missionary') {
+        if ($profile->type == Profile::TYPE_MISSIONARY) {
 
             if (isset($_POST['activate'])) {
                 return $this->redirect(['/profile-mgmt/activate', 'id' => $id]); 
@@ -441,15 +407,15 @@ class PreviewController extends ProfileFormController
                 return $this->redirect(['/profile-mgmt/my-profiles']);
             }
 
-            $profile->getformattedNames();
             $church = $profile->homeChurch;
             $churchPlant = $missionary->churchPlant;
-            $mission = $missionary->missionAgcy;
-            $missionLink = $this->findActiveProfile($mission->profile_id);
-            $updates = $missionary->getPublicUpdate();
-            $otherMinistryArray = Staff::getOtherMinistries($profile->id);
-            $schoolsAttended = $profile->school;
-            $social = $this->getSocial($profile);
+            $missionAgcy = $missionary->missionAgcy;
+            $missionAgcyProfile = $missionAgcy ? $missionAgcy->linkedProfile : NULL;
+            $updates = $missionary->publicUpdates;
+            $otherMinistries = $profile->otherMinistriesConfirmed;
+            $schoolsAttended = $profile->schoolsAttended;
+            $social = $profile->hasSocial;
+
             if ($profile->show_map == Profile::MAP_PRIMARY && !empty($profile->ind_loc)) {
                 $loc = explode(',', $profile->ind_loc);
             } elseif ($church && $church->org_loc && $profile->show_map == Profile::MAP_CHURCH) {
@@ -467,11 +433,11 @@ class PreviewController extends ProfileFormController
                 'profile' => $profile,
                 'missionary' => $missionary,
                 'church' => $church,
-                'mission' => $mission,
-                'missionLink' => $missionLink,
+                'missionAgcy' => $missionAgcy,
+                'missionAgcyProfile' => $missionAgcyProfile,
                 'churchPlant' => $churchPlant,
                 'updates' => $updates,
-                'otherMinistryArray' => $otherMinistryArray,
+                'otherMinistries' => $otherMinistries,
                 'schoolsAttended' => $schoolsAttended,
                 'social' => $social,
                 'loc' => $loc,
@@ -489,13 +455,11 @@ class PreviewController extends ProfileFormController
      */
     public function actionPreviewMusic($id)
     {
-        if (!$profile = $this->findProfile($id)) {
+        $profile = Profile::findProfile($id);
+        if (!\Yii::$app->user->can(PermissionProfile::UPDATE, ['profile' => $profile]) || !$profile->validType()) {
             throw new NotFoundHttpException;
         }
-        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
-            throw new NotFoundHttpException;
-        }
-        if ($profile->type == 'Music Ministry') {
+        if ($profile->type == Profile::TYPE_MUSIC) {
 
             if (isset($_POST['activate'])) {
                 return $this->redirect(['/profile-mgmt/activate', 'id' => $id]); 
@@ -504,13 +468,11 @@ class PreviewController extends ProfileFormController
                 return $this->redirect(['/profile-mgmt/my-profiles']);
             }
 
-            $parentMinistry = $profile->ministryOf;
-            $social = $this->getSocial($profile);
-            if ($profile->org_loc && $profile->show_map == Profile::MAP_PRIMARY) {
-                $loc = explode(',', $profile->org_loc);
-            } else {
-                $loc = NULL;
-            }
+            $parentMinistry = $profile->parentMinistry;
+            $social = $profile->hasSocial;
+
+            $loc = ($profile->org_loc && ($profile->show_map == Profile::MAP_PRIMARY)) ? 
+                explode(',', $profile->org_loc) : NULL;
 
             $typeMask = ProfileFormController::$formArray[$profile->type];
             $profile->status == Profile::STATUS_ACTIVE ? $activate = NULL : $activate = 1;
@@ -534,13 +496,11 @@ class PreviewController extends ProfileFormController
      */
     public function actionPreviewPastor($id)
     {
-        if (!$profile = $this->findProfile($id)) {
+        $profile = Profile::findProfile($id);
+        if (!\Yii::$app->user->can(PermissionProfile::UPDATE, ['profile' => $profile]) || !$profile->validType()) {
             throw new NotFoundHttpException;
         }
-        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
-            throw new NotFoundHttpException;
-        }
-        if ($profile->type == 'Pastor') {
+        if ($profile->type == Profile::TYPE_PASTOR) {
 
             if (isset($_POST['activate'])) {
                 return $this->redirect(['/profile-mgmt/activate', 'id' => $id]); 
@@ -549,12 +509,12 @@ class PreviewController extends ProfileFormController
                 return $this->redirect(['/profile-mgmt/my-profiles']);
             }
 
-            $profile->getformattedNames();
             $church = $profile->homeChurch;
-            $flwshipArray = $profile->fellowship;
-            $otherMinistryArray = Staff::getOtherMinistries($profile->id);
-            $schoolsAttended = $profile->school;
-            $social = $this->getSocial($profile);
+            $fellowships = $profile->fellowships;
+            $otherMinistries = $profile->otherMinistriesConfirmed;
+            $schoolsAttended = $profile->schoolsAttended;
+            $social = $profile->hasSocial;
+
             if ($profile->ind_loc && $profile->show_map == Profile::MAP_PRIMARY) {
                 $loc = explode(',', $profile->ind_loc);
             } elseif ($church && $church->org_loc && $profile->show_map == Profile::MAP_CHURCH) {
@@ -569,9 +529,9 @@ class PreviewController extends ProfileFormController
             return $this->render('previewPastor', [
                 'profile' => $profile,
                 'church' => $church,
-                'otherMinistryArray' => $otherMinistryArray,
+                'otherMinistries' => $otherMinistries,
                 'schoolsAttended' => $schoolsAttended,
-                'flwshipArray' => $flwshipArray,
+                'fellowships' => $fellowships,
                 'social' => $social,
                 'loc' => $loc,
                 'formList' => ProfileFormController::$formList,
@@ -588,13 +548,11 @@ class PreviewController extends ProfileFormController
      */
     public function actionPreviewPrint($id)
     {
-        if (!$profile = $this->findProfile($id)) {
+        $profile = Profile::findProfile($id);
+        if (!\Yii::$app->user->can(PermissionProfile::UPDATE, ['profile' => $profile]) || !$profile->validType()) {
             throw new NotFoundHttpException;
         }
-        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
-            throw new NotFoundHttpException;
-        }
-        if ($profile->type == 'Print Ministry') {
+        if ($profile->type == Profile::TYPE_PRINT) {
 
             if (isset($_POST['activate'])) {
                 return $this->redirect(['/profile-mgmt/activate', 'id' => $id]); 
@@ -603,13 +561,11 @@ class PreviewController extends ProfileFormController
                 return $this->redirect(['/profile-mgmt/my-profiles']);
             }
 
-            $parentMinistry = $profile->ministryOf;
-            $social = $this->getSocial($profile);
-            if ($profile->org_loc && $profile->show_map == Profile::MAP_PRIMARY) {
-                $loc = explode(',', $profile->org_loc);
-            } else {
-                $loc = NULL;
-            }
+            $parentMinistry = $profile->parentMinistry;
+            $social = $profile->hasSocial;
+
+            $loc = ($profile->org_loc && ($profile->show_map == Profile::MAP_PRIMARY)) ? 
+                explode(',', $profile->org_loc) : NULL;
 
             $typeMask = ProfileFormController::$formArray[$profile->type];
             $profile->status == Profile::STATUS_ACTIVE ? $activate = NULL : $activate = 1;
@@ -633,13 +589,11 @@ class PreviewController extends ProfileFormController
      */
     public function actionPreviewSchool($id)
     {
-        if (!$profile = $this->findProfile($id)) {
+        $profile = Profile::findProfile($id);
+        if (!\Yii::$app->user->can(PermissionProfile::UPDATE, ['profile' => $profile]) || !$profile->validType()) {
             throw new NotFoundHttpException;
         }
-        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
-            throw new NotFoundHttpException;
-        }
-        if ($profile->type == 'School') {
+        if ($profile->type == Profile::TYPE_SCHOOL) {
 
             if (isset($_POST['activate'])) {
                 return $this->redirect(['/profile-mgmt/activate', 'id' => $id]); 
@@ -648,25 +602,22 @@ class PreviewController extends ProfileFormController
                 return $this->redirect(['/profile-mgmt/my-profiles']);
             }
 
-            $parentMinistry = $profile->ministryOf;
-            $schoolLevel = $profile->schoolLevel;                                                   // Create array of previously selected school levels
-            usort($schoolLevel, [$this, 'level_sort']);                                             // Sort the multidimensional array
-            $accreditations = $profile->accreditation;
-            $social = $this->getSocial($profile);
-            if ($profile->org_loc && $profile->show_map == Profile::MAP_PRIMARY) {
-                $loc = explode(',', $profile->org_loc);
-            } elseif ($church && $church->org_loc && $profile->show_map == Profile::MAP_MINISTRY) {
-                $loc = explode(',', $church->org_loc);
-            } else {
-                $loc = NULL;
-            }
+            $parentMinistry = $profile->parentMinistry;
+            $schoolLevels = $profile->schoolLevels;
+            // Sort the multidimensional array
+            usort($schoolLevels, [$this, 'level_sort']);
+            $accreditations = $profile->accreditations;
+            $social = $profile->hasSocial;
+
+            $loc = ($profile->org_loc && ($profile->show_map == Profile::MAP_PRIMARY)) ? 
+                explode(',', $profile->org_loc) : NULL;
 
             $typeMask = ProfileFormController::$formArray[$profile->type];
             $profile->status == Profile::STATUS_ACTIVE ? $activate = NULL : $activate = 1;
 
             return $this->render('previewSchool', [
                 'profile' => $profile, 
-                'schoolLevel' => $schoolLevel,
+                'schoolLevels' => $schoolLevels,
                 'parentMinistry' => $parentMinistry,
                 'accreditations' => $accreditations,
                 'social' => $social,
@@ -685,13 +636,11 @@ class PreviewController extends ProfileFormController
      */
     public function actionPreviewSpecialMinistry($id)
     {
-        if (!$profile = $this->findProfile($id)) {
+        $profile = Profile::findProfile($id);
+        if (!\Yii::$app->user->can(PermissionProfile::UPDATE, ['profile' => $profile]) || !$profile->validType()) {
             throw new NotFoundHttpException;
         }
-        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
-            throw new NotFoundHttpException;
-        }
-        if ($profile->type == 'Special Ministry') {
+        if ($profile->type == Profile::TYPE_SPECIAL) {
 
             if (isset($_POST['activate'])) {
                 return $this->redirect(['/profile-mgmt/activate', 'id' => $id]); 
@@ -700,13 +649,11 @@ class PreviewController extends ProfileFormController
                 return $this->redirect(['/profile-mgmt/my-profiles']);
             }
 
-            $parentMinistry = $profile->ministryOf;
-            $social = $this->getSocial($profile);
-            if ($profile->show_map == Profile::MAP_PRIMARY && !empty($profile->org_loc)) {
-                $loc = explode(',', $profile->org_loc);
-            } else {
-                $loc = NULL;
-            }
+            $parentMinistry = $profile->parentMinistry;
+            $social = $profile->hasSocial;
+
+             $loc = ($profile->org_loc && ($profile->show_map == Profile::MAP_PRIMARY)) ? 
+                explode(',', $profile->org_loc) : NULL;
 
             $typeMask = ProfileFormController::$formArray[$profile->type];
             $profile->status == Profile::STATUS_ACTIVE ? $activate = NULL : $activate = 1;
@@ -730,13 +677,11 @@ class PreviewController extends ProfileFormController
      */
     public function actionPreviewStaff($id)
     {
-        if (!$profile = $this->findProfile($id)) {
+        $profile = Profile::findProfile($id);
+        if (!\Yii::$app->user->can(PermissionProfile::UPDATE, ['profile' => $profile]) || !$profile->validType()) {
             throw new NotFoundHttpException;
         }
-        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
-            throw new NotFoundHttpException;
-        }
-        if ($profile->type == 'Staff') {
+        if ($profile->type == Profile::TYPE_STAFF) {
 
             if (isset($_POST['activate'])) {
                 return $this->redirect(['/profile-mgmt/activate', 'id' => $id]); 
@@ -745,16 +690,18 @@ class PreviewController extends ProfileFormController
                 return $this->redirect(['/profile-mgmt/my-profiles']);
             }
 
-            $profile->getformattedNames();
-            $parentMinistry = $profile->ministryOf;
+            $parentMinistry = $profile->parentMinistry;
             $church = $profile->homeChurch;
-            $otherMinistryArray = Staff::getOtherMinistries($profile->id);
-            $schoolsAttended = $profile->school;
-            $social = $this->getSocial($profile);
-            if ($profile->ind_loc && $profile->show_map == Profile::MAP_PRIMARY) {
-                $loc = explode(',', $profile->ind_loc);
-            } elseif ($ministry && $ministry->org_loc && $profile->show_map == Profile::MAP_MINISTRY) {
-                $loc = explode(',', $ministry->org_loc);
+            $otherMinistries = $profile->otherMinistriesConfirmed;
+            $schoolsAttended = $profile->schoolsAttended;
+            $social = $profile->hasSocial;
+
+            if ($profile->org_loc && $profile->show_map == Profile::MAP_PRIMARY) {
+                $loc = explode(',', $profile->org_loc);
+            } elseif ($church && $church->org_loc && $profile->show_map == Profile::MAP_CHURCH) {
+                 $loc = explode(',', $church->org_loc);
+            } elseif ($parentMinistry && $parentMinistry->org_loc && $profile->show_map == Profile::MAP_MINISTRY) {
+                 $loc = explode(',', $parentMinistry->org_loc);
             } else {
                 $loc = NULL;
             }
@@ -766,7 +713,7 @@ class PreviewController extends ProfileFormController
                 'profile' => $profile,
                 'church' => $church,
                 'parentMinistry' => $parentMinistry,
-                'otherMinistryArray' => $otherMinistryArray,
+                'otherMinistries' => $otherMinistries,
                 'schoolsAttended' => $schoolsAttended,
                 'social' => $social,
                 'loc' => $loc,
@@ -784,36 +731,6 @@ class PreviewController extends ProfileFormController
      */
     private function level_sort($a,$b) {
        return $a['id']>$b['id'];
-    }
-
-    /**
-     * Returns a social object.
-     * @param string $id
-     * @return model $social
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function getSocial($profile)
-    {
-        if ($profile->social_id) {
-            if ($social = $profile->social && !(
-                empty($social->sermonaudio) &&
-                empty($social->facebook) &&
-                empty($social->linkedin) &&
-                empty($social->twitter) &&
-                empty($social->google) &&
-                empty($social->rss) &&
-                empty($social->youtube) &&
-                empty($social->vimeo) &&
-                empty($social->pinterest) &&
-                empty($social->tumblr) &&
-                empty($social->soundcloud) &&
-                empty($social->instagram) &&
-                empty($social->flickr)
-            )) {
-                return $social;
-            }
-        }
-        return NULL;
     }
 
 }                     

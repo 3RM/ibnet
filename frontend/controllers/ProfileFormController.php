@@ -1,4 +1,9 @@
 <?php
+/**
+ * @link http://www.ibnet.org/
+ * @copyright  Copyright (c) IBNet (http://www.ibnet.org)
+ * @author Steve McKinley <steve@themckinleys.org>
+ */
 
 namespace frontend\controllers;
 
@@ -8,7 +13,6 @@ use common\models\profile\Country;
 use common\models\profile\Fellowship;
 use common\models\profile\FormsCompleted;
 use common\models\profile\MissHousing;
-use common\models\profile\MissHousingVisibility;
 use common\models\profile\MissionAgcy;
 use common\models\profile\Profile;
 use common\models\profile\ProfileForm;
@@ -17,14 +21,13 @@ use common\models\profile\School;
 use common\models\profile\ServiceTime;
 use common\models\profile\Social;
 use common\models\profile\Staff;
-use common\models\profile\SubType;
 use common\models\profile\Type;
 use common\models\User;
 use common\models\Utility;
+use common\rbac\PermissionProfile;
 use frontend\controllers\ProfileMailController;
 use kartik\markdown\MarkdownEditor;
 use Yii;
-use yii\db\Query;
 use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Inflector;
@@ -43,21 +46,21 @@ class ProfileFormController extends ProfileController
 
     // Determine sequence of forms
     public static $formArray = [     
-          // Form #            0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18 
-        'Pastor' =>           [1,  1,  1,  1,  1,  0,  0,  0,  1,  0,  1,  0,  1,  0,  1,  0,  0,  1,  0],  
-        'Evangelist' =>       [1,  1,  1,  1,  1,  0,  0,  0,  1,  0,  1,  0,  1,  0,  1,  0,  0,  1,  0],
-        'Missionary' =>       [1,  1,  1,  1,  1,  0,  0,  1,  1,  1,  1,  0,  1,  0,  1,  1,  0,  0,  0],
-        'Chaplain' =>         [1,  1,  1,  1,  1,  0,  0,  0,  1,  0,  1,  0,  1,  0,  1,  1,  0,  0,  0],
-        'Staff' =>            [1,  1,  1,  1,  1,  0,  0,  0,  1,  0,  1,  0,  1,  0,  0,  0,  0,  0,  0],
-        'Church' =>           [1,  1,  1,  1,  1,  1,  1,  0,  0,  0,  0,  1,  0,  0,  1,  1,  1,  1,  0],
-        'Mission Agency' =>   [1,  1,  1,  1,  1,  1,  0,  0,  0,  0,  1,  0,  0,  0,  0,  0,  0,  0,  0],
-        'Fellowship' =>       [1,  1,  1,  1,  1,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0],
-        'Association' =>      [1,  1,  1,  1,  1,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0],
-        'Camp' =>             [1,  1,  1,  1,  1,  1,  0,  0,  0,  0,  1,  0,  0,  0,  0,  0,  0,  0,  0],
-        'School' =>           [1,  1,  1,  1,  1,  1,  0,  0,  0,  0,  1,  0,  0,  1,  0,  0,  0,  1,  0],
-        'Print Ministry' =>   [1,  1,  1,  1,  1,  1,  0,  0,  0,  0,  1,  0,  0,  0,  0,  0,  0,  0,  0],
-        'Music Ministry' =>   [1,  1,  1,  1,  1,  1,  0,  0,  0,  0,  1,  0,  0,  0,  0,  0,  0,  0,  0],
-        'Special Ministry' => [1,  1,  1,  1,  1,  1,  0,  0,  0,  0,  1,  0,  0,  0,  0,  0,  0,  0,  1]];
+        // Form #                       0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18 
+        Profile::TYPE_PASTOR        => [1,  1,  1,  1,  1,  0,  0,  0,  1,  0,  1,  0,  1,  0,  1,  0,  0,  1,  0],  
+        Profile::TYPE_EVANGELIST    => [1,  1,  1,  1,  1,  0,  0,  0,  1,  0,  1,  0,  1,  0,  1,  0,  0,  1,  0],
+        Profile::TYPE_MISSIONARY    => [1,  1,  1,  1,  1,  0,  0,  1,  1,  1,  1,  0,  1,  0,  1,  1,  0,  0,  0],
+        Profile::TYPE_CHAPLAIN      => [1,  1,  1,  1,  1,  0,  0,  0,  1,  0,  1,  0,  1,  0,  1,  1,  0,  0,  0],
+        Profile::TYPE_STAFF         => [1,  1,  1,  1,  1,  0,  0,  0,  1,  0,  1,  0,  1,  0,  0,  0,  0,  0,  0],
+        Profile::TYPE_CHURCH        => [1,  1,  1,  1,  1,  1,  1,  0,  0,  0,  0,  1,  0,  0,  1,  1,  1,  1,  0],
+        Profile::TYPE_MISSION_AGCY  => [1,  1,  1,  1,  1,  1,  0,  0,  0,  0,  1,  0,  0,  0,  0,  0,  0,  0,  0],
+        Profile::TYPE_FELLOWSHIP    => [1,  1,  1,  1,  1,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0],
+        Profile::TYPE_ASSOCIATION   => [1,  1,  1,  1,  1,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0],
+        Profile::TYPE_CAMP          => [1,  1,  1,  1,  1,  1,  0,  0,  0,  0,  1,  0,  0,  0,  0,  0,  0,  0,  0],
+        Profile::TYPE_SCHOOL        => [1,  1,  1,  1,  1,  1,  0,  0,  0,  0,  1,  0,  0,  1,  0,  0,  0,  1,  0],
+        Profile::TYPE_PRINT         => [1,  1,  1,  1,  1,  1,  0,  0,  0,  0,  1,  0,  0,  0,  0,  0,  0,  0,  0],
+        Profile::TYPE_MUSIC         => [1,  1,  1,  1,  1,  1,  0,  0,  0,  0,  1,  0,  0,  0,  0,  0,  0,  0,  0],
+        Profile::TYPE_SPECIAL       => [1,  1,  1,  1,  1,  1,  0,  0,  0,  0,  1,  0,  0,  0,  0,  0,  0,  0,  1]];
 
     // Assign form #s
     public static $form = [
@@ -101,7 +104,7 @@ class ProfileFormController extends ProfileController
         'Distinctives',
         'Mission Agency',
         'Skip',
-        'Associations',
+        'Associations/Fellowships',
         'Tags'
     ];
 
@@ -110,7 +113,7 @@ class ProfileFormController extends ProfileController
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'except' => [],                                                                     // Apply authentication to all actions
+                'except' => [],
                 'rules' => [
                     [
                         'allow' => false,
@@ -132,18 +135,16 @@ class ProfileFormController extends ProfileController
      */
     public function actionFormsMenu($id)
     {
-        $profile = $this->findProfile($id);
+        $profile = Profile::findProfile($id);
         $typeMask = self::$formArray[$profile->type];
-        $profile->status != Profile::STATUS_ACTIVE ? 
-            $progressPercent = $profile->getProgressPercent($typeMask) :
-            $progressPercent = NULL;
+        $pp = $profile->progressIfInactive;
 
         return $this->render('formsMenu', [
             'profile' => $profile,
             'formList' => self::$formList,
             'count' => count(Self::$form)-1,
             'typeMask' => $typeMask,
-            'progressPercent' => $progressPercent]);
+            'pp' => $pp]);
     }
 
     /**
@@ -155,8 +156,8 @@ class ProfileFormController extends ProfileController
      */
     public function actionFormRoute($type, $fmNum, $id)
     {
-        $value = 0;                                                                                 // Initialize $value
-        while ($value == 0) {                                                                       // Find next '1' (i.e. required form) in row
+        $value = 0;
+        while ($value == 0) {
             $fmNum++;
             if ($fmNum > (count(Self::$form)-1)) {
                 return $this->redirect(['/preview/view-preview', 'id' => $id]);
@@ -197,12 +198,12 @@ class ProfileFormController extends ProfileController
     {
         $fmNum = Self::$form['nd'];
         $fm = 'forms/form' . $fmNum;
-        $profile = $this->findProfile($id);
-        if ($profile->type == 'Fellowship' || $profile->type == 'Association') {
+        $profile = Profile::findProfile($id);
+        if ($profile->type == Profile::TYPE_FELLOWSHIP || $profile->type == Profile::TYPE_ASSOCIATION) {
             $profile->scenario = 'nd-flwsp_ass';
-        } elseif ($profile->type == 'Mission Agency') {
+        } elseif ($profile->type == Profile::TYPE_MISSION_AGCY) {
             $profile->scenario = 'nd-miss_agency';
-        } elseif ($profile->type == 'School') {
+        } elseif ($profile->type == Profile::TYPE_SCHOOL) {
             $profile->scenario = 'nd-school';
         } else {
             $profile->category == Profile::CATEGORY_IND ?
@@ -210,7 +211,7 @@ class ProfileFormController extends ProfileController
                 $profile->scenario = 'nd-org';
         }
 
-        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
+        if (!Yii::$app->user->can(PermissionProfile::UPDATE, ['profile' => $profile]) || !$profile->validType()) {
             throw new NotFoundHttpException;
         }
         if (!self::$formArray[$profile->type][$fmNum]) {
@@ -233,25 +234,67 @@ class ProfileFormController extends ProfileController
                 $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
 
         } else {
-            $toolbar = $this->getMarkdownToolbar();
-            $profile->status != Profile::STATUS_ACTIVE ?
-                $progressPercent = $profile->getProgressPercent(self::$formArray[$profile->type]) :
-                $progressPercent = NULL;
+            $toolbar = [
+                [
+                    'buttons' => [
+                        MarkdownEditor::BTN_BOLD => ['icon' => 'bold', 'title' => 'Bold'],
+                        MarkdownEditor::BTN_ITALIC => ['icon' => 'italic', 'title' => 'Italic'],
+                        MarkdownEditor::BTN_PARAGRAPH => ['icon' => 'font', 'title' => 'Paragraph'],
+                        MarkdownEditor::BTN_NEW_LINE => ['icon' => 'text-height', 'title' => 'Append Line Break'],
+                        MarkdownEditor::BTN_HEADING => ['icon' => 'header', 'title' => 'Heading', 'items' => [
+                        MarkdownEditor::BTN_H1 => ['label' => 'Heading 1', 'options' => ['class' => 'kv-heading-1', 'title' => 'Heading 1 Style']],
+                        MarkdownEditor::BTN_H2 => ['label' => 'Heading 2', 'options' => ['class' => 'kv-heading-2', 'title' => 'Heading 2 Style']],
+                        MarkdownEditor::BTN_H3 => ['label' => 'Heading 3', 'options' => ['class' => 'kv-heading-3', 'title' => 'Heading 3 Style']],
+                        MarkdownEditor::BTN_H4 => ['label' => 'Heading 4', 'options' => ['class' => 'kv-heading-4', 'title' => 'Heading 4 Style']],
+                        MarkdownEditor::BTN_H5 => ['label' => 'Heading 5', 'options' => ['class' => 'kv-heading-5', 'title' => 'Heading 5 Style']],
+                        MarkdownEditor::BTN_H6 => ['label' => 'Heading 6', 'options' => ['class' => 'kv-heading-6', 'title' => 'Heading 6 Style']],
+                        ]],
+                    ],
+                ],
+                [
+                    'buttons' => [
+                        MarkdownEditor::BTN_LINK => ['icon' => 'link', 'title' => 'URL/Link'],
+                    ],
+                ],
+                [
+                    'buttons' => [
+                        MarkdownEditor::BTN_INDENT_L => ['icon' => 'indent-left', 'title' => 'Indent Text'],
+                        MarkdownEditor::BTN_INDENT_R => ['icon' => 'indent-right', 'title' => 'Unindent Text'],
+                    ],
+                ],
+                [
+                    'buttons' => [
+                        MarkdownEditor::BTN_UL => ['icon' => 'list', 'title' => 'Bulleted List'],
+                        MarkdownEditor::BTN_OL => ['icon' => 'list-alt', 'title' => 'Numbered List'],
+                        MarkdownEditor::BTN_DL => ['icon' => 'th-list', 'title' => 'Definition List'],
+                    ],
+                ],
+                [
+                    'buttons' => [
+                        MarkdownEditor::BTN_HR => ['label' => MarkdownEditor::ICON_HR, 'title' => 'Horizontal Line', 'encodeLabel' => false],
+                    ],
+                ],
+                [
+                    'buttons' => [
+                        MarkdownEditor::BTN_MAXIMIZE => ['icon' => 'fullscreen', 'title' => 'Toggle full screen', 'data-enabled' => true]
+                    ],
+                    'options' => ['class' => 'pull-right'] 
+                ],
+            ];
+            $pp = $profile->progressIfInactive;
+
             switch($profile->type) {
 
-        // *********************** Association *********************************
-                case 'Association': 
+                case Profile::TYPE_ASSOCIATION: 
                     $list = ArrayHelper::map(Association::find()
                         ->where(['status' => Profile::STATUS_ACTIVE])
                         ->andWhere('profile_id IS NULL')
                         ->orWhere(['profile_id' => $profile->id])
-                        ->orderBy('association')
-                        ->all(), 'id', 'association');
+                        ->orderBy('name')
+                        ->all(), 'id', 'name');
                     $toggle = NULL;
-                    if ($association = Association::find()
-                        ->where(['status' => Profile::STATUS_ACTIVE])
-                        ->andWhere(['profile_id' => $profile->id])
-                        ->one()) {                                                                  // Prepopulate select
+                    // Prepopulate select
+                    if ($association = $profile->linkedAssociation) {
                         $toggle = true;
                         $profile->select = $association->id;
                         $profile->name = NULL;
@@ -264,22 +307,19 @@ class ProfileFormController extends ProfileController
                         'list' => $list,
                         'toggle' => $toggle,
                         'toolbar' => $toolbar, 
-                        'pp' => $progressPercent]);
+                        'pp' => $pp]);
                     break;
 
-        // *********************** Fellowship *********************************
-                case 'Fellowship':
+                case Profile::TYPE_FELLOWSHIP:
                     $list = ArrayHelper::map(Fellowship::find()
                         ->where(['status' => Profile::STATUS_ACTIVE])
                         ->andWhere('profile_id IS NULL')
                         ->orWhere(['profile_id' => $profile->id])
-                        ->orderBy('fellowship')
-                        ->all(), 'id', 'fellowship');
+                        ->orderBy('name')
+                        ->all(), 'id', 'name');
                     $toggle = NULL;
-                    if ($fellowship = Fellowship::find()
-                        ->where('profile_id IS NULL')
-                        ->andWhere(['profile_id' => $profile->id])
-                        ->one()) {                                                                  // Prepopulate select
+                    // Prepopulate select
+                    if ($fellowship = $profile->linkedFellowship) {
                         $toggle = true;
                         $profile->select = $fellowship->id;
                         $profile->name = NULL;
@@ -291,19 +331,19 @@ class ProfileFormController extends ProfileController
                         'profile' => $profile, 
                         'list' => $list,
                         'toolbar' => $toolbar, 
-                        'pp' => $progressPercent]);
+                        'pp' => $pp]);
                     break;
 
-        // *********************** Mission Agency *********************************
-                case 'Mission Agency':
+                case Profile::TYPE_MISSION_AGCY:
                     $list = ArrayHelper::map(MissionAgcy::find()
                         ->where('id>2')
                         ->orWhere(['profile_id' => $profile->id])
                         ->orderBy('mission')
                         ->all(), 'id', 'mission');
                     $toggle = NULL;
+                    // Prepopulate select
                     if ($missionAgcy = MissionAgcy::find()
-                        ->where(['profile_id' => $profile->id])->one()) {                           // Prepopulate select
+                        ->where(['profile_id' => $profile->id])->one()) {
                         $toggle = true;
                         $profile->select = $missionAgcy->id;
                         $profile->name = NULL;
@@ -316,31 +356,32 @@ class ProfileFormController extends ProfileController
                         'toggle' => $toggle,
                         'toolbar' => $toolbar, 
                         'list' => $list,
-                        'pp' => $progressPercent]);
+                        'pp' => $pp]);
                     break;
 
-        // *********************** School *********************************
-                case 'School': 
-                    $schools = School::find()                                                       //     Populate dropdown: array of all associations minus ones with other linked profiles
+                case Profile::TYPE_SCHOOL: 
+                    // Populate dropdown: array of all associations minus ones with other linked profiles
+                    $schools = School::find()
                         ->select('id, school, city, st_prov_reg')
-                        ->where('id > 2')                                                           // Exclude first two Ids (other secular, other Christian schools)
-                        ->andWhere('ib = 1')                                                        // Include only "IB" schools
-                        ->andWhere('closed < 1')                                                    // Include only schools that are still open
-                        ->andWhere('profile_id IS NULL')                                            // List only schools that have not already been claimed by another profile
+                        ->where(['>', 'id', 2]) // Exclude first two Ids (other secular, other Christian schools)
+                        ->andWhere(['ib' => 1]) // Include only "IB" schools
+                        ->andWhere(['<', 'closed', 1]) // Include only schools that are still open
+                        ->andWhere(['IS', 'profile_id', NULL]) // List only schools that have not already been claimed by another profile
                         ->orWhere(['profile_id' => $profile->id])
                         ->indexBy('id')
                         ->orderBy('id')
                         ->all();
-                    $i = 1;
-                    foreach($schools as $school) {                                                  // Create 2D array of [id=>1][name=>XX] to format names as school (city, state)
+                    // Create 2D array of [id=>1][name=>XX] to format names as school (city, state)
+                    foreach($schools as $i=>$school) {
                         $formatNames[$i]['id'] = $school->id;
                         $formatNames[$i]['name'] = $school->school . ' (' . 
                             $school->city . ', ' . $school->st_prov_reg . ')';
-                        $i++;
                     }
-                    $list = ArrayHelper::map($formatNames, 'name', 'name');                         // Build map (key-value pairs) from 2D array [1=>XX] for use in dropdown list
+                    // Build map (key-value pairs) from 2D array [1=>XX] for use in dropdown list
+                    $list = ArrayHelper::map($formatNames, 'name', 'name');
                     $toggle = NULL;
-                    if ($school = School::find()->where(['profile_id' => $profile->id])->one()) {   // Prepopulate select
+                    // Prepopulate select
+                    if ($school = School::find()->where(['profile_id' => $profile->id])->one()) {
                         $toggle = true;
                         $profile->select = $school->school . ' (' . 
                             $school->city . ', ' . $school->st_prov_reg . ')';
@@ -354,21 +395,19 @@ class ProfileFormController extends ProfileController
                         'toggle' => $toggle,
                         'toolbar' => $toolbar,
                         'list' => $list,
-                        'pp' => $progressPercent]);
+                        'pp' => $pp]);
                     break;  
-
-        // *********************** All Others *********************************  
                 
                 default:
-                    return $profile->scenario == 'nd-org' ?
-                        $this->render($fm . '-org', [
-                            'profile' => $profile, 
-                            'toolbar' => $toolbar, 
-                            'pp' => $progressPercent]) :
+                    return $profile->category == Profile::CATEGORY_IND ?
                         $this->render($fm . '-ind', [
                             'profile' => $profile,
                             'toolbar' => $toolbar, 
-                            'pp' => $progressPercent]);
+                            'pp' => $pp]) :
+                        $this->render($fm . '-org', [
+                            'profile' => $profile, 
+                            'toolbar' => $toolbar, 
+                            'pp' => $pp]);
                     break;
             }
         }
@@ -384,10 +423,10 @@ class ProfileFormController extends ProfileController
     {
         $fmNum = Self::$form['i1'];
         $fm = 'forms/form' . $fmNum;
-        $profile = $this->findProfile($id);
+        $profile = Profile::findProfile($id);
         $profile->scenario = 'i1';
 
-        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
+        if (!\Yii::$app->user->can(PermissionProfile::UPDATE, ['profile' => $profile]) || !$profile->validType()) {
             throw new NotFoundHttpException;
         }
         if (!self::$formArray[$profile->type][$fmNum]) {
@@ -401,32 +440,32 @@ class ProfileFormController extends ProfileController
             return $this->redirect(['/profile-mgmt/my-profiles']); 
         }
         if (isset($_POST['banner1'])) {
-            $profile->updateAttributes(['image1' => '/images/content/banner1.jpg']);
+            $profile->updateAttributes(['image1' => '@img.profile/banner1.jpg']);
             $profile->deleteOldImg('image1');
             return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum-1, 'id' => $id]);
         }
         if (isset($_POST['banner2'])) {
-            $profile->updateAttributes(['image1' => '/images/content/banner2.jpg']);
+            $profile->updateAttributes(['image1' => '@img.profile/banner2.jpg']);
             $profile->deleteOldImg('image1');
             return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum-1, 'id' => $id]);
         }
         if (isset($_POST['banner3'])) {
-            $profile->updateAttributes(['image1' => '/images/content/banner3.jpg']);
+            $profile->updateAttributes(['image1' => '@img.profile/banner3.jpg']);
             $profile->deleteOldImg('image1');
             return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum-1, 'id' => $id]);
         }
         if (isset($_POST['banner4'])) {
-            $profile->updateAttributes(['image1' => '/images/content/banner4.jpg']);
+            $profile->updateAttributes(['image1' => '@img.profile/banner4.jpg']);
             $profile->deleteOldImg('image1');
             return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum-1, 'id' => $id]);
         }
         if (isset($_POST['banner5'])) {
-            $profile->updateAttributes(['image1' => '/images/content/banner5.jpg']);
+            $profile->updateAttributes(['image1' => '@img.profile/banner5.jpg']);
             $profile->deleteOldImg('image1');
             return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum-1, 'id' => $id]);
         }
         if (isset($_POST['banner6'])) {
-            $profile->updateAttributes(['image1' => '/images/content/banner6.jpg']);
+            $profile->updateAttributes(['image1' => '@img.profile/banner6.jpg']);
             $profile->deleteOldImg('image1');
             return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum-1, 'id' => $id]);
         }
@@ -441,11 +480,9 @@ class ProfileFormController extends ProfileController
             } 
 
         } else {   
-            $profile->status != Profile::STATUS_ACTIVE ?
-                $progressPercent = $profile->getProgressPercent(self::$formArray[$profile->type]) :
-                $progressPercent = NULL;      
+            $pp = $profile->progressIfInactive;     
 
-            return $this->render($fm, ['profile' => $profile, 'pp' => $progressPercent]);
+            return $this->render($fm, ['profile' => $profile, 'pp' => $pp]);
         }
     }
 
@@ -459,21 +496,24 @@ class ProfileFormController extends ProfileController
     {
         $fmNum = Self::$form['i2'];
         $fm = 'forms/form' . $fmNum;
-        $profile = $this->findProfile($id);
+        $profile = Profile::findProfile($id);
         $profile->scenario = 'i2';
 
-        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
+        if (!\Yii::$app->user->can(PermissionProfile::UPDATE, ['profile' => $profile]) || !$profile->validType()) {
             throw new NotFoundHttpException;
         }
         if (!self::$formArray[$profile->type][$fmNum]) {
             return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
         }
 
-        if ($profile->type == 'Church') {                                                           // Handle linked image on church profile
-            if (isset($_POST['remove'])) {                                                          // User selected to remove linked image
+        // Handle linked image on church profile
+        if ($profile->type == Profile::TYPE_CHURCH) {
+            // User selected to remove linked image
+            if (isset($_POST['remove'])) {
                 $profile->updateAttributes(['image2' => NULL]);
                 return $this->redirect(['form' . $fmNum, 'id' => $id]);
-            } elseif (isset($_POST['use'])) {                                                       // User selected to use pastor image for church profile
+            // User selected to use pastor image for church profile
+            } elseif (isset($_POST['use'])) {
                 $profile->updateAttributes(['image2' => $_POST['use']]);
                 return $this->redirect(['form' . $fmNum, 'id' => $id]);
             }        
@@ -496,19 +536,17 @@ class ProfileFormController extends ProfileController
 
         } else {  // Give option to share linked pastor image with church profile
     
-            if (($profile->type == 'Church') && ($pastorLink = $profile->findSrPastor())) {
+            if (($profile->type == Profile::TYPE_CHURCH) && ($pastorLink = $profile->srPastorChurchConfirmed)) {
                 if (isset($pastorLink->image2)) {
                     $imageLink = $pastorLink->image2;
                 }
             }
-            $profile->status != Profile::STATUS_ACTIVE ?
-                $progressPercent = $profile->getProgressPercent(self::$formArray[$profile->type]) :
-                $progressPercent = NULL;
+            $pp = $profile->progressIfInactive;
 
             return $this->render($fm, [
                 'profile' => $profile, 
                 'imageLink' => $imageLink, 
-                'pp' => $progressPercent]);
+                'pp' => $pp]);
         } 
     }
 
@@ -524,12 +562,12 @@ class ProfileFormController extends ProfileController
     {
         $fmNum = Self::$form['lo'];
         $fm = 'forms/form' . $fmNum;
-        $profile = $this->findProfile($id);
+        $profile = Profile::findProfile($id);
         $profile->category == Profile::CATEGORY_IND ?
             $profile->scenario = 'lo-ind' :
             $profile->scenario = 'lo-org';
 
-        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
+        if (!\Yii::$app->user->can(PermissionProfile::UPDATE, ['profile' => $profile]) || !$profile->validType()) {
             throw new NotFoundHttpException;
         }
         if (!self::$formArray[$profile->type][$fmNum]) {
@@ -544,39 +582,35 @@ class ProfileFormController extends ProfileController
         }
         if ($profile->load(Yii::$app->request->Post()) && 
             $profile->handleFormLO() &&
-            !($this->isDuplicate($id)) && 
             $profile->setProgress($fmNum)) {
+            if ($dup = $profile->duplicate) {
+                return $this->redirect(['duplicate-profile', 'id' => $profile->id, 'dupId' => $dup->id]);
+            }
             return isset($_POST['save']) ?
                 $this->redirect(['/preview/view-preview', 'id' => $id]) :
                 $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]); 
 
         } else {
-            $profile->status != Profile::STATUS_ACTIVE ?
-                $progressPercent = $profile->getProgressPercent(self::$formArray[$profile->type]) :
-                $progressPercent = NULL;
-            if ($profile->show_map == Profile::MAP_PRIMARY) {
-                $profile->map = 1;
-            }
+            $pp = $profile->progressIfInactive;
+            $profile->map = $profile->show_map == Profile::MAP_PRIMARY ? 1 : NULL;
+            $list = ArrayHelper::map(Country::find()->where(['>', 'id', 1])->all(), 'printable_name', 'printable_name');
     
             if ($profile->scenario == 'lo-ind') {
                 $title = 'Street or Mailing Address';
-                $list = ArrayHelper::map(Country::find()->where('id>1')->all(), 'printable_name', 'printable_name');
                 return $this->render($fm . '-ind', [
                     'profile' => $profile, 
                     'title' => $title, 
                     'list' => $list,
-                    'pp' => $progressPercent]);
+                    'pp' => $pp]);
             } else {
-                $profile->type == 'Special Ministry' ?
+                $profile->type == Profile::TYPE_SPECIAL ?
                     $title = 'Minsitry Address' :
                     $title = $profile->type . ' Address';
-                $list = ArrayHelper::map(Country::find()->where('id>1')->all(), 'printable_name', 'printable_name');
-
                 return $this->render($fm . '-org', [
                     'profile' => $profile, 
                     'title' => $title, 
                     'list' => $list,
-                    'pp' => $progressPercent]);
+                    'pp' => $pp]);
             }
         } 
     }
@@ -591,10 +625,10 @@ class ProfileFormController extends ProfileController
     {
         $fmNum = Self::$form['co'];
         $fm = 'forms/form' . $fmNum;
-        $profile = $this->findProfile($id);
+        $profile = Profile::findProfile($id);
         $profile->scenario = 'co';
 
-        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
+        if (!\Yii::$app->user->can(PermissionProfile::UPDATE, ['profile' => $profile]) || !$profile->validType()) {
             throw new NotFoundHttpException;
         }
         if (!self::$formArray[$profile->type][$fmNum]) {
@@ -636,17 +670,14 @@ class ProfileFormController extends ProfileController
             $profile->category == Profile::CATEGORY_IND ?
                 $ibnetEmail = Inflector::slug($profile->ind_last_name) . $profile->id . '@ibnet.org' :
                 $ibnetEmail = Inflector::slug($profile->org_name) . $profile->id . '@ibnet.org';
-
-            $profile->status != Profile::STATUS_ACTIVE ?
-                $progressPercent = $profile->getProgressPercent(self::$formArray[$profile->type]) :
-                $progressPercent = NULL;
+            $pp = $profile->progressIfInactive;
 
             return $this->render($fm, [
                 'profile' => $profile, 
                 'social' => $social, 
                 'preferred' => $preferred, 
                 'ibnetEmail' => $ibnetEmail,
-                'pp' => $progressPercent]);
+                'pp' => $pp]);
         }
     }
 
@@ -660,12 +691,12 @@ class ProfileFormController extends ProfileController
     {
         $fmNum = Self::$form['sf'];
         $fm = 'forms/form' . $fmNum;
-        $profile = $this->findProfile($id);
-        $profile->type == 'Church' ?
+        $profile = Profile::findProfile($id);
+        $profile->type == Profile::TYPE_CHURCH ?
             $profile->scenario = 'sf-church' :
             $profile->scenario = 'sf-org';
 
-        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
+        if (!\Yii::$app->user->can(PermissionProfile::UPDATE, ['profile' => $profile]) || !$profile->validType()) {
             throw new NotFoundHttpException;
         }
         if (!self::$formArray[$profile->type][$fmNum]) {
@@ -677,34 +708,37 @@ class ProfileFormController extends ProfileController
             if ($staff = Staff::findOne($_POST['add'])) {
                 $staff->updateAttributes(['confirmed' => 1]);
 
-                $staffProfile = $this->findProfile($staff->staff_id);
+                $staffProfile = Profile::findProfile($staff->staff_id);
                 $staffProfileOwner = User::findOne($staffProfile->user_id);
-                ProfileMailController::initSendLink($profile, $staffProfile, $staffProfileOwner, 'SF', 'L');   // Notify staff profile owner of unconfirmed status
+                // Notify staff profile owner of unconfirmed status
+                ProfileMailController::initSendLink($profile, $staffProfile, $staffProfileOwner, 'SF', 'L');
             
             }
-            return $this->redirect(['form' . $fmNum, 'id' => $profile->id]);                        // Refresh page
+            return $this->redirect(['form' . $fmNum, 'id' => $profile->id]);
     
     // *********************** Remove Staff *********************************    
         } elseif (isset($_POST['remove'])) {
             if ($staff = Staff::findOne($_POST['remove'])) {
                 $staff->updateAttributes(['confirmed' => NULL]);
 
-                $staffProfile = $this->findProfile($staff->staff_id);
+                $staffProfile = Profile::findProfile($staff->staff_id);
                 $staffProfileOwner = User::findOne($staffProfile->user_id);
-                ProfileMailController::initSendLink($profile, $staffProfile, $staffProfileOwner, 'SF', 'UL'); // Notify staff profile owner of unconfirmed status
+                // Notify staff profile owner of unconfirmed status
+                ProfileMailController::initSendLink($profile, $staffProfile, $staffProfileOwner, 'SF', 'UL');
 
             }
-            return $this->redirect(['form' . $fmNum, 'id' => $profile->id]);                        // Refresh page
+            return $this->redirect(['form' . $fmNum, 'id' => $profile->id]);
 
     // *********************** Add Sr Pastor ******************************
-        } elseif (isset($_POST['senior']) && $profile->handleFormSFSA($profile)) {
-            return $this->redirect(['form' . $fmNum, 'id' => $profile->id]);                        // Refresh page
+        } elseif (isset($_POST['senior']) && $profile->handleFormSFSA()) {
+            return $this->redirect(['form' . $fmNum, 'id' => $profile->id]);
     
     // *********************** Remove Sr Pastor ******************************     
-        } elseif (isset($_POST['clear']) && $profile->handleFormSFSR($profile)) {
-            return $this->redirect(['form' . $fmNum, 'id' => $profile->id]);                        // Refresh page
+        } elseif (isset($_POST['clear']) && $profile->handleFormSFSR()) {
+            return $this->redirect(['form' . $fmNum, 'id' => $profile->id]);
         
-        } elseif (isset($_POST['continue-org'])) {                                                  // Post coming from Org Staff page
+        // Post coming from Org Staff page
+        } elseif (isset($_POST['continue-org'])) {
             $profile->setProgress($fmNum);
             return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $profile->id]);
         
@@ -725,57 +759,22 @@ class ProfileFormController extends ProfileController
                 $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);      
         
         } else {
-            $profile->getFormattedNames();
-            $srPastor = NULL;
-            if ($staff = Staff::find()
-                ->where(['ministry_id' => $profile->id])
-                ->andWhere(['sr_pastor' => 1])
-                ->one()) {
-                if ($srPastor = $this->findActiveProfile($staff->staff_id)) {
-                    $srPastor->getFormattedNames();
-                }
-            }
 
-            $staffArray = Staff::find()
-                ->select('
-                    staff.id,
-                    staff.staff_id, 
-                    staff.staff_title, 
-                    staff.confirmed, 
-                    staff.sr_pastor,
-                    profile.ind_first_name,
-                    profile.spouse_first_name,
-                    profile.ind_last_name,
-                    profile.ind_city,
-                    profile.ind_st_prov_reg,
-                    profile.sub_type,
-                    profile.home_church')
-                ->innerJoinWith('profile', '`staff`.`staff_id` = `profile`.`id`')
-                ->where(['staff.ministry_id' => $profile->id])
-                ->andWhere(['staff.sr_pastor' => NULL])
-                ->andWhere('staff.staff_title IS NOT NULL')
-                ->andWhere(['profile.status' => Profile::STATUS_ACTIVE])
-                ->all();
+            $srPastor = $profile->srPastorChurchConfirmed;
+            $staff = $profile->orgStaff;
+            $pp = $profile->progressIfInactive;
 
-            foreach ($staffArray as $staff) {
-                $staff->{'profile'}->getFormattedNames();
-            }
-
-            $profile->status != Profile::STATUS_ACTIVE ?
-                $progressPercent = $profile->getProgressPercent(self::$formArray[$profile->type]) :
-                $progressPercent = NULL;
-
-            return $profile->type == 'Church' ?
+            return $profile->type == Profile::TYPE_CHURCH ?
                 $this->render($fm . '-church', [
                     'profile' => $profile, 
                     'srPastor' => $srPastor,
-                    'staffArray' => $staffArray,
-                    'pp' => $progressPercent]) :
+                    'staffArray' => $staff,
+                    'pp' => $pp]) :
                 $this->render($fm . '-org', [
                     'profile' => $profile, 
-                    'staffArray' => $staffArray, 
+                    'staffArray' => $staff, 
                     'fmNum' => $fmNum, 
-                    'pp' => $progressPercent]);
+                    'pp' => $pp]);
         }
     }
 
@@ -789,18 +788,18 @@ class ProfileFormController extends ProfileController
     {
         $fmNum = Self::$form['st'];
         $fm = 'forms/form' . $fmNum;
-        $profile = $this->findProfile($id);
+        $profile = Profile::findProfile($id);
         $profile->scenario = 'st';
 
-        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
+        if (!\Yii::$app->user->can(PermissionProfile::UPDATE, ['profile' => $profile]) || !$profile->validType()) {
             throw new NotFoundHttpException;
         }
         if (!self::$formArray[$profile->type][$fmNum]) {
             return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
         }
 
-        if($profile->service_time_id != NULL) {                                                     // Load previously saved service times
-            $serviceTime = $profile->serviceTime;
+        // Load previously saved service times
+        if ($serviceTime = $profile->serviceTime) {
             $serviceTime->explodeTime();
         } else {
             $serviceTime = new ServiceTime();
@@ -821,9 +820,7 @@ class ProfileFormController extends ProfileController
                 $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
 
         } else {
-            $profile->status != Profile::STATUS_ACTIVE ?
-                $progressPercent = $profile->getProgressPercent(self::$formArray[$profile->type]) :
-                $progressPercent = NULL;
+            $pp = $profile->progressIfInactive;
             $days = [
                 'Sun' => 'Sunday', 
                 'Mon' => 'Monday', 
@@ -868,7 +865,7 @@ class ProfileFormController extends ProfileController
                 'days' => $days,
                 'hours' => $hours,
                 'minutes' => $minutes,
-                'pp' => $progressPercent]);
+                'pp' => $pp]);
         }
     }
 
@@ -882,14 +879,12 @@ class ProfileFormController extends ProfileController
     {
         $fmNum = Self::$form['fi'];
         $fm = 'forms/form' . $fmNum;
-        $profile = $this->findProfile($id);
+        $profile = Profile::findProfile($id);
 
-        $profile->missionary_id == NULL ?
-            $missionary = new Missionary() :
-            $missionary = $profile->missionary;
+        $missionary = $profile->missionary ? $profile->missionary : new Missionary();
         $missionary->scenario = 'fi';
 
-        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
+        if (!\Yii::$app->user->can(PermissionProfile::UPDATE, ['profile' => $profile]) || !$profile->validType()) {
             throw new NotFoundHttpException;
         }
         if (!self::$formArray[$profile->type][$fmNum]) {
@@ -902,26 +897,26 @@ class ProfileFormController extends ProfileController
         } elseif (isset($_POST['exit'])) {
             return $this->redirect(['/profile-mgmt/my-profiles']); 
 
-        } elseif ($missionary->load(Yii::$app->request->Post()) && 
-            $missionary->save() &&
-            $profile->setUpdateDate() &&
-            $profile->setProgress($fmNum)) {
-            if ($profile->missionary_id != $missionary->id) {
-                $profile->link('missionary', $missionary);                                          // Link new missionary record to profile
+        } elseif ($missionary->load(Yii::$app->request->Post()) 
+            && $missionary->save() 
+            && $profile->setUpdateDate() 
+            && $profile->setProgress($fmNum)) {
+            if (!$profile->missionary) {
+                // Link new missionary record to profile
+                $profile->link('missionary', $missionary);
             }
-            $profile->updateAttributes(['url_loc' =>  $missionary->field]);                         // Set url_loc to missionary field
+            // Set url_loc to missionary field
+            $profile->updateAttributes(['url_loc' =>  $missionary->field]);
             return isset($_POST['save']) ?
                 $this->redirect(['/preview/view-preview', 'id' => $id]) :
                 $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);     
         }
-        $profile->status != Profile::STATUS_ACTIVE ?
-            $progressPercent = $profile->getProgressPercent(self::$formArray[$profile->type]) :
-            $progressPercent = NULL;
+        $pp = $profile->progressIfInactive;
 
         return $this->render($fm, [
             'profile' => $profile, 
             'missionary' => $missionary, 
-            'pp' => $progressPercent]);
+            'pp' => $pp]);
     }
 
     /**
@@ -934,30 +929,19 @@ class ProfileFormController extends ProfileController
     {
         $fmNum = Self::$form['hc'];
         $fm = 'forms/form' . $fmNum;
-        $profile = $this->findProfile($id); 
-        $profile->scenario = 'hc-required';
+        $profile = Profile::findProfile($id); 
+        $profile->scenario = 'hc';
         $churchLink = NULL;
    
-        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
+        if (!\Yii::$app->user->can(PermissionProfile::UPDATE, ['profile' => $profile]) || !$profile->validType()) {
             throw new NotFoundHttpException;
         }
         if (!self::$formArray[$profile->type][$fmNum]) {
             return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
         }
-        $profile->status != Profile::STATUS_ACTIVE ?
-            $progressPercent = $profile->getProgressPercent(self::$formArray[$profile->type]) :
-            $progressPercent = NULL;
+        $pp = $profile->progressIfInactive;
 
-        if (isset($_POST['edit'])) {
-            return $this->render($fm, [
-                'profile' => $profile,
-                'churchLink' => $churchLink,
-                'pp' => $progressPercent,
-                'edit' => 1]);
-
-        } elseif (isset($_POST['update'])) {
-
-        } elseif (isset($_POST['cancel'])) {
+        if (isset($_POST['cancel'])) {
             return $this->redirect(['/preview/view-preview', 'id' => $id]); 
 
         } elseif (isset($_POST['exit'])) {
@@ -968,39 +952,32 @@ class ProfileFormController extends ProfileController
             $profile->setProgress($fmNum);
             return isset($_POST['save']) ?
                 $this->redirect(['/preview/view-preview', 'id' => $id]) :
-                $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);    
+                $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
 
-        } else {
-            $churchLabel = $profile->getChurchLabel($profile->type, $profile->sub_type);
-            if (isset($profile->home_church)) {
-                if ($churchLink = $profile->homeChurch) {
-                    $profile->select = $churchLink->id;
-                    if ($churchLink->status != Profile::STATUS_ACTIVE) {                                // A linked profile is inactive.  Show an info message to user to reactivate the linked profile                                                              
-                        Yii::$app->session->setFlash('info', 'The profile for ' .                       // If the linked church stays inactive then this profile will eventually go inactive as well
-                            $churchLink->org_name . ' is currently inactive. Reactivate the 
-                            profile or choose a different home church to proceed.');
-                        $churchLink = NULL;
-                    } else {
-                        $profile->scenario = 'hc';                                                      // Don't require church for profiles that already have this set.  This is a work-around for the ajax loaded kartik dropdown, which cannot select an intiial value.
-                    }
-                }
-            }
-
-            if ($miss = $profile->missionary) {                                                         // Exclude church plant church from home church search
-                $chId = $miss->cp_pastor_at;
-            }
-
-            if ($profile->show_map == Profile::MAP_CHURCH) {
-                $profile->map = 1;
-            }
-
-            return $this->render($fm, [
-                'profile' => $profile,
-                'churchLink' => $churchLink,
-                'churchLabel' => $churchLabel,
-                'pp' => $progressPercent,
-                'chId' => $chId]);
         }
+            
+        if ($chLink = $profile->homeChurch) {  
+            if ($chLink->status == Profile::STATUS_ACTIVE) { 
+                $initialData = [$chLink->id => $chLink->org_name];
+            } else {
+                Yii::$app->session->setFlash('info', 'The profile for ' .
+                    $chLink->org_name . ' is currently inactive. Reactivate the 
+                    profile or choose a different home church to proceed.');
+                $profile->home_church = NULL;
+                $initialData = NULL;
+            }
+        }
+        // Exclude church plant church from home church search
+        if ($missionary = $profile->missionary) {
+            $exclude = $missionary->cp_pastor_at;
+        }
+        $profile->map = $profile->show_map == Profile::MAP_CHURCH ? 1 : NULL;
+
+        return $this->render($fm, [
+            'profile' => $profile,
+            'initialData' => $initialData,
+            'pp' => $pp,
+            'chId' => $exclude]);
     }
 
      /**
@@ -1013,27 +990,21 @@ class ProfileFormController extends ProfileController
     {
         $fmNum = Self::$form['cp'];
         $fm = 'forms/form' . $fmNum;
-        $profile = $this->findProfile($id);
-        $profile->missionary_id == NULL ?
-            $missionary = New Missionary() :
-            $missionary = $profile->missionary;
+        $profile = Profile::findProfile($id);
+        $missionary = $profile->missionary ? $profile->missionary : New Missionary();
         $missionary->scenario = 'cp';
-        $ministryLink = NULL;
 
-        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
+        if (!\Yii::$app->user->can(PermissionProfile::UPDATE, ['profile' => $profile]) || !$profile->validType()) {
             throw new NotFoundHttpException;
         }
         if (!self::$formArray[$profile->type][$fmNum]) {
             return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
         }
-        if ($profile->sub_type != 'Church Planter') {
+        if ($profile->sub_type != Profile::SUBTYPE_MISSIONARY_CP) {
              return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
         }
 
-        if (isset($_POST['remove']) && $missionary->handleFormCPR($profile)) {
-            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum-1, 'id' => $id]);
-        
-        } elseif (isset($_POST['cancel'])) {
+        if (isset($_POST['cancel'])) {
             return $this->redirect(['/preview/view-preview', 'id' => $id]); 
 
         } elseif (isset($_POST['exit'])) {
@@ -1047,35 +1018,29 @@ class ProfileFormController extends ProfileController
                 $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
 
         } else {
-            $profile->show_map == NULL ?
-                $missionary->showMap = 0 :                                                         // Set default map choice to sending church map
-                $missionary->showMap = $profile->show_map;
-            
-            if (isset($missionary->cp_pastor_at) && 
-                ($ministryLink = $profile->findOne($missionary->cp_pastor_at))) {                  // Load any previously selected ministry_of (sending church)
-                $missionary->select = $ministryLink->id;
-                
-                if ($ministryLink->status != Profile::STATUS_ACTIVE) {                              // A linked profile is inactive.  Show info message to user to reactivate the linked profile
+
+            if ($churchPlant = $missionary->churchPlant) {
+                if ($churchPlant->status == Profile::STATUS_ACTIVE) {
+                    $initialData = [$churchPlant->id => $churchPlant->org_name];
+                } else {
                     Yii::$app->session->setFlash('info', 'The profile for ' . 
-                        $ministryLink->org_name . ' is currently inactive. Consider reactivating 
-                        the profile in order to list it as a church planting ministry.');
-                    $ministryLink = NULL;
+                        $churchPlant->org_name . ' is currently inactive. Consider reactivating 
+                        the profile in order to list it as a parent ministry here.');
+                    $profile->cp_pastor = NULL;
+                    $missionary->cp_pastor_at = NULL;
+                    $initialData = NULL;
                 }
             }
-            $profile->status != Profile::STATUS_ACTIVE ?
-                $progressPercent = $profile->getProgressPercent(self::$formArray[$profile->type]) :
-                $progressPercent = NULL;
+            $pp = $profile->progressIfInactive;
             $msg = $profile->show_map;
-            $profile->show_map == Profile::MAP_CHURCH_PLANT ? 
-                $missionary->showMap = 1 : 
-                $missionary->showMap = NULL;
+            $missionary->showMap = $profile->show_map == Profile::MAP_CHURCH_PLANT ? 1 : NULL;
 
             return $this->render($fm, [
                 'profile' => $profile,
                 'missionary' => $missionary,
-                'ministryLink' => $ministryLink,
+                'initialData' => $initialData,
                 'msg' => $msg,
-                'pp' => $progressPercent,]);
+                'pp' => $pp,]);
         }
     }
 
@@ -1089,8 +1054,8 @@ class ProfileFormController extends ProfileController
     { 
         $fmNum = Self::$form['pm'];
         $fm = 'forms/form' . $fmNum;
-        $profile = $this->findProfile($id); 
-        if ($profile->type == 'Staff') {
+        $profile = Profile::findProfile($id); 
+        if ($profile->type == Profile::TYPE_STAFF) {
             $profile->scenario = 'pm-required';
         } elseif ($profile->category == Profile::CATEGORY_IND) {
             $profile->scenario = 'pm-ind';
@@ -1098,7 +1063,7 @@ class ProfileFormController extends ProfileController
             $profile->scenario = 'pm-org';
         }
 
-        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
+        if (!\Yii::$app->user->can(PermissionProfile::UPDATE, ['profile' => $profile]) || !$profile->validType()) {
             throw new NotFoundHttpException;
         }
 
@@ -1106,73 +1071,38 @@ class ProfileFormController extends ProfileController
             return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
         }
 
-        $ministryLink = NULL;
-        $more = false;
-
-        $ministryLabel = $profile->getMinistryLabel($profile->type);
-        if (isset($profile->ministry_of)) {
-            $ministryLink = $profile->ministryOf;
-            $profile->select = $ministryLink->id;
-            if ($ministryLink->status != Profile::STATUS_ACTIVE) {                                  // A linked profile is inactive.  Show info message to user to reactivate the linked profile
+        if ($parentMinistry = $profile->parentMinistry) {
+            if ($parentMinistry->status == Profile::STATUS_ACTIVE) {
+                $initialData = [$parentMinistry->id => $parentMinistry->org_name];
+            } else {
                 Yii::$app->session->setFlash('info', 'The profile for ' . 
-                    $ministryLink->org_name . ' is currently inactive. Consider reactivating 
+                    $parentMinistry->org_name . ' is currently inactive. Consider reactivating 
                     the profile in order to list it as a parent ministry here.');
-                $ministryLink = NULL;
+                $profile->ministry_of = NULL;
+                $initialData = NULL;
             }
         }
         
-        if ($profile->show_map == Profile::MAP_MINISTRY) {
-            $profile->map = $profile->show_map;
-        }
-
-        $profile->status != Profile::STATUS_ACTIVE ?
-            $progressPercent = $profile->getProgressPercent(self::$formArray[$profile->type]) :
-            $progressPercent = NULL;
+        $exclude = $profile->home_church;
+        $profile->map = $profile->show_map == Profile::MAP_MINISTRY ? $profile->show_map : NULL;
+        $pp = $profile->progressIfInactive;
+        $more = false;
 
         if (isset($_POST['more'])) {
             $more = true;
 
-        } elseif (isset($_POST['remove'])) {                                                        // This code is a work-around for the Kartik Select2 AJAX drop-down widget which won't show the current ministry_of upon page load.
-            if ($profile->category == Profile::CATEGORY_IND && 
-                $staff = Staff::find()
-                    ->where(['ministry_id' => $profile->ministry_of])
-                    ->andWhere(['ministry_of' => 1])
-                    ->one()) {
-                
-                $ministryProfile = $this->findProfile($staff->ministry_id);
-                $ministryProfileOwner = User::findOne($ministryProfile->user_id);
-                ProfileMailController::initSendLink($profile, $ministryProfile, $ministryProfileOwner, 'PM', 'UL'); // Notify individual ministry profile owner of unlink
-                
-                $staff->delete();
-            } else {
-
-                $ministryProfile = $profile->ministryOf;
-                $ministryProfileOwner = User::findOne($ministryProfile->user_id);
-                ProfileMailController::initSendLink($profile, $ministryProfile, $ministryProfileOwner, 'PM', 'UL'); // Notify organization ministry profile owner of unlink
-
-            }
-            $profile->updateAttributes(['ministry_of' => NULL]);
-            $ministryLink = NULL; 
-            $profile->select = NULL;
-            
         } elseif (isset($_POST['removeM']) && $staff = Staff::findOne($_POST['removeM'])) {
             
-            $ministryProfile = $this->findProfile($staff->ministry_id);                             // Notify ministry profile owner of unlink
-            $ministryProfileOwner = User::findOne($ministryProfile->user_id);
-            ProfileMailController::initSendLink($profile, $ministryProfile, $ministryProfileOwner, 'PM', 'UL');
-            
+            // Notify ministry profile owner of unlink
+            $parentMinistryOwner = $parentMinistry->user;
+            ProfileMailController::initSendLink($profile, $parentMinistry, $parentMinistryOwner, 'PM', 'UL');
             $staff->delete();
-            return $this->redirect(['form' . $fmNum, 'id' => $profile->id]);                        // Refresh page
+            return $this->redirect(['form' . $fmNum, 'id' => $profile->id]);
 
-        } elseif (isset($_POST['submit-ministry']) && 
-            $profile->load(Yii::$app->request->Post()) &&
-            $profile->handleFormPM()) {
-            return $this->redirect(['form' . $fmNum, 'id' => $profile->id]);                        // Save select and refresh page
-
-         } elseif (isset($_POST['submit-more']) &&
+        } elseif (isset($_POST['submit-more']) &&
             $profile->load(Yii::$app->request->Post()) &&
             $profile->handleFormPMM()) {
-            return $this->redirect(['form' . $fmNum, 'id' => $profile->id]);                        // Save select and refresh page
+            return $this->redirect(['form' . $fmNum, 'id' => $profile->id]);
 
         } elseif (isset($_POST['cancel'])) {
             return $this->redirect(['/preview/view-preview', 'id' => $id]); 
@@ -1189,31 +1119,26 @@ class ProfileFormController extends ProfileController
                 $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
         }
 
-        $ministryM = Staff::find()                                                                  // Find all "other" staff
-            ->where(['staff_id' => $profile->id])
-            ->andWhere(['ministry_other' => 1])
-            ->all();
-
+        $otherMinistries = $profile->otherMinistries;
         if ($profile->category == Profile::CATEGORY_IND) {
-            return ($profile->type == 'Staff' || $profile->type == 'Evangelist') ?
+            return ($profile->type == Profile::TYPE_STAFF || $profile->type == Profile::TYPE_EVANGELIST) ?
                 $this->render($fm . '-ind', [
                     'profile' => $profile,
-                    'ministryLink' => $ministryLink,
-                    'ministryLabel' => $ministryLabel,
-                    'ministryM' => $ministryM,
+                    'initialData' => $initialData,
+                    'otherMinistries' => $otherMinistries,
+                    'exclude' => $exclude,
                     'more' => $more,
-                    'pp' => $progressPercent]) :
+                    'pp' => $pp]) :
                 $this->render($fm . '-other', [
                     'profile' => $profile,
-                    'ministryM' => $ministryM,
+                    'otherMinistries' => $otherMinistries,
                     'more' => $more,
-                    'pp' => $progressPercent]);
+                    'pp' => $pp]);
         } else {
             return $this->render($fm . '-org', [
                 'profile' => $profile,
-                'ministryLink' => $ministryLink,
-                'ministryLabel' => $ministryLabel,
-                'pp' => $progressPercent]);
+                'initialData' => $initialData,
+                'pp' => $pp]);
         }
     }
 
@@ -1227,10 +1152,10 @@ class ProfileFormController extends ProfileController
     { 
         $fmNum = Self::$form['pg'];
         $fm = 'forms/form' . $fmNum;
-        $profile = $this->findProfile($id); 
+        $profile = Profile::findProfile($id); 
         $profile->scenario = 'pg';
        
-        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
+        if (!\Yii::$app->user->can(PermissionProfile::UPDATE, ['profile' => $profile]) || !$profile->validType()) {
             throw new NotFoundHttpException;
         }
 
@@ -1238,9 +1163,7 @@ class ProfileFormController extends ProfileController
             return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
         }
 
-        $profile->status != Profile::STATUS_ACTIVE ?
-            $progressPercent = $profile->getProgressPercent(self::$formArray[$profile->type]) :
-            $progressPercent = NULL;
+        $pp = $profile->progressIfInactive;
 
         if (isset($_POST['save']) && $profile->setProgress($fmNum)) {
             return $this->redirect(['/preview/view-preview', 'id' => $id]);
@@ -1252,13 +1175,13 @@ class ProfileFormController extends ProfileController
             $profile->handleFormPG();
         }
 
-        $programs = $profile->program;                                                              // Array of linked programs
-        $profile->select = NULL;                                                                    // Initialize select
+        $programs = $profile->programs;
+        $profile->select = NULL;
 
         return $this->render($fm, [
             'profile' => $profile,
             'programs' => $programs,
-            'pp' => $progressPercent]);
+            'pp' => $pp]);
     }
 
     /**
@@ -1271,10 +1194,10 @@ class ProfileFormController extends ProfileController
     {
         $fmNum = Self::$form['sa'];
         $fm = 'forms/form' . $fmNum;
-        $profile = $this->findProfile($id);
+        $profile = Profile::findProfile($id);
         $profile->scenario = 'sa';
 
-       if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
+       if (!\Yii::$app->user->can(PermissionProfile::UPDATE, ['profile' => $profile]) || !$profile->validType()) {
             throw new NotFoundHttpException;
         }
         if (!self::$formArray[$profile->type][$fmNum]) {
@@ -1295,30 +1218,26 @@ class ProfileFormController extends ProfileController
                 $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]); 
 
         } else {  
-            $profile->status != Profile::STATUS_ACTIVE ?
-                $progressPercent = $profile->getProgressPercent(self::$formArray[$profile->type]) :
-                $progressPercent = NULL;
-            $profile->select = $profile->school;                                                     // Array of previously selected schools
-            
+
+            $pp = $profile->progressIfInactive;
+            $profile->select = $profile->schoolsAttended;
             $first = School::find()->where('id <= 2')->orderBy('id')->all();
             $second = School::find()->where('id > 2')->orderBy('school')->all();
             $schools = array_merge($first, $second);
-            $i=0;
-            foreach ($schools as $school) {
+            foreach ($schools as $i=>$school) {
                 if ($i > 1) {
                     $school->formattedNames = $school->school . 
                         ' (' . $school->city . ', ' . $school->st_prov_reg . ')';
                 } else {
                     $school->formattedNames = $school->school;
                 }
-                $i++;
             }
             $list = ArrayHelper::map($schools, 'id', 'formattedNames');
 
             return $this->render($fm, [
                 'profile' => $profile,
                 'list' => $list, 
-                'pp' => $progressPercent]);
+                'pp' => $pp]);
         }
     }
 
@@ -1332,10 +1251,10 @@ class ProfileFormController extends ProfileController
     {
         $fmNum = Self::$form['sl'];
         $fm = 'forms/form' . $fmNum;
-        $profile = $this->findProfile($id);
+        $profile = Profile::findProfile($id);
         $profile->scenario = 'sl';
 
-        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
+        if (!\Yii::$app->user->can(PermissionProfile::UPDATE, ['profile' => $profile]) || !$profile->validType()) {
             throw new NotFoundHttpException;
         }
         if (!self::$formArray[$profile->type][$fmNum]) {
@@ -1356,14 +1275,12 @@ class ProfileFormController extends ProfileController
                 $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]); 
 
         } else {
-            $profile->status != Profile::STATUS_ACTIVE ?
-                $progressPercent = $profile->getProgressPercent(self::$formArray[$profile->type]) :
-                $progressPercent = NULL;
-            $profile->select = $profile->schoolLevel;                                               // Previously selected school levels
+            $pp = $profile->progressIfInactive;
+            $profile->select = $profile->schoolLevels;
             
             return $this->render($fm, [
                 'profile' => $profile, 
-                'pp' => $progressPercent]);
+                'pp' => $pp]);
         }
     }
 
@@ -1377,10 +1294,10 @@ class ProfileFormController extends ProfileController
     {
         $fmNum = Self::$form['di'];
         $fm = 'forms/form' . $fmNum;
-        $profile = $this->findProfile($id);
+        $profile = Profile::findProfile($id);
         $profile->scenario = 'di';
 
-        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
+        if (!\Yii::$app->user->can(PermissionProfile::UPDATE, ['profile' => $profile]) || !$profile->validType()) {
             throw new NotFoundHttpException;
         }
         if (!self::$formArray[$profile->type][$fmNum]) {
@@ -1402,13 +1319,11 @@ class ProfileFormController extends ProfileController
                 $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);  
 
         } else {
-            $profile->status != Profile::STATUS_ACTIVE ?
-                $progressPercent = $profile->getProgressPercent(self::$formArray[$profile->type]) :
-                $progressPercent = NULL;
+            $pp = $profile->progressIfInactive;
 
             return $this->render($fm, [
                 'profile' => $profile, 
-                'pp' => $progressPercent]);
+                'pp' => $pp]);
         }
     }
 
@@ -1424,28 +1339,26 @@ class ProfileFormController extends ProfileController
     {
         $fmNum = Self::$form['ma'];
         $fm = 'forms/form' . $fmNum;
-        $profile = $this->findProfile($id);
+        $profile = Profile::findProfile($id);
         $profile->scenario = 'ma-church';
 
-        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
+        if (!\Yii::$app->user->can(PermissionProfile::UPDATE, ['profile' => $profile]) || !$profile->validType()) {
             throw new NotFoundHttpException;
         }
         if (!self::$formArray[$profile->type][$fmNum]) {
             return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
         }
 
-        if ($profile->type == 'Missionary' || $profile->type == 'Chaplain') {
-            $profile->missionary_id == NULL ?
-                $missionary = new Missionary() :
-                $missionary = $profile->missionary;
-            $profile->type == 'Missionary' ?
+        if ($profile->type == Profile::TYPE_MISSIONARY || $profile->type == Profile::TYPE_CHAPLAIN) {
+            $missionary = $profile->missionary ? $profile->missionary : new Missionary();
+            $profile->type == Profile::TYPE_MISSIONARY ?
                 $missionary->scenario = 'ma-missionary' :
                 $missionary->scenario = 'ma-chaplain';
         }
 
     // ************************* Remove Packet *********************************
         if (isset($_POST['remove'])) {
-            $profile->type == 'Church' ?
+            $profile->type == Profile::TYPE_CHURCH ?
                 $profile->updateAttributes(['packet' => NULL]) :
                 $missionary->updateAttributes(['packet' => NULL]);
             return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum-1, 'id' => $id]); 
@@ -1457,49 +1370,46 @@ class ProfileFormController extends ProfileController
             return $this->redirect(['/profile-mgmt/my-profiles']); 
 
     // **************************** Church POST *********************************
-        } elseif ($profile->type == 'Church' && 
+        } elseif ($profile->type == Profile::TYPE_CHURCH && 
             $profile->load(Yii::$app->request->Post()) && 
             $profile->handleFormMA() && 
             $profile->setProgress($fmNum)) {
 
-            if ($_POST['Profile']['missHousing'] == 'Y') {
+            if ($_POST['Profile']['housingSelect'] == 'Y') {
                 return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
 
             } else {
                 $fmNum++;
-                $profile->setProgress($fmNum);                                                      // Set form complete for missionary housing
+                $profile->setProgress($fmNum);
                 return isset($_POST['save']) ?
                     $this->redirect(['/preview/view-preview', 'id' => $id]) :
                     $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]); 
             } 
 
     // ************************** Missionary POST *******************************    
-        } elseif (($profile->type == 'Missionary' || $profile->type == 'Chaplain') && 
+        } elseif (($profile->type == Profile::TYPE_MISSIONARY || $profile->type == Profile::TYPE_CHAPLAIN) && 
             $missionary->load(Yii::$app->request->Post()) && 
             $missionary->handleFormMA($profile) && 
             $profile->setProgress($fmNum)) { 
+            // Skip Missionary Housing if checkbox is not checked
             return isset($_POST['save']) ?
                 $this->redirect(['/preview/view-preview', 'id' => $id]) :
-                $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => ($fmNum + 1), 'id' => $id]);    // Skip Missionary Housing if checkbox is not checked
+                $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => ($fmNum + 1), 'id' => $id]);
             
         } else {
-            $profile->status != Profile::STATUS_ACTIVE ?
-                $progressPercent = $profile->getProgressPercent(self::$formArray[$profile->type]) :
-                $progressPercent = NULL;
+           $pp = $profile->progressIfInactive;
 
     // **************************** Church Render *********************************
-            if($profile->type == 'Church') {
+            if($profile->type == Profile::TYPE_CHURCH) {
                 $list1 = ArrayHelper::map(MissionAgcy::find()->where('id < 3')->orderBy('mission')->all(), 'id', 'mission');    // Append "All" and "Independent" to top of list
                 $list2 = ArrayHelper::map(MissionAgcy::find()->where('id > 2')->orderBy('mission')->all(), 'id', 'mission'); 
                 $list = array_replace($list1, $list2);
-                $profile->select = $profile->missionAgcy;
-                empty($profile->miss_housing_id) ?
-                    $profile->missHousing = 'N' :                                                   // pre-populate profile->missHousing
-                    $profile->missHousing = 'Y';
+                $profile->select = $profile->missionAgcys;
+                $profile->housingSelect = $profile->missHousing ? 'Y' : 'N';
                 return $this->render($fm . '-church', [
                     'profile' => $profile,
                     'list' => $list,
-                    'pp' => $progressPercent]);
+                    'pp' => $pp]);
             } else {
 
     // ************************** Missionary Render *******************************
@@ -1510,7 +1420,7 @@ class ProfileFormController extends ProfileController
                     'profile' => $profile, 
                     'missionary' => $missionary, 
                     'list' => $list,
-                    'pp' => $progressPercent]);  
+                    'pp' => $pp]);  
             }
         }
     }
@@ -1525,22 +1435,17 @@ class ProfileFormController extends ProfileController
     {
         $fmNum = Self::$form['mh'];
         $fm = 'forms/form' . $fmNum;
-        $profile = $this->findProfile($id);
+        $profile = Profile::findProfile($id);
         $profile->scenario = 'mh';
 
-        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
+        if (!\Yii::$app->user->can(PermissionProfile::UPDATE, ['profile' => $profile]) || !$profile->validType()) {
             throw new NotFoundHttpException;
         }
         if (!self::$formArray[$profile->type][$fmNum]) {
             return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
         }
 
-        if (isset($profile->miss_housing_id) &&
-            $missHousing = MissHousing::findOne($profile->miss_housing_id)) {
-            $missHousing->select = $missHousing->missHousingVisibility;                             // DB relation via junction table
-        } else {
-            $missHousing = new MissHousing();
-        }
+        $missHousing = $profile->missHousing ? $profile->missHousing : new MissHousing();
         
         if (isset($_POST['cancel'])) {
             return $this->redirect(['/preview/view-preview', 'id' => $id]); 
@@ -1557,16 +1462,12 @@ class ProfileFormController extends ProfileController
                 $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]); 
 
         } else {
-            $list = ArrayHelper::map(MissHousingVisibility::find()->all(), 'id', 'approved', 'distinctive');
-            $profile->status != Profile::STATUS_ACTIVE ?
-                $progressPercent = $profile->getProgressPercent(self::$formArray[$profile->type]) :
-                $progressPercent = NULL;
+            $pp = $profile->progressIfInactive;
 
             return $this->render($fm, [
                 'profile' => $profile,
                 'missHousing' => $missHousing,
-                'list' => $list, 
-                'pp' => $progressPercent]);
+                'pp' => $pp]);
         }
     }
 
@@ -1583,16 +1484,16 @@ class ProfileFormController extends ProfileController
     {
         $fmNum = Self::$form['as'];
         $fm = 'forms/form' . $fmNum;
-        $profile = $this->findProfile($id);
-        if($profile->type == 'School') {
+        $profile = Profile::findProfile($id);
+        if($profile->type == Profile::TYPE_SCHOOL) {
             $profile->scenario = 'as-school';
-        } elseif ($profile->type == 'Church') {
+        } elseif ($profile->type == Profile::TYPE_CHURCH) {
             $profile->scenario = 'as-church';
         } else {
             $profile->scenario = 'as-ind';
         }
 
-        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
+        if (!\Yii::$app->user->can(PermissionProfile::UPDATE, ['profile' => $profile]) || !$profile->validType()) {
             throw new NotFoundHttpException;
         }
         if (!self::$formArray[$profile->type][$fmNum]) {
@@ -1603,36 +1504,39 @@ class ProfileFormController extends ProfileController
             return $this->redirect(['/preview/view-preview', 'id' => $id]); 
 
         } elseif (isset($_POST['exit'])) {
-            return $this->redirect(['/profile-mgmt/my-profiles']); 
+            return $this->redirect(['/profile-mgmt/my-profiles']);
 
-        } elseif ($profile->load(Yii::$app->request->Post()) && 
-            $profile->handleFormAS() && 
-            $profile->setProgress($fmNum)) {
+        } elseif (isset($_POST['add']) 
+            && $profile->load(Yii::$app->request->Post()) 
+            && $profile->handleFormAS()) {
+            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum-1, 'id' => $id]); 
+
+        } elseif ($profile->load(Yii::$app->request->Post()) 
+            && $profile->handleFormAS() 
+            && $profile->setProgress($fmNum)) {
             return isset($_POST['save']) ?
                 $this->redirect(['/preview/view-preview', 'id' => $id]) :
                 $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);  
 
         } else {
-            $profile->status != Profile::STATUS_ACTIVE ?
-                $progressPercent = $profile->getProgressPercent(self::$formArray[$profile->type]) :
-                $progressPercent = NULL;
+            $pp = $profile->progressIfInactive;
 
-            if ($profile->type == 'School') {
-                $profile->select = $profile->accreditation;                                         // DB relation via junction table
+            if ($profile->type == Profile::TYPE_SCHOOL) {
+                $profile->select = $profile->accreditations;
                 return $this->render($fm . '-school', [
                     'profile' => $profile, 
-                    'pp' => $progressPercent]);
-            } elseif ($profile->type == 'Church') {
-                $profile->select = $profile->fellowship;                                           // DB relation via junction table 
-                $profile->selectM = $profile->association;                                      
+                    'pp' => $pp]);
+            } elseif ($profile->type == Profile::TYPE_CHURCH) {
+                $profile->select = $profile->fellowships;
+                $profile->selectM = $profile->associations;                                      
                 return $this->render($fm . '-church', [
                     'profile' => $profile, 
-                    'pp' => $progressPercent]);
+                    'pp' => $pp]);
             } else {
-                $profile->select = $profile->fellowship;                                            // DB relation via junction table
+                $profile->select = $profile->fellowships;
                 return $this->render($fm . '-ind', [
                     'profile' => $profile, 
-                    'pp' => $progressPercent]);
+                    'pp' => $pp]);
             }
 
         }
@@ -1648,10 +1552,10 @@ class ProfileFormController extends ProfileController
     {
         $fmNum = Self::$form['ta'];
         $fm = 'forms/form' . $fmNum;
-        $profile = $this->findProfile($id);
+        $profile = Profile::findProfile($id);
         $profile->scenario = 'ta';
 
-        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile]) || !$profile->validType()) {
+        if (!\Yii::$app->user->can(PermissionProfile::UPDATE, ['profile' => $profile]) || !$profile->validType()) {
             throw new NotFoundHttpException;
         }
         if (!self::$formArray[$profile->type][$fmNum]) {
@@ -1664,22 +1568,20 @@ class ProfileFormController extends ProfileController
         } elseif (isset($_POST['exit'])) {
             return $this->redirect(['/profile-mgmt/my-profiles']); 
 
-        } elseif ($profile->load(Yii::$app->request->Post()) && 
-            $profile->handleFormTA() && 
-            $profile->setProgress($fmNum)) {
+        } elseif ($profile->load(Yii::$app->request->Post()) 
+            && $profile->handleFormTA() 
+            && $profile->setProgress($fmNum)) {
             return isset($_POST['save']) ?
                 $this->redirect(['/preview/view-preview', 'id' => $id]) :
                 $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);  
 
         } else {
-            $profile->select = $profile->tag;
-            $profile->status != Profile::STATUS_ACTIVE ?
-                $progressPercent = $profile->getProgressPercent(self::$formArray[$profile->type]) :
-                $progressPercent = NULL;
+            $profile->select = $profile->tags;
+            $pp = $profile->progressIfInactive;
 
             return $this->render($fm, [
                 'profile' => $profile, 
-                'pp' => $progressPercent]);
+                'pp' => $pp]);
         }
     }
 
@@ -1697,11 +1599,11 @@ class ProfileFormController extends ProfileController
      * Renders missing-fields if required form data is missing from the profile
      * @param string $id
      * @param array $missing
-     * @return string
+     * @return mixed
      */
     public function actionMissingForms($id, $missing) 
     {
-        $profile = $this->findProfile($id);
+        $profile = Profile::findProfile($id);
         return $this->render('missingFields', ['profile' => $profile, 'missing' => $missing]);                         
     }
 
@@ -1709,53 +1611,13 @@ class ProfileFormController extends ProfileController
      * Renders duplicate-profile if a duplicate profile is found
      * @param string $id
      * @param array $missing
-     * @return string
+     * @return mixed
      */
     public function actionDuplicateProfile($id, $dupId) 
     {
-        $profile = $this->findProfile($id);
-        $duplicate = $this->findProfile($dupId);
+        $profile = Profile::findProfile($id);
+        $duplicate = Profile::findProfile($dupId);
         return $this->render('duplicateProfile', ['profile' => $profile, 'duplicate' => $duplicate]);                         
-    }
-
-    /**
-     * Looks for a duplicate profile and redirects to duplicate-profile if found
-     * @param string $id
-     * @return mixed
-     */
-    public function isDuplicate($id) 
-    {
-        $profile = ProfileController::findProfile($id);
-        if ($profile->category == Profile::CATEGORY_IND) {
-            $duplicate = Profile::find()                                                            // Check to see if a duplicate profile exists
-                ->select('*')
-                ->where(['ind_first_name' => $profile->ind_first_name])
-                ->andwhere(['ind_last_name' => $profile->ind_last_name])
-                ->andwhere(['ind_city' => $profile->ind_city])
-                ->andwhere(['ind_st_prov_reg' => $profile->ind_st_prov_reg])
-                ->andwhere(['ind_country' => $profile->ind_country])
-                ->andwhere('id <> ' . $profile->id)
-                ->andwhere(['status' => Profile::STATUS_ACTIVE])
-                ->indexBy('id')
-                ->one();
-        } else {
-            $duplicate = Profile::find()                                                            // Check to see if a duplicate profile exists
-                ->select('*')
-                ->where(['org_name' => $profile->org_name])
-                ->andwhere(['org_city' => $profile->org_city])
-                ->andwhere(['org_st_prov_reg' => $profile->org_st_prov_reg])
-                ->andwhere(['org_country' => $profile->org_country])
-                ->andwhere('id <> ' . $profile->id)
-                ->andwhere(['status' => Profile::STATUS_ACTIVE])
-                ->indexBy('id')
-                ->one();
-        }
-        if ($duplicate) {                                                                           // Duplicate profile returned? Redirect to warning of duplicate profile
-            return $this->redirect(['duplicate-profile', 
-                'id' => $profile->id, 
-                'dupId' => $duplicate->id]);                            
-        }
-        return false;
     }
 
     /**
@@ -1773,171 +1635,4 @@ class ProfileFormController extends ProfileController
         exit;
     }
 
-    /**
-     * Process Ajax request from Programs search box for churches
-     * Return a table of 10 or fewer results from db.
-     */
-    public function actionProgramListAjax($q = NULL, $id = NULL) 
-    {
-        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        $out = ['results' => ['id' => '', 'text' => '']];
-        if (!is_null($q)) {
-            $query = new Query;
-            $query->select('id, type, status, org_name AS text, org_city, org_st_prov_reg')
-                ->from('profile')
-                ->where(['type' => 'Special Ministry'])
-                ->andWhere(['status' => Profile::STATUS_ACTIVE])
-                ->andWhere('((`org_city` LIKE "%' . $q . '%") OR (`org_name` LIKE "%' . $q . '%"))')
-                ->limit(10);
-            $command = $query->createCommand();
-            $data = $command->queryAll();
-            $out['results'] = array_values($data);
-        }
-        elseif ($id > 0) {
-            $out['results'] = ['id' => $id, 'text' => Profile::find($id)->org_name];
-        }
-        return $out;
-    }
- 
-    /**
-     * Process Ajax request from Parent Ministry search box for ministries
-     * Return a table of 10 or fewer results from db.
-     */
-    public function actionMinistryListAjax($q = NULL, $id = NULL) 
-    {
-        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        $out = ['results' => ['id' => '', 'text' => '']];
-        if (!is_null($q)) {
-            $query = new Query;
-            $query->select('id, type, status, org_name AS text, org_city, org_st_prov_reg')
-                ->from('profile')
-                ->where(['type' => 'Association'])   
-                ->orWhere(['type' => 'Camp'])
-                ->orWhere(['type' => 'Church'])
-                ->orWhere(['type' => 'Fellowship'])
-                ->orWhere(['type' => 'Special Ministry'])
-                ->orWhere(['type' => 'Mission Agency'])
-                ->orWhere(['type' => 'Music Ministry'])
-                ->orWhere(['type' => 'Print Ministry'])
-                ->orWhere(['type' => 'School'])
-                ->andWhere(['status' => Profile::STATUS_ACTIVE])
-                ->andwhere('id <> ' . $id)
-                ->andWhere('((`org_city` LIKE "%' . $q . '%") OR (`org_name` LIKE "%' . $q . '%"))')
-                ->limit(10);
-            $command = $query->createCommand();
-            $data = $command->queryAll();
-            $out['results'] = array_values($data);
-        }
-        elseif ($id > 0) {
-            $out['results'] = ['id' => $id, 'text' => Profile::find($id)->org_name];
-        }
-        return $out;
-    }
-
-    /**
-     * Process Ajax request from Parent Ministry search box for churches
-     * Return a table of 10 or fewer results from db.
-     */
-    public function actionChurchListAjax($q=NULL, $id=NULL, $chId=NULL) 
-    {
-        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        $out = ['results' => ['id' => '', 'text' => '']];
-        if (!is_null($q)) {
-            $query = new Query;
-            $query->select('id, type, status, org_name AS text, org_city, org_st_prov_reg')
-                ->from('profile')
-                ->where(['type' => 'Church'])
-                ->andWhere(['status' => Profile::STATUS_ACTIVE]);
-            $chId == NULL ? NULL : $query->andWhere('id <> ' . $chId);                              // Do not allow home church and church plant to be the same
-            $query->andWhere('((`org_city` LIKE "%' . $q . '%") OR (`org_name` LIKE "%' . $q . '%"))')
-                ->limit(10);
-            $command = $query->createCommand();
-            $data = $command->queryAll();
-            $out['results'] = array_values($data);
-        }
-        elseif ($id > 0) {
-            $out['results'] = ['id' => $id, 'text' => Profile::find($id)->org_name];
-        }
-        return $out;
-    }
-
-    /**
-     * Process "Create a Forwarding Email" modal form
-     * Updates user email and sends notification email to admin.
-     */
-    public function actionForwardingEmailAjax($id)
-    {
-        $fmNum = Self::$form['lo'];
-        $profile = $this->findProfile($id);
-        $profile->scenario = '';
-
-        $profile->category == Profile::CATEGORY_IND ?
-            $profile->email = Inflector::slug($profile->ind_last_name) . $profile->id . '@ibnet.org' :
-            $profile->email = Inflector::slug($profile->org_name) . $profile->id . '@ibnet.org';
-
-        $profile->load(Yii::$app->request->Post());
-    
-        if (ProfileMail::sendForwardingEmailRqst($id, $profile->email, $profile->email_pvt)) {         // Send request to admin
-            Yii::$app->session->setFlash('success', 
-                'Your new email is pending and should be visible on your profile within 48 hours.  
-                You may proceed with creating or updating your profile.');
-        }
-
-        return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum-1, 'id' => $id]);
-    }
-
-    /**
-     * Return custom toolbar for Kartik markdown extension
-     */
-    public function getMarkdownToolbar()
-    {
-
-        return $toolbar = [
-            [
-                'buttons' => [
-                    MarkdownEditor::BTN_BOLD => ['icon' => 'bold', 'title' => 'Bold'],
-                    MarkdownEditor::BTN_ITALIC => ['icon' => 'italic', 'title' => 'Italic'],
-                    MarkdownEditor::BTN_PARAGRAPH => ['icon' => 'font', 'title' => 'Paragraph'],
-                    MarkdownEditor::BTN_NEW_LINE => ['icon' => 'text-height', 'title' => 'Append Line Break'],
-                    MarkdownEditor::BTN_HEADING => ['icon' => 'header', 'title' => 'Heading', 'items' => [
-                    MarkdownEditor::BTN_H1 => ['label' => 'Heading 1', 'options' => ['class' => 'kv-heading-1', 'title' => 'Heading 1 Style']],
-                    MarkdownEditor::BTN_H2 => ['label' => 'Heading 2', 'options' => ['class' => 'kv-heading-2', 'title' => 'Heading 2 Style']],
-                    MarkdownEditor::BTN_H3 => ['label' => 'Heading 3', 'options' => ['class' => 'kv-heading-3', 'title' => 'Heading 3 Style']],
-                    MarkdownEditor::BTN_H4 => ['label' => 'Heading 4', 'options' => ['class' => 'kv-heading-4', 'title' => 'Heading 4 Style']],
-                    MarkdownEditor::BTN_H5 => ['label' => 'Heading 5', 'options' => ['class' => 'kv-heading-5', 'title' => 'Heading 5 Style']],
-                    MarkdownEditor::BTN_H6 => ['label' => 'Heading 6', 'options' => ['class' => 'kv-heading-6', 'title' => 'Heading 6 Style']],
-                    ]],
-                ],
-            ],
-            [
-                'buttons' => [
-                    MarkdownEditor::BTN_LINK => ['icon' => 'link', 'title' => 'URL/Link'],
-                ],
-            ],
-            [
-                'buttons' => [
-                    MarkdownEditor::BTN_INDENT_L => ['icon' => 'indent-left', 'title' => 'Indent Text'],
-                    MarkdownEditor::BTN_INDENT_R => ['icon' => 'indent-right', 'title' => 'Unindent Text'],
-                ],
-            ],
-            [
-                'buttons' => [
-                    MarkdownEditor::BTN_UL => ['icon' => 'list', 'title' => 'Bulleted List'],
-                    MarkdownEditor::BTN_OL => ['icon' => 'list-alt', 'title' => 'Numbered List'],
-                    MarkdownEditor::BTN_DL => ['icon' => 'th-list', 'title' => 'Definition List'],
-                ],
-            ],
-            [
-                'buttons' => [
-                    MarkdownEditor::BTN_HR => ['label' => MarkdownEditor::ICON_HR, 'title' => 'Horizontal Line', 'encodeLabel' => false],
-                ],
-            ],
-            [
-                'buttons' => [
-                    MarkdownEditor::BTN_MAXIMIZE => ['icon' => 'fullscreen', 'title' => 'Toggle full screen', 'data-enabled' => true]
-                ],
-                'options' => ['class' => 'pull-right'] 
-            ],
-        ];
-    }
 }                     

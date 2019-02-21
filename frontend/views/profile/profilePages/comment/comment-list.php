@@ -93,7 +93,7 @@ echo yii\widgets\ListView::widget([
                 ?>
            
                 <?= false !== $url ? 
-                    Html::a($avatar_html, $url, ['target' => '_blank']) :
+                    Html::a($avatar_html, $url, ['target' => '_blank', 'rel' => 'noopener noreferrer']) :
                     $avatar_html; 
                 ?>
              
@@ -101,7 +101,7 @@ echo yii\widgets\ListView::widget([
                     <div class="comment-author">
                         <?php
                         echo false !== $url ?
-                            Html::a($name_html, $url, ['target' => '_blank']) :
+                            Html::a($name_html, $url, ['target' => '_blank', 'rel' => 'noopener noreferrer']) :
                             $name_html;
                         echo Html::tag('bold', ' &middot ');
                         echo $churchName_html;

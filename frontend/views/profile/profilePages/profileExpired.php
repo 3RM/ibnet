@@ -1,5 +1,6 @@
 <?php
 
+use common\widgets\Alert;
 use yii\bootstrap\Html;
 use yii\helpers\Url;
 use yii\web\View;
@@ -18,7 +19,7 @@ $this->title = 'Profile Expired';
         </div>
         <div class="row">
 			<div class="col-md-8">
-				<h3>The page you are looking for has recently expired. :-(</h3>
+				<h3>Sadly, the page you are looking for has recently expired. :-(</h3>
 				<br>
 				<p><?= Html::a(Html::icon('search') . ' Return to Search', ['site/index']) ?></p>
 			</div>

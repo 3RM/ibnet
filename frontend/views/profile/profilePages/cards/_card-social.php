@@ -4,7 +4,7 @@ use yii\bootstrap\Html;
 
 		<div class="card">
 			<div class="social-wrapper">
-				<?= empty($social->sermonaudio) ? NULL : HTML::a(Html::img('@web/images/content/sa.png'), $social->sermonaudio, ['target' => 'blank']) ?>
+				<?= empty($social->sermonaudio) ? NULL : HTML::a(Html::img('@img.profile/sa.png'), $social->sermonaudio, ['target' => 'blank']) ?>
 				<?= empty($social->facebook) ? NULL : HTML::a(Html::icon('glyphicon social social-facebook', ['class' => 'icon-padding']), $social->facebook, ['target' => 'blank']) ?>
 				<?= empty($social->twitter) ? NULL : HTML::a(Html::icon('glyphicon social social-twitter', ['class' => 'icon-padding']), $social->twitter, ['target' => 'blank']) ?>
 				<?= empty($social->linkedin) ? NULL : HTML::a(Html::icon('glphyicon social social-linked-in', ['class' => 'icon-padding']), $social->linkedin, ['target' => 'blank']) ?>

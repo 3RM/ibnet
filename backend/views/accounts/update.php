@@ -26,15 +26,13 @@ $this->title = 'Update User';
 	<?= $form->field($user, 'updated_at')->textInput(['maxlength' => true]) ?>
 	<?= $form->field($user, 'last_login')->textInput(['maxlength' => true]) ?>
 	<?= $form->field($user, 'status')->textInput(['maxlength' => true]) ?>
-	<?= $form->field($user, 'screen_name')->textInput(['maxlength' => true]) ?>
+	<?= $form->field($user, 'display_name')->textInput(['maxlength' => true]) ?>
 	<?= $form->field($user, 'home_church')->textInput(['maxlength' => true]) ?>
-	<?= $form->field($user, 'role')->textInput(['maxlength' => true]) ?>
-	<?= $form->field($user, 'ind_act_profiles')->textInput(['maxlength' => true]) ?>
+	<?= $form->field($user, 'primary_role')->textInput(['maxlength' => true]) ?>
 	<?= $form->field($user, 'emailPrefLinks')->checkbox() ?>
 	<?= $form->field($user, 'emailPrefComments')->checkbox() ?>
 	<?= $form->field($user, 'emailPrefFeatures')->checkbox() ?>
 	<?= $form->field($user, 'emailPrefBlog')->checkbox() ?>
-	<?= $form->field($user, 'is_missionary')->checkbox() ?>
 	<?= $form->field($user, 'reviewed')->checkbox() ?>
 
 	<?= Html::a('Cancel', ['/accounts/users'], ['class' => 'btn btn-primary']) ?>

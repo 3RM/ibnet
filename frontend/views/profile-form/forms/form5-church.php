@@ -1,7 +1,6 @@
 <?php
 
 use common\models\profile\Profile;
-use common\models\Utility;
 use yii\bootstrap\Html;
 use yii\widgets\ActiveForm;
 
@@ -38,7 +37,7 @@ EOD
                         <table class="table table-hover">
                             <tr>
                                 <td class="center">
-                                    <?= $srPastor->formattedNames ?>
+                                    <?= $srPastor->mainName ?>
                                 </td>
                                 <td class="center">
                                     <?= Html::submitButton(HTML::icon('remove') . ' Remove', [
@@ -64,7 +63,7 @@ EOD
     
         <?php } else { ?>
         
-            <?= empty($staffArray) ? NULL : '<p>Enter a Pastor name, or choose a pastor profile from the list below.</p>' ?>
+            <?= empty($staff) ? NULL : '<p>Enter a Pastor name, or choose a pastor profile from the list below.</p>' ?>
             <div class="row">
                 <div class="col-md-4">
                     <h3>Senior Pastor Name</h3>
@@ -83,8 +82,8 @@ EOD
         <div class="row">
             <div class="col-md-11">
                 <h3>Additional Staff</h3>
-                <?php if ($staffArray) { ?>
-                    <?= isset($staffArray[1]) ? '<p>' . Html::icon('search') . ' We found people in the directory who have identified themselves as church staff members. "Staff" includes anyone in ministry who serves under the ministry of the church, and need not be in a paid staff position.</p>' :
+                <?php if ($staff) { ?>
+                    <?= isset($staff[1]) ? '<p>' . Html::icon('search') . ' We found people in the directory who have identified themselves as church staff members. "Staff" includes anyone in ministry who serves under the ministry of the church, and need not be in a paid staff position.</p>' :
                     '<p>' . Html::icon('search') . ' We found a person in the directory who has identified themself as a church staff member.  "Staff" includes anyone in ministry who serves under the ministry of the church, and need not be in a paid staff position.</p>' ?>
                 <?php } else { ?>
                     <p><?= Html::icon('search') ?> We did not find any pastor or staff for your church in the directory.  Pastor and staff profiles can be a great way to help the public get aquainted with your church.</p>
@@ -92,40 +91,44 @@ EOD
             </div>
         </div>
 
-        <?php if ($staffArray) { ?>
+        <?php if ($staff) { ?>
             
             <div class="row">
                 <div class="col-md-10">
                     <div class="panel panel-default">
                         <div class="panel-heading">Church Staff</div>
                         <table class="table table-hover">
-                            <?php foreach($staffArray as $staff) { ?>
+                            <?php foreach($staff as $stf) { ?>
                             <tr>
-                                <td class="center"><b><?= $staff->{'profile'}->sub_type == 'Missionary' ? 'Church Planting Pastor' : $staff->staff_title ?></b></td>
-                                <td class="center"><?= $staff->{'profile'}->spouse_first_name ? $staff->{'profile'}->ind_first_name . ' (& ' . $staff->{'profile'}->spouse_first_name . ') ' . $staff->{'profile'}->ind_last_name : $staff->{'profile'}->ind_first_name . ' ' . $staff->{'profile'}->ind_last_name; ?></td>
-                                <td class="center"><?= $staff->{'profile'}->ind_city . ', ' ?><?= $staff->{'profile'}->ind_st_prov_reg ? $staff->{'profile'}->ind_st_prov_reg : NULL ?></td>
-                                <td class="center"><?= $staff->confirmed == NULL ? 'Uncomfirmed' : 'Confirmed Staff' ?></td>
+                                <td class="center"><b><?= $stf->{'profile'}->sub_type == Profile::TYPE_MISSIONARY ? 'Church Planting Pastor' : $stf->stf_title ?></b></td>
+                                <td class="center"><?= $stf->{'profile'}->spouse_first_name ? $stf->{'profile'}->ind_first_name . ' (& ' . $stf->{'profile'}->spouse_first_name . ') ' . $stf->{'profile'}->ind_last_name : $stf->{'profile'}->ind_first_name . ' ' . $stf->{'profile'}->ind_last_name; ?></td>
+                                <td class="center"><?= $stf->{'profile'}->ind_city . ', ' ?><?= $stf->{'profile'}->ind_st_prov_reg ? $stf->{'profile'}->ind_st_prov_reg : NULL ?></td>
+                                <td class="center"><?= $stf->confirmed == NULL ? 'Uncomfirmed' : 'Confirmed Staff' ?></td>
                                 
 
                                 <td class="center">
-                                    <?php if ($staff->confirmed == NULL) { ?>
+                                    <?php if ($stf->confirmed == NULL) { ?>
                                         <?= Html::submitButton(HTML::icon('ok') . ' Add Staff', [
                                             'id' => 'add_submit',
                                             'method' => 'POST',
                                             'class' => 'btn btn-form btn-sm',
                                             'name' => 'add',
-                                            'value' => $staff->id,
+                                            'value' => $stf->id,
                                         ]); ?>
                                         
 
-                                        <?php if ($staff['sr_pastor'] == NULL && 
-                                            ($staff->staff_title == 'Senior Pastor' || $staff->staff_title == 'Pastor' || 
-                                            ($staff->staff_title == 'Church Planter' && $staff->home_church != $profile->id))) { ?>
+                                        <?php if ($stf['sr_pastor'] == NULL 
+                                            && ($stf->staff_title == Profile::SUBTYPE_PASTOR_SENIOR 
+                                                || $stf->staff_title == Profile::SUBTYPE_PASTOR_PASTOR 
+                                                || ($stf->staff_title == Profile::SUBTYPE_MISSIONARY_CP 
+                                                    && $stf->home_church != $profile->id)
+                                                )
+                                            ) { ?>
                                             <?= Html::submitButton(HTML::icon('ok') . ' Add Sr. Pastor', [
                                                 'method' => 'POST',
                                                 'class' => 'btn btn-form btn-sm',
                                                 'name' => 'senior',
-                                                'value' => $staff->staff_id . '+' . $staff->id,
+                                                'value' => $stf->staff_id . '+' . $stf->id,
                                             ]); ?>
                                         <?php } ?>
 
@@ -135,7 +138,7 @@ EOD
                                             'method' => 'POST',
                                             'class' => 'btn btn-form btn-sm',
                                             'name' => 'remove',
-                                            'value' => $staff->id,
+                                            'value' => $stf->id,
                                         ]); ?>
                                     <?php } ?>
                                 </td>

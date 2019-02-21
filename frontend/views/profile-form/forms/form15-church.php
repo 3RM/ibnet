@@ -53,7 +53,7 @@ $this->title = 'Missions';
 
                 <?php if (isset($profile->packet)) { ?>
                     <p>You have one uploaded PDF file.
-                    <?= Html::a(HTML::icon('download-alt'), ['profile-form/download', 'path' => $profile->packet], ['class' => 'btn btn-form btn-sm', 'target' => '_blank', 'alt' => 'Download']) ?>
+                    <?= Html::a(HTML::icon('download-alt'), ['profile-form/download', 'path' => $profile->packet], ['class' => 'btn btn-form btn-sm', 'target' => '_blank', 'rel' => 'noopener noreferrer', 'alt' => 'Download']) ?>
                     <?= Html::submitButton(HTML::icon('remove'), [
                         'method' => 'POST',
                         'class' => 'btn btn-form btn-sm',
@@ -68,10 +68,10 @@ $this->title = 'Missions';
         <br>
 
         <h3>Mission Housing</h3>
-        <p><?= HTML::icon('info-sign') ?> If you select yes, on the next page you will be able to add a description and contact information, and specify who will have access to the housing.</p>
+        <p><?= HTML::icon('info-sign') ?> If you select yes, on the next page you will be able to add a description and contact information.</p>
         <div class="row">
             <div class="col-md-8">
-                <?= $form->field($profile, 'missHousing')->radioList([ 'N' => 'No', 'Y' => 'Yes', ]) ?>
+                <?= $form->field($profile, 'housingSelect')->radioList([ 'N' => 'No', 'Y' => 'Yes', ]) ?>
             </div>
         </div>
             

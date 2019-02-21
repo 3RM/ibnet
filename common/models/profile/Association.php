@@ -1,4 +1,9 @@
 <?php
+/**
+ * @link http://www.ibnet.org/
+ * @copyright  Copyright (c) IBNet (http://www.ibnet.org)
+ * @author Steve McKinley <steve@themckinleys.org>
+ */
 
 namespace common\models\profile;
 
@@ -7,10 +12,12 @@ use Yii;
 /**
  * This is the model class for table "association".
  *
- * @property string $id
- * @property string $association
- * @property string $association_acronym
- * @property string $profile_id
+ * @property int $id
+ * @property string $name
+ * @property string $acronym
+ * @property int $profile_id FOREIGN KEY (profile_id) REFERENCES profile (id)
+ * @property int $status
+ * @property int $reviewed
  */
 class Association extends \yii\db\ActiveRecord
 {
@@ -28,12 +35,12 @@ class Association extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            ['association', 'required'],
-            ['association_acronym', 'default', 'value' => NULL],
-            ['association', 'unique'],
-            ['association_acronym', 'unique'],
-            ['association', 'string', 'max' => 60],
-            ['association_acronym', 'string', 'max' => 10],
+            ['name', 'required'],
+            ['acronym', 'default', 'value' => NULL],
+            ['name', 'unique'],
+            ['acronym', 'unique'],
+            ['name', 'string', 'max' => 60],
+            ['acronym', 'string', 'max' => 10],
         ];
     }
 
@@ -43,19 +50,20 @@ class Association extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'association' => 'Association',
-            'association_acronym' => 'Association Acronym',
+            'name' => 'Association',
+            'acronym' => 'Association Acronym',
         ];
     }
 
     /**
-     * Links a list of associations to individual profiles
+     *  Individual profiles that have linked to this association as members
      * @return \yii\db\ActiveQuery
      */
-    public function getProfile()
+    public function getProfiles()
     {
         return $this->hasMany(Profile::className(), ['id' => 'profile_id'])
-            ->viaTable('profile_has_association', ['ass_id' => 'id']);
+            ->viaTable('profile_has_association', ['ass_id' => 'id'])
+            ->where(['profile.status' => Profile::STATUS_ACTIVE]);
     }
 
     /* 

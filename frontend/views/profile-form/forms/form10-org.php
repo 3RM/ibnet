@@ -21,73 +21,45 @@ $this->title = 'Parent Ministry';
 <div class="wrap profile-form">
 
     <div class="forms-container">
- 
+
         <?php $form = ActiveForm::begin(); ?>
-
-        <?php if (empty($ministryLink)) { ?>
-
-            <div class="row">
-                <div class="col-md-6">
-                    <p><?= HTML::icon('info-sign') ?> A ministry or orginzation must have a listing in this directory.</p>
-                    <?php echo $form->field($profile, 'select')->widget(Select2::classname(), [ 
-                        'options' => ['placeholder' => 'Search by name or city...'],
-                        'initValueText' => 'Search ...', 
-                        'pluginOptions' => [
-                            'allowClear' => true,
-                            'minimumInputLength' => 3,
-                            'language' => [
-                                'errorLoading' => new JsExpression("function () { return 'Waiting for results...'; }"),
-                            ],
-                            'ajax' => [
-                                'url' => Url::to(['ministry-list-ajax', 'id' => $profile->id]),
-                                'dataType' => 'json',
-                                'data' => new JsExpression('function(params) { return {q:params.term}; }')
-                            ],
-                            'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
-                            'templateResult' => new JsExpression('function(profile) { 
-                                if(profile.org_city > "" && profile.org_st_prov_reg > "") {
-                                    return profile.text+", "+profile.org_city+", "+profile.org_st_prov_reg;
-                                } else {
-                                    return profile.text;
-                                };
-                            }'),
-                            'templateSelection' => new JsExpression('function (profile) { 
-                                if(profile.org_city > "" && profile.org_st_prov_reg > "") {
-                                    return profile.text+", "+profile.org_city+", "+profile.org_st_prov_reg;
-                                } else {
-                                    return profile.text;
-                                };
-                            }'),
+        <div class="row">
+            <div class="col-md-6">
+                <p><?= HTML::icon('info-sign') ?> A ministry or orginzation must have a listing in this directory.</p>
+                <?php echo $form->field($profile, 'ministry_of')->widget(Select2::classname(), [ 
+                    'data' => $initialData,
+                    'options' => ['placeholder' => 'Search by name or city...'], 
+                    'pluginOptions' => [
+                        'allowClear' => true,
+                        'minimumInputLength' => 3,
+                        'language' => [
+                            'errorLoading' => new JsExpression("function () { return 'Waiting for results...'; }"),
                         ],
-                    ]); ?>
-                </div>
+                        'ajax' => [
+                            'url' => Url::to(['ajax/search', 'type' => 'ministry', 'id' => $profile->id]),
+                            'dataType' => 'json',
+                            'data' => new JsExpression('function(params) { return {q:params.term}; }')
+                        ],
+                        'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
+                        'templateResult' => new JsExpression('function(profile) { 
+                            if(profile.org_city > "" && profile.org_st_prov_reg > "") {
+                                return profile.text+", "+profile.org_city+", "+profile.org_st_prov_reg;
+                            } else {
+                                return profile.text;
+                            };
+                        }'),
+                        'templateSelection' => new JsExpression('function (profile) { 
+                            if(profile.org_city > "" && profile.org_st_prov_reg > "") {
+                                return profile.text+", "+profile.org_city+", "+profile.org_st_prov_reg;
+                            } else {
+                                return profile.text;
+                            };
+                        }'),
+                    ],
+                ]); ?>
             </div>
-
-        <?php } else { ?>
-
-            <div class="row">
-                <div class="col-md-8">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">Ministry</div>
-                        <table class="table table-hover">
-                            <td><?= $ministryLabel ?> <b><?= $ministryLink->org_name . ', ' . $ministryLink->org_city . ', ' . $ministryLink->org_st_prov_reg ?></b></td>
-                            <td>
-                                <?= Html::submitButton(Html::icon('remove'), [
-                                    'method' => 'POST',
-                                    'class' => 'btn btn-form btn-sm',
-                                    'name' => 'remove',
-                                ]) ?>
-                            </td>
-                        </table>
-                        <?= Html::activeHiddenInput($profile, 'select'); ?>
-                    </div>
-                </div>
-            </div>
-
-        <?php } ?>
-
-        <br>
-        
+        </div>
+        <br>        
         <div class="row">
             <div class="col-md-11">
                 <p><?php if ($profile->show_map == Profile::MAP_PRIMARY) {
@@ -104,7 +76,6 @@ $this->title = 'Parent Ministry';
         </div>
 
         <?= $this->render('_profileFormFooter', ['profile' => $profile]) ?>
-
         <?php ActiveForm::end(); ?>
 
     </div>

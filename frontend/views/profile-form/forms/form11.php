@@ -27,8 +27,7 @@ $this->title = 'Programs';
             <div class="col-md-6">
                 <p><?= HTML::icon('info-sign') ?> A program must have a listing in this directory.</p>
                 <?php echo $form->field($profile, 'select')->widget(Select2::classname(), [ 
-                    'options' => ['placeholder' => 'Search by name or city...'],
-                    'initValueText' => 'Search ...', 
+                    'options' => ['placeholder' => 'Search by name or city...'], 
                     'pluginOptions' => [
                         'allowClear' => true,
                         'minimumInputLength' => 3,
@@ -36,7 +35,7 @@ $this->title = 'Programs';
                             'errorLoading' => new JsExpression("function () { return 'Waiting for results...'; }"),
                         ],
                         'ajax' => [
-                            'url' => Url::to(['program-list-ajax']),
+                            'url' => Url::to(['ajax/search', 'type' => 'program']),
                             'dataType' => 'json',
                             'data' => new JsExpression('function(params) { return {q:params.term}; }')
                         ],

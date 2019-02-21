@@ -13,7 +13,7 @@
 }
 .account-header {
 }
-.acc-settings-header, .acc-profiles-header, .acc-update-header, .acc-forms-header, .acc-preview-header {
+.acc-settings-header, .acc-profiles-header, .acc-network-header, .acc-update-header, .acc-forms-header, .acc-preview-header {
   height: 100%;
   margin-top: -165px;
   /* Stretch image outside of containing div */
@@ -26,24 +26,28 @@
 }
 
 .acc-settings-header {
-  background: url(../images/content/settings-header.jpg);
+  background: url(../images/user-area/settings-header.jpg);
   border-bottom: 1px solid #bbb;
 }
 .acc-profiles-header {
-  background: url(../images/content/profiles-header.jpg);
+  background: url(../images/user-area/profiles-header.jpg);
+  border-bottom: 1px solid #bbb;
+}
+.acc-network-header {
+  background: url(../images/user-area/network-header.jpg);
+  border-bottom: 1px solid #bbb;
+}
+.acc-update-header {
+  background: url(../images/user-area/update-header.jpg);
   border-bottom: 1px solid #bbb;
 }
 .acc-preview-header {
-  background: url(../images/content/profile-preview-header.jpg);
+  background: url(../images/profile/profile-preview-header.jpg);
   border-bottom: 1px solid #1b3e66;
 }
 .acc-forms-header {
-  background: url(../images/content/profile-forms-header.jpg);
+  background: url(../images/profile/profile-forms-header.jpg);
   border-bottom: 1px solid #1b3e66;
-}
-.acc-update-header {
-  background: url(../images/content/update-header.jpg);
-  border-bottom: 1px solid #bbb;
 }
 .account-header h1 {
   position: relative;
@@ -171,7 +175,7 @@ li.active .underline {
 .pwd {
   height: 18px;
   width: 126px;
-  background: url(../images/pwd.jpg) center left;
+  background: url(../images/user-area/pwd.jpg) center left;
   background-repeat: no-repeat;
   display: inline-block;
 }
@@ -513,6 +517,47 @@ img.mc-icon {
   -o-transition: height 0.12s !important;
   transition: height 0.12s !important;
 }
+#videoModal .modal-header {
+  display: none;
+}
+#videoModal .link-modal-body {
+  padding: 0;
+}
+.videoWrapper {
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 */
+  padding-top: 25px;
+  height: 0;
+}
+.videoWrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+.feature-video-container {
+  width: 50%;
+  height: 60px;
+  background-color: #eee;
+  border: 1px solid #b0bec5;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 40px;
+  padding: 10px 20px;
+}
+.feature-video-container button {
+  margin: 0;
+}
+.feature-video-container i {
+  font-size: 2em;
+  color: #546e7a;
+}
+.feature-video-container i:hover {
+  color: #e91e42;
+}
 .videoWrapper {
   position: relative;
   padding-bottom: 56.25%; /* 16:9 */
@@ -557,7 +602,6 @@ img.mc-icon {
 
 
 
-
 /*
  * Media Queries
 ---------------------------------------------------------------------------------------------------- */
@@ -565,20 +609,23 @@ img.mc-icon {
 /* UHD (landscape) ----------- */
 @media only screen and (min-device-width: 1920px) {
     .acc-settings-header {
-      background: url(../images/content/settings-header-uw.jpg);
-    }
-    .acc-preview-header {
-      background: url(../images/content/profile-preview-header-uw.jpg);
+      background: url(../images/user-area/settings-header-uw.jpg);
     }
     .acc-profiles-header {
-      background: url(../images/content/profiles-header-uw.jpg);
+      background: url(../images/user-area/profiles-header-uw.jpg);
+    }
+    .acc-network-header {
+      background: url(../images/user-area/network-header-uw.jpg);
+    } 
+    .acc-update-header {
+      background: url(../images/user-area/update-header-uw.jpg);
+    }
+    .acc-preview-header {
+      background: url(../images/profile/profile-preview-header-uw.jpg);
     }
     .acc-forms-header {
-      background: url(../images/content/profile-forms-header-uw.jpg);
+      background: url(../images/profile/profile-forms-header-uw.jpg);
     }
-    .acc-update-header {
-      background: url(../images/content/update-header-uw.jpg);
-    }    
     .account-header h1 {
       left: 24%;
     } 
@@ -634,19 +681,22 @@ img.mc-icon {
 
 @media only screen and (max-width: 768px) {
     .acc-settings-header {
-      background: url(../images/content/settings-header-mb.jpg);
+      background: url(../images/user-area/settings-header-mb.jpg);
     }
     .acc-profiles-header {
-      background: url(../images/content/profiles-header-mb.jpg);
-    }
-    .acc-preview-header {
-      background: url(../images/content/profile-preview-header-mb.jpg);
-    }
-    .acc-forms-header {
-      background: url(../images/content/profile-forms-header-mb.jpg);
+      background: url(../images/user-area/profiles-header-mb.jpg);
     }
     .acc-update-header {
-      background: url(../images/content/update-header-mb.jpg);
+      background: url(../images/user-area/network-header-mb.jpg);
+    }
+    .acc-update-header {
+      background: url(../images/user-area/update-header-mb.jpg);
+    }
+    .acc-forms-header {
+      background: url(../images/profile/profile-forms-header-mb.jpg);
+    }
+    .acc-preview-header {
+      background: url(../images/profile/profile-preview-header-mb.jpg);
     }
     .left-nav {
       display: none;

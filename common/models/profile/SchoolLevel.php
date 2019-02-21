@@ -1,4 +1,9 @@
 <?php
+/**
+ * @link http://www.ibnet.org/
+ * @copyright  Copyright (c) IBNet (http://www.ibnet.org)
+ * @author Steve McKinley <steve@themckinleys.org>
+ */
 
 namespace common\models\profile;
 
@@ -7,9 +12,9 @@ use Yii;
 /**
  * This is the model class for table "school_level".
  *
- * @property string $id
- * @property string $school
- * @property string $school_acronym
+ * @property int $id
+ * @property string $school_level
+ * @property string $level_group
  */
 class SchoolLevel extends \yii\db\ActiveRecord
 {
@@ -46,7 +51,7 @@ class SchoolLevel extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getProfile()
+    public function getProfiles()
     {
         return $this->hasMany(Profile::className(), ['id' => 'profile_id'])
             ->viaTable('profile_has_school_level', ['school_level_id' => 'id']);

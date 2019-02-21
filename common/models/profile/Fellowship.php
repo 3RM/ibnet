@@ -1,4 +1,9 @@
 <?php
+/**
+ * @link http://www.ibnet.org/
+ * @copyright  Copyright (c) IBNet (http://www.ibnet.org)
+ * @author Steve McKinley <steve@themckinleys.org>
+ */
 
 namespace common\models\profile;
 
@@ -7,10 +12,12 @@ use Yii;
 /**
  * This is the model class for table "fellowship".
  *
- * @property string $id
- * @property string $fellowship
- * @property string $fellowship_acronym
- * @property string $profile_id
+ * @property int $id
+ * @property string $name
+ * @property string $acronym
+ * @property int $profile_id FOREIGN KEY (profile_id) REFERENCES profile(id)
+ * @property int $status
+ * @property int $reviewed
  */
 class Fellowship extends \yii\db\ActiveRecord
 {
@@ -28,12 +35,12 @@ class Fellowship extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            ['fellowship', 'required'],
-            ['fellowship_acronym', 'default', 'value' => NULL],
-            ['fellowship', 'unique'],
-            ['fellowship_acronym', 'unique'],
-            ['fellowship', 'string', 'max' => 60],
-            ['fellowship_acronym', 'string', 'max' => 10],
+            ['name', 'required'],
+            ['acronym', 'default', 'value' => NULL],
+            ['name', 'unique'],
+            ['acronym', 'unique'],
+            ['name', 'string', 'max' => 60],
+            ['acronym', 'string', 'max' => 10],
         ];
     }
 
@@ -43,19 +50,20 @@ class Fellowship extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'fellowship' => 'Fellowship',
-            'fellowship_acronym' => 'Fellowship Acronym',
+            'name' => 'Fellowship',
+            'acronym' => 'Fellowship Acronym',
         ];
     }
 
     /**
-     * Links a list of fellowships to individual profiles
+     * Individual profiles that have linked to this fellowship as members
      * @return \yii\db\ActiveQuery
      */
-    public function getProfile()
+    public function getProfiles()
     {
         return $this->hasMany(Profile::className(), ['id' => 'profile_id'])
-            ->viaTable('profile_has_fellowship', ['flwship_id' => 'id']);
+            ->viaTable('profile_has_fellowship', ['flwship_id' => 'id'])
+            ->where(['profile.status' => Profile::STATUS_ACTIVE]);
     }
 
     /* 

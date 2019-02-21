@@ -1,14 +1,10 @@
 <?php
 
 use common\models\profile\Profile;
-use common\models\Utility;
 use common\widgets\Alert;
-use frontend\controllers\ProfileController;
 use kartik\markdown\Markdown;
-use yii\bootstrap\Modal;
 use yii\bootstrap\Html;
 use yii\helpers\Url;
-use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
 $this->title = $profile->org_name;
@@ -18,12 +14,12 @@ $this->title = $profile->org_name;
 <div class="profile">
 	<div class="profile-main">
 
-		<div class="img1"><?= empty($profile->image1) ? Html::img('@web/images/content/banner6.jpg', ['alt' => 'Header Image']) : Html::img($profile->image1, ['alt' => 'Header Image']) ?></div>
-		<?= empty($profile->image2) ? Html::img('@web/images/content/profile-logo.png', ['class' => 'img2', 'alt' => 'Logo Image']) : Html::img($profile->image2, ['class' => 'img2', 'alt' => 'Logo image']) ?>
+		<div class="img1"><?= $profile->image1 ? Html::img($profile->image1, ['alt' => 'Header Image']) : Html::img('@img.profile/banner6.jpg', ['alt' => 'Header Image']) ?></div>
+		<?= $profile->image2 ? Html::img($profile->image2, ['class' => 'img2', 'alt' => 'Logo image']) : Html::img('@img.profile/profile-logo.png', ['class' => 'img2', 'alt' => 'Logo Image']) ?>
 	
 		<div class="header-text-wrap">
 			<h1><?= $this->title ?></h1>
-			<p class="tagline"><?= empty($profile->tagline) ? NULL : $profile->tagline ?></p>
+			<p class="tagline"><?= $profile->tagline ? $profile->tagline : NULL ?></p>
 			<p class="type"><?= Profile::$icon[$profile->type] . ' ' . $profile->flwsp_ass_level . ' ' . $profile->type ?></p>
 		</div>
 
@@ -32,7 +28,7 @@ $this->title = $profile->org_name;
 		</div>
 
 		<?= $this->render('cards/_card-contact-org', ['profile' => $profile]) ?>
-		<?= empty($social) ? NULL : $this->render('cards/_card-social', ['social' => $social]) ?>
+		<?= $social ? $this->render('cards/_card-social', ['social' => $social]) : NULL ?>
 
 		<?= $this->render('_map', ['loc' => $loc]) ?>
 
@@ -46,7 +42,14 @@ $this->title = $profile->org_name;
 		</div>
 	<?php } elseif ($p == 'connections') { ?>
 		<div class="additional-content">
-			<?= $this->render('connection/_' . ProfileController::$profilePageArray[$profile->type] . 'Connections', ['profile' => $profile, 'staffArray' => $staffArray, 'indvArray' => $indvArray, 'churchArray' => $churchArray, 'likeArray' => $likeArray]); ?>
+			<h3>Connections</h3>
+			<hr>
+			<?= $staff ? $this->render('connection/_orgStaff', ['staff' => $staff]) : NULL ?>
+			<?= $members ? $this->render('connection/_flwshipAssMembers', ['members' => $members]) : NULL ?>
+			<?= $likeProfiles ? $this->render('connection/_likes', ['likeProfiles' => $likeProfiles]) : NULL ?>
+			<?php if (!$staff && !$members && !$likeProfiles) {
+				echo '<em>No connections found.</em>';
+			} ?>
 		</div>
 	<?php } elseif ($p == 'history') { ?>
 		<div class="additional-content">

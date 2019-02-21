@@ -57,23 +57,23 @@ AjaxAsset::register($this);
 				<div class="link-to-profile">
 
 					<div class="right">
-						<a href=<?= '"' . Url::toRoute(['profile/' . ProfileController::$profilePageArray[$profile->type], 'urlLoc' => $profile->url_loc, 'name' => $profile->url_name, 'id' => $profile->id], 'https') . '"' ?>>Visit us at IBNet</a>
-						<a href=<?= '"' . Url::toRoute(['profile/' . ProfileController::$profilePageArray[$profile->type], 'urlLoc' => $profile->url_loc, 'name' => $profile->url_name, 'id' => $profile->id], 'https') . '"' ?>><?= Html::img('@web/images/content/ibnet_icon.png', ['alt' => 'IBNet']) ?> Visit us at IBNet</a>
-						<a href=<?= '"' . Url::toRoute(['profile/' . ProfileController::$profilePageArray[$profile->type], 'urlLoc' => $profile->url_loc, 'name' => $profile->url_name, 'id' => $profile->id], 'https') . '"' ?>><?= Html::img('@web/images/content/ibnet_icon_gr.png', ['alt' => 'IBNet']) ?> Visit us at IBNet</a>
+						<a href=<?= '"' . Url::toRoute(['profile/' . ProfileController::$profilePageArray[$profile->type], 'urlLoc' => $profile->url_loc, 'urlName' => $profile->url_name, 'id' => $profile->id], 'https') . '"' ?>>Visit us at IBNet</a>
+						<a href=<?= '"' . Url::toRoute(['profile/' . ProfileController::$profilePageArray[$profile->type], 'urlLoc' => $profile->url_loc, 'urlName' => $profile->url_name, 'id' => $profile->id], 'https') . '"' ?>><?= Html::img('@img.site/ibnet_icon.png', ['alt' => 'IBNet']) ?> Visit us at IBNet</a>
+						<a href=<?= '"' . Url::toRoute(['profile/' . ProfileController::$profilePageArray[$profile->type], 'urlLoc' => $profile->url_loc, 'urlName' => $profile->url_name, 'id' => $profile->id], 'https') . '"' ?>><?= Html::img('@img.site/ibnet_icon_gr.png', ['alt' => 'IBNet']) ?> Visit us at IBNet</a>
 					</div>
 
 					<div class="left">
 						<h4>URL:</h4>
-						<?= \Eddmash\Clipboard\Clipboard::input($this, 'text', 'URL', Url::toRoute(['profile/' . ProfileController::$profilePageArray[$profile->type], 'urlLoc' => $profile->url_loc, 'name' => $profile->url_name, 'id' => $profile->id], 'https'), ['id' => 'url']); ?>
+						<?= \Eddmash\Clipboard\Clipboard::input($this, 'text', 'URL', Url::toRoute(['profile/' . ProfileController::$profilePageArray[$profile->type], 'urlLoc' => $profile->url_loc, 'urlName' => $profile->url_name, 'id' => $profile->id], 'https'), ['id' => 'url']); ?>
 						
 						<h4>Text Link:</h4>
-						<?= \Eddmash\Clipboard\Clipboard::input($this, 'text', 'URL', Html::a('Visit us at IBNet', Url::toRoute(['profile/' . ProfileController::$profilePageArray[$profile->type], 'urlLoc' => $profile->url_loc, 'name' => $profile->url_name, 'id' => $profile->id], 'https')), ['size' => 20, 'id' => 'text-link']); ?>
+						<?= \Eddmash\Clipboard\Clipboard::input($this, 'text', 'URL', Html::a('Visit us at IBNet', Url::toRoute(['profile/' . ProfileController::$profilePageArray[$profile->type], 'urlLoc' => $profile->url_loc, 'urlName' => $profile->url_name, 'id' => $profile->id], 'https')), ['size' => 20, 'id' => 'text-link']); ?>
 						
 						<h4>Orange Logo Link:</h4>
-						<?= \Eddmash\Clipboard\Clipboard::input($this, 'text', 'URL', Html::a(Html::img(Url::toRoute(['/images/content/ibnet_icon.png'], 'https'), ['alt' => 'IBNet']) . 'Visit us at IBNet', Url::toRoute(['profile/' . ProfileController::$profilePageArray[$profile->type], 'urlLoc' => $profile->url_loc, 'name' => $profile->url_name, 'id' => $profile->id], 'https')), ['size' => 20, 'id' => 'text-logo']); ?>
+						<?= \Eddmash\Clipboard\Clipboard::input($this, 'text', 'URL', Html::a(Html::img(Url::toRoute(['@img.site/ibnet_icon.png'], 'https'), ['alt' => 'IBNet']) . 'Visit us at IBNet', Url::toRoute(['profile/' . ProfileController::$profilePageArray[$profile->type], 'urlLoc' => $profile->url_loc, 'urlName' => $profile->url_name, 'id' => $profile->id], 'https')), ['size' => 20, 'id' => 'text-logo']); ?>
 											
 						<h4>Gray Logo Link:</h4>
-						<?= \Eddmash\Clipboard\Clipboard::input($this, 'text', 'URL', Html::a(Html::img(Url::toRoute(['/images/content/ibnet_icon_gr.png'], 'https'), ['alt' => 'IBNet']) . 'Visit us at IBNet', Url::toRoute(['profile/' . ProfileController::$profilePageArray[$profile->type], 'urlLoc' => $profile->url_loc, 'name' => $profile->url_name, 'id' => $profile->id], 'https')), ['size' => 20, 'id' => 'text-logo-gr']); ?>
+						<?= \Eddmash\Clipboard\Clipboard::input($this, 'text', 'URL', Html::a(Html::img(Url::toRoute(['@img.site/ibnet_icon_gr.png'], 'https'), ['alt' => 'IBNet']) . 'Visit us at IBNet', Url::toRoute(['profile/' . ProfileController::$profilePageArray[$profile->type], 'urlLoc' => $profile->url_loc, 'urlName' => $profile->url_name, 'id' => $profile->id], 'https')), ['size' => 20, 'id' => 'text-logo-gr']); ?>
 					</div>
 
 				</div>

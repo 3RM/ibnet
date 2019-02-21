@@ -1,4 +1,9 @@
 <?php
+/**
+ * @link http://www.ibnet.org/
+ * @copyright  Copyright (c) IBNet (http://www.ibnet.org)
+ * @author Steve McKinley <steve@themckinleys.org>
+ */
 
 namespace common\models\missionary;
 
@@ -17,23 +22,35 @@ use yii\web\UploadedFile;
 /**
  * This is the model class for table "missionary".
  *
- * @property string $id
- * @property string $mission_agcy_id
- * @property string $cp_pastor_at
+ * @property int $id
+ * @property int $user_id
+ * @property string $field
+ * @property string $status
+ * @property int $mission_agcy_id FOREIGN KEY (mission_agcy_id) REFERENCES mission_agcy (id)
+ * @property string $packet
+ * @property int $cp_pastor_at FOREIGN KEY (cp_pastor_at) REFERENCES profile (id)
+ * @property string $repository_key
+ * @property string $mc_token
+ * @property string $mc_key
+ * @property int $viewed_update
  */
 
 class Missionary extends \yii\db\ActiveRecord
 {
     
     /**
-     * @var string $select User selected ministry from AJAX dropdown
-     */
-    public $select;
-
-    /**
      * @var string $showMap Accepts checkbox selection for map display on missionary church plant form
      */
     public $showMap;
+
+    /**
+     * @const int $STATUS_* The missionary field status
+     */
+    const STATUS = [
+        'Deputation' => 'Deputation',
+        'Field' => 'Field',
+        'Furlough' => 'Furlough',
+    ];
 
 
     /**
@@ -47,7 +64,7 @@ class Missionary extends \yii\db\ActiveRecord
     public function scenarios() {
         return[
             'fi' => ['field', 'status'],
-            'cp' => ['select', 'showMap'],
+            'cp' => ['cp_pastor_at', 'showMap'],
             'ma-missionary' => ['mission_agcy_id', 'packet'],
             'ma-chaplain' => ['mission_agcy_id', 'packet'],
         ];
@@ -60,7 +77,7 @@ class Missionary extends \yii\db\ActiveRecord
     {
         return [
             [['field', 'status'], 'required', 'on' => 'fi'],
-            [['select', 'showMap'], 'safe', 'on' => 'cp'],
+            [['cp_pastor_at', 'showMap'], 'safe', 'on' => 'cp'],
             [['mission_agcy_id'], 'required', 'on' => 'ma-missionary'],
             [['packet'], 'file', 'extensions' => 'pdf', 'mimeTypes' => 'application/pdf', 'maxFiles' => 1, 'maxSize' => 1024 * 4000, 'skipOnEmpty' => true, 'on' => 'ma-missionary'],
             
@@ -75,7 +92,7 @@ class Missionary extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'select' => 'Church-Planting Pastor at',
+            'cp_pastor_at' => 'Church-Planting Pastor at',
             'showMap' => 'Show a Google map of this church plant on my profile',
             'mission_agcy_id' => 'Mission Agency',
             'packet' => '',
@@ -89,18 +106,29 @@ class Missionary extends \yii\db\ActiveRecord
      */
     public function handleFormCP($profile)
     {
-
-        if ($this->select != NULL) {
-            if ($this->getOldAttribute('cp_pastor_at') != $this->select) {
-                $this->updateAttributes(['cp_pastor_at' => $this->select]);
+        $oldCP = $this->getOldAttribute('cp_pastor_at');
+        // Removed CP
+        if ($oldCP && ($this->cp_pastor_at == NULL)) {
+            $profile->updateAttributes(['cp_pastor' => NULL]);
+            if ($staff = Staff::find()
+                ->where(['staff_id' => $profile->id])
+                ->andWhere(['ministry_id' => $oldCP])
+                ->andWhere(['staff_type' => $profile->type])
+                ->andWhere(['staff_title' => $profile->sub_type])
+                ->andWhere(['church_pastor' => 1])
+                ->one()) {
+                $staff->delete();
             }
-    
+
+        // Added new CP
+        } elseif ($this->cp_pastor_at && ($this->cp_pastor_at != $oldCP)) {
+            $profile->updateAttributes(['cp_pastor' => 1]);
             if (!$staff = Staff::find()
                 ->where(['staff_id' => $profile->id])
-                ->andWhere(['ministry_id' => $this->select])
-                ->andWhere(['staff_type' => $profile->type])                                        // Allow for different staff roles at same church
-                ->andWhere(['staff_title' => $profile->sub_type])                                       //
-                ->andwhere(['church_pastor' => 1])                                                  // Pastor of church plant
+                ->andWhere(['ministry_id' => $this->cp_pastor_at])
+                ->andWhere(['staff_type' => $profile->type]) // Allow for different staff roles at same church
+                ->andWhere(['staff_title' => $profile->sub_type])
+                ->andwhere(['church_pastor' => 1]) // Pastor of church plant
                 ->one()) {
                 $staff = new Staff();
                 $staff->save();
@@ -112,38 +140,10 @@ class Missionary extends \yii\db\ActiveRecord
                 'ministry_id' => $this->select,
                 'church_pastor' => 1]);
         }
-        
-        $oldMap = $profile->show_map;
-        if ($oldMap == Profile::MAP_CHURCH_PLANT && empty($this->showMap)) {
-            $profile->updateAttributes(['show_map' => NULL]);
-        } elseif (!empty($this->showMap)) {
-            $profile->updateAttributes(['show_map' => Profile::MAP_CHURCH_PLANT]);
-        }
+        $profile->updateMap(Profile::MAP_CHURCH_PLANT);
 
-         return $profile;
-    }
-
-    /**
-     * handleFormCPR: Church Plant Remove
-     * 
-     * @return mixed
-     */
-    public function handleFormCPR($profile)
-    {
-        if ($staff = Staff::find()                                                                  // Remove from Staff table
-            ->where(['staff_id' => $profile->id])
-            ->andWhere(['ministry_id' => $this->cp_pastor_at])
-            ->andWhere(['staff_type' => $profile->type])
-            ->andWhere(['staff_title' => $profile->sub_type])
-            ->andWhere(['church_pastor' => 1])
-            ->one()) {
-            $staff->delete();
-        }
-        $this->updateAttributes(['cp_pastor_at' => NULL]);
-        $this->showMap = $profile->show_map;
-
-        return $this;
-    }    
+        return $profile;
+    }  
 
     /**
      * handleFormMA: Missions Agency
@@ -192,7 +192,7 @@ class Missionary extends \yii\db\ActiveRecord
         }
         
         if ($this->validate() && $this->save() && $profile->setUpdateDate()) {            
-            if (empty($profile->missionary_id)) {
+            if (!isset($profile->missionary)) {
                 $this->link('profile', $profile);
             }
             return $profile;
@@ -329,7 +329,7 @@ class Missionary extends \yii\db\ActiveRecord
      */
     public function getProfile()
     {
-        return $this->hasOne(Profile::className(), ['missionary_id' => 'id']);
+        return $this->hasOne(Profile::className(), ['id' => 'profile_id']);
     }
 
     /**
@@ -349,21 +349,44 @@ class Missionary extends \yii\db\ActiveRecord
     }
 
     /**
-     * @return Array
+     * @return \yii\db\ActiveQuery
      */
-    public function getUpdate()
+    public function getUpdates()
     {
-        return MissionaryUpdate::find()
-            ->where(['missionary_id' => $this->id])
+        return $this->hasMany(MissionaryUpdate::className(), ['missionary_id' => 'id'])
             ->andWhere(['deleted' => 0])
             ->andWhere('to_date >= NOW()')
             ->andWhere(['profile_inactive' => 0])
-            ->orderBy(['created_at' => SORT_DESC])
-            ->all();
+            ->andWhere(['vid_not_accessible' => 0])
+            ->orderBy(['created_at' => SORT_DESC]);
     }
 
     /**
-     * @return Array
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPublicUpdates()
+    {
+        return $this->hasMany(MissionaryUpdate::className(), ['missionary_id' => 'id'])
+            ->andwhere(['deleted' => 0, 'visible' => 1]) 
+            ->andwhere('to_date >= NOW()')
+            ->orderBy(['created_at' => SORT_DESC]);
+    }
+
+    /**
+     * Updates including videos that are marked inaccessible 
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUpdatesAll()
+    {
+        return $this->hasMany(MissionaryUpdate::className(), ['missionary_id' => 'id'])
+            ->andWhere(['deleted' => 0])
+            ->andWhere('to_date >= NOW()')
+            ->andWhere(['profile_inactive' => 0])
+            ->orderBy(['created_at' => SORT_DESC]);
+    }
+
+    /**
+     * @return boolean
      */
     public function setUpdatesActive()
     {
@@ -378,19 +401,5 @@ class Missionary extends \yii\db\ActiveRecord
             $update->updateAttributes(['profile_inactive' => 0]);
         }
         return true;
-    }
-
-    /**
-     * @return Array
-     */
-    public function getPublicUpdate()
-    {
-        return MissionaryUpdate::find()
-            ->where(['missionary_id' => $this->id])
-            ->andwhere(['deleted' => 0])
-            ->andWhere(['visible' => 1])
-            ->andwhere('to_date >= NOW()')
-            ->orderBy(['created_at' => SORT_DESC])
-            ->all();
     }
 }

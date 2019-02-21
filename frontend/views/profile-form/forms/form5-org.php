@@ -19,11 +19,11 @@ $this->title = 'Staff';
 
         <?php $form = ActiveForm::begin(); ?>
 
-        <?php if ($staffArray) { ?>
+        <?php if ($staff) { ?>
 
             <div class="row">
                 <div class="col-md-11">
-                    <?= isset($staffArray[1]) ? '<p>' . Html::icon('search') . ' We found people in the directory who have identified themselves as staff members.  Use the buttons to add or remove them.</p>' :
+                    <?= isset($staff[1]) ? '<p>' . Html::icon('search') . ' We found people in the directory who have identified themselves as staff members.  Use the buttons to add or remove them.</p>' :
                     '<p>' . Html::icon('search') . ' We found a person in the directory who has identified themself as a staff member.  Use the button to add or remove.</p>' ?>
                     <?= Html::activeHiddenInput($profile, 'staff') ?>
                 </div>
@@ -34,27 +34,27 @@ $this->title = 'Staff';
                     <div class="panel panel-default">
                         <div class="panel-heading"><?= $profile->type ?> Staff</div>
                         <table class="table table-hover">
-                            <?php foreach($staffArray as $staff) { ?>
+                            <?php foreach($staff as $stf) { ?>
                             <tr>
-                                <td class="center"><b><?= $staff->staff_title ?></b></td>
-                                <td class="center"><?= $staff->{'profile'}->formattedNames ?></td>
-                                <td class="center"><?= $staff->{'profile'}->ind_city . ', ' . $staff->{'profile'}->ind_st_prov_reg ?></td>
-                                <td class="center"><?= $staff->confirmed == NULL ?
+                                <td class="center"><b><?= $stf->staff_title ?></b></td>
+                                <td class="center"><?= $stf->{'profile'}->mainName ?></td>
+                                <td class="center"><?= $stf->{'profile'}->ind_city . ', ' . $stf->{'profile'}->ind_st_prov_reg ?></td>
+                                <td class="center"><?= $stf->confirmed == NULL ?
                                     'Uncomfirmed' :
                                     'Confirmed Staff' ?></td>
-                                <td class="center"><?= $staff->confirmed == NULL ?
+                                <td class="center"><?= $stf->confirmed == NULL ?
                                     Html::submitButton(HTML::icon('ok') . ' Add', [
                                         'id' => 'add_submit',
                                         'method' => 'POST',
                                         'class' => 'btn btn-form btn-sm',
                                         'name' => 'add',
-                                        'value' => $staff->id,
+                                        'value' => $stf->id,
                                     ]) :
                                     Html::submitButton(HTML::icon('remove') . ' Remove', [
                                         'method' => 'POST',
                                         'class' => 'btn btn-form btn-sm',
                                         'name' => 'remove',
-                                        'value' => $staff->id,
+                                        'value' => $stf->id,
                                     ]); ?>
                                 </td>
                             </tr>

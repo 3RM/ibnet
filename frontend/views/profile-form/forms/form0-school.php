@@ -54,6 +54,8 @@ $this->title = 'School Name and Description';
                     MarkdownEditor::classname(), [
                         'height' => 200, 
                         'options' => ['smarty' => true],
+                        'showExport' => false,
+                        'footerMessage' => false,
                         'toolbar' => $toolbar
                     ]
                 ); ?>

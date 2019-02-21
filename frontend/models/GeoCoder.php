@@ -17,7 +17,7 @@ class GeoCoder extends Model
      * @var string $apiKey Api for geocoding service
      * @return string || array
      */ 
-    public static function getCoordinates($address, $key, $array=NULL) {
+    public static function getCoordinates($address, $key, $array=false) {
         
         // Replace all spaces with "+"
         $address = preg_replace('/\s+/', '+', $address);

@@ -8,7 +8,7 @@ use yii\bootstrap\Html;
 			<div class="right">
 				<ul>
 					<?php foreach ($accreditations as $accreditation) {
-						echo '<li>' . HTML::a($accreditation->association . '&nbsp' . Html::icon('new-window', ['class' => 'internal-link']), $accreditation->website, ['target' => '_blank']) . '</li>';
+						echo '<li>' . HTML::a($accreditation->association . '&nbsp' . Html::icon('new-window', ['class' => 'internal-link']), $accreditation->website, ['target' => '_blank', 'rel' => 'noopener noreferrer']) . '</li>';
 					} ?>
 				</ul>
 			</div>

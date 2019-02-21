@@ -1,4 +1,10 @@
 <?php
+/**
+ * @link http://www.ibnet.org/
+ * @copyright  Copyright (c) IBNet (http://www.ibnet.org)
+ * @author Steve McKinley <steve@themckinleys.org>
+ */
+ 
 namespace common\models\profile;
 
 use common\models\profile\Profile;
@@ -11,7 +17,17 @@ use yii\base\Model;
 use yii\helpers\Html;
 use yii\helpers\Url;
 
-
+/**
+ * This is the model class for table "mail".
+ *
+ * @property int $id
+ * @property int $linking_profile
+ * @property int $profile
+ * @property int $profile_owner
+ * @property string $l_type
+ * @property string $dir
+ * @property string $orig_dir
+ */
 class ProfileMail extends \yii\db\ActiveRecord
 {
 
@@ -33,10 +49,10 @@ class ProfileMail extends \yii\db\ActiveRecord
         Yii::$app
             ->mailer
             ->compose(
-                ['html' => 'profile-transfer-html'], 
+                ['html' => 'profile/profile-transfer-html'], 
                 ['title' => $title, 'msg' => $msg, 'profile' => $profile, 'link' => $link]
             )
-            ->setFrom([\yii::$app->params['adminEmail']])
+            ->setFrom([\yii::$app->params['email.admin']])
             ->setTo([$email])
             ->setSubject($subject)
             ->send();
@@ -59,10 +75,10 @@ class ProfileMail extends \yii\db\ActiveRecord
         Yii::$app
             ->mailer
             ->compose(
-                ['html' => 'notification-html'], 
+                ['html' => 'site/notification-html'], 
                 ['title' => 'New Missionary Update', 'message' => $msg]
             )
-            ->setFrom([\yii::$app->params['adminEmail']])
+            ->setFrom([\yii::$app->params['email.admin']])
             ->setTo($email)
             ->setSubject('IBNet Mailchimp Sync')
             ->send();
@@ -81,10 +97,10 @@ class ProfileMail extends \yii\db\ActiveRecord
         Yii::$app
             ->mailer
             ->compose(
-                ['html' => 'notification-html'], 
+                ['html' => 'site/notification-html'], 
                 ['message' => $msg]
             )
-            ->setFrom([\yii::$app->params['adminEmail']])
+            ->setFrom([\yii::$app->params['email.admin']])
             ->setTo($email)
             ->setSubject('IBNet Forwarding Email')
             ->send();
@@ -105,8 +121,8 @@ class ProfileMail extends \yii\db\ActiveRecord
                 ['html' => 'system/forwarding-email-html'], 
                 ['id' => $id, 'email' => $email, 'email_pvt' => $email_pvt]
             )
-            ->setFrom([\yii::$app->params['no-replyEmail']])
-            ->setTo([\yii::$app->params['adminEmail']])
+            ->setFrom([\yii::$app->params['email.no-reply']])
+            ->setTo([\yii::$app->params['email.admin']])
             ->setSubject('Forwarding Address Request')
             ->send();
 
@@ -126,7 +142,7 @@ class ProfileMail extends \yii\db\ActiveRecord
                 $dir == 'UL' ?
                     $title = 'A Link to your Church Profile has Changed' :
                     $title = 'New Link to your Church Profile';
-                $msg = Html::a($linkingProfile->ind_first_name . ' ' . $linkingProfile->ind_last_name, 
+                $msg = Html::a($linkingProfile->fullName, 
                     Url::toRoute(['profile/' . ProfileController::$profilePageArray[$linkingProfile->type], 
                         'urlLoc' => $linkingProfile->url_loc, 
                         'name' => $linkingProfile->url_name, 
@@ -151,13 +167,10 @@ class ProfileMail extends \yii\db\ActiveRecord
 
             case 'PSHC':                                                                              // Personal Settings Home Church
                 $subject = 'IBNet Church Profile: Church Member Link';
-                $name = $user->screen_name ? 
-                    $linkingProfile->screen_name :
-                    $linkingProfile->first_name . ' ' . $linkingProfile->last_name;
                 $dir == 'UL' ?
                     $title = 'A Link to your Church Profile has Changed' :
                     $title = 'New Link to your Church Profile';
-                $msg = $name;
+                $msg = $linkingProfile->fullName;
                 $dir == 'UL'? 
                     $msg .= ' has just unlinked from ' :
                     $msg .= ' has just linked to ';
@@ -169,10 +182,10 @@ class ProfileMail extends \yii\db\ActiveRecord
                 break;
 
             case 'PM':                                                                                  // Parent Ministry
-                $profile->type == 'Church' ?
+                $profile->type == Profile::TYPE_CHURCH ?
                     $subject = 'IBNet Church Profile: Updated Link' :
                     $subject = 'IBNet Ministry Profile: Updated Link';
-                if ($profile->type == 'Church') {
+                if ($profile->type == Profile::TYPE_CHURCH) {
                     $dir == 'UL' ?
                         $title = 'A Link to your Church Profile has Changed' :
                         $title = 'New Link to your Church Profile';
@@ -182,7 +195,7 @@ class ProfileMail extends \yii\db\ActiveRecord
                         $title = 'New Link to your Ministry Profile';
                 }
                 if ($linkingProfile->category == Profile::CATEGORY_IND) {
-                    $msg = Html::a($linkingProfile->ind_first_name . ' ' . $linkingProfile->ind_last_name, 
+                    $msg = Html::a($linkingProfile->fullName, 
                         Url::toRoute(['profile/' . ProfileController::$profilePageArray[$linkingProfile->type], 
                             'urlLoc' => $linkingProfile->url_loc, 
                             'name' => $linkingProfile->url_name, 
@@ -202,7 +215,7 @@ class ProfileMail extends \yii\db\ActiveRecord
                         'urlLoc' => $profile->url_loc, 
                         'name' => $profile->url_name, 
                         'id' => $profile->id], 'https')) . '.';
-                if ($linkingProfile->category == Profile::CATEGORY_IND && $profile->type == 'Church') {
+                if ($linkingProfile->category == Profile::CATEGORY_IND && $profile->type == Profile::TYPE_CHURCH) {
                     $dir == 'UL'?
                         NULL :
                         $msg .= ' Be sure to visit the ' . Html::a('church staff page', 
@@ -290,7 +303,7 @@ class ProfileMail extends \yii\db\ActiveRecord
                     $title = 'Change to a Linked Minsitry' :
                     $title = 'New Linked Minsitry';
                 $linkingProfile->category == Profile::CATEGORY_IND ?
-                    $msg = Html::a($linkingProfile->ind_first_name . ' ' . $linkingProfile->ind_last_name, 
+                    $msg = Html::a($linkingProfile->fullName, 
                         Url::toRoute(['profile/' . ProfileController::$profilePageArray[$linkingProfile->type], 
                             'urlLoc' => $linkingProfile->url_loc, 
                             'name' => $linkingProfile->url_name, 
@@ -325,7 +338,7 @@ class ProfileMail extends \yii\db\ActiveRecord
                     $title = 'Change to a Linked Missionary' :
                     $title = 'New Linked Missionary';
                 $msg = 'Missionary ';
-                $msg .= Html::a($linkingProfile->ind_first_name . ' ' . $linkingProfile->ind_last_name, 
+                $msg .= Html::a($linkingProfile->fullName, 
                     Url::toRoute(['profile/' . ProfileController::$profilePageArray[$linkingProfile->type], 
                         'urlLoc' => $linkingProfile->url_loc, 
                         'name' => $linkingProfile->url_name, 
@@ -345,7 +358,7 @@ class ProfileMail extends \yii\db\ActiveRecord
                 $dir == 'UL' ?
                     $title = 'Change to a Linked Profile' :
                     $title = 'New Linked Profile';
-                $msg = Html::a($linkingProfile->ind_first_name . ' ' . $linkingProfile->ind_last_name, 
+                $msg = Html::a($linkingProfile->fullName, 
                     Url::toRoute(['profile/' . ProfileController::$profilePageArray[$linkingProfile->type], 
                         'urlLoc' => $linkingProfile->url_loc, 
                         'name' => $linkingProfile->url_name, 
@@ -371,10 +384,10 @@ class ProfileMail extends \yii\db\ActiveRecord
         Yii::$app
             ->mailer
             ->compose(
-                ['html' => 'profile-link-html'],
+                ['html' => 'profile/profile-link-html'],
                 ['title' => $title, 'msg' => $msg, 'profile' => $profile]
             )
-            ->setFrom([\yii::$app->params['adminEmail']])
+            ->setFrom([\yii::$app->params['email.admin']])
             ->setTo([$profileOwner->email])
             ->setSubject($subject)
             ->send();
@@ -396,7 +409,7 @@ class ProfileMail extends \yii\db\ActiveRecord
         $commenter = User::findOne($createdBy);
         $profile = Profile::findOne($id);
         $title = '<b>New Comment</b>';
-        $msg = $commenter->screen_name . ' just left a comment on your profile "' . $profile->profile_name . '". Click ' . 
+        $msg = $commenter->display_name . ' just left a comment on your profile "' . $profile->profile_name . '". Click ' . 
             Html::a('here', 
                 Url::toRoute([
                     'profile/' . ProfileController::$profilePageArray[$profile->type], 
@@ -405,16 +418,16 @@ class ProfileMail extends \yii\db\ActiveRecord
                     'id' => $profile->id,
                     'p' => 'comments', 
                     '#' => 'p'
-                ], ['target' => '_blank'])
+                ], ['target' => '_blank', 'rel' => 'noopener noreferrer'])
             ) . ' to see it.';
         
         Yii::$app
             ->mailer
             ->compose(
-                ['html' => 'notification-html'], 
+                ['html' => 'site/notification-html'], 
                 ['title' => $title, 'message' => $msg]
             )
-            ->setFrom([\yii::$app->params['adminEmail']])
+            ->setFrom([\yii::$app->params['email.admin']])
             ->setTo($user->email)
             ->setSubject('IBNet | New Comment')
             ->send();
@@ -442,18 +455,18 @@ class ProfileMail extends \yii\db\ActiveRecord
                 ->andWhere(['category' => Profile::CATEGORY_IND])
                 ->one()) {
             if (empty($likedByProfile->spouse_first_name)) {
-                $name = $likedByProfile->ind_first_name . ' ' . $likedByProfile->ind_last_name;
+                $name = $likedByProfile->coupleName;
                 $pronoun = ' themself ';
                 $verb = ' has ';
                 $noun = ' a friend ';
             } else {
-                $name = $likedByProfile->ind_first_name . ' & ' . $likedByProfile->spouse_first_name . ' ' . $likedByProfile->ind_last_name;
+                $name = $likedByProfile->coupleName;
                 $pronoun = ' themselves ';
                 $verb = ' have ';
                 $noun = ' friends ';
             }
         } else {
-            $name = $likedBy->screen_name;
+            $name = $likedBy->display_name;
             $pronoun = 'themself';
             $verb = ' has ';
             $noun = ' a friend';
@@ -469,16 +482,16 @@ class ProfileMail extends \yii\db\ActiveRecord
                     'id' => $profile->id,
                     'p' => 'connections', 
                     '#' => 'p'
-                ], ['target' => '_blank'])
+                ], ['target' => '_blank', 'rel' => 'noopener noreferrer'])
             ) . ' to see it.';
         
         Yii::$app
             ->mailer
             ->compose(
-                ['html' => 'notification-html'], 
+                ['html' => 'site/notification-html'], 
                 ['title' => $title, 'message' => $msg]
             )
-            ->setFrom([\yii::$app->params['adminEmail']])
+            ->setFrom([\yii::$app->params['email.admin']])
             ->setTo($profileOwner->email)
             ->setSubject('IBNet | New Connection')
             ->send();
@@ -495,19 +508,19 @@ class ProfileMail extends \yii\db\ActiveRecord
     {
         $profile = Profile::findOne($id);
         $user = User::findOne($profile->user_id);
-        $userName = $user->first_name . ' ' . $user->last_name;
+        $userName = $user->fullName;
         $title = 'Newly Created Profile';
         $msg = 'A profile was just created by ' . $userName . ': ' . $profile->profile_name;
 
         Yii::$app
             ->mailer
             ->compose(
-                ['html' => 'notification-html'], 
+                ['html' => 'site/notification-html'], 
                 ['title' => $title, 'message' => $msg]
             )
-            ->setFrom([\yii::$app->params['adminEmail']])
-            ->setTo([\yii::$app->params['adminEmail']])
-            ->setSubject(Yii::$app->params['emailSubject'])
+            ->setFrom([\yii::$app->params['email.admin']])
+            ->setTo([\yii::$app->params['email.admin']])
+            ->setSubject(Yii::$app->params['email.systemSubject'])
             ->send();
 
         return true;
@@ -522,22 +535,22 @@ class ProfileMail extends \yii\db\ActiveRecord
     {
         $profile = Profile::findOne($id);
         $user = User::findOne($profile->user_id);
-        $userName = $user->first_name . ' ' . $user->last_name;
+        $userName = $user->fullName;
         $title = 'Newly Activated Profile';
         $name = $profile->category == Profile::CATEGORY_IND ?
-            $profile->ind_first_name . ' ' . $profile->ind_last_name :
+            $profile->fullName :
             $profile->org_name;
         $msg = 'A profile was just activated by ' . $userName . ' : ' . $name;
 
         Yii::$app
             ->mailer
             ->compose(
-                ['html' => 'notification-html'], 
+                ['html' => 'site/notification-html'], 
                 ['title' => $title, 'message' => $msg]
             )
-            ->setFrom([\yii::$app->params['adminEmail']])
-            ->setTo([\yii::$app->params['adminEmail']])
-            ->setSubject(Yii::$app->params['emailSubject'])
+            ->setFrom([\yii::$app->params['email.admin']])
+            ->setTo([\yii::$app->params['email.admin']])
+            ->setSubject(Yii::$app->params['email.systemSubject'])
             ->send();
 
         return true;

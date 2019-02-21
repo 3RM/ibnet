@@ -9,16 +9,16 @@ use yii\helpers\HtmlPurifier;
 
     <?php switch ($model->type) { 
     	
-   	case 'Association': ?>
+   	case Profile::TYPE_ASSOCIATION: ?>
 
    		<div class="browse-card">
-			<?= empty($model->image2) ? Html::img('@web/images/content/profile-logo.png') : Html::img($model->image2) ?>
+			<?= empty($model->image2) ? Html::img('@img.profile/profile-logo.png') : Html::img($model->image2) ?>
 			<span class="pull-right"><?= $model->_distance_ ? '(' . round($model->_distance_, 1) . ' mi)' : NULL ?></span>
 	    	<h4>
 	    		<span class="icon"><?= Profile::$icon[$model->type] . ' ' ?></span>
 	    		<?= Html::a($model->org_name, ['/profile/association',
 	    			'urlLoc' => $model->url_loc, 
-	    			'name' => $model->url_name, 
+	    			'urlName' => $model->url_name, 
 	    			'id' => $model->id]) 
 	    		?>
 	    	</h4>
@@ -32,16 +32,16 @@ use yii\helpers\HtmlPurifier;
 		</div>
 
 	<?php break;
-	case 'Camp': ?>
+	case Profile::TYPE_CAMP: ?>
 		    
 		<div class="browse-card">
-			<?= empty($model->image2) ? Html::img('@web/images/content/profile-logo.png') : Html::img($model->image2) ?>
+			<?= empty($model->image2) ? Html::img('@img.profile/profile-logo.png') : Html::img($model->image2) ?>
 			<span class="pull-right"><?= $model->_distance_ ? '(' . round($model->_distance_, 1) . ' mi)' : NULL ?></span>
 	    	<h4>
 	    		<span class="icon"><?= Profile::$icon[$model->type] . ' ' ?></span>
 	    		<?= Html::a($model->org_name, ['/profile/camp',
 	    			'urlLoc' => $model->url_loc, 
-	    			'name' => $model->url_name, 
+	    			'urlName' => $model->url_name, 
 	    			'id' => $model->id]) 
 	    		?>
 	    	</h4>
@@ -55,21 +55,21 @@ use yii\helpers\HtmlPurifier;
 		</div>
 
 	<?php break;
-	case 'Chaplain': ?>
+	case Profile::TYPE_CHAPLAIN: ?>
 
 		<div class="browse-card">
-			<?= empty($model->image2) ? Html::img('@web/images/content/profile-logo.png') : Html::img($model->image2) ?>
+			<?= empty($model->image2) ? Html::img('@img.profile/profile-logo.png') : Html::img($model->image2) ?>
 			<span class="pull-right"><?= $model->_distance_ ? '(' . round($model->_distance_, 1) . ' mi)' : NULL ?></span>
 	    	<h4>
 	    		<span class="icon"><?= Profile::$icon[$model->type] . ' ' ?></span>
 	    		<?= $model->spouse_first_name == NULL ? 
 	        	Html::a($model->ind_first_name . ' ' . $model->ind_last_name, ['/profile/evangelist',
 		    		'urlLoc' => $model->url_loc, 
-		    		'name' => $model->url_name, 
+		    		'urlName' => $model->url_name, 
 		    		'id' => $model->id]) :
 	    		Html::a($model->ind_first_name . ' & ' . $model->spouse_first_name . ' ' . $model->ind_last_name, ['/profile/evangelist',
 		    		'urlLoc' => $model->url_loc, 
-		    		'name' => $model->url_name, 
+		    		'urlName' => $model->url_name, 
 		    		'id' => $model->id]);
 	    	?>
 	    	</h4>
@@ -83,16 +83,16 @@ use yii\helpers\HtmlPurifier;
 		</div>
 
 	<?php break;
-	case 'Church': ?>
+	case Profile::TYPE_CHURCH: ?>
 
 		<div class="browse-card">
-			<?= empty($model->image2) ? Html::img('@web/images/content/profile-logo.png') : Html::img($model->image2) ?>
+			<?= empty($model->image2) ? Html::img('@img.profile/profile-logo.png') : Html::img($model->image2) ?>
 			<span class="pull-right"><?= $model->_distance_ ? '(' . round($model->_distance_, 1) . ' mi)' : NULL ?></span>
 	    	<h4>
 	    		<span class="icon"><?= Profile::$icon[$model->type] . ' ' ?></span>
 	    		<?= Html::a($model->org_name, ['/profile/church',
 	    			'urlLoc' => $model->url_loc, 
-	    			'name' => $model->url_name, 
+	    			'urlName' => $model->url_name, 
 	    			'id' => $model->id]) 
 	    		?>
 	    	</h4>
@@ -106,21 +106,21 @@ use yii\helpers\HtmlPurifier;
 		</div>
 
 	<?php break;
-	case 'Evangelist': ?>
+	case Profile::TYPE_EVANGELIST ?>
 	
 	   	<div class="browse-card">
-			<?= empty($model->image2) ? Html::img('@web/images/content/profile-logo.png') : Html::img($model->image2) ?>
+			<?= empty($model->image2) ? Html::img('@img.profile/profile-logo.png') : Html::img($model->image2) ?>
 			<span class="pull-right"><?= $model->_distance_ ? '(' . round($model->_distance_, 1) . ' mi)' : NULL ?></span>
 	    	<h4>
 	    		<span class="icon"><?= Profile::$icon[$model->type] . ' ' ?></span>
 	    		<?= $model->spouse_first_name == NULL ? 
 	        	Html::a($model->ind_first_name . ' ' . $model->ind_last_name, ['/profile/evangelist',
 		    		'urlLoc' => $model->url_loc, 
-		    		'name' => $model->url_name, 
+		    		'urlName' => $model->url_name, 
 		    		'id' => $model->id]) :
 	    		Html::a($model->ind_first_name . ' & ' . $model->spouse_first_name . ' ' . $model->ind_last_name, ['/profile/evangelist',
 		    		'urlLoc' => $model->url_loc, 
-		    		'name' => $model->url_name, 
+		    		'urlName' => $model->url_name, 
 		    		'id' => $model->id]);
 	    	?>
 	    	</h4>
@@ -134,16 +134,16 @@ use yii\helpers\HtmlPurifier;
 		</div>
 
 	<?php break;
-	case 'Fellowship': ?>
+	case Profile::TYPE_FELLOWSHIP: ?>
 		 
 	  	<div class="browse-card">
-			<?= empty($model->image2) ? Html::img('@web/images/content/profile-logo.png') : Html::img($model->image2) ?>
+			<?= empty($model->image2) ? Html::img('@img.profile/profile-logo.png') : Html::img($model->image2) ?>
 			<span class="pull-right"><?= $model->_distance_ ? '(' . round($model->_distance_, 1) . ' mi)' : NULL ?></span>
 	    	<h4>
 	    		<span class="icon"><?= Profile::$icon[$model->type] . ' ' ?></span>
 	    		<?= Html::a($model->org_name, ['/profile/fellowship',
 	    			'urlLoc' => $model->url_loc, 
-	    			'name' => $model->url_name, 
+	    			'urlName' => $model->url_name, 
 	    			'id' => $model->id]) 
 	    		?>
 	    	</h4>
@@ -157,16 +157,16 @@ use yii\helpers\HtmlPurifier;
 		</div>
 
 	<?php break;
-	case 'Special Ministry': ?>
+	case Profile::TYPE_SPECIAL: ?>
 		 
 	   	<div class="browse-card">
-			<?= empty($model->image2) ? Html::img('@web/images/content/profile-logo.png') : Html::img($model->image2) ?>
+			<?= empty($model->image2) ? Html::img('@img.profile/profile-logo.png') : Html::img($model->image2) ?>
 			<span class="pull-right"><?= $model->_distance_ ? '(' . round($model->_distance_, 1) . ' mi)' : NULL ?></span>
 	    	<h4>
 	    		<span class="icon"><?= Profile::$icon[$model->type] . ' ' ?></span>
 	    		<?= Html::a($model->org_name, ['/profile/special-ministry',
 	    			'urlLoc' => $model->url_loc, 
-	    			'name' => $model->url_name, 
+	    			'urlName' => $model->url_name, 
 	    			'id' => $model->id]) 
 	    		?>
 	    	</h4>
@@ -180,16 +180,16 @@ use yii\helpers\HtmlPurifier;
 		</div>
 
 	<?php break;
-	case 'Mission Agency': ?>
+	case Profile::TYPE_MISSION_AGCY: ?>
 	
 	  	<div class="browse-card">
-			<?= empty($model->image2) ? Html::img('@web/images/content/profile-logo.png') : Html::img($model->image2) ?>
+			<?= empty($model->image2) ? Html::img('@img.profile/profile-logo.png') : Html::img($model->image2) ?>
 			<span class="pull-right"><?= $model->_distance_ ? '(' . round($model->_distance_, 1) . ' mi)' : NULL ?></span>
 	    	<h4>
 	    		<span class="icon"><?= Profile::$icon[$model->type] . ' ' ?></span>
 	    		<?= Html::a($model->org_name, ['/profile/mission-agency',
 	    			'urlLoc' => $model->url_loc, 
-	    			'name' => $model->url_name, 
+	    			'urlName' => $model->url_name, 
 	    			'id' => $model->id]) 
 	    		?>
 	    	</h4>
@@ -203,21 +203,21 @@ use yii\helpers\HtmlPurifier;
 		</div>
 
 	<?php break;
-	case 'Missionary': ?>
+	case Profile::TYPE_MISSIONARY: ?>
 
 	    <div class="browse-card">
-			<?= empty($model->image2) ? Html::img('@web/images/content/profile-logo.png') : Html::img($model->image2) ?>
+			<?= empty($model->image2) ? Html::img('@img.profile/profile-logo.png') : Html::img($model->image2) ?>
 			<span class="pull-right"><?= $model->_distance_ ? '(' . round($model->_distance_, 1) . ' mi)' : NULL ?></span>
 	    	<h4>
 	    		<span class="icon"><?= Profile::$icon[$model->type] . ' ' ?></span>
 	    		<?= $model->spouse_first_name == NULL ? 
 	        	Html::a($model->ind_first_name . ' ' . $model->ind_last_name, ['/profile/missionary',
 		    		'urlLoc' => $model->url_loc, 
-		    		'name' => $model->url_name, 
+		    		'urlName' => $model->url_name, 
 		    		'id' => $model->id]) :
 	    		Html::a($model->ind_first_name . ' & ' . $model->spouse_first_name . ' ' . $model->ind_last_name, ['profile/missionary',
 		    		'urlLoc' => $model->url_loc, 
-		    		'name' => $model->url_name, 
+		    		'urlName' => $model->url_name, 
 		    		'id' => $model->id]);
 	    	?>
 	    	</h4>
@@ -238,16 +238,16 @@ use yii\helpers\HtmlPurifier;
 		</div>
 
 	<?php break;
-	case 'Music Ministry': ?>
+	case Profile::TYPE_MUSIC: ?>
 		  
 	  	<div class="browse-card">
-			<?= empty($model->image2) ? Html::img('@web/images/content/profile-logo.png') : Html::img($model->image2) ?>
+			<?= empty($model->image2) ? Html::img('@img.profile/profile-logo.png') : Html::img($model->image2) ?>
 			<span class="pull-right"><?= $model->_distance_ ? '(' . round($model->_distance_, 1) . ' mi)' : NULL ?></span>
 	    	<h4>
 	    		<span class="icon"><?= Profile::$icon[$model->type] . ' ' ?></span>
 	    		<?= Html::a($model->org_name, ['/profile/music',
 	    			'urlLoc' => $model->url_loc, 
-	    			'name' => $model->url_name, 
+	    			'urlName' => $model->url_name, 
 	    			'id' => $model->id]) 
 	    		?>
 	    	</h4>
@@ -261,21 +261,21 @@ use yii\helpers\HtmlPurifier;
 		</div>
 
 	<?php break;
-	case 'Pastor': ?>
+	case Profile::TYPE_PASTOR: ?>
 	
 	  	<div class="browse-card">
-			<?= empty($model->image2) ? Html::img('@web/images/content/profile-logo.png') : Html::img($model->image2) ?>
+			<?= empty($model->image2) ? Html::img('@img.profile/profile-logo.png') : Html::img($model->image2) ?>
 			<span class="pull-right"><?= $model->_distance_ ? '(' . round($model->_distance_, 1) . ' mi)' : NULL ?></span>
 	    	<h4>
 	    		<span class="icon"><?= Profile::$icon[$model->type] . ' ' ?></span>
 	    		<?= $model->spouse_first_name == NULL ? 
 	        	Html::a($model->ind_first_name . ' ' . $model->ind_last_name, ['/profile/pastor',
 		    		'urlLoc' => $model->url_loc, 
-		    		'name' => $model->url_name, 
+		    		'urlName' => $model->url_name, 
 		    		'id' => $model->id]) :
 	    		Html::a($model->ind_first_name . ' & ' . $model->spouse_first_name . ' ' . $model->ind_last_name, ['/profile/pastor',
 		    		'urlLoc' => $model->url_loc, 
-		    		'name' => $model->url_name, 
+		    		'urlName' => $model->url_name, 
 		    		'id' => $model->id]);
 	    	?>
 	    	</h4>
@@ -289,16 +289,16 @@ use yii\helpers\HtmlPurifier;
 		</div>
 
     <?php break;
-	case 'Print Ministry': ?>
+	case Profile::TYPE_PRINT: ?>
 
 	    <div class="browse-card">
-			<?= empty($model->image2) ? Html::img('@web/images/content/profile-logo.png') : Html::img($model->image2) ?>
+			<?= empty($model->image2) ? Html::img('@img.profile/profile-logo.png') : Html::img($model->image2) ?>
 			<span class="pull-right"><?= $model->_distance_ ? '(' . round($model->_distance_, 1) . ' mi)' : NULL ?></span>
 	    	<h4>
 	    		<span class="icon"><?= Profile::$icon[$model->type] . ' ' ?></span>
 	    		<?= Html::a($model->org_name, ['/profile/print',
 	    			'urlLoc' => $model->url_loc, 
-	    			'name' => $model->url_name, 
+	    			'urlName' => $model->url_name, 
 	    			'id' => $model->id]) 
 	    		?>
 	    	</h4>
@@ -312,16 +312,16 @@ use yii\helpers\HtmlPurifier;
 		</div>
 
 	<?php break;
-	case 'School': ?>
+	case Profile::TYPE_SCHOOL: ?>
 			
 		<div class="browse-card">
-			<?= empty($model->image2) ? Html::img('@web/images/content/profile-logo.png') : Html::img($model->image2) ?>
+			<?= empty($model->image2) ? Html::img('@img.profile/profile-logo.png') : Html::img($model->image2) ?>
 			<span class="pull-right"><?= $model->_distance_ ? '(' . round($model->_distance_, 1) . ' mi)' : NULL ?></span>
 	    	<h4>
 	    		<span class="icon"><?= Profile::$icon[$model->type] . ' ' ?></span>
 	    		<?= Html::a($model->org_name, ['/profile/school',
 	    			'urlLoc' => $model->url_loc, 
-	    			'name' => $model->url_name, 
+	    			'urlName' => $model->url_name, 
 	    			'id' => $model->id]) 
 	    		?>
 	    	</h4>
@@ -335,26 +335,26 @@ use yii\helpers\HtmlPurifier;
 		</div>
 
 	<?php break;
-	case 'Staff': ?>
+	case Profile::TYPE_STAFF: ?>
 	
 	   	<div class="browse-card">
-			<?= empty($model->image2) ? Html::img('@web/images/content/profile-logo.png') : Html::img($model->image2) ?>
+			<?= empty($model->image2) ? Html::img('@img.profile/profile-logo.png') : Html::img($model->image2) ?>
 			<span class="pull-right"><?= $model->_distance_ ? '(' . round($model->_distance_, 1) . ' mi)' : NULL ?></span>
 	    	<h4>
 	    		<span class="icon"><?= Profile::$icon[$model->type] . ' ' ?></span>
 	    		<?= $model->spouse_first_name == NULL ? 
 	        	Html::a($model->ind_first_name . ' ' . $model->ind_last_name, ['/profile/staff',
 		    		'urlLoc' => $model->url_loc, 
-		    		'name' => $model->url_name, 
+		    		'urlName' => $model->url_name, 
 		    		'id' => $model->id]) :
 	    		Html::a($model->ind_first_name . ' (& ' . $model->spouse_first_name . ') ' . $model->ind_last_name, ['/profile/staff',
 		    		'urlLoc' => $model->url_loc, 
-		    		'name' => $model->url_name, 
+		    		'urlName' => $model->url_name, 
 		    		'id' => $model->id]);
 	    	?>
 	    	</h4>
 	    	<div class="text">
-	    		<p><?= $model->title ?></p>
+	    		<p><?= $model->title ?> at <?= $model->ministry_of ? Profile::findOne($model->ministry_of)->org_name : NULL ?></p>
 	    		<p class="loc"><?= $model->ind_city . ', ' ?>
 	    		<?= (empty($model->ind_st_prov_reg) ? NULL : $model->ind_st_prov_reg) .
 	    			($model->ind_country == 'United States' ? NULL : ', ' . $model->ind_country) ?>

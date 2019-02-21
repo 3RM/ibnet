@@ -172,15 +172,13 @@ class AccountsController extends Controller
                 },
             ],
             'usr_image',
-            'screen_name',
+            'display_name',
             'home_church',
-            'role',
-            'ind_act_profiles',
+            'primary_role',
             'emailPrefLinks',
             'emailPrefComments',
             'emailPrefFeatures',
             'emailPrefBlog',
-            'is_missionary',
             'reviewed',
         ];
         

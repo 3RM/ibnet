@@ -30,7 +30,7 @@ $this->title = 'Fellowship / Association';
     
                 <h3>Fellowship</h3>
                 <?= $form->field($profile, 'select')->widget(Select2::classname(), [                 // see customization options here: http://demos.krajee.com/widget-details/select2
-                    'data' => ArrayHelper::map(Fellowship::find()->all(), 'id', 'fellowship'),
+                    'data' => ArrayHelper::map(Fellowship::find()->all(), 'id', 'name'),
                     'language' => 'en',
                     'theme' => 'krajee',
                     'options' => [
@@ -48,13 +48,20 @@ $this->title = 'Fellowship / Association';
             <div class="col-md-2">
                 <?= $form->field($profile, 'acronym')->textInput(['maxlength' => true])->label('Acronym') ?>
             </div>
+            <div class="col-md-2">    
+                <?= HTML::submitbutton(Html::icon('plus') . ' Add', [
+                    'method' => 'POST',
+                    'class' => 'btn btn-form btn-sm btn-lower',
+                    'name' => 'add',
+                ]) ?>
+            </div>
         </div>
 
         <div class="row top-margin">
             <div class="col-md-6">
                 <h3>Association</h3>
                 <?= $form->field($profile, 'selectM')->widget(Select2::classname(), [                 // see customization options here: http://demos.krajee.com/widget-details/select2
-                    'data' => ArrayHelper::map(Association::find()->all(), 'id', 'association'),
+                    'data' => ArrayHelper::map(Association::find()->all(), 'id', 'name'),
                     'language' => 'en',
                     'theme' => 'krajee',
                     'options' => [
@@ -71,6 +78,13 @@ $this->title = 'Fellowship / Association';
             </div>
             <div class="col-md-2">   
                 <?= $form->field($profile, 'aAcronym')->textInput(['maxlength' => true])->label('Acronym') ?>
+            </div>
+            <div class="col-md-2">    
+                <?= HTML::submitbutton(Html::icon('plus') . ' Add', [
+                    'method' => 'POST',
+                    'class' => 'btn btn-form btn-sm btn-lower',
+                    'name' => 'add',
+                ]) ?>
             </div>
         </div>
 

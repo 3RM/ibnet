@@ -7,7 +7,7 @@ use yii\bootstrap\Html;
 			<p>Levels Offered:</p>
 			<div class="right">
 				<ul>
-					<?php foreach ($schoolLevel as $level) {
+					<?php foreach ($schoolLevels as $level) {
 						echo '<li>' . $level['school_level'] . '</li>';
 					} ?>
 				</ul>

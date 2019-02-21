@@ -1,4 +1,10 @@
 <?php
+/**
+ * @link http://www.ibnet.org/
+ * @copyright  Copyright (c) IBNet (http://www.ibnet.org)
+ * @author Steve McKinley <steve@themckinleys.org>
+ */
+ 
 namespace frontend\controllers;
 
 use common\models\Utility;
@@ -26,37 +32,46 @@ class ProfileMailController extends Controller
      */
     public function initSendLink($linkingProfile, $profile, $profileOwner, $lType, $dir)
     {   
-        if ($profileOwner->emailPrefLinks != 1) {                                                   // check if profile owner has email preferences set to receive link notifications
+        // check if profile owner has email preferences set to receive link notifications
+        if ($profileOwner->emailPrefLinks != 1) {
             return true;
         }
 
-        if ($linkingProfile->status != Profile::STATUS_ACTIVE) {                                    // linking profile is new or inactive (don't save for active profiless, emails are sent in real time)
+        // linking profile is new or inactive
+        if ($linkingProfile->status != Profile::STATUS_ACTIVE) {
             
+            // link exists in db
             if ($mail = ProfileMail::find()
                 ->where(['linking_profile' => $linkingProfile->id])
                 ->andWhere(['profile' => $profile->id])
                 ->andWhere(['profile_owner' => $profileOwner->id])
                 ->andWhere(['l_type' => $lType])
-                ->one()) {                                                                          // link exists
-                $mail->dir = $dir;                                                                  // update direction in case it is opposite
+                ->one()) {
+                // Update direction in case it is opposite
+                $mail->dir = $dir;
                 $mail->save();
-            } else {                                                                                // Link doens't exist in db, add it  
+
+            // Link doens't exist in db, add it
+            } else {  
                 $mail = new ProfileMail;
                 $mail->linking_profile = $linkingProfile->id;
                 $mail->profile = $profile->id;
                 $mail->profile_owner = $profileOwner->id;
                 $mail->l_type = $lType;
                 $mail->dir = $dir;
-                if ($mail->orig_dir == NULL) {                                                      // Set original direction to be opposite of current selection
-                    $dir == 'L' ?                                                                       // This will be used at time of send to avoid sending out  
-                        $mail->orig_dir = 'UL' :                                                        // notification for current selection
+                // Set original direction to be opposite of current selection
+                if ($mail->orig_dir == NULL) {
+                    // This will be used at time of send to avoid sending out notification for current selection
+                    $dir == 'L' ?
+                        $mail->orig_dir = 'UL' :
                         $mail->orig_dir = 'L';
                 }
                 $mail->save();
             }
 
+        // profile is active, send notificaiton
         } else {
-            ProfileMail::sendLink($linkingProfile, $profile, $profileOwner, $lType, $dir);           // profile is active, send notificaiton
+            ProfileMail::sendLink($linkingProfile, $profile, $profileOwner, $lType, $dir);
         }
 
         return true;
@@ -73,17 +88,19 @@ class ProfileMailController extends Controller
         $mailArray = ProfileMail::find()->where(['linking_profile' => $id])->all();
         
         foreach ($mailArray as $mail) {
-        
-            if ($mail->dir == $mail->orig_dir) {                                                    // Don't send if link direction is the same as original direction
+            
+            // Don't send if link direction is the same as original direction
+            if ($mail->dir == $mail->orig_dir) {
                 $mail->delete();
                 break;
             }
                         
-            $linkingProfile = ProfileController::findProfile($mail->linking_profile);
-            $profile = ProfileController::findActiveProfile($mail->profile);
+            $linkingProfile = Profile::findProfile($mail->linking_profile);
+            $profile = Profile::findActiveProfile($mail->profile);
             $profileOwner = $profile->user;
 
-            if ($mail->dir == 'UL' && $linkingProfile->status == Profile::STATUS_NEW) {             // Don't send if link direction is unlink and profile status is new
+            // Don't send if link direction is unlink and profile status is new
+            if ($mail->dir == 'UL' && $linkingProfile->status == Profile::STATUS_NEW) {
                 $mail->delete();
                 break;
             }

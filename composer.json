@@ -39,6 +39,7 @@
         "kartik-v/yii2-widget-datepicker": "@dev",
         "dektrium/yii2-rbac": "1.0.0-alpha@dev",
         "eddmash/yii2-clipboard": "@dev",
+        "yiisoft/yii2-authclient": "^2.0@dev",
         "sammaye/yii2-yiichimp": "^1.0",
         "geocoder-php/google-maps-provider": "^4.0@dev",
         "php-http/guzzle6-adapter": "^2.0@dev",

@@ -1,4 +1,9 @@
 <?php
+/**
+ * @link http://www.ibnet.org/
+ * @copyright  Copyright (c) IBNet (http://www.ibnet.org)
+ * @author Steve McKinley <steve@themckinleys.org>
+ */
 
 namespace common\models\profile;
 
@@ -10,11 +15,10 @@ use yii\data\ActiveDataProvider;
 use yii\db\Query;
 
 /**
- * ProfileBrowse represents the model behind the browse form.
+ * ProfileBrowse handles the browse function for `common\models\profile\Profile`
  */
 class ProfileBrowse extends Profile
 {
-    
     /**
      * @var int $distance length of search radius
      */
@@ -34,7 +38,6 @@ class ProfileBrowse extends Profile
      * @var float $lng Longitude returned by geocoder
      */
     public $lng;
-
 
     public function scenarios() {
         return[
@@ -124,4 +127,5 @@ class ProfileBrowse extends Profile
 
         return $dataProvider;
     }
+
 }

@@ -14,7 +14,7 @@ if ($events != NULL) {
 ?>
 
 <?= Yii::$app->user->id == $profile->user_id ? 
-	'You can add events to your timeline on your ' . Html::a('profile history page', ['profile-mgmt/history', 'id' => $profile->id], ['target' => '_blank']) . '</em>' : 
+	'You can add events to your timeline on your ' . Html::a('profile history page', ['profile-mgmt/history', 'id' => $profile->id], ['target' => '_blank', 'rel' => 'noopener noreferrer']) . '</em>' : 
 	NULL; ?>
 
 <ul id='timeline'>
@@ -44,6 +44,6 @@ if ($events != NULL) {
 
 <?php } else {
 	echo Yii::$app->user->id == $profile->user_id ?
-		'<em>No events recorded.  You can add events to your timeline on your ' . Html::a('profiles history page', ['profile-mgmt/history', 'id' => $profile->id], ['target' => '_blank']) . '</em>' :
+		'<em>No events recorded.  You can add events to your timeline on your ' . Html::a('profiles history page', ['profile-mgmt/history', 'id' => $profile->id], ['target' => '_blank', 'rel' => 'noopener noreferrer']) . '</em>' :
 		'<em>No events recorded.</em>';
 } ?>

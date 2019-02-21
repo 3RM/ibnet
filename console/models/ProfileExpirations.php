@@ -20,9 +20,8 @@ class ProfileExpirations extends Model
     public function getTwoWeeksProfiles()
     {
         return Profile::find()
-            ->select('*')
             ->where(['status' => PROFILE::STATUS_ACTIVE])
-            ->andwhere('renewal_date=DATE_ADD(CURDATE(), INTERVAL 14 DAY)')
+            ->andWhere('renewal_date=DATE_ADD(CURDATE(), INTERVAL 14 DAY)')
             ->all();
     }
 
@@ -34,9 +33,8 @@ class ProfileExpirations extends Model
     public function getGraceProfiles()
     {
         return Profile::find()
-            ->select('*')
             ->where(['status' => PROFILE::STATUS_ACTIVE])
-            ->andwhere('renewal_date=DATE_SUB(CURDATE(), INTERVAL 1 DAY)')
+            ->andWhere('renewal_date=DATE_SUB(CURDATE(), INTERVAL 1 DAY)')
             ->all();
     }
 
@@ -48,9 +46,8 @@ class ProfileExpirations extends Model
     public function getExpiredProfiles()
     { 
         return Profile::find()
-            ->select('*')
             ->where(['status' => PROFILE::STATUS_ACTIVE])
-            ->andwhere('renewal_date=DATE_SUB(CURDATE(), INTERVAL 8 DAY)')
+            ->andWhere('renewal_date=DATE_SUB(CURDATE(), INTERVAL 8 DAY)')
             ->all();
     }
 }

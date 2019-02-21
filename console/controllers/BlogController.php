@@ -8,9 +8,6 @@ use fedemotta\cronjob\models\CronJob;
 use yii\console\Controller;
 use yii\helpers\ArrayHelper;
 
-/**
- * Blog controller
- */
 class BlogController extends Controller
 {
     
@@ -30,8 +27,23 @@ class BlogController extends Controller
             foreach ($dates as $date) {
                 if ($posts = WpPosts::getWeeksPosts()) {
                     $users = User::find()->where(['status' => User::STATUS_ACTIVE, 'emailPrefBlog' => 1])->andWhere('email IS NOT NULL')->all();
+                    
                     foreach ($users as $user) {
-                        Mail::sendWeeklyBlog($user, $posts);
+                        $emailPrefLink = Html::a('click here', \Yii::$app->params['frontendUrl'] . '/site/login?url=' . \Yii::$app->params['frontendUrl'] . '/site/settings/#account-settings', ['target' => '_blank'])
+                        Yii::$app
+                            ->mailer
+                            ->compose(
+                                ['html' => 'blog/weekly-blog-html', 'text' => 'blog/weekly-blog-text'], 
+                                [
+                                    'title' => 'This Week\'s Blog Posts', 
+                                    'message' => 'Read the latest articles from the IBNet Blog: ', 
+                                    'posts' => $posts, 
+                                    'emailPrefLink' => $emailPrefLink
+                                ])
+                            ->setFrom([\Yii::$app->params['blogDigestEmail']])
+                            ->setTo($user->email)
+                            ->setSubject('IBNet Blog')
+                            ->send();
                     }
                 }
             }

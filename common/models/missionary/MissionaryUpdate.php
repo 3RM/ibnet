@@ -1,28 +1,42 @@
 <?php
+/**
+ * @link http://www.ibnet.org/
+ * @copyright  Copyright (c) IBNet (http://www.ibnet.org)
+ * @author Steve McKinley <steve@themckinleys.org>
+ */
 
 namespace common\models\missionary;
 
+use common\models\User;
 use common\models\Utility;
+use common\models\network\NetworkMember;
+use common\models\profile\Profile;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
-use yii\helpers\Json;
 use yii\web\UploadedFile;
 
 /**
  * This is the model class for table "missionary_update".
  *
- * @property string $id
- * @property string $missionary_id
- * @property string $created_at
+ * @property int $id
+ * @property int $missionary_id FOREIGN KEY (missionary_id) REFERENCES  missionary (id)
+ * @property int $created_at
+ * @property int $updated_at
  * @property string $title
  * @property string $pdf
- * @property string $youtube_link
- * @property string $vimeo_link
+ * @property string $mailchimp_url
+ * @property string $youtube_url
+ * @property string $vimeo_url
+ * @property string $thumbnail
  * @property string $description
- * @property string $start_date
- * @property string $end_date
+ * @property string $from_date
+ * @property string $to_date
+ * @property int $visible
+ * @property int $deleted
+ * @property int $vid_not_accessible
+ * @property int $profile_inactive
  */
 class MissionaryUpdate extends \yii\db\ActiveRecord
 {
@@ -102,7 +116,7 @@ class MissionaryUpdate extends \yii\db\ActiveRecord
     	if ($this->validate()) {
 
     		$this->from_date = new Expression('CURDATE()');
-    		if ($this->editActive != NULL) {
+    		if (NULL != $this->editActive) {
     			$this->active = $this->editActive;
     		}
 
@@ -129,39 +143,12 @@ class MissionaryUpdate extends \yii\db\ActiveRecord
     				break;
     		}      	
 
-    	// ************************* Validate Vimeo Url *****************************
-        	if ($this->vimeo_url) {  // https://developer.vimeo.com/apis/oembed
-
-        		$vimeo_oembed_url = 'https://vimeo.com/api/oembed.json?url=';
-        		$url = $vimeo_oembed_url . $this->vimeo_url;
-        		$res = Utility::get($url);
-        		if ($res == '404 Not Found') {
-        			Yii::$app->session->setFlash('danger', 'The Url you supplied does not appear to be a valid Vimeo Url. Please contact us if you think this is in error.');
-        			return false;
-        		}
-        		$decoded = Json::decode($res);
-        		if (!is_array($decoded) || !isset($decoded['html'])) {
-        			Yii::$app->session->setFlash('danger', 'The Url you supplied does not appear to be a valid Vimeo Url. Please contact us if you think this is in error.');
-        			return false;
-        		}
-        		$this->thumbnail = ($decoded['thumbnail_url'] != NULL) ? $decoded['thumbnail_url'] : NULL;
-
-    	// ************************** Validate Youtube Url *************************
-        	} elseif ($this->youtube_url) {
-
-        		$youtube_oembed_url = 'http://www.youtube.com/oembed?format=json&url=';
-        		$url = $youtube_oembed_url . $this->youtube_url;
-        		$res = Utility::get($url);
-        		if ($res == '404 Not Found') {
-        			Yii::$app->session->setFlash('danger', 'The Url you supplied does not appear to be a valid Youtube Url. Please contact us if you think this is in error.');
-        			return false;
-        		}
-        		$decoded = Json::decode($res);
-        		if (!is_array($decoded) || !isset($decoded['html'])) {
-        			Yii::$app->session->setFlash('danger', 'The Url you supplied does not appear to be a valid Youtube Url. Please contact us if you think this is in error.');
-        			return false;
-        		}
-        		$this->thumbnail = ($decoded['thumbnail_url'] != NULL) ? $decoded['thumbnail_url'] : NULL;
+    	// ************************* Validate Video Url *****************************
+        	if ($this->vimeo_url || $this->youtube_url) {
+                if (!$this->thumbnail = $this->getVideo(false, true)) {
+                    Yii::$app->session->setFlash('danger', 'The Url you supplied does not appear to be a valid Vimeo Url. Ensure your video privacy settings allow embedding. Please contact us if you think this is in error.');
+                    return false;
+                }        	
       
         // ************************* Process PDF upload *****************************
     		} elseif ($pdf = UploadedFile::getInstance($this, 'pdf')) {                           // Create subfolders on server and store uploaded pdf
@@ -185,7 +172,10 @@ class MissionaryUpdate extends \yii\db\ActiveRecord
         	    $this->pdf = $this->getOldAttribute('pdf');
         	}
 
-    		if (($this->edit == NULL) && ($this->pdf == NULL) && ($this->vimeo_url == NULL) && ($this->youtube_url == NULL)) {
+    		if ((NULL == $this->edit) 
+                && (NULL == $this->pdf) 
+                && (NULL == $this->vimeo_url) 
+                && (NULL == $this->youtube_url)) {
     			Yii::$app->session->setFlash('info', 'Your update was not saved.  Be sure to upload a pdf or video link.');
     		} else {
     			$this->save();
@@ -194,12 +184,84 @@ class MissionaryUpdate extends \yii\db\ActiveRecord
     	}
     }
 
+    /**
+     * Call video API
+     *
+     * If video is retrievable:
+     *    Clear vid_not_accessible if set
+     *    Return embed coded if $thumbnail = false
+     *    Return thumbnail url if $thumbnal = true
+     * If video is not retrievable:
+     *    Set vid_not_accessible if clear
+     *    Return false if $errorImage=false
+     *    Return error image html if $errorImage=true
+     *
+     * Default is return embed code | false
+     *
+     * @return mixed
+     */
+    public function getVideo($errorImage=false, $thumb=false)
+    {
+        if ($this->vimeo_url) {
+            $url = 'https://vimeo.com/api/oembed.json?url=' . $this->vimeo_url;
+        } elseif ($this->youtube_url) {
+            $url = 'http://www.youtube.com/oembed?format=json&url=' . $this->youtube_url;
+        }
+        $res = Utility::get($url);
+        if (('404 Not Found' == $res) || ('Not Found' == $res)) {
+            if (0 == $this->vid_not_accessible) {
+                $this->updateAttributes(['vid_not_accessible' => 1]);
+            }
+            return $errorImage ? Html::img('@img.network/broken-vid.jpg', ['style' => 'width:100%']) : false;
+        } else {
+            if (1 == $this->vid_not_accessible) {
+                $this->updateAttributes(['vid_not_accessible' => 0]);
+            }
+            return $thumb ? json_decode($res)->thumbnail_url : json_decode($res)->html;
+        }
+    }
+
+
+
     /*
-     * Links a missionary update to its missionary record
      * @return \yii\db\ActiveQuery
      */
     public function getMissionary()
     {
         return $this->hasOne(Missionary::className(), ['id' => 'missionary_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUser()
+    {
+        return $this->hasOne(User::className(), ['id' => 'user_id'])
+            ->via('missionary');
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getNetworkMember()
+    {
+        return $this->hasOne(NetworkMember::className(), ['missionary_id' => 'missionary_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getNetworkMemberProfile()
+    {
+        return $this->hasOne(Profile::className(), ['id' => 'profile_id'])
+            ->via('networkMember');
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFullName()
+    {
+        return $this->user->fullName;
     }
 }

@@ -7,12 +7,10 @@ use yii\bootstrap\Html;
 			<p>Fellowship(s):</p>
 			<div class="right">
 				<ul>
-					<?php foreach ($flwshipArray as $fellowship) {
-						if ($flwshipLink = Profile::findOne($fellowship->profile_id)) {
-							echo '<li>' . Html::a($fellowship->fellowship . '&nbsp' . Html::icon('link', ['class' => 'internal-link']), ['profile/fellowship', 'id' => $flwshipLink->id, 'urlLoc' => $flwshipLink->url_loc, 'name' => $flwshipLink->url_name], ['title' => $fellowship->fellowship_acronym]) . '</li>';
-						} else {
-							echo '<li>' . Html::tag('span', $fellowship->fellowship, ['title' => $fellowship->fellowship_acronym]) . '</li>';
-						}
+					<?php foreach ($fellowships as $flwship) {
+						echo $flwship->linkedProfile ?
+							'<li>' . Html::a($flwship->name . '&nbsp' . Html::icon('link', ['class' => 'internal-link']), ['profile/fellowship', 'id' => $flwship->linkedProfile->id, 'urlLoc' => $flwship->linkedProfile->url_loc, 'urlName' => $flwship->linkedProfile->url_name], ['title' => $flwship->acronym]) . '</li>' :
+							'<li>' . Html::tag('span', $flwship->name, ['title' => $flwship->acronym]) . '</li>';
 					} ?>
 				</ul>
 			</div>

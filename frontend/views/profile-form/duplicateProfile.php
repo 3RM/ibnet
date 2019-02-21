@@ -19,13 +19,13 @@ $this->title = 'Duplicate Profile?';
 		<div class="bg-info col-md-4" style="padding:10px; margin:0 0 10pt 20pt">
 			<?php if ($profile->category == Profile::CATEGORY_IND) { ?>
 				<p>
-					<?= Html::a('<h4>' . $duplicate->ind_first_name . ' ' . $duplicate->ind_last_name . '</h4>', [
+					<?= Html::a('<h4>' . $duplicate->fullName . '</h4>', [
 						'/profile/view-profile',
 			   			'id' => $duplicate->id,
-			   			'name' => $duplicate->url_name,
+			   			'urlName' => $duplicate->url_name,
 			   			'urlLoc' => $duplicate->url_loc,
 			   		],
-			   		['target' => '_blank']) ?>
+			   		['target' => '_blank', 'rel' => 'noopener noreferrer']) ?>
 					<?= $duplicate->ind_address1 . ', '
 					. ($duplicate->ind_address2 != NULL ? ($duplicate->ind_address2 . ', ') : '')
 					. ($duplicate->ind_po_box != NULL ? ('PO Box ' . $duplicate->ind_po_box . ', ') : '')
@@ -36,10 +36,10 @@ $this->title = 'Duplicate Profile?';
 					<?= Html::a('<h4>' . $duplicate->org_name . '</h4>', [
 						'/profile/view-profile',
 			   			'id' => $duplicate->id,
-			   			'name' => $duplicate->url_name,
+			   			'urlName' => $duplicate->url_name,
 			   			'urlLoc' => $duplicate->url_loc,
 			   		],
-			   		['target' => '_blank']) ?>
+			   		['target' => '_blank', 'rel' => 'noopener noreferrer']) ?>
 					<?= $duplicate->org_address1 . ', '
 					. ($duplicate->org_address2 != NULL ? ($duplicate->org_address2 . ', ') : '')
 					. ($duplicate->org_po_box != NULL ? ('PO Box ' . $duplicate->org_po_box . ', ') : '') 
@@ -51,11 +51,11 @@ $this->title = 'Duplicate Profile?';
 
 	<p>If this profile is different from the one above,	please 
 		<?= HTML::a('edit', Url::to(['form2', 'profileId' => $profile->id])) ?>
-		the name and address to make it unique.  If it is a duplicate entry, return
-		to <?= HTML::a('My Profiles', Url::to(['my-profiles', 'profileId' => $profile->id])) ?>
+		the name and address to make it unique.  If it is a duplicate entry, return to 
+		<?= HTML::a('My Profiles', Url::to(['my-profiles', 'profileId' => $profile->id])) ?>
 		where you can delete this entry. If you feel that this message is in error, 
-		please use the <?= HTML::a('Contact Form', Url::to(['site/contact'])) ?> and let us know 
-		so that we can resolve this issue.
+		please use the <?= HTML::a('Contact Form', Url::to(['site/contact'])) ?> or email us at 
+		admin@ibnet.org and let us know so that we can resolve this issue.
 	</p>
 
 	<p>&nbsp;</p>

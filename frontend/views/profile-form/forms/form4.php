@@ -50,7 +50,7 @@ $this->title = 'Contact Information';
                         'header' => '<h3>Create a Forwarding Email Address</h3>',
                         'toggleButton' => [
                             'id' => 'request-email',
-                            'label' => Html::img('@web/images/message-plus.png'),
+                            'label' => Html::img('@img.profile/message-plus.png'),
                             'class' => 'btn btn-primary']
                     ]); ?>
                         <div class="modal-body">

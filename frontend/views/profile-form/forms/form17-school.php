@@ -21,7 +21,7 @@ $this->title = 'School Accreditation or Association';
 
         <?php $form = ActiveForm::begin(); ?>
 
-        <p><?= Html::icon('info-sign') ?> Is your accreditation or association missing?  Please <?= Html::a('let us know', ['/site/contact'], ['target' => '_blank']) ?> so we can add it.</p>
+        <p><?= Html::icon('info-sign') ?> Is your accreditation or association missing?  Please <?= Html::a('let us know', ['/site/contact'], ['target' => '_blank', 'rel' => 'noopener noreferrer']) ?> so we can add it.</p>
 
         <div class="row">
             <div class="col-md-8">

@@ -3,6 +3,7 @@
 use frontend\assets\AjaxAsset;
 use kartik\select2\Select2;
 use yii\bootstrap\Html;
+use yii\bootstrap\Modal;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 
@@ -11,20 +12,43 @@ use yii\widgets\ActiveForm;
 AjaxAsset::register($this);
 \Eddmash\Clipboard\ClipboardAsset::register($this);
 ?>
-<?= $this->render('../site/_userAreaHeader', ['menuItems' => $menuItems, 'active' => 'update']) ?>
+<?= $this->render('../site/_userAreaHeader', ['active' => 'update']) ?>
 <div class="container">
     <?= $this->render('../site/_userAreaLeftNav', ['active' => 'updates']) ?>
 
     <div class="right-content">
+        <div id="video-container" class="feature-video-container" <?= $displayNone ?>>
+            <?php Modal::begin([
+                'header' => '',
+                'id' => 'videoModal',
+                'toggleButton' => [
+                    'label' => 'Watch Video',
+                    'alt' => 'Flag innapropriate content',
+                    'class' => 'btn-primary'],
+                'headerOptions' => ['class' => 'modal-header'],
+                'bodyOptions' => ['class' => 'link-modal-body'],
+                ]); ?>
+                <div class="videoWrapper">
+                    <iframe id="video" src="https://player.vimeo.com/video/261478010?byline=0&portrait=0" width="640" height="341" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>                    
+                </div>
+            <?php Modal::end() ?>
+            <?= Html::a('<i class="fa fa-close"></i>', ['ajax/viewed', 'mid' => $missionary->id], [
+                'id' => 'viewed-id', 
+                'data-on-done' => 'viewedDone',
+            ]); ?>
+            <?php $this->registerJs("$('#viewed-id').click(handleAjaxSpanLink);", \yii\web\View::POS_READY); ?>
+        </div>
+
         <h2>Missionary Updates</h2>
 
         <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
         <div class="repo-url">
+            <?= '' // 'Private Url to share with your mailing list:<br>' . \Eddmash\Clipboard\Clipboard::input($this, 'text', 'url', $repo_url, ['id' => 'repository_link', 'readonly' => true]) ?>
             <?= 'Private Url to share with your mailing list:<br>' . \Eddmash\Clipboard\Clipboard::input($this, 'text', 'url', $repo_url, ['id' => 'repository_link', 'readonly' => true]) ?>
         </div>
         <div class="repo-links">
             <?= Html::submitButton(Html::icon('refresh') . ' Generate new url', ['class' => 'repo-url-refresh', 'name' => 'new_url', 'onclick' => 'return confirm("Are you sure? This will lock out everyone who has bookmarked this link to access your updates.")']) ?>
-            <?= Html::a(Html::icon('new-window') . ' Take me there', $repo_url, ['target' => '_blank']) ?>
+            <?= Html::a(Html::icon('new-window') . ' Take me there', $repo_url, ['target' => '_blank', 'rel' => 'noopener noreferrer']) ?>
         </div>
 
         <?php if ($profileActive) { ?>
@@ -87,7 +111,7 @@ AjaxAsset::register($this);
                                         <div class="row">
                                             <div class="col-md-2">
                                                 <?php if ($update->mailchimp_url) {
-                                                    echo Html::img('@images/content/freddie-small.png');
+                                                    echo Html::img('@img.user-area/freddie-small.png');
                                                 } elseif ($update->pdf) {
                                                     echo '<span class="filetypes filetypes-pdf repo-table-icon"></span>';
                                                 } elseif ($update->youtube_url) {
@@ -142,7 +166,7 @@ AjaxAsset::register($this);
                             <tr id=<?= '"' . $update->id . '"' ?>>
                                 <td>
                                     <?php if ($update->mailchimp_url) {
-                                        echo Html::img('@images/content/freddie-small.png', ['class' => 'mc-icon']);
+                                        echo Html::img('@img.user-area/freddie-small.png', ['class' => 'mc-icon']);
                                     } elseif ($update->pdf) {
                                         echo '<span class="filetypes filetypes-pdf repo-table-icon"></span>';
                                     } elseif ($update->youtube_url) {
@@ -161,6 +185,7 @@ AjaxAsset::register($this);
                                     </div>
                                     <?= $update->description ? '<p>' . $update->description . '</p>' : NULL; ?>
                                     <?= empty($update->pdf) ? NULL : \Eddmash\Clipboard\Clipboard::input($this, 'text', 'url', Url::base(true) . $update->pdf, ['id' => 'update_link_' . $update->id, 'readonly' => true])?>
+                                    <?= (1 == $update->vid_not_accessible) ? '<div class="alert alert-danger">' . Html::icon('warning-sign') . ' We could not retrieve this video. Ensure your video privacy settings allow embedding on this site.</div>' : NULL; ?>
                                     <?= empty($update->thumbnail) ? NULL : Html::img($update->thumbnail, ['class' => 'repo-thumb']); ?>
                                 </td>
                                 <td>
@@ -191,7 +216,7 @@ AjaxAsset::register($this);
                                             ]) ?>
                                     </div>
                                     <?php $this->registerJs("$('#visible-result-" . $update->id . "').on('click', '#visible-" . $update->id . "', handleAjaxSpanLink);", \yii\web\View::POS_READY); ?>
-                                    </td>
+                                </td>
                             </tr>
                         <?php }                           
                     } ?>
@@ -210,5 +235,22 @@ AjaxAsset::register($this);
     $(document).ready(function(){
             console.log($('#hash').val());
             location.hash = "#"+$('#hash').val();           
+    });
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        /* Get iframe src attribute value i.e. YouTube video url and store it in a variable */
+        var url = $("#video").attr('src');
+        
+        /* Assign empty url value to the iframe src attribute when modal hide, which stop the video playing */
+        $("#videoModal").on('hide.bs.modal', function(){
+            $("#video").attr('src', '');
+        });
+        
+        /* Assign the initially stored url back to the iframe src attribute when modal is displayed again */
+        $("#videoModal").on('show.bs.modal', function(){
+            $("#video").attr('src', url);
+        });
     });
 </script>

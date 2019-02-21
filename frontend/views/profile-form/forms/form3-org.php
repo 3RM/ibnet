@@ -115,7 +115,7 @@ $this->title = $title;
             </div>
             <div class="col-md-3">
                 <?= $form->field($profile, 'org_po_country')->widget(Select2::classname(), [
-                    'data' => ArrayHelper::map(Country::find()->all(), 'printable_name', 'printable_name'),
+                    'data' => $list,
                     'language' => 'en',
                     'theme' => 'krajee',
                     'options' => ['placeholder' => 'Select a country ...'],

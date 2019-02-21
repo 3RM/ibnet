@@ -7,8 +7,8 @@ use yii\bootstrap\Html;
 			<p>Ministries:</p>
 			<div class="right">
 				<ul>
-				<?php foreach ($ministryArray as $ministry) {
-					echo '<li>' . Html::a($ministry->org_name . '&nbsp' . Html::icon('link', ['class' => 'internal-link']), ['profile/' . ProfileController::$profilePageArray[$ministry->type], 'id' => $ministry->id, 'urlLoc' => $ministry->url_loc, 'name' => $ministry->url_name]) . '</li>';
+				<?php foreach ($ministries as $ministry) {
+					echo '<li>' . Html::a($ministry->org_name . '&nbsp' . Html::icon('link', ['class' => 'internal-link']), ['profile/' . ProfileController::$profilePageArray[$ministry->type], 'id' => $ministry->id, 'urlLoc' => $ministry->url_loc, 'urlName' => $ministry->url_name]) . '</li>';
 				} ?>
 				</ul>
 			</div>

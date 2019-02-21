@@ -1,4 +1,10 @@
 <?php
+/**
+ * @link http://www.ibnet.org/
+ * @copyright  Copyright (c) IBNet (http://www.ibnet.org)
+ * @author Steve McKinley <steve@themckinleys.org>
+ */
+
 namespace frontend\controllers;
 
 use common\models\AccountSettings;
@@ -9,7 +15,7 @@ use common\models\profile\Profile;
 use common\models\profile\ProfileBrowse;
 use common\models\profile\ProfileMail;
 use common\models\profile\ProfileSearch;
-use common\models\Role;
+use common\models\PrimaryRole;
 use common\models\User;
 use common\models\Utility;
 use frontend\controllers\ProfileController;
@@ -218,15 +224,15 @@ class SiteController extends Controller
         $searchModel = new ProfileSearch();
 
         if ($searchModel->load(Yii::$app->request->Post()) &&
-            $searchModel->term != '') {                                                         // Render index if user enters a blank search string
-        
-                $term = $searchModel->term;     // Consider adding ~ to key words for fuzzy search 
-                return $this->redirect(['/profile/search', 'term' => $term]);
+            $searchModel->term != '') {
+            $term = $searchModel->term; 
+            return $this->redirect(['/profile/search', 'term' => $term]);
         } else {
         
             $term = '';
 
-            $profiles = Profile::find()                                                             // Get new profiles for box 3 and add to session
+            // Get new profiles for box 3 and add to session
+            $profiles = Profile::find()
                 ->select('*')
                 ->where(['status' => PROFILE::STATUS_ACTIVE])
                 ->andwhere('created_at>DATE_SUB(NOW(), INTERVAL 14 DAY)')
@@ -237,8 +243,8 @@ class SiteController extends Controller
 
             $session = Yii::$app->session;
             $session->open('profiles');
-            $session->open('count');                                                                 // Total number of profiles
-            $session->open('i');                                                                     // Profile number to show
+            $session->open('count'); // Total number of profiles
+            $session->open('i'); // Profile number to show
             $session->set('profiles', $profiles);
             $session->set('count', $count);
             $session->set('i', $i);
@@ -341,7 +347,7 @@ class SiteController extends Controller
     {
         $model = new ContactForm();
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            if ($model->sendEmail(Yii::$app->params['adminEmail'])) {
+            if ($model->sendEmail(Yii::$app->params['email.admin'])) {
                 Yii::$app->session->setFlash('success', 'Thank you for contacting us. We will respond to you as soon as possible.');
             } else {
                 Yii::$app->session->setFlash('error', 'There was an error sending email.');
@@ -378,8 +384,37 @@ class SiteController extends Controller
         $model = new RegisterForm();
         if ($model->load(Yii::$app->request->post())) {
             if ($user = $model->register()) {                
-                Mail::sendVerificationEmail($user->username);
-                Mail::sendAdminNewUser($user->username);                                            // Send admin notice of new user registration
+
+                // Send email verification email
+                $user->generateNewEmailToken();
+                $link = Yii::$app->urlManager->createAbsoluteUrl(['site/registration-complete', 
+                    'token' => $user->new_email_token]);
+                Yii::$app->mailer
+                    ->compose(
+                        ['html' => 'site/notification-html', 'text' => 'site/notification-text'],
+                        [
+                            'title' => 'Complete your registration with IBNet.org', 
+                            'message' => 'Follow this link to complete your registration: ' . $link,
+                        ])
+                    ->setFrom(Yii::$app->params['email.admin'])
+                    ->setTo($user->new_email)
+                    ->setSubject(Yii::$app->params['email.systemSubject'])
+                    ->send();
+
+                // Notify admin of new user
+                Yii::$app
+                    ->mailer
+                    ->compose(
+                        ['html' => 'site/notification-html', 'text' => 'notification-text'], 
+                        [
+                            'title' => 'New User Registration', 
+                            'message' => 'A new user has registered at IBNet: ' . $user->fullName
+                        ])
+                    ->setFrom([\yii::$app->params['email.admin']])
+                    ->setTo([\yii::$app->params['email.admin']])
+                    ->setSubject(Yii::$app->params['email.systemSubject'])
+                    ->send();
+                    
                 return $this->render('completeRegistration');
             }
         }
@@ -417,9 +452,9 @@ class SiteController extends Controller
      *
      * @return mixed
      */
-    public function actionRegistrationComplete($token=null)
+    public function actionRegistrationComplete($token=NULL)
     {
-        if (!empty($token) && $user = User::findByNewEmailToken($token)) {                          // Complete user registration
+        if (!empty($token) && $user = User::findByNewEmailToken($token)) {
             if ($user->isNewEmailTokenValid($token)) {
                 $user->updateAttributes([
                     'new_email_token' => NULL,
@@ -429,14 +464,15 @@ class SiteController extends Controller
                 $user->scenario = 'emailPref';
                 return $this->render('registrationComplete', ['user' => $user]);
             }
-        } elseif ($user = Yii::$app->user->identity) {                                              // Check for logged in user
-            if ($user->load(Yii::$app->request->Post()) &&                                          // Load post data from email preferences
+        } elseif ($user = Yii::$app->user->identity) {
+            // Load post data from email preferences
+            if ($user->load(Yii::$app->request->Post()) &&
                 $user->validate() && 
                 $user->save()) {
                 return $this->redirect('settings');
             }
         }
-        return $this->render('invalidToken');                                                   // No posted data; already registered
+        return $this->render('invalidToken');
     }
 
     /**
@@ -493,7 +529,7 @@ class SiteController extends Controller
     }
 
     /**
-     * Resets password.
+     * Resets password
      *
      * @param string $token
      * @return mixed
@@ -517,7 +553,7 @@ class SiteController extends Controller
     }
 
     /**
-     * New email confirmed.
+     * New email confirmed
      *
      * @param string $token
      * @return mixed
@@ -542,22 +578,24 @@ class SiteController extends Controller
      */
     public function actionSettings()
     {
-        $userP = Yii::$app->user->identity;                                                         // Personal user settings
+        // Personal user settings
+        $userP = Yii::$app->user->identity;
         $userP->scenario = 'personal';
 
-        $userA = Yii::$app->user->identity;                                                         // Account user settings
+        // Account user settings
+        $userA = Yii::$app->user->identity;
         $userA->scenario = 'account';
 
-        if ($userP->role == NULL) {
-            $userP->role = 'Church Member';                                                          // Set default role
+        // Set default role
+        if ($userP->primary_role == NULL) {
+            $userP->primary_role = 'Church Member';
         }
         $home_church = NULL;
-        if ($userP->home_church != NULL) {
-            if ($hc = ProfileController::findActiveProfile($userP->home_church)) {
-                $home_church = $hc->org_name . ', ' . $hc->org_city . ', ' . $hc->org_st_prov_reg;
-            }
+        if (($userP->home_church != NULL)
+            && ($hc = Profile::findActiveProfile($userP->home_church))) {
+            $home_church = $hc->org_name . ', ' . $hc->org_city . ', ' . $hc->org_st_prov_reg;
         }
-        $list = ArrayHelper::map(Role::find()->all(), 'role', 'role', 'type');
+        $list = ArrayHelper::map(PrimaryRole::find()->all(), 'role', 'role', 'type');
 
         return $this->render('settings', [
             'userP' => $userP,
@@ -568,27 +606,56 @@ class SiteController extends Controller
         ]);
     }
 
+    /**
+     * Personal settings form submit redirects here
+     * @return mixed
+     */
     public function actionPersonalSettings()
     {
-        $user = Yii::$app->user->identity;                                                          // Personal user settings
+        $user = Yii::$app->user->identity;
         $user->scenario = 'personal';
 
         if ($user->load(Yii::$app->request->Post())) {
             $user->validate(); 
-            if ($user->role == NULL) {
-                $user->role = 'Church Member';                                                      // Set default role
+            if ($user->primary_role == NULL) {
+                // Set default role
+                $user->primary_role = 'Church Member';
             }
-            $oldId = $user->getOldAttribute('home_church');
+
+            // Update roles
+            $role = array_keys(Yii::$app->authManager->getRolesByUser($user->id))[0];            
+            if ($user->home_church && ($role == User::ROLE_USER)) {  
+                // Revoke current SafeUser role
+                $auth = Yii::$app->authManager;
+                $item = $auth->getRole(User::ROLE_USER);
+                $auth->revoke($item, $user->id);  
+                // Home church identified; Upgrade user role to SafeUser         
+                $auth = Yii::$app->authManager;
+                $userRole = $auth->getRole('SafeUser');
+                $auth->assign($userRole, $user->id);
+            
+            } elseif (!$user->home_church && !$user->hasIndActiveProfile && ($role == User::ROLE_SAFEUSER)) {
+                // Revoke current SafeUser role
+                $auth = Yii::$app->authManager;
+                $item = $auth->getRole(User::ROLE_SAFEUSER);
+                $auth->revoke($item, $user->id);
+                // Assign User role
+                $auth = Yii::$app->authManager;
+                $userRole = $auth->getRole(USER::ROLE_USER);
+                $auth->assign($userRole, $user->id);
+            }
             $user->save();
 
-            if ($user->home_church && $user->home_church != $oldId) {                               // Notify church profile owner of new link
-                $church = ProfileController::findActiveProfile($user->home_church);
+            // Notify church profile owner of new link
+            $oldChurch = $user->getOldAttribute('home_church');
+            if ($user->home_church && $user->home_church != $oldChurch) {
+                $church = Profile::findActiveProfile($user->home_church);
                 $churchProfOwner = User::findOne($church->user_id);
                 if ($churchProfOwner && $churchProfOwner->emailPrefLinks == 1) {
                     ProfileMail::sendLink($user, $church, $churchProfOwner, 'PSHC', 'L');
                 }
-                if ($oldId) {
-                    $oldChurch = ProfileController::findActiveProfile($oldId);
+                if ($oldChurch) {
+                    $oldChurch = Profile::findActiveProfile($oldChurch);
                     $oldChurchProfOwner = User::findOne($oldChurch->user_id);
                     if ($oldChurchProfOwner && $oldChurchProfOwner->emailPrefLinks == 1) {
                         ProfileMail::sendLink($user, $oldChurch, $oldChurchProfOwner, 'PSHC', 'UL');
@@ -602,7 +669,8 @@ class SiteController extends Controller
 
     public function actionAccountSettings()
     {
-        $user = Yii::$app->user->identity;                                                          // Personal user settings
+        // Personal user settings
+        $user = Yii::$app->user->identity;
         $user->scenario = 'account';
 
         if ($user->load(Yii::$app->request->Post()) &&

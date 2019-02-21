@@ -18,8 +18,8 @@ $progress = $profile->getProgress();
         <h1><?= Html::encode($this->title) ?></h1>
         <div class = "col-md-4">
             <div class="progress" >
-                <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="<?= $progressPercent ?>" aria-valuemin="0" aria-valuemax="100" style="width:<?= $progressPercent ?>%"><span style="color:#444"><?= $progressPercent ?>%</span>
-                    <span class="sr-only"><?= $progressPercent ?>% Complete</span>
+                <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="<?= $pp ?>" aria-valuemin="0" aria-valuemax="100" style="width:<?= $pp ?>%"><span style="color:#444"><?= $pp ?>%</span>
+                    <span class="sr-only"><?= $pp ?>% Complete</span>
                 </div>
             </div>
         </div>

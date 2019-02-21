@@ -45,32 +45,32 @@ $this->title = 'Large Picture';
         <div class="row">
             <h2>Or choose an image below:</h2>
 
-            <p><?= HTML::submitbutton(Html::img('@web/images/content/banner1.jpg'), [
+            <p><?= HTML::submitbutton(Html::img('@img.profile/banner1.jpg'), [
                     'method' => 'POST',
                     'class' => 'btn forms-btn-banner',
                     'name' => 'banner1',
                 ]) ?></p>
-            <p><?= HTML::submitbutton(Html::img('@web/images/content/banner2.jpg'), [
+            <p><?= HTML::submitbutton(Html::img('@img.profile/banner2.jpg'), [
                     'method' => 'POST',
                     'class' => 'btn forms-btn-banner',
                     'name' => 'banner2',
                 ]) ?></p>
-            <p><?= HTML::submitbutton(Html::img('@web/images/content/banner3.jpg'), [
+            <p><?= HTML::submitbutton(Html::img('@img.profile/banner3.jpg'), [
                     'method' => 'POST',
                     'class' => 'btn forms-btn-banner',
                     'name' => 'banner3',
                 ]) ?></p>
-            <p><?= HTML::submitbutton(Html::img('@web/images/content/banner4.jpg'), [
+            <p><?= HTML::submitbutton(Html::img('@img.profile/banner4.jpg'), [
                     'method' => 'POST',
                     'class' => 'btn forms-btn-banner',
                     'name' => 'banner4',
                 ]) ?></p>
-            <p><?= HTML::submitbutton(Html::img('@web/images/content/banner5.jpg'), [
+            <p><?= HTML::submitbutton(Html::img('@img.profile/banner5.jpg'), [
                     'method' => 'POST',
                     'class' => 'btn forms-btn-banner',
                     'name' => 'banner5',
                 ]) ?></p>
-            <p><?= HTML::submitbutton(Html::img('@web/images/content/banner6.jpg'), [
+            <p><?= HTML::submitbutton(Html::img('@img.profile/banner6.jpg'), [
                     'method' => 'POST',
                     'class' => 'btn forms-btn-banner',
                     'name' => 'banner6',

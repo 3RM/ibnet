@@ -399,12 +399,6 @@ class DirectoryController extends Controller
             'polity',
             'packet',
             'inappropriate',
-            'service_time_id',
-            'social_id',
-            'flwship_id',
-            'ass_id',
-            'miss_housing_id',
-            'missionary_id'
         ];
         
         return $this->render('view', [

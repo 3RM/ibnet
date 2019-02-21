@@ -1,4 +1,9 @@
 <?php
+/**
+ * @link http://www.ibnet.org/
+ * @copyright  Copyright (c) IBNet (http://www.ibnet.org)
+ * @author Steve McKinley <steve@themckinleys.org>
+ */
 
 namespace common\models\profile;
 
@@ -7,15 +12,27 @@ use Yii;
 /**
  * This is the model class for table "social".
  *
- * @property string $id
- * @property string $social
+ * @property int $id
+ * @property string $facebook
+ * @property string $instagram
+ * @property string $flickr
+ * @property string $linkedin
+ * @property string $pinterest
+ * @property string $rss
+ * @property string $sermonaudio
+ * @property string $soundcloud
+ * @property string $tumblr
+ * @property string $twitter
+ * @property string $vimeo
+ * @property string $youtube
+ * @property int $reviewed
  */
 class Social extends \yii\db\ActiveRecord
 {
     /**
      * @inheritdoc
      */
-    public static function Social()
+    public static function tableName()
     {
         return 'social';
     }
@@ -26,7 +43,7 @@ class Social extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['sermonaudio', 'facebook', 'linkedin', 'twitter', 'google', 'rss', 'youtube', 'vimeo', 'pinterest', 'tumblr', 'soundcloud', 'instagram', 'flickr'], 'url', 'defaultScheme' => 'http', 'skipOnEmpty' =>true],
+            [['sermonaudio', 'facebook', 'linkedin', 'twitter', 'rss', 'youtube', 'vimeo', 'pinterest', 'tumblr', 'soundcloud', 'instagram', 'flickr'], 'url', 'defaultScheme' => 'http', 'skipOnEmpty' =>true],
         ];
     }
 
@@ -42,8 +59,7 @@ class Social extends \yii\db\ActiveRecord
             'sermonaudio' => 'SermonAudio',
             'facebook' => 'Facebook', 
             'linkedin' => 'LinkedIn', 
-            'twitter' => 'Twitter', 
-            'google' => 'Google+', 
+            'twitter' => 'Twitter',  
             'rss' => 'RSS', 
             'youtube' => 'YouTube', 
             'vimeo' => 'Vimeo', 
@@ -60,7 +76,7 @@ class Social extends \yii\db\ActiveRecord
      */
     public function getProfile()
     {
-        return $this->hasOne(Profile::className(), ['social_id' => 'id']);
+        return $this->hasOne(Profile::className(), ['id' => 'profile_id']);
     }
 
 }

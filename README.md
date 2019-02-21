@@ -1,11 +1,11 @@
-![cutter](https://ibnet.org/images/ibnet-large-color.png)
+![cutter](https://ibnet.org/images/site/ibnet-large-color.png)
 
 -------------------
 ### ibnet.org | Independent Baptist Network
 
 Independent Baptist Network is an online community of Independent Baptists.
 
-The IBNet application is built on the Yii2 framework using the [Advanced Project Template](http://www.yiiframework.com/). Documentation is at [docs/guide/README.md](docs/guide/README.md).
+The IBNet application is built on the [Yii2 framework](https://www.yiiframework.com/) using the [Advanced Project Template](https://www.yiiframework.com/extension/yiisoft/yii2-app-advanced/doc/guide/2.0/en).
 
 It includes three tiers: 
  * front end - the main site
@@ -15,40 +15,36 @@ It includes three tiers:
 each of which is a separate Yii application.
 
 
-DIRECTORY STRUCTURE
+New Yii Installation
 -------------------
+### Install Yii with advanced template
+[Follow the Yii Guide](https://www.yiiframework.com/extension/yiisoft/yii2-app-advanced/doc/guide/2.0/en/start-installation)
 
+
+Want to Contribute?
+-------------------
+Contributions are welcome!
+
+###Clone this Repository
+This installation assumes Ubuntu server and php7.
+
+### Configure the app
+ * common/config/main-local.php (db and mailer)
+ * frontend/config/main-local.php (set unique cookie validation key)
+
+### Run Migrations
 ```
-common
-    config/              contains shared configurations
-    mail/                contains view files for e-mails
-    models/              contains model classes used in both backend and frontend
-    tests/               contains tests for common classes    
-console
-    config/              contains console configurations
-    controllers/         contains console controllers (commands)
-    migrations/          contains database migrations
-    models/              contains console-specific model classes
-    runtime/             contains files generated during runtime
-backend
-    assets/              contains application assets such as JavaScript and CSS
-    config/              contains backend configurations
-    controllers/         contains Web controller classes
-    models/              contains backend-specific model classes
-    runtime/             contains files generated during runtime
-    tests/               contains tests for backend application    
-    views/               contains view files for the Web application
-    web/                 contains the entry script and Web resources
-frontend
-    assets/              contains application assets such as JavaScript and CSS
-    config/              contains frontend configurations
-    controllers/         contains Web controller classes
-    models/              contains frontend-specific model classes
-    runtime/             contains files generated during runtime
-    tests/               contains tests for frontend application
-    views/               contains view files for the Web application
-    web/                 contains the entry script and Web resources
-    widgets/             contains frontend widgets
-vendor/                  contains dependent 3rd-party packages
-environments/            contains environment-based overrides
+php yii migrate 
+php yii migrate --migrationPath=@fedemotta/cronjob/migrations
+php yii migrate/up --migrationPath=@vendor/rmrevin/yii2-comments/migrations/
+php yii migrate --migrationPath=@vendor/uguranyum/yii2-icalender/migration --interactive=0
 ```
+
+### Send a pull request
+
+
+Have Ideas for New Features and Improvements?
+-------------------
+Create a new issue
+
+Did you find a bug?  Create a new issue.

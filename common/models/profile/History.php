@@ -1,7 +1,13 @@
 <?php
+/**
+ * @link http://www.ibnet.org/
+ * @copyright  Copyright (c) IBNet (http://www.ibnet.org)
+ * @author Steve McKinley <steve@themckinleys.org>
+ */
 
 namespace common\models\profile;
 
+use sadovojav\cutter\behaviors\CutterBehavior;
 use Yii;
 
 /**
@@ -25,6 +31,18 @@ class History extends \yii\db\ActiveRecord
         return 'history';
     }
 
+    public function behaviors()
+    {   
+        return [
+            'image' => [
+                'class' => CutterBehavior::className(),
+                'attributes' => ['event_image'],
+                'baseDir' => '/uploads/image',
+                'basePath' => '@webroot',
+            ],
+        ];
+    }
+
     /**
      * @inheritdoc
      */
@@ -35,6 +53,7 @@ class History extends \yii\db\ActiveRecord
             [['title'], 'string', 'max' => 50],
             [['description'], 'string', 'max' => 1000],
             [['title', 'description'], 'filter', 'filter' => 'strip_tags'],
+            [['event_image'], 'image', 'extensions' => 'jpg, jpeg, gif, png', 'mimeTypes' => 'image/jpeg, image/png', 'maxFiles' => 1, 'maxSize' => 1024 * 4000, 'skipOnEmpty' => true],
         ];
     }
 
@@ -47,6 +66,7 @@ class History extends \yii\db\ActiveRecord
             'date' => 'Event Date',
             'title' => 'Event Title',
             'description' => 'Description (optional)',
+            'event_image' => 'Image (optional)',
         ];
     }
 

@@ -1,4 +1,9 @@
 <?php
+/**
+ * @link http://www.ibnet.org/
+ * @copyright  Copyright (c) IBNet (http://www.ibnet.org)
+ * @author Steve McKinley <steve@themckinleys.org>
+ */
 
 namespace common\models\profile;
 
@@ -9,12 +14,21 @@ use yii\helpers\ArrayHelper;
 /**
  * This is the model class for table "type".
  *
- * @property string $id
- * @property string $type
+ * @property int $id
+ * @property int $staff_id FOREIGN KEY (staff_id) REFERENCES profile (id)
+ * @property string $staff_type
+ * @property string $staff_title
+ * @property int $ministry_id FOREIGN KEY (ministry_id) REFERENCES profile (id)
+ * @property int $home_church
+ * @property int $church_pastor
+ * @property int $ministry_of
+ * @property int $ministry_other
+ * @property int $sr_pastor
+ * @property int $confirmed
+ * @property int $reviewed
  */
 class Staff extends \yii\db\ActiveRecord
 {
-    public $staffNames;                     // Names in the format "First (& Spouse) Last" or "First Last"
 
     /**
      * @inheritdoc
@@ -25,21 +39,25 @@ class Staff extends \yii\db\ActiveRecord
     }
 
     /**
-     * Return ind_names in format "First (& Spouse) Last" if spouse
-     * or "First Last" if no spouse
-     * Assumes 'profile' is a sub object resulting from a join
-     * 
-     * @return string
+     * @var string $type profile or ministry type
      */
-    public function getStaffNames()
-    {
-        if ($this->spouse != NULL) {
-            $this->staffNames = $this->first . ' (& ' . $this->spouse . ') ' . $this->last;
-        } else {
-            $this->formattedNames = $this->first . ' ' . $this->last;
-        }
-        return $this;
-    }
+    public $type;
+
+    /**
+     * @var string $name profile or ministry org_name
+     */
+    public $name;
+
+    /**
+     * @var string $urlLoc profile or ministry urlLoc
+     */
+    public $urlLoc;
+
+    /**
+     * @var string $urlName profile or ministry urlName
+     */
+    public $urlName;
+
 
     /**
      * @return array
@@ -66,56 +84,5 @@ class Staff extends \yii\db\ActiveRecord
     public function getMinistry()
     {
         return $this->hasOne(Profile::className(), ['id' => 'ministry_id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getOtherMinistries($id)
-    {
-        if ($ministries = self::find()
-            ->where(['staff_id' => $id])
-            ->andWhere(['ministry_other' => 1])
-            ->andWhere(['confirmed' => 1])
-            ->orderBy('id Asc')
-            ->all()) {
-            $i = 0;
-            foreach ($ministries as $mstry) {                                                          // Combine multiple staff titles for same ministry
-                if ($i > 0 && ($mstry['ministry_id'] == $ministries[$i-1]['ministry_id'])) {
-                    $ministries[$i-1]['staff_title'] .= ' & ' . $mstry['staff_title'];
-                    unset($ministries[$i]);
-                    $ministries = array_values($ministries);
-                    continue;
-                }
-                $i++;
-            }
-            $ids = ArrayHelper::getColumn($ministries, 'ministry_id');
-            $names = ArrayHelper::getColumn($ministries, 'staff_title');
-            $otherMinistryArray = Profile::findAll($ids);
-
-            $i = 0;
-            foreach ($otherMinistryArray as $min) {
-                $min->titleM = $names[$i];
-                $i++;
-            }
-            return $otherMinistryArray;
-        }
-        return NULL;
-    }    
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getSrPastor($id)
-    {
-        if ($staff = self::find()
-            ->where(['ministry_id' => $id])
-            ->andWhere(['sr_pastor' => 1])
-            ->andWhere(['confirmed' => 1])
-            ->one()) {
-            $pastor = $staff->profile;
-            return $pastor->status == Profile::STATUS_ACTIVE ? $pastor : NULL;
-        }
-        return NULL;
     }
 }

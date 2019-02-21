@@ -1,4 +1,9 @@
 <?php
+/**
+ * @link http://www.ibnet.org/
+ * @copyright  Copyright (c) IBNet (http://www.ibnet.org)
+ * @author Steve McKinley <steve@themckinleys.org>
+ */
 
 namespace common\models\profile;
 
@@ -14,7 +19,10 @@ use yii\db\Query;
  */
 class ProfileSearch extends Profile
 {
-    public $term;                                                                                   // User entered search string
+    /**
+     * @param string $term User entered search string
+     */
+    public $term;
    
     /**
      * @inheritdoc
@@ -22,6 +30,7 @@ class ProfileSearch extends Profile
     public function rules()
     {
         return [
+            ['term', 'string', 'max' => 20],
             ['term', 'filter', 'filter' => 'strip_tags'],
         ];
     }

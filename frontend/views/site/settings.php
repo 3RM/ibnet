@@ -12,20 +12,20 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 ?>
-<?= $this->render('_userAreaHeader', ['menuItems' => $menuItems, 'active' => 'settings']) ?>
+<?= $this->render('_userAreaHeader', ['active' => 'settings']) ?>
 <div class="container">
     <?= $this->render('../site/_userAreaLeftNav', ['active' => 'settings']) ?>
 
     <div class="right-content">
-        <h2>Personal Settings</h2>
+        <h2>Profile Settings</h2>
         <div class="personal-settings">
             <?= empty($userP->usr_image) ?
-                Html::img('@web/images/content/user.png', ['class' => 'img-circle']) :
+                Html::img('@img.site/user.png', ['class' => 'img-circle']) :
                 Html::img($userP->usr_image, ['class' => 'img-circle']); ?>
             <div class="personal-info">
-                <p class="lead"><b>Display Name:</b> <?= $userP->screen_name ?></p>
+                <p class="lead"><b>Display Name:</b> <?= $userP->display_name ?></p>
                 <p class="lead"><b>Home Church:</b> <?= $home_church ?></p>
-                <p class="lead"><b>Primary Role:</b> <?= $userP->role ?></p>
+                <p class="lead"><b>Primary Role:</b> <?= $userP->primary_role ?></p>
                 <p class="lead"><b>Joined:</b> <?= Yii::$app->formatter->asDate($userP->created_at, 'php:F Y') ?></p>
             </div> 
         </div>
@@ -40,7 +40,7 @@ use yii\widgets\ActiveForm;
         <div class="row edit-personal" style="display: none;">
             <div class="col-md-6 settings-form">
                     
-                <?= $form->field($userP, 'screen_name')->textInput(['maxlength' => true]) ?>
+                <?= $form->field($userP, 'display_name')->textInput(['maxlength' => true]) ?>
                 <?php echo $form->field($userP, 'home_church')->widget(Select2::classname(), [ 
                     'options' => ['placeholder' => 'Search by name or city...'],
                     'initValueText' => $home_church ? $home_church : 'Search ...', 
@@ -51,7 +51,7 @@ use yii\widgets\ActiveForm;
                             'errorLoading' => new JsExpression("function () { return 'Waiting for results...'; }"),
                         ],
                         'ajax' => [
-                            'url' => Url::to(['profile-form/church-list-ajax']),
+                            'url' => Url::to(['ajax/search']),
                             'dataType' => 'json',
                             'data' => new JsExpression('function(params) { return {q:params.term}; }')
                         ],
@@ -73,7 +73,7 @@ use yii\widgets\ActiveForm;
                     ],
                 ]); ?>
                 
-                <?= $form->field($userP, 'role')->widget(Select2::classname(), [
+                <?= $form->field($userP, 'primary_role')->widget(Select2::classname(), [
                     'data' => $list,
                     'language' => 'en',
                     'theme' => 'krajee',

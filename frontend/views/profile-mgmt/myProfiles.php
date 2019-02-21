@@ -18,8 +18,8 @@ use yii\widgets\ActiveForm;
     
         <?= Html::a(Html::icon('plus') . ' New Profile', ['profile-mgmt/terms'], ['class' => 'btn btn-primary']) ?>
 
-        <?php if ($profileArray) { ?>
-            <?php foreach($profileArray as $profile) { ?>
+        <?php if ($profiles) { ?>
+            <?php foreach($profiles as $profile) { ?>
                 <div class="profile-card">
                     <div class="profile-card-header">
                         <div class="profile-title">
@@ -40,16 +40,11 @@ use yii\widgets\ActiveForm;
                     <div class="profile-card-body">
                         <div class="profile-info">
                             <div class="picture-name">
-                                <?= empty($profile->image2) ? Html::img('@web/images/content/profile-logo.png', ['class' => '', 'alt' => 'Logo Image']) : Html::img($profile->image2, ['class' => '', 'alt' => 'Logo image']) ?>
-                                <?php if ($profile->status == Profile::STATUS_ACTIVE) {
-                                    echo $profile->category == Profile::CATEGORY_IND ?
-                                        '<h1>' . Html::a($profile->formattedNames . '&nbsp' . Html::icon('new-window', ['class' => 'internal-link']), ['profile/' . ProfileController::$profilePageArray[$profile->type], 'id' => $profile->id, 'urlLoc' => $profile->url_loc, 'name' => $profile->url_name], ['target' => '_blank', 'rel' => 'noopener noreferrer']) . '</h1>' :
-                                        '<h1>' . Html::a($profile->org_name . '&nbsp' . Html::icon('new-window', ['class' => 'internal-link']), ['profile/' . ProfileController::$profilePageArray[$profile->type], 'id' => $profile->id, 'urlLoc' => $profile->url_loc, 'name' => $profile->url_name], ['target' => '_blank', 'rel' => 'noopener noreferrer']) . '</h1>';
-                                } else {
-                                    echo $profile->category == Profile::CATEGORY_IND ?
-                                        '<h1>' . $profile->formattedNames . '</h1>' :
-                                        '<h1>' . $profile->org_name . '</h1>';
-                                } ?>
+                                <?= empty($profile->image2) ? Html::img('@img.profile/profile-logo.png', ['class' => '', 'alt' => 'Logo Image']) : Html::img($profile->image2, ['class' => '', 'alt' => 'Logo image']) ?>
+                                <?= $profile->status == Profile::STATUS_ACTIVE ?
+                                    '<h1>' . Html::a($profile->formatName . '&nbsp' . Html::icon('new-window', ['class' => 'internal-link']), ['profile/' . ProfileController::$profilePageArray[$profile->type], 'id' => $profile->id, 'urlLoc' => $profile->url_loc, 'urlName' => $profile->url_name], ['target' => '_blank', 'rel' => 'noopener noreferrer']) . '</h1>' :
+                                    '<h1>' . $profile->formatName . '</h1>';
+                                ?>
                             </div>
                             <?php if (time() > strtotime($profile->renewal_date) && ($profile->status == Profile::STATUS_ACTIVE)) {                           // Profile is in grace period
                                 echo '<div class="notification"><p>This profile is set to expire soon. ' . Html::a('Click here', ['preview/view-preview', 'id' => $profile->id]) . ' and hit the update button to keep it active.</p></div>';

@@ -12,12 +12,11 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 /* @var $profilemodel app\models\Profile */
 
-\Eddmash\Clipboard\ClipboardAsset::register($this);
 $this->title = 'My Account';
 $menuItems = [
     ['label' => '<span class="glyphicons glyphicons-settings"></span> Settings', 'url' => ['/site/settings']],
     ['label' => '<span class="glyphicons glyphicons-vcard"></span> Profiles', 'url' => ['/profile-mgmt/my-profiles']],
-    ['label' => '<span class="glyphicons glyphicons-direction"></span> Updates', 'url' => ['/missionary/update-repository'], ['visible' => Yii::$app->user->identity->is_missionary]],
+    ['label' => '<span class="glyphicons glyphicons-direction"></span> Updates', 'url' => ['/missionary/update-repository'], ['visible' => Yii::$app->user->identity->isMissionary]],
 ];
 ?>
 <div class="account-header-container">
@@ -58,7 +57,7 @@ $menuItems = [
         
         <p>Click on Freddie below.  You will be taken to MailChimp to login.  Upon successful login, you will be sent back here to complete the setup.</p>
         <p><?= Html::icon('info-sign') ?> You may experience a "server error" on this step or the next if you're on a slow internet connection.  If you experience this error, please try again and on a faster connection when possible.</p>
-        <div class="mailchimp"><?= Html::a(Html::img('@images/content/freddie.png'), ['missionary/mailchimp-authorize']) ?></div>
+        <div class="mailchimp"><?= Html::a(Html::img('@img.user-area/freddie.png'), ['missionary/mailchimp-authorize']) ?></div>
 
         <?php $form = ActiveForm::begin(); ?>
         <div class="row top-margin">

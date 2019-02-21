@@ -10,6 +10,6 @@ use yii\helpers\Url;
 			<?= $update->description ? '<p>' . $update->description . '</p>' : NULL ?>
 			
 			<div class="update-video-wrapper">
-				<?= $update->videoHtml ?>
+				<?= $update->getVideo(true) ?>
 			</div>
 		</div>

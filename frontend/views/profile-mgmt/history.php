@@ -1,5 +1,6 @@
 <?php
 
+use common\models\profile\Profile;
 use common\widgets\Alert;
 use frontend\controllers\ProfileController;
 use kartik\date\DatePicker;
@@ -28,7 +29,7 @@ $this->title = 'My Account';
     <h2 class="top-margin-60"><span class="glyphicons glyphicons-history"></span> Ministry Timeline</h2> 
     For profile <span class="lead">"<?= $profile->profile_name ?>"</span>
     <br><br>
-    <?= $profile->url_loc ? '<p>' . Html::a('View my timeline ' . Html::icon('new-window', ['class' => 'internal-link']), ['/profile/' . ProfileController::$profilePageArray[$profile->type], 'id' => $profile->id, 'urlLoc' => $profile->url_loc, 'name' => $profile->url_name, 'p' => 'history', '#' => 'p'], ['target' => '_blank']) . '</p>' : NULL; ?>
+    <?= $profile->status == Profile::STATUS_ACTIVE ? '<p>' . Html::a('View my timeline ' . Html::icon('new-window', ['class' => 'internal-link']), ['/profile/' . ProfileController::$profilePageArray[$profile->type], 'id' => $profile->id, 'urlLoc' => $profile->url_loc, 'urlName' => $profile->url_name, 'p' => 'history', '#' => 'p'], ['target' => '_blank', 'rel' => 'noopener noreferrer']) . '</p>' : NULL; ?>
 
     <div class="row top-margin">
         <div class="col-md-8">

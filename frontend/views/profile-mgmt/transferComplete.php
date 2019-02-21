@@ -30,6 +30,6 @@ $this->title = 'Transfer Complete';
 
     <p>Be sure to update the profile at least once per year in order to keep it active.</p>
 
-    <p>Profile Url: <?= Html::a(Url::base('http') . Url::toRoute(['profile/' . ProfileController::$profilePageArray[$profile->type], 'urlLoc' => $profile->url_loc, 'name' => $profile->url_name, 'id' => $profile->id]), ['/profile/' . ProfileController::$profilePageArray[$profile->type],   'urlLoc' => $profile->url_loc, 'name' => $profile->url_name, 'id' => $profile->id]) ?></p>
+    <p>Profile Url: <?= Html::a(Url::base('http') . Url::toRoute(['profile/' . ProfileController::$profilePageArray[$profile->type], 'urlLoc' => $profile->url_loc, 'urlName' => $profile->url_name, 'id' => $profile->id]), ['/profile/' . ProfileController::$profilePageArray[$profile->type],   'urlLoc' => $profile->url_loc, 'urlName' => $profile->url_name, 'id' => $profile->id]) ?></p>
 
 </div>

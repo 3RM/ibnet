@@ -15,12 +15,12 @@ $this->title = '';
 
 <div class="header-container">
     <div class="header-img">
-        <?= Html::img('@web/images/content/ibnet-large.png') ?>
+        <?= Html::img('@img.site/ibnet-large.png') ?>
         <div id="search-box" class="input-group">
             <?php $form = ActiveForm::begin(['id' => 'search-form']); ?>
             <?= $form->field($searchModel, 'term')->textInput([
                 'maxlength' => true, 
-                'class' => 'form-control',
+                  'class' => 'form-control',
                 'placeholder' => 'Find churches, organizations and individuals ...',
                 'autocomplete' => 'off',
             ])->label('') ?>

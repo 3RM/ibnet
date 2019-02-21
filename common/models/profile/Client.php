@@ -9,11 +9,18 @@ use Solarium\Client as SolrClient;
 /**
  * This is the Solr client, representing the connection
  */
-
 class Client extends Component
 {
+	/**
+     * @param array $options
+     */
 	public $options = [];
+
+	/**
+ 	 * @param object $solr
+ 	 */
 	public $solr;
+
 
 	public function init()
 	{

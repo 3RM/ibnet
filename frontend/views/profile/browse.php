@@ -64,6 +64,7 @@ $this->title = 'Browse';
                             ]) ?>
                         </div>
                         <?php ActiveForm::end(); ?>
+                        <hr>
                     </div>
 
                     <!-- =============================== Map =============================== -->
@@ -84,7 +85,6 @@ $this->title = 'Browse';
                         <?php $countries = $resultSet->getFacetSet()->getFacet('f_country');
                         $i = 0;
                         foreach ($countries as $countryPivot) {
-                            $i++;
                             if ($i > 3 && $more['country'] == 1) {continue;}
                             if (($countryCount = $countryPivot->getCount()) > 0) {
                                 $country = $countryPivot->getValue();
@@ -112,9 +112,7 @@ $this->title = 'Browse';
                                         # =============================== City ===============================
                     echo '<div class="left-block">';
                                                 echo '<h4>City</h4>';
-                                                $k = 0;
-                                                foreach ($statePivot->getPivot() as $cityPivot) {
-                                                    $k++;
+                                                foreach ($statePivot->getPivot() as $k=>$cityPivot) {
                                                     if ($k > 3 && $more['city'] == 1) {continue;}
                                                     if (($cityCount = $cityPivot->getCount()) > 0) {
                                                         $city = $cityPivot->getValue();
@@ -167,7 +165,7 @@ $this->title = 'Browse';
                         <h4>Profile Type</h4>
                         <?php $types = $resultSet->getFacetSet()->getFacet('type');
                         $i = 0;
-                        foreach ($types as $type => $count) {
+                        foreach ($types as $type=>$count) {
                             $i++;
                             if ($i > 3 && $more['type'] == 1) {continue;}
                             $constraint = 'f_type:"' . $type . '"';
@@ -195,7 +193,7 @@ $this->title = 'Browse';
                                     echo '<h4>Programs</h4>';
                                     $programs = $resultSet->getFacetSet()->getFacet('program');
                                     $i = 0;
-                                    foreach ($programs as $program => $count) {
+                                    foreach ($programs as $program=>$count) {
                                         $i++;
                                         if ($i > 3 && $more['program'] == 1) {continue;}
                                         $constraint = 'f_pg_org_name:"' . $program . '"';
@@ -218,7 +216,7 @@ $this->title = 'Browse';
                                     echo '<h4>Tags</h4>';
                                     $tags = $resultSet->getFacetSet()->getFacet('tag');
                                     $i = 0;
-                                    foreach ($tags as $tag => $count) {
+                                    foreach ($tags as $tag=>$count) {
                                         $i++;
                                         if ($i > 3 && $more['tag'] == 1) {continue;}
                                         $constraint = 'f_tag:"' . $tag . '"';
@@ -241,7 +239,7 @@ $this->title = 'Browse';
                                     echo '<h4>Missionary Type</h4>';
                                     $sub_types = $resultSet->getFacetSet()->getFacet('sub_type');
                                     $i = 0;
-                                    foreach ($sub_types as $sub_type => $count) {
+                                    foreach ($sub_types as $sub_type=>$count) {
                                         $i++;
                                         if ($i > 3 && $more['sub_type'] == 1) {continue;}
                                         $constraint = 'f_sub_type:"' . $sub_type . '"';
@@ -261,7 +259,7 @@ $this->title = 'Browse';
 
                                     echo '<h4>Status</h4>';
                                     $statuses = $resultSet->getFacetSet()->getFacet('miss_status');
-                                    foreach ($statuses as $status => $count) {
+                                    foreach ($statuses as $status=>$count) {
                                         $i++;
                                         $constraint = 'f_miss_status:"' . $status . '"';
                                         if (isset($fqs['type']['miss_status']) && $selected = ($constraint == $fqs['type']['miss_status'])) {
@@ -276,7 +274,7 @@ $this->title = 'Browse';
                                     echo '<h4>Field</h4>';
                                     $fields = $resultSet->getFacetSet()->getFacet('miss_field');
                                     $i = 0;
-                                    foreach ($fields as $field => $count) {
+                                    foreach ($fields as $field=>$count) {
                                         $i++;
                                          if ($i > 3 && $more['miss_field'] == 1) {continue;}
                                         $constraint = 'f_miss_field:"' . $field . '"';
@@ -297,7 +295,7 @@ $this->title = 'Browse';
                                     echo '<h4>Mission Agency</h4>';
                                     $agcys = $resultSet->getFacetSet()->getFacet('miss_agcy');
                                     $i = 0;
-                                    foreach ($agcys as $agcy => $count) {
+                                    foreach ($agcys as $agcy=>$count) {
                                         $i++;
                                         if ($i > 3 && $more['miss_agcy'] == 1) {continue;}
                                         $constraint = 'f_miss_agcy:"' . $agcy . '"';
@@ -320,7 +318,7 @@ $this->title = 'Browse';
                                     echo '<h4>School Levels</h4>';
                                     $levels = $resultSet->getFacetSet()->getFacet('level');
                                     $i = 0;
-                                    foreach ($levels as $level => $count) {
+                                    foreach ($levels as $level=>$count) {
                                         $i++;
                                         if ($i > 3 && $more['level'] == 1) {continue;}
                                         $constraint = 'f_level:"' . $level . '"';
@@ -343,7 +341,7 @@ $this->title = 'Browse';
                                     echo '<h4>Pastor Type</h4>';
                                     $sub_types = $resultSet->getFacetSet()->getFacet('sub_type');
                                     $i = 0;
-                                    foreach ($sub_types as $sub_type => $count) {
+                                    foreach ($sub_types as $sub_type=>$count) {
                                         $i++;
                                         if ($i > 3 && $more['sub_type'] == 1) {continue;}
                                         $constraint = 'f_sub_type:"' . $sub_type . '"';
@@ -366,7 +364,7 @@ $this->title = 'Browse';
                                     echo '<h4>Staff Title</h4>';
                                     $titles = $resultSet->getFacetSet()->getFacet('title');
                                     $i = 0;
-                                    foreach ($titles as $title => $count) {
+                                    foreach ($titles as $title=>$count) {
                                         $i++;
                                         if ($i > 3 && $more['title'] == 1) {continue;}
                                         $constraint = 'f_title:"' . $title . '"';
@@ -400,7 +398,7 @@ $this->title = 'Browse';
                             <h4>Bible</h4>
                             <?php $bibles = $resultSet->getFacetSet()->getFacet('bible');
                             $i = 0;
-                            foreach ($bibles as $value => $count) {
+                            foreach ($bibles as $value=>$count) {
                                 $i++;
                                 if ($i > 3 && $more['bible'] == 1) {continue;}
                                 $constraint = 'f_bible:"' . $value . '"';
@@ -422,7 +420,7 @@ $this->title = 'Browse';
                             <h4>Worship</h4>
                             <?php $worship_style = $resultSet->getFacetSet()->getFacet('worship_style');
                             $i = 0;
-                            foreach ($worship_style as $value => $count) {
+                            foreach ($worship_style as $value=>$count) {
                                 $i++;
                                 if ($i > 3 && $more['worship_style'] == 1) {continue;}
                                 $constraint = 'f_worship_style:"' . $value . '"';
@@ -444,7 +442,7 @@ $this->title = 'Browse';
                             <h4>Church Government</h4>
                             <?php $polity = $resultSet->getFacetSet()->getFacet('polity');
                             $i = 0;
-                            foreach ($polity as $value => $count) {
+                            foreach ($polity as $value=>$count) {
                                 $i++;
                                 if ($i > 3 && $more['polity'] == 1) {continue;}
                                 $constraint = 'f_polity:"' . $value . '"';
@@ -466,25 +464,31 @@ $this->title = 'Browse';
                 <!-- =============================== Browse Results =============================== -->
 
 
-                    <?php if (empty($fqs) && (empty($browseModel->distance) || empty($browseModel->location))) { ?>
-                        <div class="col-xs-12 col-sm-6">
-                        <?= '<div id="br" class="alert alert-cat" role="alert"><h3>' . Html::icon('hand-left') . ' Choose a category to begin browsing.</h3></div>';
-                    } elseif ($resultSet->getNumFound() == 0) { ?>
-                        <div class="col-xs-12 col-sm-6">
-                        <?= '<div class="alert alert-info" role="alert"><h4>No listings found.  Try a larger search radius.</h4></div>';
-                    } else { ?>
-                        <div class="col-xs-12 col-sm-9">
-                        <?= ListView::widget([
-                            'dataProvider' => $dataProvider,
-                            'showOnEmpty' => true,
-                            'emptyText' => 'testing',
-                            'itemView' => '_browseResults',
-                            'itemOptions' => ['class' => 'item-bordered'],
-                            'layout' => '<div class="summary-row hidden-print clearfix">{summary}</div>{items}{pager}',
-                        ]); 
-
-                    }?>
+                <?php if (empty($fqs) && (empty($browseModel->distance) || empty($browseModel->location))) { ?>
+                <div class="col-xs-12 col-sm-6">
+                    <div id="br" class="alert alert-cat" role="alert">
+                        <h3><?= Html::icon('hand-left') ?> Choose a category to begin browsing.</h3>
+                    </div>
                 </div>
+                
+                <?php } else { ?>
+                <div class="col-xs-12 col-sm-9">
+                    <?= ListView::widget([
+                        'dataProvider' => $dataProvider,
+                        'showOnEmpty' => false,
+                        'emptyText' => '
+                            <div class="col-xs-12 col-sm-6">
+                                <div class="alert alert-info" role="alert">
+                                    <h4>No listings found.  Try a larger search radius.</h4>
+                                </div>
+                            </div>',
+                        'itemView' => '_browseResults',
+                        'itemOptions' => ['class' => 'item-bordered'],
+                        'layout' => '<div class="summary-row hidden-print clearfix">{summary}</div>{items}{pager}',
+                    ]); ?>
+                </div>
+                <?php }?>
+
             </div>
         </div>
 
@@ -506,14 +510,14 @@ JS;
 $this->registerJs($script);
 ?>
 <script type="text/javascript">
-    var tabId, placeSearch, autocomplete;
+    var tabId, autocomplete;
     var componentForm = {
-    street_number: 'short_name',
-    route: 'long_name',
-    locality: 'long_name',
-    administrative_area_level_1: 'short_name',
-    country: 'long_name',
-    postal_code: 'short_name'
+        street_number: 'short_name',
+        route: 'long_name',
+        locality: 'long_name',
+        administrative_area_level_1: 'short_name',
+        country: 'long_name',
+        postal_code: 'short_name'
     };
 
     function initAutocomplete() {
@@ -556,33 +560,12 @@ $this->registerJs($script);
               this.infoWindow.open(map,this);
             })
         }
-        // map.data.setStyle(function(feature) {
-        //     return {
-        //         icon: getCircle(radius)
-        //     };
-        // });
     }
-
-    // function getCircle(radius) {
-    //     return {
-    //       path: google.maps.SymbolPath.CIRCLE,
-    //       fillColor: 'red',
-    //       fillOpacity: .2,
-    //       scale: radius,
-    //       strokeColor: 'white',
-    //       strokeWeight: .5
-    //     };
-    //   }
-
 
     function initMap() {
         if ($('#map').length > 0) loadMap();
         initAutocomplete();
     }
-
-    // function setTabId() {
-        // var tabId = sessionStorage.tabHash = Math.random();
-    // }
 
 </script>
 <script src="https://maps.googleapis.com/maps/api/js?key=<?= Yii::$app->params['apiKey.Google-no-restrictions'] ?>&libraries=places&callback=initMap"

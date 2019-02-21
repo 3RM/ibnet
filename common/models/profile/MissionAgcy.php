@@ -1,15 +1,25 @@
 <?php
+/**
+ * @link http://www.ibnet.org/
+ * @copyright  Copyright (c) IBNet (http://www.ibnet.org)
+ * @author Steve McKinley <steve@themckinleys.org>
+ */
 
 namespace common\models\profile;
 
+use common\models\missionary\Missionary;
 use Yii;
 
 /**
- * This is the model class for table "mission_agcy".
+ * This is the model class for table "mission_agcy"
  *
  * @property string $id
  * @property string $mission
+ * @property string $mission_acronym 
+ * @property int $id
+ * @property string $mission
  * @property string $mission_acronym
+ * @property int $profile_id FOREIGN KEY (profile_id) REFERENCES profile (id)
  */
 
 class MissionAgcy extends \yii\db\ActiveRecord
@@ -50,7 +60,7 @@ class MissionAgcy extends \yii\db\ActiveRecord
      * Links a list of mission agcys to a church profile
      * @return \yii\db\ActiveQuery
      */
-    public function getProfile()
+    public function getProfiles()
     {
         return $this->hasMany(Profile::className(), ['id' => 'profile_id'])
             ->viaTable('profile_has_mission_agcy', ['mission_agcy_id' => 'id']);
@@ -63,6 +73,16 @@ class MissionAgcy extends \yii\db\ActiveRecord
     public function getLinkedProfile()
     {
         return $this->hasOne(Profile::className(), ['id' => 'profile_id']);
+    }
+
+    /**
+     * Missionaries linked to a missionary
+     * @return \yii\db\ActiveQuery
+     */
+    public function getMissionaries()
+    {
+        return $this->hasMany(Missionary::className(), ['mission_agcy_id' => 'id'])
+            ->joinWith('profile');
     }
 
 }

@@ -1,4 +1,9 @@
 <?php
+/**
+ * @link http://www.ibnet.org/
+ * @copyright  Copyright (c) IBNet (http://www.ibnet.org)
+ * @author Steve McKinley <steve@themckinleys.org>
+ */
 
 namespace frontend\controllers;
 
@@ -44,7 +49,8 @@ class FacetController extends Controller
      */
     public function actionFacet($constraint, $cat)
     {
-        $session = Yii::$app->session;                                                              // Retrieve user selections from session 
+        // Retrieve user selections from session
+        $session = Yii::$app->session; 
         
         $browseModel = new ProfileBrowse();
         $browseModel->scenario = 'browse';
@@ -58,7 +64,8 @@ class FacetController extends Controller
             $toggle = $select[1];
         }
 
-        if (isset($_POST['clear'])) {                                                               // User cleared spatial search
+        // User cleared spatial search
+        if (isset($_POST['clear'])) {
             $spatial = [
                 'distance' => 60,
                 'location' => NULL,
@@ -66,7 +73,8 @@ class FacetController extends Controller
                 'lng'   => NULL
             ];
 
-        } elseif ($browseModel->load(Yii::$app->request->post()) && $browseModel->validate()) {     // User performed spatial browse
+        // User performed spatial browse
+        } elseif ($browseModel->load(Yii::$app->request->post()) && $browseModel->validate()) {
             $spatial = [
                 'distance' => $browseModel->distance,
                 'location' => $browseModel->location,
@@ -74,12 +82,15 @@ class FacetController extends Controller
                 'lng'   => NULL,
             ];
 
-        } elseif (isset($con) && isset($cat)) {                                                     // Add constraint choices            
-            switch ($cat) {                                                                         // If constraint is in $fqs, remove it
+        // Add constraint choices
+        } elseif (isset($con) && isset($cat)) {
+            // If constraint is in $fqs, remove it
+            switch ($cat) {
                 case 'type':
                     if (isset($fqs['type']['type']) && $fqs['type']['type'] == $con && $toggle == 'u') { 
                         unset($fqs['type']);
-                    } elseif ($toggle == 's') {                                                     // If constraint is not in $fqs, add it
+                    // If constraint is not in $fqs, add it
+                    } elseif ($toggle == 's') {
                         $fqs['type']['type'] = $con;
                     }
                     break;
@@ -97,7 +108,7 @@ class FacetController extends Controller
                         $fqs['type']['tag'] = $con;
                     }
                     break;
-                case 'country':                                                                     // Pattern: 'country' => ['country' => '', 'state' => ['state' => '', 'city' => '']]
+                case 'country': // Pattern: 'country' => ['country' => '', 'state' => ['state' => '', 'city' => '']]
                     if (isset($fqs['country']['country']) && $fqs['country']['country'] == $con && $toggle == 'u') {
                         unset($fqs['country']);
                     } elseif ($toggle == 's') {
@@ -140,13 +151,13 @@ class FacetController extends Controller
                     }
                     break;
                 case 'level':
-                    if (isset($fqs['type']['level']) && $fqs['type']['level'] == $con && $toggle == 'u') {     // pattern 'type' => ['type' => '', 'level' = '']
+                    if (isset($fqs['type']['level']) && $fqs['type']['level'] == $con && $toggle == 'u') {
                         unset($fqs['type']['level']);
                     } elseif ($toggle == 's') {
                          $fqs['type']['level'] = $con;
                     }
                     break;
-                case 'sub_type':                                                                    // Sub type for pastors and missionaries
+                case 'sub_type':   // Sub type for pastors and missionaries
                     if (isset($fqs['type']['sub_type']) && $fqs['type']['sub_type'] == $con && $toggle == 'u') {
                         unset($fqs['type']['sub_type']);
                     } elseif ($toggle == 's') {
@@ -187,7 +198,8 @@ class FacetController extends Controller
             $session->set('fqs', $fqs);
         }
 
-        isset($spatial['distance']) ?                                                               // Populate browseModel from session or POST
+        // Populate browseModel from session or POST
+        isset($spatial['distance']) ?
             $browseModel->distance = $spatial['distance'] :
             $browseModel->distance = 60;
         $browseModel->location = $spatial['location'];
@@ -195,8 +207,8 @@ class FacetController extends Controller
         $browseModel->lng = $spatial['lng'];
 
     // =================== Set spatial search fq =======================
-
-        if ($browseModel->distance && $browseModel->location) {                                     // Add geo filterquery in the event of user spatial browse
+        // Add geo filterquery in the event of user spatial browse
+        if ($browseModel->distance && $browseModel->location) {
             if (empty($browseModel->lat) || empty($browseModel->lng)) {
                 $res = GeoCoder::getCoordinates($browseModel->location, Yii::$app->params['apiKey.Google-no-restrictions'], true);
                 $spatial['lat'] = $res['lat'];
@@ -253,8 +265,7 @@ class FacetController extends Controller
         $markers[] = NULL;
         if (!empty($_SESSION['spatial']['distance']) && !empty($_SESSION['spatial']['location'])) {
             $center = '{lat: ' . $spatial['lat'] . ', lng: ' . $spatial['lng'] . '}';
-            $i = 0;
-            foreach ($resultSet as $doc) {
+            foreach ($resultSet as $i=>$doc) {
                 //if ($doc->category == Profile::CATEGORY_IND) {continue;}
                 if ($doc->org_loc) { 
                     $latlng = explode(',', $doc->org_loc);
@@ -265,14 +276,14 @@ class FacetController extends Controller
                 }
                 $markers[$i][1] = $latlng[0];
                 $markers[$i][2] = $latlng[1];
-                $i++;
                 if ($i == 10) {break;}
             }
         }
 
     // =================== Toggle more/less button =======================
         $more = $session->get('more');
-        if (count($more) < 12) {                                                                    // If session has expired and any elements are missing from $more, reset browse
+        // If session has expired and any elements are missing from $more, reset browse
+        if (count($more) < 12) {
             return $this->redirect(['/profile/browse']);
         }  
         if ($constraint == false && !empty($cat)) {

@@ -11,12 +11,12 @@ use yii\helpers\HtmlPurifier;
 <div class="col-sm-10 col-md-11">
     <?php switch ($model->type) {
     	
-   	case 'Association': ?>
+   	case Profile::TYPE_ASSOCIATION: ?>
   
 	    <h4>
 	        <?= Html::a($model->org_name, ['association',
 	    		'urlLoc' => $model->url_loc, 
-	    		'name' => $model->url_name, 
+	    		'urlName' => $model->url_name, 
 	    		'id' => $model->id]) 
 	    	?>
 	    </h4>
@@ -32,12 +32,12 @@ use yii\helpers\HtmlPurifier;
         </b> 
 
 	<?php break;
-	case 'Camp': ?>
+	case Profile::TYPE_CAMP: ?>
 		    
 	    <h4>
 	    	<?= Html::a($model->org_name, ['camp',
 	    		'urlLoc' => $model->url_loc, 
-	    		'name' => $model->url_name, 
+	    		'urlName' => $model->url_name, 
 	    		'id' => $model->id]) 
 	    	?>
 	    </h4>
@@ -53,17 +53,17 @@ use yii\helpers\HtmlPurifier;
 	    </b>
 
 	<?php break;
-	case 'Chaplain': ?>
+	case Profile::TYPE_CHAPLAIN: ?>
 	
 	   	<h4>
 	        <?= $model->spouse_first_name == NULL ? 
 	        	Html::a($model->ind_first_name . ' ' . $model->ind_last_name, ['evangelist',
 		    		'urlLoc' => $model->url_loc, 
-		    		'name' => $model->url_name, 
+		    		'urlName' => $model->url_name, 
 		    		'id' => $model->id]) :
 	    		Html::a($model->ind_first_name . ' & ' . $model->spouse_first_name . ' ' . $model->ind_last_name, ['evangelist',
 		    		'urlLoc' => $model->url_loc, 
-		    		'name' => $model->url_name, 
+		    		'urlName' => $model->url_name, 
 		    		'id' => $model->id]);
 	    	?>
 	    </h4>
@@ -76,12 +76,12 @@ use yii\helpers\HtmlPurifier;
 	    </b>
 
 	<?php break;
-	case 'Church': ?>
+	case Profile::TYPE_CHURCH: ?>
 	 
 	    <h4>
 	    	<?= Html::a($model->org_name, ['church',
 	    		'urlLoc' => $model->url_loc, 
-	    		'name' => $model->url_name, 
+	    		'urlName' => $model->url_name, 
 	    		'id' => $model->id]) 
 	    	?>
 	    </h4>
@@ -97,17 +97,17 @@ use yii\helpers\HtmlPurifier;
 	    </b>
 
 	<?php break;
-	case 'Evangelist': ?>
+	case Profile::TYPE_EVANGELIST: ?>
 	
 	   	<h4>
 	        <?= $model->spouse_first_name == NULL ? 
 	        	Html::a($model->ind_first_name . ' ' . $model->ind_last_name, ['evangelist',
 		    		'urlLoc' => $model->url_loc, 
-		    		'name' => $model->url_name, 
+		    		'urlName' => $model->url_name, 
 		    		'id' => $model->id]) :
 	    		Html::a($model->ind_first_name . ' & ' . $model->spouse_first_name . ' ' . $model->ind_last_name, ['evangelist',
 		    		'urlLoc' => $model->url_loc, 
-		    		'name' => $model->url_name, 
+		    		'urlName' => $model->url_name, 
 		    		'id' => $model->id]);
 	    	?>
 	    </h4>
@@ -120,12 +120,12 @@ use yii\helpers\HtmlPurifier;
 	    </b>
 
 	<?php break;
-	case 'Fellowship': ?>
+	case Profile::TYPE_FELLOWSHIP: ?>
 		 
 	  	<h4>
 	   	    <?= Html::a($model->org_name, ['fellowship', 
 	   	    	'urlLoc' => $model->url_loc, 
-	   	    	'name' => $model->url_name, 
+	   	    	'urlName' => $model->url_name, 
 	   	    	'id' => $model->id]) 
 	   	    ?>
 	    </h4>
@@ -141,12 +141,12 @@ use yii\helpers\HtmlPurifier;
 	    </b>
 
 	<?php break;
-	case 'Special Ministry': ?>
+	case Profile::TYPE_SPECIAL: ?>
 		 
 	   	<h4>
 	  		<?= Html::a($model->org_name, ['special-ministry',
 	    		'urlLoc' => $model->url_loc, 
-	    		'name' => $model->url_name, 
+	    		'urlName' => $model->url_name, 
 	    		'id' => $model->id]) 
 	    	?>
 	  	</h4>
@@ -162,12 +162,12 @@ use yii\helpers\HtmlPurifier;
 	    </b>
 
 	<?php break;
-	case 'Mission Agency': ?>
+	case Profile::TYPE_MISSION_AGCY: ?>
 	
 	  	<h4>
 	  		<?= Html::a($model->org_name, ['mission-agency',
 	    		'urlLoc' => $model->url_loc, 
-	    		'name' => $model->url_name, 
+	    		'urlName' => $model->url_name, 
 	    		'id' => $model->id]) 
 	    	?>
 	   	</h4>
@@ -183,17 +183,17 @@ use yii\helpers\HtmlPurifier;
 	    </b>
 
 	<?php break;
-	case 'Missionary': ?>
+	case Profile::TYPE_MISSIONARY: ?>
 
 	    <h4>
 	    	<?= $model->spouse_first_name == NULL ? 
 	        	Html::a($model->ind_first_name . ' ' . $model->ind_last_name, ['missionary',
 		    		'urlLoc' => $model->url_loc, 
-		    		'name' => $model->url_name, 
+		    		'urlName' => $model->url_name, 
 		    		'id' => $model->id]) :
 	    		Html::a($model->ind_first_name . ' & ' . $model->spouse_first_name . ' ' . $model->ind_last_name, ['missionary',
 		    		'urlLoc' => $model->url_loc, 
-		    		'name' => $model->url_name, 
+		    		'urlName' => $model->url_name, 
 		    		'id' => $model->id]);
 	    	?>
 		</h4>
@@ -208,12 +208,12 @@ use yii\helpers\HtmlPurifier;
 	    </b>
 
 	<?php break;
-	case 'Music Ministry': ?>
+	case Profile::TYPE_MUSIC: ?>
 		  
 	  	<h4>
 	  		<?= Html::a($model->org_name, ['music',
 	    		'urlLoc' => $model->url_loc, 
-	    		'name' => $model->url_name, 
+	    		'urlName' => $model->url_name, 
 	    		'id' => $model->id]) 
 	    	?>
 	   	</h4>
@@ -229,17 +229,17 @@ use yii\helpers\HtmlPurifier;
 	    </b>
 
 	<?php break;
-	case 'Pastor': ?>
+	case Profile::TYPE_PASTOR: ?>
 	
 	  	<h4>
 	   		<?= $model->spouse_first_name == NULL ? 
 	        	Html::a($model->ind_first_name . ' ' . $model->ind_last_name, ['pastor',
 		    		'urlLoc' => $model->url_loc, 
-		    		'name' => $model->url_name, 
+		    		'urlName' => $model->url_name, 
 		    		'id' => $model->id]) :
 	    		Html::a($model->ind_first_name . ' (& ' . $model->spouse_first_name . ') ' . $model->ind_last_name, ['pastor',
 		    		'urlLoc' => $model->url_loc, 
-		    		'name' => $model->url_name, 
+		    		'urlName' => $model->url_name, 
 		    		'id' => $model->id]);
 	    	?>
 	   	</h4>
@@ -249,12 +249,12 @@ use yii\helpers\HtmlPurifier;
         </b>
 
     <?php break;
-	case 'Print Ministry': ?>
+	case Profile::TYPE_PRINT: ?>
 
 	    <h4>
 	    	<?= Html::a($model->org_name, ['print',
 	    		'urlLoc' => $model->url_loc, 
-	    		'name' => $model->url_name, 
+	    		'urlName' => $model->url_name, 
 	    		'id' => $model->id]) 
 	    	?>
 	    </h4>
@@ -270,12 +270,12 @@ use yii\helpers\HtmlPurifier;
         </b>
 
 	<?php break;
-	case 'School': ?>
+	case Profile::TYPE_SCHOOL: ?>
 			
 		<h4>
 	    	<?= Html::a($model->org_name, ['school',
 	    		'urlLoc' => $model->url_loc, 
-	    		'name' => $model->url_name, 
+	    		'urlName' => $model->url_name, 
 	    		'id' => $model->id]) 
 	    	?>
 	    </h4>
@@ -291,17 +291,17 @@ use yii\helpers\HtmlPurifier;
         </b>
 
 	<?php break;
-	case 'Staff': ?>
+	case Profile::TYPE_STAFF: ?>
 	
 	   	<h4>
 	        <?= $model->spouse_first_name == NULL ? 
 	        	Html::a($model->ind_first_name . ' ' . $model->ind_last_name, ['staff',
 		    		'urlLoc' => $model->url_loc, 
-		    		'name' => $model->url_name, 
+		    		'urlName' => $model->url_name, 
 		    		'id' => $model->id]) :
 	    		Html::a($model->ind_first_name . ' (& ' . $model->spouse_first_name . ') ' . $model->ind_last_name, ['staff',
 		    		'urlLoc' => $model->url_loc, 
-		    		'name' => $model->url_name, 
+		    		'urlName' => $model->url_name, 
 		    		'id' => $model->id]);
 	    	?>
 	    </h4>

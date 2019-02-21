@@ -12,7 +12,7 @@ use yii\widgets\ActiveForm;
 /* @var $model app\models\Profile */
 /* @var $form yii\widgets\ActiveForm */
 
-$profile->type == 'Missionary' ?
+$profile->type == Profile::TYPE_MISSIONARY ?
     $this->title = 'Sending Church' :
     $this->title = 'Home Church';
 ?>
@@ -25,109 +25,43 @@ $profile->type == 'Missionary' ?
  
         <?php $form = ActiveForm::begin(); ?>
 
-        <?php if (empty($churchLink)) { ?>
-
-            <div class="row">
-                <div class="col-md-6">
-                    <p><?= HTML::icon('info-sign') ?> Your home church must have a listing in this directory.</p>
-                    <?php echo $form->field($profile, 'select')->widget(Select2::classname(), [ 
-                        'options' => ['placeholder' => 'Search by name or city...'],
-                        'initValueText' => 'Search ...', 
-                        'pluginOptions' => [
-                            'allowClear' => true,
-                            'minimumInputLength' => 3,
-                            'language' => [
-                                'errorLoading' => new JsExpression("function () { return 'Waiting for results...'; }"),
-                            ],
-                            'ajax' => [
-                                'url' => Url::to(['church-list-ajax', 'chId' => $chId]),
-                                'dataType' => 'json',
-                                'data' => new JsExpression('function(params) { return {q:params.term}; }')
-                            ],
-                            'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
-                            'templateResult' => new JsExpression('function(profile) { 
-                                if(profile.org_city > "" && profile.org_st_prov_reg > "") {
-                                    return profile.text+", "+profile.org_city+", "+profile.org_st_prov_reg;
-                                } else {
-                                    return profile.text;
-                                };
-                            }'),
-                            'templateSelection' => new JsExpression('function (profile) { 
-                                if(profile.org_city > "" && profile.org_st_prov_reg > "") {
-                                    return profile.text+", "+profile.org_city+", "+profile.org_st_prov_reg;
-                                } else {
-                                    return profile.text;
-                                };
-                            }'),
+        <div class="row">
+            <div class="col-md-6">
+                <p><?= HTML::icon('info-sign') ?> Your home church must have a listing in this directory.</p>
+                <?php echo $form->field($profile, 'home_church')->widget(Select2::classname(), [ 
+                    'data' => $initialData,
+                    'options' => ['placeholder' => 'Search by name or city...'], 
+                    'pluginOptions' => [
+                        'allowClear' => true,
+                        'minimumInputLength' => 3,
+                        'language' => [
+                            'errorLoading' => new JsExpression("function () { return 'Waiting for results...'; }"),
                         ],
-                    ]); ?>
-                </div>
-            </div>
-
-        <?php } elseif ($edit) { ?>
-
-            <div class="row">
-                <div class="col-md-6">
-                    <p><?= HTML::icon('info-sign') ?> Your home church must have a listing in this directory.</p>
-                    <?php echo $form->field($profile, 'selectM')->widget(Select2::classname(), [ 
-                        'options' => ['placeholder' => 'Search by name or city...'],
-                        'initValueText' => 'Search ...', 
-                        'pluginOptions' => [
-                            'allowClear' => true,
-                            'minimumInputLength' => 3,
-                            'language' => [
-                                'errorLoading' => new JsExpression("function () { return 'Waiting for results...'; }"),
-                            ],
-                            'ajax' => [
-                                'url' => Url::to(['church-list-ajax', 'chId' => $chId]),
-                                'dataType' => 'json',
-                                'data' => new JsExpression('function(params) { return {q:params.term}; }')
-                            ],
-                            'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
-                            'templateResult' => new JsExpression('function(profile) { 
-                                if(profile.org_city > "" && profile.org_st_prov_reg > "") {
-                                    return profile.text+", "+profile.org_city+", "+profile.org_st_prov_reg;
-                                } else {
-                                    return profile.text;
-                                };
-                            }'),
-                            'templateSelection' => new JsExpression('function (profile) { 
-                                if(profile.org_city > "" && profile.org_st_prov_reg > "") {
-                                    return profile.text+", "+profile.org_city+", "+profile.org_st_prov_reg;
-                                } else {
-                                    return profile.text;
-                                };
-                            }'),
+                        'ajax' => [
+                            'url' => Url::to(['ajax/search', 'exclude' => $exclude]),
+                            'dataType' => 'json',
+                            'data' => new JsExpression('function(params) { return {q:params.term}; }')
                         ],
-                    ]); ?>
-                </div>
+                        'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
+                        'templateResult' => new JsExpression('function(profile) { 
+                            if(profile.org_city > "" && profile.org_st_prov_reg > "") {
+                                return profile.text+", "+profile.org_city+", "+profile.org_st_prov_reg;
+                            } else {
+                                return profile.text;
+                            };
+                        }'),
+                        'templateSelection' => new JsExpression('function (profile) { 
+                            if(profile.org_city > "" && profile.org_st_prov_reg > "") {
+                                return profile.text+", "+profile.org_city+", "+profile.org_st_prov_reg;
+                            } else {
+                                return profile.text;
+                            };
+                        }'),
+                    ],
+                ]); ?>
             </div>
-
-        <?php } else { ?>
-
-            <div class="row">
-                <div class="col-md-8">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">Church</div>
-                        <table class="table table-hover">
-                            <td><?= $churchLabel ?> <b><?= $churchLink->org_name . ', ' . $churchLink->org_city . ', ' . $churchLink->org_st_prov_reg ?></b></td>
-                            <td>
-                                <?= Html::submitButton(HTML::icon('edit'), [
-                                    'method' => 'POST',
-                                    'class' => 'btn btn-form btn-sm',
-                                    'name' => 'edit',
-                                ]) ?>
-                            </td>
-                        </table>
-                    </div>
-                    <?= Html::activeHiddenInput($profile, 'select'); ?>
-                </div>
-            </div>
-
-        <?php } ?>
-
+        </div>
         <br>
-
         <div class="row">
             <div class="col-md-8">
                 <p><?php if ($profile->show_map == Profile::MAP_PRIMARY) {

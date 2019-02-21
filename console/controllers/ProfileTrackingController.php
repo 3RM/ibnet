@@ -9,10 +9,6 @@ use yii;
 use yii\console\Controller;
 use yii\db\Expression;
 
-
-/**
- * Profile count tracking controller
- */
 class ProfileTrackingController extends Controller
 {
     

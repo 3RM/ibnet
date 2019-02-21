@@ -20,6 +20,10 @@ $this->title = 'Missionary Housing';
 
         <?php $form = ActiveForm::begin(); ?>
 
+        <p> <?= Html::icon('info-sign') ?> Missionary housing is only visible to missionaries who have registered with IBNet.
+            It will not be accessible through the public directory.
+        </p>
+
         <div class="row">
             <div class="col-md-8">
                 <h4>Housing</h4>
@@ -69,7 +73,7 @@ $this->title = 'Missionary Housing';
                 ])->label(false) ?>
             </div>
         </div>
-
+        <br>
         <?= $this->render('_profileFormFooter', ['profile' => $profile]) ?>
 
         <?php ActiveForm::end(); ?>

@@ -23,7 +23,7 @@ $this->title = 'Activation';
         the accuracy of your information to keep your profile active.
     </p>
 
-    <p>Profile Url: <?= Html::a(Url::base('http') . Url::toRoute(['profile/' . ProfileController::$profilePageArray[$profile->type], 'urlLoc' => $profile->url_loc, 'name' => $profile->url_name, 'id' => $profile->id]) . ' ' . Html::icon('new-window'), ['/profile/' . ProfileController::$profilePageArray[$profile->type],   'urlLoc' => $profile->url_loc, 'name' => $profile->url_name, 'id' => $profile->id], ['target' => '_blank']) ?></p>
+    <p>Profile Url: <?= Html::a(Url::base('http') . Url::toRoute(['profile/' . ProfileController::$profilePageArray[$profile->type], 'urlLoc' => $profile->url_loc, 'urlName' => $profile->url_name, 'id' => $profile->id]) . ' ' . Html::icon('new-window'), ['/profile/' . ProfileController::$profilePageArray[$profile->type],   'urlLoc' => $profile->url_loc, 'urlName' => $profile->url_name, 'id' => $profile->id], ['target' => '_blank', 'rel' => 'noopener noreferrer']) ?></p>
 
     <br />
     <br />

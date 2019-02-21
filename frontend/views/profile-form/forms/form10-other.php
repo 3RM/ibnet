@@ -1,8 +1,6 @@
 <?php
 
 use common\models\profile\Profile;
-use common\models\Utility;
-use frontend\controllers\ProfileController;
 use kartik\markdown\MarkdownEditor;
 use kartik\select2\Select2;
 use yii\bootstrap\Alert;
@@ -33,32 +31,30 @@ $this->title = 'Other Ministries';
             </div>
         </div>
 
-        <?php if ($ministryM) { ?>
+        <?php if ($otherMinistries) { ?>
 
             <div class = "row">
                 <div class = "col-md-8">
                     <div class="panel panel-default">
                         <div class="panel-heading">Other Ministries</div>
                         <table class="table table-hover">
-                            <?php foreach ($ministryM as $m) {
-                                $p = ProfileController::findActiveProfile($m->ministry_id);
-                                if ($m && $p) { ?>
-                                    <tr>
-                                        <td>
-                                            <?= $m->staff_title . ' at ' . $p->org_name . ', ' . $p->org_city . 
-                                                ($p->org_st_prov_reg ? (', ' . $p->org_st_prov_reg) : NULL) . 
-                                                ($p->org_country == 'United States' ? NULL : ', ' . $p->org_country) ?>
-                                        </td>
-                                        <td>
-                                            <?= Html::submitButton(Html::icon('remove'), [
-                                                'method' => 'POST',
-                                                'class' => 'btn btn-form btn-sm',
-                                                'name' => 'removeM',
-                                                'value' => $m['id'],
-                                            ]) ?>
-                                        </td>
-                                    </tr>
-                                <?php } ?>
+                            <?php foreach ($otherMinistries as $m) { ?>
+                                <tr>
+                                    <td>
+                                        <?= $m->staff_title . ' at ' . $m->ministry->org_name . ', ' . $m->ministry->org_city . 
+                                            ($m->ministry->org_st_prov_reg ? (', ' . $m->ministry->org_st_prov_reg) : NULL) . 
+                                            ($m->ministry->org_country == 'United States' ? NULL : ', ' . $m->ministry->org_country) 
+                                        ?>
+                                    </td>
+                                    <td>
+                                        <?= Html::submitButton(Html::icon('remove'), [
+                                            'method' => 'POST',
+                                            'class' => 'btn btn-form btn-sm',
+                                            'name' => 'removeM',
+                                            'value' => $m['id'],
+                                        ]) ?>
+                                    </td>
+                                </tr>
                             <?php } ?>
                         </table>
                     </div>
@@ -84,7 +80,7 @@ $this->title = 'Other Ministries';
                                 'errorLoading' => new JsExpression("function () { return 'Waiting for results...'; }"),
                             ],
                             'ajax' => [
-                                'url' => Url::to(['ministry-list-ajax', 'id' => $profile->id]),
+                                'url' => Url::to(['ajax/search', 'type' => 'ministry', 'id' => $profile->id]),
                                 'dataType' => 'json',
                                 'data' => new JsExpression('function(params) { return {q:params.term}; }')
                             ],

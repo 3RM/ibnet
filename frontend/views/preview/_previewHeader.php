@@ -15,8 +15,10 @@ use yii\widgets\ActiveForm;
                 '<h1>' . Html::icon('edit') . ' Preview & Activate</h1>' :
                 '<h1>' . Html::icon('edit') . ' Preview & Edit</h1>' ?>
             <div id="open" class="preview-edit-menu"><?= Html::a(Html::icon('menu-hamburger') . ' Open Edit Menu', '#') ?></div>
+            <br />
+            <br />
             <?php $profile->status == Profile::STATUS_ACTIVE ? 
-                print('<p class="preview-profile-link">' . Html::a(Url::toRoute(['profile/' . ProfileController::$profilePageArray[$profile->type], 'urlLoc' => $profile->url_loc, 'name' => $profile->url_name, 'id' => $profile->id], 'https') . ' ' . Html::icon('new-window'), ['profile/' . ProfileController::$profilePageArray[$profile->type], 'urlLoc' => $profile->url_loc, 'name' => $profile->url_name, 'id' => $profile->id], ['target' => '_blank']) . '</p>') :
+                print('<p class="progress-menu">' . Html::a(Url::toRoute(['profile/' . ProfileController::$profilePageArray[$profile->type], 'urlLoc' => $profile->url_loc, 'urlName' => $profile->url_name, 'id' => $profile->id], 'https') . ' ' . Html::icon('new-window'), ['profile/' . ProfileController::$profilePageArray[$profile->type], 'urlLoc' => $profile->url_loc, 'urlName' => $profile->url_name, 'id' => $profile->id], ['target' => '_blank', 'rel' => 'noopener noreferrer']) . '</p>') :
                 NULL; ?>
             <?php $form = ActiveForm::begin(); ?>
             <?= $activate ?
@@ -34,3 +36,4 @@ use yii\widgets\ActiveForm;
         </div>
     </div>
 </div>
+<?= Alert::widget() ?>

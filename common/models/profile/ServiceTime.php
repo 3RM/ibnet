@@ -1,4 +1,9 @@
 <?php
+/**
+ * @link http://www.ibnet.org/
+ * @copyright  Copyright (c) IBNet (http://www.ibnet.org)
+ * @author Steve McKinley <steve@themckinleys.org>
+ */
 
 namespace common\models\profile;
 
@@ -7,7 +12,7 @@ use Yii;
 /**
  * This is the model class for table "service_time".
  *
- * @property string $id
+ * @property int $id
  * @property string $day_1
  * @property string $time_1
  * @property string $description_1
@@ -26,6 +31,7 @@ use Yii;
  * @property string $day_6
  * @property string $time_6
  * @property string $description_6
+ * @property int $reviewed
  */
 
 class ServiceTime extends \yii\db\ActiveRecord
@@ -294,6 +300,6 @@ class ServiceTime extends \yii\db\ActiveRecord
      */
     public function getProfile()
     {
-        return $this->hasOne(Profile::className(), ['service_time_id' => 'id']);
+        return $this->hasOne(Profile::className(), ['id' => 'profile_id']);
     }
 }

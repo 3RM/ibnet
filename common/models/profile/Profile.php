@@ -1,4 +1,9 @@
 <?php
+/**
+ * @link http://www.ibnet.org/
+ * @copyright  Copyright (c) IBNet (http://www.ibnet.org)
+ * @author Steve McKinley <steve@themckinleys.org>
+ */
 
 namespace common\models\profile;
 
@@ -14,6 +19,7 @@ use common\models\profile\Type;
 use common\models\User;
 use common\models\Utility;
 use frontend\controllers\ProfileController;
+use frontend\controllers\ProfileFormController;
 use frontend\controllers\ProfileMailController;
 use frontend\models\GeoCoder;
 use sadovojav\cutter\behaviors\CutterBehavior;
@@ -29,19 +35,29 @@ use yii\web\UploadedFile;
 /**
  * This is the model class for table "profile".
  *
- * @property integer $id
- * @property integer $user_id
+ * @property int $id
+ * @property int $user_id FOREIGN KEY (user_id) REFERENCES  user (id)
+ * @property string $transfer_token
+ * @property int $reviewed
  * @property string $type
+ * @property string $sub_type
+ * @property int $category
  * @property string $profile_name
+ * @property string $url_name
+ * @property string $url_loc
  * @property string $created_at
- * @property string $last_update
- * @property string $last_modified
+ * @property string $last_update User update
+ * @property string $last_modified record altered
  * @property string $renewal_date
  * @property string $inactivation_date
- * @property string $status
+ * @property int $has_been_inactivated
+ * @property int $status
+ * @property int $edit
  * @property string $tagline
+ * @property string $title
  * @property string $description
- * @property integer $ministry_of
+ * @property int $ministry_of
+ * @property int $home_church
  * @property string $image1
  * @property string $image2
  * @property string $flwsp_ass_level
@@ -51,9 +67,17 @@ use yii\web\UploadedFile;
  * @property string $org_po_box
  * @property string $org_city
  * @property string $org_st_prov_reg
+ * @property string $org_state_long
  * @property string $org_zip
  * @property string $org_country
  * @property string $org_loc
+ * @property string $org_po_address1
+ * @property string $org_po_address2
+ * @property string $org_po_city
+ * @property string $org_po_st_prov_reg
+ * @property string $org_po_state_long
+ * @property string $org_po_zip
+ * @property string $org_po_country
  * @property string $ind_first_name
  * @property string $ind_last_name
  * @property string $spouse_first_name
@@ -62,31 +86,75 @@ use yii\web\UploadedFile;
  * @property string $ind_po_box
  * @property string $ind_city
  * @property string $ind_st_prov_reg
+ * @property string $ind_state_long
  * @property string $ind_zip
  * @property string $ind_country
  * @property string $ind_loc
- * @property integer $show_map
+ * @property string $ind_po_address1
+ * @property string $ind_po_address2
+ * @property string $ind_po_city
+ * @property string $ind_po_st_prov_reg
+ * @property string $ind_po_state_long
+ * @property string $ind_po_zip
+ * @property string $ind_po_country
+ * @property int $show_map
  * @property string $phone
  * @property string $email
+ * @property string $email_pvt
+ * @property int $email_pvt_status
  * @property string $website
- * @property integer $pastor_interim
- * @property integer $pastor_church_planter
- * @property string $miss_field
- * @property string $miss_status
- * @property integer $inappropriate
+ * @property int $pastor_interim
+ * @property int $cp_pastor
  * @property string $bible
  * @property string $worship_style
  * @property string $polity
- * @property integer $staff_id
- * @property integer $service_time_id
- * @property integer $social_id
- * @property integer $flwship_id
- * @property integer $ass_id
- * @property integer $miss_housing_id
+ * @property string $packet
+ * @property int $inappropriate
  */
 
 class Profile extends \yii\db\ActiveRecord
 {
+
+    /**
+     * @const string $TYPE_* The profile types
+     */
+    const TYPE_PASTOR = 'Pastor';
+    const TYPE_EVANGELIST = 'Evangelist';
+    const TYPE_MISSIONARY = 'Missionary';
+    const TYPE_CHAPLAIN = 'Chaplain';
+    const TYPE_STAFF = 'Staff';
+    const TYPE_CHURCH = 'Church';
+    const TYPE_MISSION_AGCY = 'Mission Agency';
+    const TYPE_FELLOWSHIP = 'Fellowship';
+    const TYPE_ASSOCIATION = 'Association';
+    const TYPE_CAMP = 'Camp';
+    const TYPE_SCHOOL = 'School';
+    const TYPE_PRINT = 'Print Ministry';
+    const TYPE_MUSIC = 'Music Ministry';
+    const TYPE_SPECIAL = 'Special Ministry';
+
+    /**
+     * @const string $SUBTYPE_* The profile subtypes
+     */
+    const SUBTYPE_PASOTR_ASSOCIATE = 'Associate Pastor';
+    const SUBTYPE_PASTOR_ASSISTANT = 'Assistant Pastor';
+    const SUBTYPE_PASTOR_MUSIC = 'Music Pastor';
+    const SUBTYPE_PASTOR_PASTOR = 'Pastor';
+    const SUBTYPE_PASTOR_EMERITUS = 'Pastor Emeritus';
+    const SUBTYPE_PASTOR_SENIOR = 'Senior Pastor';
+    const SUBTYPE_PASTOR_YOUTH = 'Youth Pastor';
+    const SUBTYPE_PASTOR_ELDER = 'Elder';
+    const SUBTYPE_MISSIONARY_CP = 'Church Planter';
+    const SUBTYPE_MISSIONARY_BT = 'Bible Translator';
+    const SUBTYPE_MISSIONARY_MM = 'Medical Missionary';
+    const SUBTYPE_CHAPLAIN_J = 'Jail Chaplain';
+    const SUBTYPE_CHAPLAIN_M = 'Military Chaplain';
+
+    /**
+     * @const int $CATEGORY_* The category (individual or organization) of the profile.
+     */
+    const CATEGORY_IND = 10;
+    const CATEGORY_ORG = 20;
 
     /**
      * @const int $STATUS_* The status of the profile.
@@ -96,12 +164,6 @@ class Profile extends \yii\db\ActiveRecord
     const STATUS_INACTIVE = 20;
     const STATUS_EXPIRED = 25;
     const STATUS_TRASH = 30;
-
-    /**
-     * @const int $CATEGORY_* The category (individual or organization) of the profile.
-     */
-    const CATEGORY_IND = 10;
-    const CATEGORY_ORG = 20;
 
     /**
      * @const int $PRIVATE_EMAIL_* Private email request status
@@ -131,20 +193,20 @@ class Profile extends \yii\db\ActiveRecord
     * @var array $icon Outputs html markup for glyphicon icons for each profile type
     */
     public static $icon = [
-        'Association' => '<span class="glyphicons glyphicons-group"></span>',
-        'Camp' => '<span class="glyphicons glyphicons-camping"></span>',
-        'Chaplain' => '<span class="glyphicons glyphicons-shield"></span>',
-        'Church' => '<span class="glyphicons glyphicons-temple-christianity-church type-icon"></span>',
-        'Evangelist' => '<span class="glyphicons glyphicons-fire"></span>',
-        'Fellowship' => '<span class="glyphicons glyphicons-handshake"></span>',
-        'Mission Agency' => '<span class="glyphicons glyphicons-globe-af"></span>',
-        'Missionary' => '<span class="glyphicons glyphicons-person-walking"></span>',
-        'Music Ministry' => '<span class="glyphicons glyphicons-music"></span>',
-        'Pastor' => '<span class="glyphicons glyphicons-book-open"></span>',
-        'Print Ministry' => '<span class="glyphicons glyphicons-book"></span>',
-        'School' => '<span class="glyphicons glyphicons-education"></span>',
-        'Special Ministry' => '<span class="glyphicons glyphicons-global"></span>',
-        'Staff' => '<span class="glyphicons glyphicons-briefcase"></span>',
+        self::TYPE_ASSOCIATION => '<span class="glyphicons glyphicons-group"></span>',
+        self::TYPE_CAMP => '<span class="glyphicons glyphicons-camping"></span>',
+        self::TYPE_CHAPLAIN => '<span class="glyphicons glyphicons-shield"></span>',
+        self::TYPE_CHURCH => '<span class="glyphicons glyphicons-temple-christianity-church type-icon"></span>',
+        self::TYPE_EVANGELIST => '<span class="glyphicons glyphicons-fire"></span>',
+        self::TYPE_FELLOWSHIP => '<span class="glyphicons glyphicons-handshake"></span>',
+        self::TYPE_MISSION_AGCY => '<span class="glyphicons glyphicons-globe-af"></span>',
+        self::TYPE_MISSIONARY => '<span class="glyphicons glyphicons-person-walking"></span>',
+        self::TYPE_MUSIC => '<span class="glyphicons glyphicons-music"></span>',
+        self::TYPE_PASTOR => '<span class="glyphicons glyphicons-book-open"></span>',
+        self::TYPE_PRINT => '<span class="glyphicons glyphicons-book"></span>',
+        self::TYPE_SCHOOL => '<span class="glyphicons glyphicons-education"></span>',
+        self::TYPE_SPECIAL => '<span class="glyphicons glyphicons-global"></span>',
+        self::TYPE_STAFF => '<span class="glyphicons glyphicons-briefcase"></span>',
     ];
 
     /**
@@ -203,14 +265,9 @@ class Profile extends \yii\db\ActiveRecord
     public $duplicateId;
 
     /**
-     * @var string $formattedNames Names in the format "First (& Spouse) Last" or "First Last"
+     * @var string $housingSelect User selection of whether church has missions housing
      */
-    public $formattedNames;
-
-    /**
-     * @var string $missHousing User selection of whether church has missions housing
-     */
-    public $missHousing;
+    public $housingSelect;
 
     /**
      * @var string $location Stores city and state for geolookup on browse page
@@ -232,7 +289,7 @@ class Profile extends \yii\db\ActiveRecord
      */
     public $staff;
 
-     /**
+    /**
      * @var array $unconfirmed Ids of any unconfirmed staff profiles associated with an organization
      */
     public $unconfirmed;
@@ -302,16 +359,14 @@ class Profile extends \yii\db\ActiveRecord
             'sf-church' => ['ind_first_name', 'ind_last_name', 'spouse_first_name', 'pastor_interim', 'cp_pastor'],
     // sf-org: Staff Organization
             'sf-org' => ['staff'],
-    // hc-required: Home Church
-            'hc-required' => ['select', 'map'],
-    // hc: Parent Home Church
-            'hc' => ['select', 'map'],
+    // hc: Home Church
+            'hc' => ['home_church', 'map'],
     // pm-required: Parent Ministry for Staff
-            'pm-required' => ['select', 'selectM', 'titleM', 'map'],
+            'pm-required' => ['ministry_of', 'selectM', 'titleM', 'map'],
     // pm-ind: Other Ministries of individuals
-            'pm-ind' => ['select', 'selectM', 'titleM', 'map'],
+            'pm-ind' => ['ministry_of', 'selectM', 'titleM', 'map'],
     // pm-org: Parent Ministry
-            'pm-org' => ['select', 'map'],
+            'pm-org' => ['ministry_of', 'map'],
     // pg: Programs
             'pg' => ['select'],
     // sa: Schools Attended
@@ -319,7 +374,7 @@ class Profile extends \yii\db\ActiveRecord
     // sl: School Levels
             'sl' => ['select'],
     // ma-church: Mission Agencies - Church
-            'ma-church' => ['select', 'missHousing', 'packet'],
+            'ma-church' => ['select', 'housingSelect', 'packet'],
     // di: Distinctives
             'di' => ['bible', 'worship_style', 'polity'],
     // as-school: Associations for school
@@ -347,9 +402,9 @@ class Profile extends \yii\db\ActiveRecord
                 return $('#profile-type').val() == 'Pastor';
             }", 'message' => 'Pastor type is required.', 'on' => 'create'],
             ['mtype', 'required', 'when' => function($profile) {
-                return $profile->type == 'Missionary';
+                return $profile->type == self::TYPE_MISSIONARY;
             }, 'whenClient' => "function (attribute, value) {
-                return $('#profile-type').val() == 'Missionary';
+                return $('#profile-type').val() == '" . self::TYPE_MISSIONARY . "';
             }", 'message' => 'Missionary type is required.', 'on' => 'create'],
             ['profile_name', 'string', 'max' => 60, 'on' =>'create'],
             ['profile_name', 'filter', 'filter' => 'strip_tags', 'on' => 'create'],
@@ -552,7 +607,7 @@ class Profile extends \yii\db\ActiveRecord
             [['email', 'email_pvt'], 'email', 'message' => 'Please enter a valid email', 'on' => 'default'],
 
     // co-fe: Contact - Forwarding Email ('phone', 'email', 'email_pvt', 'website')
-            [['email_pvt'], 'required', 'on' => 'co-fe'],
+            [['phone', 'email_pvt'], 'required', 'on' => 'co-fe'],
             [['phone'], 'string', 'on' => 'co-fe'],
             [['phone'], PhoneInputValidator::className(),'on' => 'co-fe'],
             [['email', 'email_pvt'], 'string', 'max' => 60, 'on' => 'co-fe'],
@@ -569,24 +624,21 @@ class Profile extends \yii\db\ActiveRecord
     // sf-org: Staff Organization ('staff')
             ['staff', 'safe', 'on' => 'sf-org'],
 
-    // hc-required: Home Church ('select', 'map')
-            ['select', 'required', 'on' => 'hc-required'],
-            ['map', 'safe', 'on' => 'hc-required'],
-
-    // hc: Home Church ('select', 'map')
-            [['select', 'map'], 'safe', 'on' => 'hc'],
+    // hc: Home Church ('home_church', 'map')
+            ['home_church', 'required', 'on' => 'hc'],
+            ['map', 'safe', 'on' => 'hc'],
 
     // pm-required: Parent Ministry for Staff ('select', 'selectM', 'titleM', 'map')
-            ['select', 'required', 'on' => 'pm-required'],
+            ['ministry_of', 'required', 'on' => 'pm-required'],
             ['titleM', 'string', 'max' => 60, 'on' => 'pm-required'],
             ['map', 'safe', 'on' => 'pm-required'],
 
     // pm-ind: Other Ministries for Individuals ('select', 'selectM', 'titleM', 'map')
             ['titleM', 'string', 'max' => 60, 'on' => 'pm-ind'],
-            [['select', 'selectM', 'map'], 'safe', 'on' => 'pm-ind'],
+            [['ministry_of', 'selectM', 'map'], 'safe', 'on' => 'pm-ind'],
 
-    // pm-org: Parent Ministry ('select', 'map')
-            ['select', 'safe', 'on' => 'pm-org'],
+    // pm-org: Parent Ministry ('ministry_of', 'map')
+            ['ministry_of', 'safe', 'on' => 'pm-org'],
             [['map'], 'safe', 'on' => 'pm-org'],
 
     // pg: Programs ('select')
@@ -598,9 +650,9 @@ class Profile extends \yii\db\ActiveRecord
     // sl: School Levels ('select')
             ['select', 'safe', 'on' => 'sl'],
 
-    // ma-church: Mission Agencies - Church ('select', 'missHousing', 'packet')
+    // ma-church: Mission Agencies - Church ('select', 'housingSelect', 'packet')
             ['select', 'default', 'value' => NULL, 'on' => 'ma-church'],
-            ['missHousing', 'default', 'value' => 'N', 'on' => 'ma-church'],
+            ['housingSelect', 'default', 'value' => 'N', 'on' => 'ma-church'],
             ['packet', 'file', 'extensions' => 'pdf', 'mimeTypes' => 'application/pdf', 'maxFiles' => 1, 'maxSize' => 1024 * 6000, 'skipOnEmpty' => true, 'on' => 'ma-church'],
 
     // di: Distinctives ('bible', 'worship_style', 'polity')
@@ -641,13 +693,7 @@ class Profile extends \yii\db\ActiveRecord
      */
     public function attributeLabels()
     {
-    // Determine profile type specific labels
-        $parent_ministry = $this->getMinistryLabel($this->type);
-        $home_church = $this->getChurchLabel($this->type, $this->sub_type);
-        $this->type == 'Special Ministry' ?
-            $orgNameLabel = 'Ministry or Organization Name' :
-            $orgNameLabel = $this->type . ' Name';
-        switch($this->scenario){                                                                    // Apply labels depending on scenario
+        switch ($this->scenario) {
     
     // create a new profile
             case 'create':
@@ -670,7 +716,7 @@ class Profile extends \yii\db\ActiveRecord
     // nd-org: Name & Description Organization ('org_name', 'tagline', 'description')
             case 'nd-org':
             return [
-                'org_name' => $orgNameLabel,
+                'org_name' => $this->orgNameLabel,
                 'tagline' => 'Ministry Tagline',
                 'description' => 'Description',
             ];
@@ -692,7 +738,7 @@ class Profile extends \yii\db\ActiveRecord
             case 'nd-flwsp_ass':
             return [
                 'select' => $this->type . ' Name',
-                'name' => $this->org_name == NULL ? 'Or enter a new name here' : 'Fellowship Name',
+                'name' => 'Or enter a new ' . $this->type . ' name here',
                 'acronym' => 'Acronym',
                 'tagline' => $this->type . ' Tagline',
                 'flwsp_ass_level' => $this->type . ' Level',
@@ -803,46 +849,38 @@ class Profile extends \yii\db\ActiveRecord
             ];
             break;
 
-    // hc-required: Home Church ('select')
-            case 'hc-required':
-            return [
-                'select' => $home_church,
-                'map' => 'Show a Google map of this ministry on my profile',
-            ];
-            break;
-
-    // hc: Home Church ('select', 'map')
+    // hc: Home Church ('home_church')
             case 'hc':
             return [
-                'select' => $home_church,
+                'home_church' => $this->churchLabel,
                 'map' => 'Show a Google map of this ministry on my profile',
             ];
             break;
 
-    // pm-required: Parent Ministry for Staff ('select', 'selectM', 'titleM', 'map')
+    // pm-required: Parent Ministry for Staff ('ministry_of', 'selectM', 'titleM', 'map')
             case 'pm-required':
             return [
-                'select' => $parent_ministry,
+                'ministry_of' => $this->parentMinistryLabel,
                 'selectM' =>  'Ministry',
                 'titleM' => 'Title',
                 'map' => 'Show a Google map of this ministry on my profile',
             ];
             break;
 
-    // pm-ind: Other Ministries for Individuals ('select', 'selectM', 'titleM', 'map')
+    // pm-ind: Other Ministries for Individuals ('ministry_of', 'selectM', 'titleM', 'map')
             case 'pm-ind':
             return [
-                'select' => $parent_ministry,
+                'ministry_of' => $this->parentMinistryLabel,
                 'selectM' =>  'Ministry',
                 'titleM' => 'Title',
                 'map' => 'Show a Google map of this ministry on my profile',
             ];
             break;
 
-    // pm: Parent Ministry ('select', 'map')
+    // pm: Parent Ministry ('ministry_of', 'map')
             case 'pm-org':
             return [
-                'select' => $parent_ministry,
+                'ministry_of' => $this->parentMinistryLabel,
                 'map' => 'Show a Google map of this ministry on my profile',
             ];
             break;
@@ -862,9 +900,9 @@ class Profile extends \yii\db\ActiveRecord
             return ['select' => 'School Levels Offered'];
             break;
 
-    // ma-church: Mission Agencies - Church ('select', 'missHousing', 'packet')
+    // ma-church: Mission Agencies - Church ('select', 'housingSelect', 'packet')
             case 'ma-church':
-            return ['missHousing' => 'Does the church have mission housing or motorhome/trailer parking?'];
+            return ['housingSelect' => 'Does the church have mission housing or motorhome/trailer parking?'];
             break;
 
     // di: Distinctives ('bible', 'worship_style', 'polity')
@@ -913,11 +951,12 @@ class Profile extends \yii\db\ActiveRecord
         $this->status = self::STATUS_NEW;
         $this->user_id = Yii::$app->user->identity->id;
 
-        if ($this->type == 'Pastor') {                                                              // Set Subtype
+        // Set Subtype
+        if ($this->type == self::TYPE_PASTOR) {
             $this->sub_type = $this->ptype;
-        } elseif ($this->type == 'Missionary') {
+        } elseif ($this->type == self::TYPE_MISSIONARY) {
             $this->sub_type = $this->mtype;
-        } elseif ($this->type == 'Chaplain') {
+        } elseif ($this->type == self::TYPE_CHAPLAIN) {
             $this->sub_type = $this->ctype;
         } else {
             $this->sub_type = $this->type;
@@ -929,7 +968,7 @@ class Profile extends \yii\db\ActiveRecord
             $this->category = self::CATEGORY_ORG;
 
         if ($this->validate() && $this->getIsNewRecord() && $this->save()) {
-            ProfileMail::sendAdminNewProfile($this->id);                                           // Notify admin of new profile
+            ProfileMail::sendAdminNewProfile($this->id);
            
             return $this;
         }
@@ -943,7 +982,6 @@ class Profile extends \yii\db\ActiveRecord
  ***************************************************************************************************
  *
  * The following functions process the incoming data from the profile data collection forms 
- * 
  *
  ***************************************************************************************************
 \**************************************************************************************************/
@@ -958,20 +996,24 @@ class Profile extends \yii\db\ActiveRecord
     public function handleFormND()
     {
     // ************************ Mission Agency**********************************
-        if ($this->type == 'Mission Agency') {
-            if (!empty($this->select)) {
+        if ($this->type == self::TYPE_MISSION_AGCY) {
+            if ($this->select) {
                 $mission = MissionAgcy::findOne($this->select);
                 if ($mission && ($this->getOldAttribute('org_name') != $mission->mission)) {
-                    $this->org_name = $mission->mission;                                                          
-                    if ($oldA = MissionAgcy::find()->where(['profile_id' => $this->id])->one()) {    // Unlink old mission agcency
+                    $this->org_name = $mission->mission;
+                    // Unlink old mission agcency                                                     
+                    if ($oldA = MissionAgcy::find()->where(['profile_id' => $this->id])->one()) {
                         $oldA->unlink('linkedProfile', $this);
                     }
-                    $mission->link('linkedProfile', $this);                                          // link mission agency in mission agency table
+                    // link mission agency in mission agency table
+                    $mission->link('linkedProfile', $this);
                 }
-            } elseif (!empty($this->name) && !MissionAgcy::find()                                    // Check for duplicate
+            // Check for duplicate
+            } elseif ($this->name && !MissionAgcy::find()
                 ->where(['mission' => $this->name])->exists()) {
                 $this->org_name = $this->name;
-                $mission = new MissionAgcy();                                                        // Add to mission agency table
+                // Add to mission agency table
+                $mission = new MissionAgcy();
                 $mission->mission = $this->name;
                 $mission->mission_acronym = $this->acronym;
                 $mission->profile_id = $this->id;
@@ -981,22 +1023,25 @@ class Profile extends \yii\db\ActiveRecord
         }
 
     // *************************** Fellowship **********************************
-        if ($this->type == 'Fellowship') {  
-            if (!empty($this->select)) {
-                $fellowship = ProfileController::findFellowship($this->select);
-                if ($fellowship && ($this->getOldAttribute('org_name') != $fellowship->fellowship)) {
-                    $this->org_name = $fellowship->fellowship;                                                      
-                    if ($oldA = Fellowship::find()->where(['profile_id' => $this->id])->one()) {    // Unlink old fellowship
-                        $oldA->unlink('profile', $this);
+        if ($this->type == Profile::TYPE_FELLOWSHIP) {  
+            if ($this->select
+                && ($fellowship = Fellowship::findOne($this->select))
+                && ($this->getOldAttribute('org_name') != $fellowship->name)) {
+                    $this->org_name = $fellowship->name;                                                      
+                    // Unlink old fellowship
+                    if ($oldA = $this->linkedFellowship) {
+                        $oldA->unlink('linkedProfile', $this);
                     }
-                    $fellowship->link('linkedProfile', $this);                                      // link fellowship in fellowship table
-                }
-            } elseif (!empty($this->name) && !Fellowship::find()                                    // Check for duplicate
-                ->where(['fellowship' => $this->name])->exists()) {
+                    // link new fellowship
+                    $fellowship->link('linkedProfile', $this);
+            // Check for duplicate
+            } elseif ($this->name
+                && !Fellowship::find()->where(['name' => $this->name])->exists()) {
                 $this->org_name = $this->name;
-                $fellowship = new Fellowship();                                                     // Add to fellowship table
-                $fellowship->fellowship = $this->name;
-                $fellowship->fellowship_acronym = $this->acronym;
+                // Add to fellowship table
+                $fellowship = new Fellowship();
+                $fellowship->name = $this->name;
+                $fellowship->acronym = $this->acronym;
                 $fellowship->profile_id = $this->id;
                 $fellowship->validate();
                 $fellowship->save();
@@ -1004,22 +1049,26 @@ class Profile extends \yii\db\ActiveRecord
         }
 
         // ************************** Association ******************************
-        if ($this->type == 'Association') {
-            if (!empty($this->select)) {
+        if ($this->type == self::TYPE_ASSOCIATION) {
+            if ($this->select) {
                 $association = Association::findOne($this->select);
-                if ($association && ($this->getOldAttribute('org_name') != $association->association)) {
-                    $this->org_name = $association->association;                                                          
-                    if ($oldA = Association::find()->where(['profile_id' => $this->id])->one()) {   // Unlink old association
-                        $oldA->unlink('profile', $this);
+                if ($association && ($this->getOldAttribute('org_name') != $association->name)) {
+                    $this->org_name = $association->name;
+                    // Unlink old association                                                
+                    if ($oldA = Association::find()->where(['profile_id' => $this->id])->one()) {
+                        $oldA->unlink('linkedProfile', $this);
                     }
-                    $association->link('linkedProfile', $this);                                     // link association in association table
+                    // link association in association table
+                    $association->link('linkedProfile', $this);
                 }
-            } elseif (!empty($this->name) && !Association::find()                                   // Check for duplicate
-                ->where(['association' => $this->name])->exists()) {
+            // Check for duplicate
+            } elseif ($this->name && !Association::find()
+                ->where(['name' => $this->name])->exists()) {
                 $this->org_name = $this->name;
-                $association = new Association();                                                   // Add to association table
-                $association->association = $this->name;
-                $association->association_acronym = $this->acronym;
+                // Add to association table
+                $association = new Association();
+                $association->name = $this->name;
+                $association->acronym = $this->acronym;
                 $association->profile_id = $this->id;
                 $association->validate();
                 $association->save();
@@ -1027,8 +1076,8 @@ class Profile extends \yii\db\ActiveRecord
         }
 
     // ***************************** School ************************************
-        if ($this->type == 'School') {
-            if (!empty($this->select)) {
+        if ($this->type == self::TYPE_SCHOOL) {
+            if ($this->select) {
                 $name = explode('(', $this->select, 2);
                 $school = School::find()->where(['school' => $name[0]])->one();
                 if ($school && ($this->getOldAttribute('org_name') != $name[0])) {
@@ -1037,17 +1086,20 @@ class Profile extends \yii\db\ActiveRecord
                     $this->org_st_prov_reg = $school->st_prov_reg;
                     $this->org_country = $school->country;
                     
-                    if ($oldSchool = School::find()->where(['profile_id' => $this->id])->one()) {   // Unlink old school
+                    // Unlink old school
+                    if ($oldSchool = School::find()->where(['profile_id' => $this->id])->one()) {
                         $oldSchool->unlink('linkedProfile', $this);
                     }
-                    $school->link('linkedProfile', $this);                                          // link school in school table                                       
+                    // link school in school table
+                    $school->link('linkedProfile', $this);                                       
                 }
-            } elseif (!empty($this->name)) {
+            } elseif ($this->name) {
                 $this->org_name = $this->name;
             }
         }
 
-        $this->category == self::CATEGORY_IND ?                                                     // Update url name
+        // Update url name
+        $this->category == self::CATEGORY_IND ?
             $this->url_name = Inflector::slug($this->ind_last_name) :
             $this->url_name = Inflector::slug($this->org_name);
 
@@ -1115,7 +1167,8 @@ class Profile extends \yii\db\ActiveRecord
     // ************************** Organization Address *****************************
             } else {
 
-                if (empty($this->org_city)) {                                                       // if physical address is empty, populate city, state, country, and zip from mailing address
+                // if physical address is empty, populate city, state, country, and zip from mailing address
+                if (empty($this->org_city)) {
                     $this->org_city = $this->org_po_city;
                     $this->org_st_prov_reg = $this->org_po_st_prov_reg;
                     $this->org_zip = $this->org_po_zip;
@@ -1156,18 +1209,12 @@ class Profile extends \yii\db\ActiveRecord
                     $this->org_po_state_long = $po_state->long;
                 }
             }
-             
-            $oldMap = $this->getOldAttribute('show_map');
-            if ($oldMap == self::MAP_PRIMARY && empty($this->map)) {
-                $this->show_map = NULL;
-            } elseif (!empty($this->map)) {
-                $this->show_map = self::MAP_PRIMARY;
-            }
-
-            if ($this->type != 'Missionary') {
-                $this->category == self::CATEGORY_IND ?                                              // Update Url location
-                $this->url_loc = Inflector::slug($this->ind_city) :
-                $this->url_loc = Inflector::slug($this->org_city);
+            $this->updateMap(self::MAP_PRIMARY);
+            if ($this->type != self::TYPE_MISSIONARY) {
+                // Update Url location
+                $this->url_loc = ($this->category == self::CATEGORY_IND) ?
+                    Inflector::slug($this->ind_city) :
+                    Inflector::slug($this->org_city);
             }
 
     // ***************************** Save **************************************
@@ -1187,7 +1234,7 @@ class Profile extends \yii\db\ActiveRecord
     {
         if ($this->validate() && $this->save() && $social->validate() && $social->save()) {
             $this->setUpdateDate();
-            if ($this->social_id != $social->id) {
+            if (!$this->social) {
                 $social->link('profile', $this);
             }
             return $this;
@@ -1200,10 +1247,10 @@ class Profile extends \yii\db\ActiveRecord
      * 
      * @return mixed
      */
-    public function handleFormSFSA($profile)
+    public function handleFormSFSA()
     {
         $ids = explode('+', $_POST['senior']);
-        $pastor = $this->findModel($ids[0]);
+        $pastor = $this->findProfile($ids[0]);
         $staff = Staff::findOne($ids[1]);
         if ($pastor && $staff) {
             $this->updateAttributes([
@@ -1214,7 +1261,8 @@ class Profile extends \yii\db\ActiveRecord
             $staff->updateAttributes(['sr_pastor' => 1, 'confirmed' => 1]);
 
             $pastorProfileOwner = User::findOne($pastor->user_id);
-            ProfileMailController::initSendLink($this, $pastor, $pastorProfileOwner, 'SFSA', 'L');    // Notify staff profile owner of unconfirmed status
+            // Notify staff profile owner of unconfirmed status
+            ProfileMailController::initSendLink($this, $pastor, $pastorProfileOwner, 'SFSA', 'L');
 
             return $this;
         }        
@@ -1228,16 +1276,19 @@ class Profile extends \yii\db\ActiveRecord
      */
     public function handleFormSFSR()
     {
-        if ($staff = Staff::find()
+        if (!$staff = Staff::find()
             ->where(['staff_id' => $_POST['clear']])
             ->andWhere(['ministry_id' => $this->id])
             ->andWhere(['sr_pastor' => 1])
             ->one()) {
-            $staff->updateAttributes([
-                'confirmed' => NULL, 
-                'sr_pastor' => NULL]);
+            return false;
         }
-        $this->updateAttributes([                                                                   // remove all reference to pastor for the church profile
+        $staff->updateAttributes([
+            'confirmed' => NULL, 
+            'sr_pastor' => NULL]);
+
+        // remove all reference to pastor for the church profile
+        $this->updateAttributes([
             'ind_first_name' => NULL,                                       
             'spouse_first_name' => NULL,
             'ind_last_name' => NULL,
@@ -1245,7 +1296,7 @@ class Profile extends \yii\db\ActiveRecord
             'pastor_interim' => NULL,
         ]);
         
-        $pastor = $this->findModel($staff->staff_id);
+        $pastor = $this->findProfile($staff->staff_id);
         $pastorProfileOwner = User::findOne($pastor->user_id);
         ProfileMailController::initSendLink($this, $pastor, $pastorProfileOwner, 'SFSA', 'UL');     // Notify staff profile owner of unconfirmed status
 
@@ -1259,74 +1310,64 @@ class Profile extends \yii\db\ActiveRecord
      */
     public function handleFormHC()
     {
-        if ($this->select != NULL) {
-            if ($this->selectM != NULL) {                                                           // SelectM holds the new selection
-                $this->handleFormHCR();                                                             // Remove the old church selection
-            }
-            $this->home_church = $this->select;
-            if (!$staff = Staff::find()
+        if (!$staff = $this->staffHC) {
+            $staff = new Staff();
+            $staff->save();
+        }
+        $staff->updateAttributes([
+            'staff_id' => $this->id, 
+            'staff_type' => $this->type,
+            'staff_title' => $this->sub_type,
+            'ministry_id' => $this->home_church,
+            'home_church' => 1
+        ]);
+        // Only add pastors to staff table on home church form; other staff will be added on staff form
+        if ($this->type == self::TYPE_PASTOR) { 
+            $staff->updateAttributes(['church_pastor' => 1]); 
+        }
+
+        // Notify church profile owners of link changes
+        $oldHc = $this->getOldAttribute('home_church');
+        $hcProfile = $this->homeChurch;
+        $hcProfileOwner = $hcProfile->user;
+        if ($oldHc === NULL) {
+            ProfileMailController::initSendLink($this, $hcProfile, $hcProfileOwner, 'PM', 'L');
+
+        // Changed home church
+        } elseif ($oldHc != $this->home_church) {
+            if ($oldStaff = Staff::find()
                 ->where(['staff_id' => $this->id])
-                ->andWhere(['ministry_id' => $this->select])
+                ->andWhere(['ministry_id' => $oldHc])
+                ->andWhere(['staff_title' => $this->sub_type])
                 ->andWhere(['home_church' => 1])
                 ->one()) {
-                $staff = new Staff();
-                $staff->save();
+                $oldStaff->delete();
             }
-
-            if ($this->select != $staff->ministry_id) {                                             // Did user select a new ministry?
-                $profile = ProfileController::findProfile($this->id);
-                $churchProfile = ProfileController::findProfile($this->select);
-                $churchProfileOwner = User::findOne($churchProfile->user_id);
-                ProfileMailController::initSendLink($profile, $churchProfile, $churchProfileOwner, 'HC', 'L');    // Notify church profile owner of new linked profile
-            }
-
-            $staff->updateAttributes([
-                'staff_id' => $this->id, 
-                'staff_type' => $this->type,
-                'staff_title' => $this->sub_type,
-                'ministry_id' => $this->select,
-                'home_church' => 1]);
-
-            if ($this->type == 'Pastor') {                                                          // Only add pastors to staff table on home church form; other staff will be added on staff form
-                $staff->updateAttributes(['church_pastor' => 1]);
-            }
+            $oldHcProfile = $this->findProfile($oldHc);
+            $oldHcProfileOwner = $oldHcProfile->user;
+            ProfileMailController::initSendLink($this, $oldHcProfile, $oldHcProfileOwner, 'PM', 'UL');
+            ProfileMailController::initSendLink($this, $hcProfile, $hcProfileOwner, 'PM', 'L');
         }
 
-        $oldMap = $this->getOldAttribute('show_map');
-        if ($oldMap == self::MAP_CHURCH && empty($this->map)) {
-            $this->show_map = NULL;
-        } elseif (!empty($this->map)) {
-            $this->show_map = self::MAP_CHURCH;
-        }
-
+        $this->updateMap(self::MAP_CHURCH);
         if ($this->save() && $this->setUpdateDate()) {
+
+            // Update role to SafeUser
+            if ($this->category == self::CATEGORY_IND 
+                && array_keys(Yii::$app->authManager->getRolesByUser($this->user_id))[0] == User::ROLE_USER) {
+                // Revoke current User role
+                $auth = Yii::$app->authManager;
+                $item = $auth->getRole(User::ROLE_USER);
+                $auth->revoke($item, $this->user_id);  
+                // Set user role to SafeUser         
+                $auth = Yii::$app->authManager;
+                $userRole = $auth->getRole(User::ROLE_SAFEUSER);
+                $auth->assign($userRole, $this->user_id);
+            }
+
             return $this;
         }
         return false;
-    }
-
-    /**
-     * handleFormHCR: Home Church Remove
-     * 
-     * @return mixed
-     */
-    public function handleFormHCR()
-    {
-        if ($staff = Staff::find()
-            ->where(['staff_id' => $this->id])
-            ->andWhere(['ministry_id' => $this->home_church])
-            ->andWhere(['staff_title' => $this->sub_type])
-            ->andWhere(['home_church' => 1])
-            ->one()) {
-
-            $profile = ProfileController::findProfile($staff->staff_id);
-            $churchProfile = ProfileController::findProfile($staff->ministry_id);
-            $churchProfileOwner = User::findOne($churchProfile->user_id);
-            ProfileMailController::initSendLink($profile, $churchProfile, $churchProfileOwner, 'HC', 'UL');     // Notify church profile owner of unlinked profile
-
-            $staff->delete();
-        }
-        return $this;
     }
 
     /**
@@ -1336,41 +1377,46 @@ class Profile extends \yii\db\ActiveRecord
      */
     public function handleFormPM()
     {
-        if ($this->select != NULL) {
-            if ($this->category == self::CATEGORY_IND) {                                            // If individual, Update staff table regardless of new or existing connection
-                $this->type == 'Staff' ? $title = $this->title : $title = $this->sub_type;
-                if (!$staff = Staff::find()                                                         // Add to staff table if not already there
-                    ->where(['staff_id' => $this->id])
-                    ->andWhere(['ministry_id' => $this->ministry_of])
-                    ->andWhere(['staff_title' => $title])
-                    ->one()) {
+        if ($this->ministry_of != NULL) {
+            // If individual, Update staff table regardless of new or existing connection
+            if ($this->category == self::CATEGORY_IND) {
+                $this->aName = ($this->type == self::TYPE_STAFF) ? $this->title : $this->sub_type;
+                // Add to staff table if not already there
+
+                if (!$staff = $this->staffPM) {
                     $staff = new Staff();
                     $staff->save();
                 }
                 $staff->updateAttributes([
                     'staff_id' => $this->id, 
                     'staff_type' => $this->type,
-                    'staff_title' => $title,
-                    'ministry_id' => $this->select,
+                    'staff_title' => $this->aName,
+                    'ministry_id' => $this->ministry_of,
                     'ministry_of' => 1]);
             }
-            if ($this->ministry_of != $this->select) {
-
-                $ministryProfile = ProfileController::findProfile($this->select);
-                $ministryProfileOwner = User::findOne($ministryProfile->user_id);
-                ProfileMailController::initSendLink($this, $ministryProfile, $ministryProfileOwner, 'PM', 'L');     // Notify ministry profile owner of new link
-                
-                $this->ministry_of = $this->select;                                                 // Update profile ministry_of
+            // Notify profile owners of link changes
+            $oldMin = $this->getOldAttribute('ministry_of');
+            $minProfile = $this->parentMinistry;
+            $minProfileOwner = $minProfile->user;
+            if ($oldMin == NULL) {
+                ProfileMailController::initSendLink($this, $minProfile, $minProfileOwner, 'PM', 'L');
+            // Changed parent ministry
+            } elseif ($oldMin != $this->ministry_of) {
+                if (($this->category == self::CATEGORY_IND)
+                    && ($oldStaff = Staff::find()
+                        ->where(['staff_id' => $this->id])
+                        ->andWhere(['ministry_id' => $oldMin])
+                        ->andWhere(['staff_title' => $this->aName])
+                        ->one())) {
+                    $oldStaff->delete();
+                }
+                $oldMinProfile = $this->findProfile($oldMin);
+                $oldMinProfileOwner = $oldMinProfile->user;
+                ProfileMailController::initSendLink($this, $oldMinProfile, $oldMinProfileOwner, 'PM', 'UL');
+                ProfileMailController::initSendLink($this, $minProfile, $minProfileOwner, 'PM', 'L');
             }
         }
-        
-        $oldMap = $this->getOldAttribute('show_map');
-        if ($oldMap == self::MAP_MINISTRY && empty($this->map)) {
-            $this->show_map = NULL;
-        } elseif (!empty($this->map)) {
-            $this->show_map = self::MAP_MINISTRY;
-        }
-
+        $this->updateMap(self::MAP_MINISTRY);
         if ($this->save() && $this->setUpdateDate()) {
             return $this;
         }
@@ -1387,8 +1433,8 @@ class Profile extends \yii\db\ActiveRecord
         if ($this->selectM != NULL) {
             if (!$staff = Staff::find()
                 ->where(['staff_id' => $this->id])
-                ->andWhere(['staff_type' => $this->type])                                           // Allow for multiple staff roles at same church
-                ->andWhere(['staff_title' => $this->titleM])                                            // 
+                ->andWhere(['staff_type' => $this->type]) // Allow for multiple staff roles at same church
+                ->andWhere(['staff_title' => $this->titleM])
                 ->andWhere(['ministry_id' => $this->selectM])
                 ->andWhere(['ministry_other' => 1])
                 ->one()) {
@@ -1396,8 +1442,9 @@ class Profile extends \yii\db\ActiveRecord
                 $staff->save();
             }
 
-            if ($staff->ministry_id != $this->selectM) {                                            // Send mail to notify ministry profile owner of new link
-                $ministryProfile = ProfileController::findProfile($this->selectM);
+            // Send mail to notify ministry profile owner of new link
+            if ($staff->ministry_id != $this->selectM) {
+                $ministryProfile = self::findProfile($this->selectM);
                 $ministryProfileOwner = User::findOne($ministryProfile->user_id);
                 ProfileMailController::initSendLink($this, $ministryProfile, $ministryProfileOwner, 'PM', 'L');   
             }
@@ -1410,7 +1457,7 @@ class Profile extends \yii\db\ActiveRecord
                 'ministry_other' => 1]);
 
         }
-        return true;
+        return $this;
     }
 
     /**
@@ -1424,26 +1471,30 @@ class Profile extends \yii\db\ActiveRecord
             $pgProfile = Profile::findOne($_POST['remove']);
 
             $pgProfileOwner = User::findOne($pgProfile->user_id);
-            ProfileMailController::initSendLink($this, $pgProfile, $pgProfileOwner, 'PG', 'UL');     // Notify program profile owner of unlinked church
+            // Notify program profile owner of unlinked church
+            ProfileMailController::initSendLink($this, $pgProfile, $pgProfileOwner, 'PG', 'UL');
 
-            $this->unlink('program', $pgProfile, $delete = true);
+            $this->unlink('programs', $pgProfile, $delete = true);
         
         } elseif ($this->select != NULL) {
             $pgProfile = $this->findOne($this->select);
             $linked = false;
             if ($pgs = $this->program) {
-                foreach($pgs as $pg) {                                                              // Check to see if program is already linked to profile
+                // Check to see if program is already linked to profile
+                foreach($pgs as $pg) {
                     if ($pg->id == $pgProfile->id) {
                         $linked = true;
                     }
                 }
             }
-            if (!$linked && $this->setUpdateDate()) {                                               // Link program to file
-                $this->link('program', $pgProfile);
+            // Link program to file
+            if (!$linked && $this->setUpdateDate()) {
+                $this->link('programs', $pgProfile);
             }
 
             $pgProfileOwner = User::findOne($pgProfile->user_id);
-            ProfileMailController::initSendLink($this, $pgProfile, $pgProfileOwner, 'PG', 'L');     // Notify program profile owner of unlinked church
+            // Notify program profile owner of unlinked church
+            ProfileMailController::initSendLink($this, $pgProfile, $pgProfileOwner, 'PG', 'L');
 
         }
         return $this;
@@ -1457,45 +1508,55 @@ class Profile extends \yii\db\ActiveRecord
     public function handleFormSA()
     {
         if ($this->validate() && $this->setUpdateDate()) {
-            $oldSelect = arrayHelper::map($this->school, 'id', 'id');
-            if (empty($oldSelect) && ($select = $this->select) != NULL) {                           // handle case of new selection
+            $oldSelect = arrayHelper::map($this->schoolsAttended, 'id', 'id');
+            // handle case of new selection
+            if (!$oldSelect && ($select = $this->select) != NULL) {
                 foreach ($select as $value) {
                     $sc = School::findOne($value);
-                    $this->link('school', $sc);                                                     // Link new schools
+                    // Link new schools
+                    $this->link('schoolsAttended', $sc);
 
                     $scProfile = $sc->linkedProfile;
                     if ($scProfile && ($scProfileOwner = $scProfile->user)) {
-                        ProfileMailController::initSendLink($this, $scProfile, $scProfileOwner, 'SA', 'L');   // notify school profile owner of link
+                        // notify school profile owner of link
+                        ProfileMailController::initSendLink($this, $scProfile, $scProfileOwner, 'SA', 'L');
                     }
                 }
             }
-            if (!empty($oldSelect) && empty($this->select))  {                                      // handle case of all unselected
-                $schoolArray = $this->school;
+            // handle case of all unselected
+            if (!empty($oldSelect) && empty($this->select))  {
+                $schoolArray = $this->schoolsAttended;
                 foreach($schoolArray as $sc) {
                     
                     $scProfile = $sc->linkedProfile;
                     if ($scProfile && ($scProfileOwner = $scProfile->user)) {
-                        ProfileMailController::initSendLink($this, $scProfile, $scProfileOwner, 'SA', 'UL');  // notify school profile owner of unlink
+                        // notify school profile owner of unlink
+                        ProfileMailController::initSendLink($this, $scProfile, $scProfileOwner, 'SA', 'UL');
                     }
 
-                    $sc->unlink('profile', $this, $delete = true);                                  // unlink all schools
+                    // unlink all schools
+                    $sc->unlink('profiles', $this, $delete = true);
 
                 }
             }
-            if (!empty($oldSelect) && ($select = $this->select) != NULL) {                          // handle all other cases of change in selection
-                foreach($select as $value) {                                                        // link any new selections
+            // handle all other cases of change in selection
+            if (!empty($oldSelect) && ($select = $this->select) != NULL) {
+                // link any new selections
+                foreach($select as $value) {
                     if(!in_array($value, $oldSelect)) {
                         $sc = School::findOne($value);
-                        $this->link('school', $sc);
+                        $this->link('schoolsAttended', $sc);
 
                         $scProfile = $sc->linkedProfile;
                         if ($scProfile && ($scProfileOwner = $scProfile->user)) {
-                            ProfileMailController::initSendLink($this, $scProfile, $scProfileOwner, 'SA', 'L');   // notify school profile owner of link
+                            // notify school profile owner of link
+                            ProfileMailController::initSendLink($this, $scProfile, $scProfileOwner, 'SA', 'L');
                         }
 
                     }
                 }
-                foreach($oldSelect as $value) {                                                     // unlink any selections that were removed
+                // unlink any selections that were removed
+                foreach($oldSelect as $value) {
                     if(!in_array($value, $select)) {
                         $sc = School::findOne($value);
 
@@ -1504,7 +1565,7 @@ class Profile extends \yii\db\ActiveRecord
                             ProfileMailController::initSendLink($this, $scProfile, $scProfileOwner, 'SA', 'UL');  // Notify school profile owner of unlink
                         }
 
-                        $this->unlink('school', $sc, $delete = true);
+                        $this->unlink('schools', $sc, $delete = true);
                 
                     }
                 }
@@ -1522,30 +1583,35 @@ class Profile extends \yii\db\ActiveRecord
     public function handleFormSL()
     {
         if ($this->validate() && $this->setUpdateDate()) {
-            $oldSelect = arrayHelper::map($this->schoolLevel, 'id', 'id');
-            if (empty($oldSelect) && ($select = $this->select) != NULL) {                           // handle case of new selection
+            $oldSelect = arrayHelper::map($this->schoolLevels, 'id', 'id');
+            // handle case of new selection
+            if (empty($oldSelect) && ($select = $this->select) != NULL) {
                 foreach ($select as $value) {
                     $s = SchoolLevel::findOne($value);
-                    $this->link('schoolLevel', $s);
+                    $this->link('schoolLevels', $s);
                 }
             }
-            if (!empty($oldSelect) && empty($this->select))  {                                      // handle case of all unselected
-                $s = $this->schoolLevel;
+            // handle case of all unselected
+            if ($oldSelect && !$this->select)  {
+                $s = $this->schoolLevels;
                 foreach($s as $model) {
-                    $model->unlink('profile', $this, $delete = TRUE);
+                    $model->unlink('profiles', $this, $delete = TRUE);
                 }
             }
-            if (!empty($oldSelect) && ($select = $this->select) != NULL) {                          // handle all other cases of change in selection
-                foreach($select as $value) {                                                        // link any new selections
+            // handle all other cases of change in selection
+            if ($oldSelect && ($select = $this->select) != NULL) {
+                // link any new selections
+                foreach($select as $value) {
                     if(!in_array($value, $oldSelect)) {
                         $s = SchoolLevel::findOne($value);
-                        $this->link('schoolLevel', $s);
+                        $this->link('schoolLevels', $s);
                     }
                 }
-                foreach($oldSelect as $value) {                                                     // unlink any selections that were removed
+                // unlink any selections that were removed
+                foreach($oldSelect as $value) {
                     if(!in_array($value, $select)) {
                         $s = SchoolLevel::findOne($value);
-                        $this->unlink('schoolLevel', $s, $delete = TRUE);
+                        $this->unlink('schoolLevels', $s, $delete = TRUE);
                     }
                 }
             }
@@ -1562,7 +1628,8 @@ class Profile extends \yii\db\ActiveRecord
     public function handleFormMA()
     {
     // *********************** Missions Packet *********************************
-        if ($uploadPacket = UploadedFile::getInstance($this, 'packet')) {                           // Create subfolders on server and store uploaded pdf
+        // Create subfolders on server and store uploaded pdf
+        if ($uploadPacket = UploadedFile::getInstance($this, 'packet')) {
             $fileName = md5(microtime() . $uploadPacket->name);
             $fileExt = strrchr($uploadPacket->name, '.');
             $fileDir = substr($fileName, 0, 2);
@@ -1583,55 +1650,52 @@ class Profile extends \yii\db\ActiveRecord
         }
 
     // **************************** Church *************************************
-        $oldSelect = arrayHelper::map($this->missionAgcy, 'id', 'id');
-        if (empty($oldSelect) && !empty($select = $this->select)) {                                 // handle case of new selection
+        $oldSelect = arrayHelper::map($this->missionAgcys, 'id', 'id');
+        // handle case of new selection
+        if (!$oldSelect && ($select = $this->select)) {
             foreach ($select as $value) {
                 $a = MissionAgcy::findOne($value);
-                    $this->link('missionAgcy', $a);
+                    $this->link('missionAgcys', $a);
             }
         }
-        if (!empty($oldSelect) && empty($this->select))  {                                          // handle case of all unselected
-            $a = $this->missionAgcy;
+        // handle case of all unselected
+        if ($oldSelect && !$this->select)  {
+            $a = $this->missionAgcys;
             foreach($a as $model) {
-                $model->unlink('profile', $this, $delete = TRUE);
+                $model->unlink('profiles', $this, $delete = TRUE);
             }
         }
-        if (!empty($oldSelect) && !empty($select = $this->select)) {                                // handle all other cases of change in selection
-            foreach($select as $value) {                                                            // link any new selections
+        // handle all other cases of change in selection
+        if ($oldSelect && ($select = $this->select)) {
+            // link any new selections
+            foreach($select as $value) {
                 if(!in_array($value, $oldSelect)) {
                     $a = MissionAgcy::findOne($value);
-                    $this->link('missionAgcy', $a);
+                    $this->link('missionAgcys', $a);
                 }
             }
-            foreach($oldSelect as $value) {                                                         // unlink any selections that were removed
+            // unlink any selections that were removed
+            foreach($oldSelect as $value) {
                 if(!in_array($value, $select)) {
                     $a = MissionAgcy::findOne($value);
-                    $this->unlink('missionAgcy', $a, $delete = TRUE);
+                    $this->unlink('missionAgcys', $a, $delete = true);
                 }
             }
         }
 
     // *********************** Missions Housing ********************************
-        if ($this->miss_housing_id && $this->missHousing == 'N') {                                  // Handle case of deleting mission housing
-            
-            if ($v = MissHousing::find()
-                ->with('missHousingVisibility')
-                ->where(['id' => $this->miss_housing_id])
-                ->one()) {  
-                if ($v->missHousingVisibility) {
-                    $v->unlink('missHousingVisibility', $v->missHousingVisibility[0], $delete = TRUE); 
-                }
-                $this->unlink('missHousing', $v);
-                $v->delete();
-            }                       
+        // Handle case of deleting mission housing
+        if (($housing = $this->missHousing) && $this->housingSelect == 'N') { 
+            $this->unlink('missHousing', $housing);
+            $housing->delete();                     
         }
 
     // ***************************** Save **************************************
-
-        if ($this->validate() && $this->save() && $this->setUpdateDate()) {                         // Save Profile instance            
+        // Save Profile instance
+        if ($this->validate() && $this->save() && $this->setUpdateDate()) {            
             return $this;
         }
-        return False;
+        return false;
     }
 
     /**
@@ -1644,80 +1708,95 @@ class Profile extends \yii\db\ActiveRecord
     // *************************** School **************************************
         if($this->type == 'School') {
 
-            $oldSelect = arrayHelper::map($this->accreditation, 'id', 'id');
-            if (empty($oldSelect) && ($select = $this->select) != NULL) {                           // handle case of new selection
+            $oldSelect = arrayHelper::map($this->accreditations, 'id', 'id');
+            // handle case of new selection
+            if (!$oldSelect && ($select = $this->select) != NULL) {
                 foreach ($select as $value) {
                     $a = Accreditation::findOne($value);
-                        $this->link('accreditation', $a);
+                        $this->link('accreditations', $a);
                 }
             }
-            if (!empty($oldSelect) && empty($this->select))  {                                      // handle case of all unselected
-                $a = $this->accreditation;
+            // handle case of all unselected
+            if ($oldSelect && !$this->select)  {
+                $a = $this->accreditations;
                 foreach($a as $model) {
-                    $model->unlink('profile', $this, $delete = TRUE);
+                    $model->unlink('profiles', $this, $delete = TRUE);
                 }
             }
-            if (!empty($oldSelect) && ($select = $this->select) != NULL) {                          // handle all other cases of change in selection
-                foreach($select as $value) {                                                        // link any new selections
+            // handle all other cases of change in selection
+            if ($oldSelect && ($select = $this->select) != NULL) {
+                // link any new selections
+                foreach($select as $value) {
                     if(!in_array($value, $oldSelect)) {
                         $a = Accreditation::findOne($value);
-                        $this->link('accreditation', $a);
+                        $this->link('accreditations', $a);
                     }
                 }
-                foreach($oldSelect as $value) {                                                     // unlink any selections that were removed
+                 // unlink any selections that were removed
+                foreach($oldSelect as $value) {
                     if(!in_array($value, $select)) {
                         $a = Accreditation::findOne($value);
-                        $this->unlink('accreditation', $a, $delete = TRUE);
+                        $this->unlink('accreditations', $a, $delete = TRUE);
                     }
                 }
             }
-            return $this;                                                                           // No need to save $profile model
+            // No need to save $profile model
+            return $this;
         }
 
     // ************************** Fellowship ***********************************
         
-        $oldSelect = arrayHelper::map($this->fellowship, 'id', 'id');
-        if (empty($oldSelect) && ($select = $this->select) != NULL) {                               // handle case of new selection
+        $oldSelect = arrayHelper::map($this->fellowships, 'id', 'id');
+        // handle case of new selection
+        if (!$oldSelect && ($select = $this->select) != NULL) {
             foreach ($select as $value) {
                 $f = Fellowship::findOne($value);
-                $this->link('fellowship', $f);
+                $this->link('fellowships', $f);
 
-                if ($fProfile = $f->linkedProfile) {                                                // notify new fellowship profile owner of new link
+                // notify new fellowship profile owner of new link
+                if ($fProfile = $f->linkedProfile) {
                     $fProfileOwner = User::findOne($fProfile->user_id);
                     ProfileMailController::initSendLink($this, $fProfile, $fProfileOwner, 'AS', 'L');      
                 }
 
             }
         }
-        if (!empty($oldSelect) && empty($this->select))  {                                          // handle case of all unselected
-            $f = $this->fellowship;
+        // handle case of all unselected
+        if ($oldSelect && !$this->select)  {
+            $f = $this->fellowships;
             foreach($f as $model) {
-                $model->unlink('profile', $this, $delete = TRUE);
+                $model->unlink('profiles', $this, $delete = TRUE);
 
-                if ($fProfile = $f->linkedProfile) {                                                // notify old fellowship profile owner of unlink
+                // notify old fellowship profile owner of unlink
+                if ($fProfile = $f->linkedProfile) {
                     $fProfileOwner = User::findOne($fProfile->user_id);
                     ProfileMailController::initSendLink($this, $fProfile, $fProfileOwner, 'AS', 'UL');      
                 }
             }
         }
-        if (!empty($oldSelect) && ($select = $this->select) != NULL) {                              // handle all other cases of change in selection
-            foreach($select as $value) {                                                            // link any new selections
+        // handle all other cases of change in selection
+        if ($oldSelect && ($select = $this->select) != NULL) {
+               // link any new selections
+            foreach($select as $value) {
                 if(!in_array($value, $oldSelect)) {
                     $f = Fellowship::findOne($value);
-                    $this->link('fellowship', $f);
+                    $this->link('fellowships', $f);
 
-                    if ($fProfile = $f->linkedProfile) {                                            // notify new fellowship profile owner of new link
+                    // notify new fellowship profile owner of new link
+                    if ($fProfile = $f->linkedProfile) {
                         $fProfileOwner = User::findOne($fProfile->user_id);
                         ProfileMailController::initSendLink($this, $fProfile, $fProfileOwner, 'AS', 'L');      
                     }
                 }
             }
-            foreach($oldSelect as $value) {                                                         // unlink any selections that were removed
+            // unlink any selections that were removed
+            foreach($oldSelect as $value) {
                 if(!in_array($value, $select)) {
                     $f = Fellowship::findOne($value);
-                    $this->unlink('fellowship', $f, $delete = TRUE);
+                    $this->unlink('fellowships', $f, $delete = TRUE);
 
-                    if ($fProfile = $f->linkedProfile) {                                            // notify old fellowship profile owner of unlink
+                    // notify old fellowship profile owner of unlink
+                    if ($fProfile = $f->linkedProfile) {
                         $fProfileOwner = User::findOne($fProfile->user_id);
                         ProfileMailController::initSendLink($this, $fProfile, $fProfileOwner, 'AS', 'UL');      
                     }
@@ -1725,62 +1804,73 @@ class Profile extends \yii\db\ActiveRecord
             }
         }
 
-        if ($this->name != NULL) {                                                                  // Give preference to text input if both fellowshipSelect and fellowshipName are populated (better to collect more data, can delete duplicate entries if need be; and mitigates accidental selection)
+        // Give preference to text input if both fellowshipSelect and fellowshipName are populated (better to 
+        // collect more data, can delete duplicate entries if need be; and mitigates accidental selection)
+        if ($this->name != NULL) {
             if ($this->validate()) {
                 $newF = new Fellowship();
-                $newF->fellowship = $this->name;
-                $newF->fellowship_acronym = $this->acronym;
+                $newF->name = $this->name;
+                $newF->acronym = $this->acronym;
                 if ($newF->save()) {
-                    $this->link('fellowship', $newF);
+                    $this->link('fellowships', $newF);
                 }
             } else {
-                return false;                                                                       // Validation failed
+                return false;
             }                                                          
         }
 
     // ************************* Association ***********************************
-        $oldSelectM = arrayHelper::map($this->association, 'id', 'id');
-        if (empty($oldSelectM) && ($selectM = $this->selectM) != NULL) {                            // handle case of new selection
+        $oldSelectM = arrayHelper::map($this->associations, 'id', 'id');
+        // handle case of new selection
+        if (!$oldSelectM && ($selectM = $this->selectM) != NULL) {
             foreach ($selectM as $value) {
                 $a = Association::findOne($value);
-                $this->link('association', $a);
+                $this->link('associations', $a);
 
-                if ($aProfile = $a->linkedProfile) {                                                // notify new association profile owner of new link
+                // notify new association profile owner of new link
+                if ($aProfile = $a->linkedProfile) {
                     $aProfileOwner = User::findOne($aProfile->user_id);
                     ProfileMailController::initSendLink($this, $aProfile, $aProfileOwner, 'AS', 'L');      
                 }
 
             }
         }
-        if (!empty($oldSelectM) && empty($this->selectM))  {                                        // handle case of all unselected
-            $a = $this->association;
+        // handle case of all unselected
+        if ($oldSelectM && !$this->selectM)  {
+            $a = $this->associations;
             foreach($a as $model) {
-                $model->unlink('profile', $this, $delete = TRUE);
+                $model->unlink('profiles', $this, $delete = TRUE);
 
-                if ($aProfile = $a->linkedProfile) {                                                // notify old association profile owner of unlink
+                // notify old association profile owner of unlink
+                if ($aProfile = $a->linkedProfile) {
                     $aProfileOwner = User::findOne($aProfile->user_id);
                     ProfileMailController::initSendLink($this, $aProfile, $aProfileOwner, 'AS', 'UL');      
                 }
             }
         }
-        if (!empty($oldSelectM) && ($selectM = $this->selectM) != NULL) {                           // handle all other cases of change in selection
-            foreach($selectM as $value) {                                                           // link any new selections
+        // handle all other cases of change in selection
+        if ($oldSelectM && ($selectM = $this->selectM) != NULL) {
+            // link any new selections
+            foreach($selectM as $value) {
                 if(!in_array($value, $oldSelectM)) {
                     $a = Association::findOne($value);
-                    $this->link('association', $a);
- 
-                    if ($aProfile =$a->linkedProfile) {                                            // notify new association profile owner of new link
+                    $this->link('associations', $a);
+                    
+                    // notify new association profile owner of new link
+                    if ($aProfile =$a->linkedProfile) {
                         $aProfileOwner = User::findOne($aProfile->user_id);
                         ProfileMailController::initSendLink($this, $aProfile, $aProfileOwner, 'AS', 'L');      
                     }
                 }
             }
-            foreach($oldSelectM as $value) {                                                        // unlink any selections that were removed
+            // unlink any selections that were removed
+            foreach($oldSelectM as $value) {
                 if(!in_array($value, $selectM)) {
                     $a = Association::findOne($value);
-                    $this->unlink('association', $a, $delete = TRUE);
+                    $this->unlink('associations', $a, $delete = TRUE);
 
-                    if ($aProfile = $a->linkedProfile) {                                            // notify old association profile owner of unlink
+                    // notify old association profile owner of unlink
+                    if ($aProfile = $a->linkedProfile) {
                         $aProfileOwner = User::findOne($aProfile->user_id);
                         ProfileMailController::initSendLink($this, $aProfile, $aProfileOwner, 'AS', 'UL');      
                     }
@@ -1788,16 +1878,18 @@ class Profile extends \yii\db\ActiveRecord
             }
         }
 
-        if ($this->aName != NULL) {                                                                 // Give preference to text input if both associationSelect and associationName are populated (better to collect more data, can delete duplicate entries if need be; and mitigates accidental selection)
+        // Give preference to text input if both associationSelect and associationName are populated (better 
+        // to collect more data, can delete duplicate entries if need be; and mitigates accidental selection)
+        if ($this->aName != NULL) {
             if ($this->validate()) {
                 $newA = new Association();
-                $newA->association = $this->aName;
-                $newA->association_acronym = $this->aAcronym;
+                $newA->name = $this->aName;
+                $newA->acronym = $this->aAcronym;
                 if ($newA->save()) {
-                    $this->link('association', $newA);
+                    $this->link('associations', $newA);
                 }
             } else {
-                return false;                                                                       // Validation failed
+                return false;
             }                                                  
         }
 
@@ -1816,37 +1908,42 @@ class Profile extends \yii\db\ActiveRecord
     public function handleFormTA()
     {
 
-        $oldSelect = arrayHelper::map($this->tag, 'id', 'id');
-        if (empty($oldSelect) && !empty($select = $this->select)) {                                 // handle case of new selection
+        $oldSelect = arrayHelper::map($this->tags, 'id', 'id');
+        // handle case of new selection
+        if (empty($oldSelect) && !empty($select = $this->select)) {
             foreach ($select as $value) {
                 $t = Tag::findOne($value);
-                    $this->link('tag', $t);
+                    $this->link('tags', $t);
             }
         }
-        if (!empty($oldSelect) && empty($this->select))  {                                          // handle case of all unselected
-            $t = $this->tag;
+        // handle case of all unselected
+        if (!empty($oldSelect) && empty($this->select))  {
+            $t = $this->tags;
             foreach($t as $model) {
-                $model->unlink('profile', $this, $delete = TRUE);
+                $model->unlink('profiles', $this, $delete = TRUE);
             }
         }
-        if (!empty($oldSelect) && !empty($select = $this->select)) {                                // handle all other cases of change in selection
-            foreach($select as $value) {                                                            // link any new selections
+        // handle all other cases of change in selection
+        if ($oldSelect && ($select = $this->select)) {
+            // link any new selections
+            foreach($select as $value) {
                 if(!in_array($value, $oldSelect)) {
                     $t = Tag::findOne($value);
-                    $this->link('tag', $t);
+                    $this->link('tags', $t);
                 }
             }
-            foreach($oldSelect as $value) {                                                         // unlink any selections that were removed
+            // unlink any selections that were removed
+            foreach($oldSelect as $value) {
                 if(!in_array($value, $select)) {
                     $t = Tag::findOne($value);
-                    $this->unlink('tag', $t, $delete = TRUE);
+                    $this->unlink('tags', $t, $delete = TRUE);
                 }
             }
         }
 
     // ***************************** Save **************************************
 
-        if ($this->validate() && $this->save() && $this->setUpdateDate()) {                         // Save Profile instance            
+        if ($this->validate() && $this->save() && $this->setUpdateDate()) {            
             return $this;
         }
         return False;
@@ -1872,7 +1969,9 @@ class Profile extends \yii\db\ActiveRecord
 
 
     /**
-     * Generates new profile transfer token
+     * Generate new profile transfer token
+     * @param int $userId
+     * @return string transfer token
      */
     public function generateProfileTransferToken($userId)
     {
@@ -1880,13 +1979,15 @@ class Profile extends \yii\db\ActiveRecord
     }
 
     /**
-     * Generates new profile transfer token
+     * Check new profile transfer token
+     * @param string $token
+     * @return boolean
      */
     public function checkProfileTransferToken($token)
     {
-        if ($token == $this->transfer_token) {                                                      // Is the token same as db token?
+        if ($token == $this->transfer_token) {
             $timestamp = (int) substr($token, strrpos($token, '_') + 1);
-            $expire = Yii::$app->params['profileTransferTokenExpire'];                              // Is the token expired?
+            $expire = Yii::$app->params['tokenExpire.profileTransfer'];
             return $timestamp + $expire >= time();
         }         
         return false;                                      
@@ -1895,40 +1996,38 @@ class Profile extends \yii\db\ActiveRecord
     /**
      * Set profile status to "Active" 
      * Update created_at, last_update, and renewal_date fields
-     * @return
+     * @return mixed
      */
     public function activate()
     {
-        $createDate = new Expression('CURDATE()');
-
         if ($this->category == self::CATEGORY_IND) {
+
             $name = Inflector::slug($this->ind_last_name);
-            $urlLoc = ($this->type == 'Missionary') ?
+            $urlLoc = ($this->type == self::TYPE_MISSIONARY) ?
                 Inflector::slug($this->missionary->field) :
                 Inflector::slug($this->ind_city);
+
         } else {
             $name = Inflector::slug($this->org_name);
             $urlLoc = Inflector::slug($this->org_city);
         }
 
-        ProfileMailController::dbSendLink($this->id);                                               // send link notifications to profile owners
-        if ($this->status == Self::STATUS_NEW) ProfileMail::sendAdminActiveProfile($this->id);      // Notify admin of activation
-        
-        if ($this->category == self::CATEGORY_IND) {                                                // Update number of active individual profiles
-            $user = Yii::$app->user->identity;
-            $indProfiles = $user->ind_act_profiles + 1;
-            $user->updateAttributes(['ind_act_profiles' => $indProfiles]);
+        // Send link notifications to profile owners
+        ProfileMailController::dbSendLink($this->id);
+        // Notify admin of activation
+        if ($this->status == Self::STATUS_NEW) {
+            ProfileMail::sendAdminActiveProfile($this->id);
         }
 
-        if ($this->type == 'Missionary') {
-            $user = Yii::$app->user->identity;
-            $user->updateAttributes(['is_missionary' => 1]);
+        if ($this->type == self::TYPE_MISSIONARY) {
             $missionary = $this->missionary;
             $missionary->generateRepositoryKey();
-            $missionary->setUpdatesActive();                                                        // Set any mailchimp updates that were generated while the profile was inactive to active status
+            // Set to active any mailchimp updates that were generated while the profile was inactive
+            $missionary->setUpdatesActive();
         }
 
-        $events = $this->history;                                                                   // Enter first timeline event as "Joined IBNet"
+        // Enter first timeline event as "Joined IBNet"
+        $events = $this->history;
         $e = false;
         foreach ($events as $event) {
             if ($event->title = 'Joined IBNet') {
@@ -1943,6 +2042,9 @@ class Profile extends \yii\db\ActiveRecord
             $history->save();
         }
 
+        $createDate = new Expression('CURDATE()');
+
+        // Set active
         $this->updateAttributes([
             'created_at' => $createDate, 
             'inactivation_date' => NULL,
@@ -1957,30 +2059,24 @@ class Profile extends \yii\db\ActiveRecord
     /**
      * Set profile status to "Inactive" 
      * Update last_update and renewal_date fields
-     * @return
+     * @return boolean
      */
     public function inactivate()
     {
-        if ($progress = FormsCompleted::findOne($this->id)) {                                       // Delete progress
+        // Delete progress
+        if ($progress = FormsCompleted::findOne($this->id)) {
             $progress->delete();
         }
-        if ($this->setUpdateDate() && 
-            $this->updateAttributes([
-                'status' => Profile::STATUS_INACTIVE, 
-                'renewal_date' => NULL,
-                'inactivation_date' => new Expression('NOW()'),
-                'has_been_inactivated' => 1,
-                'edit' => self::EDIT_NO,
-            ])) {
+        $this->setUpdateDate(); 
+        $this->updateAttributes([
+            'status' => Profile::STATUS_INACTIVE, 
+            'renewal_date' => NULL,
+            'inactivation_date' => new Expression('NOW()'),
+            'has_been_inactivated' => 1,
+            'edit' => self::EDIT_NO,
+        ]);
 
-            if ($this->category = self::CATEGORY_IND) {                                             // Update number of active individual profiles
-                $user = Yii::$app->user->identity;
-                $indProfiles = $user->ind_act_profiles - 1;
-                $user->updateAttributes(['ind_act_profiles' => $indProfiles]);
-            }
-            return true;
-        }
-        return false;
+        return true;
     }
 
     /**
@@ -1994,46 +2090,37 @@ class Profile extends \yii\db\ActiveRecord
     public function trash()
     {
     // *********************** Remove forms_completed***************************
-        //
-        //
+        if ($fc = FormsCompleted::findOne($this->id)) {
+            $fc->delete();
+        }
 
-    // ************** Remove Link to Association/Fellowship ********************
-        if ($this->type == 'Association') {
-            $association = Association::findOne($this->ass_id);
-            if (isset($association)) {
+        // Remove Link to Association/Fellowship
+        if ($this->type == self::TYPE_ASSOCIATION) {
+            if ($association = $this->linkedAssociation) {
                 $association->updateAttributes(['profile_id' => NULL]);
             }
         }
-        if ($this->type == 'Fellowship')  {
-            $fellowship = ProfileController::findFellowship($this->flwship_id);
-            if (isset($fellowship)) {
+        if ($this->type == self::TYPE_FELLOWSHIP)  {
+            if ($fellowship = $this->linkedFellowship) {
                 $fellowship->updateAttributes(['profile_id' => NULL]);   
             }         
         }
 
-    // ******************* Remove Link to Mission Agency ***********************
-        if ($this->type == 'Mission Agency') {                                                      // Remove Mission Agency profile link to mission agency table
-            $agency = MissionAgcy::find()
-                ->select('*')
-                ->where(['profile_id' => $this->id])
-                ->one();
-            if (isset($agency)) {
+        // Remove Link to Mission Agency
+        if ($this->type == self::TYPE_MISSION_AGCY) {         // Remove Mission Agency profile link to mission agency table
+            if ($agency = $this->linkedMissionAgcy) {
                 $agency->updateAttributes(['profile_id' => NULL]);
             }
         }
 
-    // ********************* Remove Link to School *****************************
-        if ($this->type == 'School') {                                                              // Remove School profile link to school table
-            $school = School::find()
-                ->select('*')
-                ->where(['profile_id' => $this->id])
-                ->one();
-            if (isset($school)) {
+        // Remove Link to School
+        if ($this->type == self::TYPE_SCHOOL) {               // Remove School profile link to school table
+            if ($school = $this->linkedSchool) {
                 $school->updateAttributes(['profile_id' => NULL]);
             }
         }
 
-    // ********************* Set Status to "trash" *****************************
+        // Set Status to "trash"
         $date = new Expression('CURDATE()');
         $this->updateAttributes([
             'status' => self::STATUS_TRASH,
@@ -2049,92 +2136,179 @@ class Profile extends \yii\db\ActiveRecord
      */
     public function annihilate()
     {
-    // *********************** Remove forms_completed***************************
-        //
-        //
+        // Remove forms_completed
+        if ($fc = FormsCompleted::findOne($this->id)) {
+            $fc->delete();
+        }
 
-    // *********************** Remove Link to Staff ****************************
-        if ($this->staff_id != NULL) {
-            $staff = Staff::findOne($this->staff_id);
-            if (isset($staff)) {
-                $staff->delete();
+        // Remove Links to Staff 
+            // Individuals (delete record)
+        if ($staff = Staff::find()->where(['staff_id' => $this->id])->all()) {
+            foreach ($staff as $sf) {
+                $sf->delete();
+            }
+            // Organizations (remove ministry_id and retain record)
+        } elseif ($staff = Staff::find()->where(['ministry_id' => $this->id])->all()) {
+            foreach ($staff as $sf) {
+                $sf->updateAttributes(['ministry_id' => NULL]);
             }
         }
 
-    // ******************* Remove Link to Service Time *************************
-        if ($this->service_time_id != NULL) {
-            $service = ServiceTime::findOne($this->service_time_id);
-            if (isset($service)) {
-                $service->delete();
+        // Delete Service Time 
+        if ($service = $this->serviceTime) {
+            $service->delete();
+        }
+
+        // Delete Social
+        if ($social = $this->social) {
+            $social->delete();
+        }
+
+        // Delete Missions Housing
+        if ($housing = $this->missHousing) {
+            $housing->delete();
+        }
+
+        // Remove Link to Mission Agency
+            // Remove church approved mission agencies
+        if (($this->type == self::TYPE_CHURCH)
+            && ($agencies = ProfileHasMissionAgcy::find()->where(['profile_id' => $this->id])->all())) {
+            foreach ($agencies as $agency) {
+                $agency->delete();
             }
         }
 
-    // ********************** Remove Link to Social ****************************
-        if ($this->social_id != NULL) {
-            $social = Social::findOne($this->social_id);
-            if (isset($social)) {
-                $social->delete();
+        // Remove Link to Schools Attended
+        if ($schools = $this->schoolsAttended) {
+            foreach ($schools as $school) {
+                $this->unlink('schoolsAttended', $school);
             }
         }
 
-    // ***************** Remove Link to Missions Housing ***********************
-        if ($this->miss_housing_id != NULL) {
-            $housing = MissHousing::findOne($this->miss_housing_id);
-            if (isset($housing)) {
-                $visibility = MissHousingVisibility::findOne($housing->visibility_id);              // Remove link to Mission Housing Visibility
-                if (isset($visibility)) {
-                    $visibility->delete();                                                          // Remove link to Missions Housing
-                }
-                $housing->delete();
+        // Remove Link to School Levels
+        if ($levels = $this->schoolLevels) {
+            foreach ($levels as $level) {
+                $this->unlink('schoolLevels', $level);
             }
         }
 
-    // ******************* Remove Link to Mission Agency ***********************
-        if ($this->type == 'Church') {                                                              // Remove church approved mission agencies
-            $agencies = ProfileHasMissionAgcy::find()
-                ->select('*')
-                ->where(['profile_id' => $this->id])
-                ->all();
-            if (isset($agencies)) {
-                foreach ($agencies as $agency) {
-                    $agency->delete();
-                }
+        // Delete Record
+        return $this->delete() ? true : false;
+    }
+
+    /**
+     * Finds the Profile model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param string $id
+     * @return $profile the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public static function findProfile($id)
+    {
+        if ($profile = self::find()
+            ->where(['id' => $id])
+            ->andWhere(['<>', 'status', self::STATUS_TRASH])
+            ->one()) {
+            return $profile;
+        }
+        throw new NotFoundHttpException;
+    }
+
+    /**
+     * Finds an active Profile model based on its primary key value.
+     * @param string $id
+     * @return Profile the loaded model
+     */
+    public static function findActiveProfile($id)
+    {
+        if ($profile = Profile::find()
+            ->where(['id' => $id])
+            ->andwhere(['status' => Profile::STATUS_ACTIVE])
+            ->one()) {
+            return $profile;
+        }     
+        return false;
+    }
+
+    /**
+     * Finds an active Profile model based on id, location, and name.
+     * @param string $id
+     * @param string $urlLoc
+     * @param string $name
+     * @return Profile the loaded model
+     */
+    public function findViewProfile($id, $urlLoc, $urlName)
+    {
+        return self::find()
+            ->where(['id' => $id])
+            ->andwhere(['url_loc' => $urlLoc])
+            ->andwhere(['url_name' => $urlName])
+            ->andwhere(['status' => Profile::STATUS_ACTIVE])
+            ->one();
+    }
+
+    /**
+     * Check if profile has expired within the last year
+     * @param string $id
+     * @return boolean
+     */
+    public function isExpired($id) 
+    {
+        $profile = self::findProfile($id);
+        if ($profile->status != Profile::STATUS_NEW) {
+            $cutoffDate = strtotime($profile->inactivation_date . '+1 year');
+            if (date("m-d-Y", $cutoffDate) > date("m-d-Y")) {
+                return true;
             }
         }
+        throw new NotFoundHttpException; 
+    }
 
-    // ********************* Remove Link to School *****************************
-        if ($this->category == self::CATEGORY_IND) {                                                // Remove links to schools attended
-            $schools = ProfileHasSchool::find()
-                ->select('*')
-                ->where(['profile_id' => $this->id])
-                ->all();
-            if (isset($schools)) {
-                foreach ($schools as $school) {
-                    $school->delete();
-                }
-            }
-        }
-
-    // ***************** Remove Link to School Levels **************************
-        if ($this->type == 'School') {
-            $levels = ProfileHasSchoolLevel::find()
-                ->select('*')
-                ->where(['profile_id' => $this->id])
-                ->all();
-            if (isset($levels)) {
-                foreach ($levels as $level) {
-                    $level->delete();
-                }
-            }
-        }
-
-    // ************************* Delete Record *********************************
-        if ($this->delete()) {
-            return true;
+    /**
+     * Return a duplicate profile if exists
+     * @return Profile the loaded model
+     */
+    public function getDuplicate() 
+    {
+        if ($this->category == self::CATEGORY_IND) {
+            return self::find()
+                ->where(['ind_first_name' => $this->ind_first_name])
+                ->andWhere(['ind_last_name' => $this->ind_last_name])
+                ->andWhere(['ind_city' => $this->ind_city])
+                ->andWhere(['ind_st_prov_reg' => $this->ind_st_prov_reg])
+                ->andWhere(['ind_country' => $this->ind_country])
+                ->andWhere(['<>', 'id', $this->id])
+                ->andWhere(['status' => self::STATUS_ACTIVE])
+                ->one();
+        } else {
+            return self::find()
+                ->where(['org_name' => $this->org_name])
+                ->andWhere(['org_city' => $this->org_city])
+                ->andWhere(['org_st_prov_reg' => $this->org_st_prov_reg])
+                ->andWhere(['org_country' => $this->org_country])
+                ->andWhere(['<>', 'id', $this->id])
+                ->andWhere(['status' => self::STATUS_ACTIVE])
+                ->one();
         }
     }
 
     /**
+     * Update $show_map to user selection
+     * @var string $mapType
+     * @return $this
+     */
+    public function updateMap($mapType)
+    {
+        if (($this->getOldAttribute('show_map') == $mapType) && empty($this->map)) {
+            $this->show_map = NULL;
+        } elseif (!empty($this->map)) {
+            $this->show_map = $mapType;
+        }
+        return $this;
+    }
+
+    /**
+     * User model for profile owner
      * @return \yii\db\ActiveQuery
      */
     public function getUser()
@@ -2143,171 +2317,530 @@ class Profile extends \yii\db\ActiveRecord
     }
 
     /**
-     * Return an array of profiles owned by the current user
-     * @return array (of objects)
+     * First and last name
+     * @return string
      */
-    public function getProfileArray()
+    public function getFullName()
     {
-        $id = Yii::$app->user->identity->id;
-        return Profile::find()
-            ->where(['user_id' => $id])
-            ->andwhere('status != ' . self::STATUS_TRASH)
-            ->orderBy('id ASC')
-            ->all();
+        return $this->ind_first_name . ' ' . $this->ind_last_name;
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * First and last name, include spouse if exists
+     * @return string
      */
-    public function getServiceTime()
+    public function getCoupleName()
     {
-        return $this->hasOne(ServiceTime::className(), ['id' => 'service_time_id']);
+        return $this->spouse_first_name ? 
+            $this->ind_first_name . ' & ' . $this->spouse_first_name . ' ' . $this->ind_last_name :
+            $this->ind_first_name . ' ' . $this->ind_last_name;
+    }
+
+    /**
+     * Fisrt and last name, spouse name in parentheses
+     * @return string
+     */
+    public function getMainName()
+    {
+        return $this->spouse_first_name ? 
+            $this->ind_first_name . ' (& ' . $this->spouse_first_name . ') ' . $this->ind_last_name :
+            $this->ind_first_name . ' ' . $this->ind_last_name;
+    }
+
+    /**
+     * CoupleName or mainName, depending on profile type for indvs, or org_name for orgs
+     * 
+     * @return string
+     */
+    public function getformatName()
+    {
+        if ($this->category == self::CATEGORY_IND) {
+            return ($this->type == self::TYPE_MISSIONARY) ? $this->coupleName : $this->mainName;
+        } else {
+            return $this->org_name;
+        }
+    }
+
+    /**
+     * Active profile by id
+     * @return \yii\db\ActiveRecord
+     */
+    public function getActiveProfile($id)
+    {
+        return static::find()->where(['id' => $id, 'status' => self::STATUS_ACTIVE])->one();
     }
  
     /**
+     * Return singular or plural of individual subtypes
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPluralType()
+    {
+        switch ($this->type) {
+            case self::TYPE_MISSIONARY:
+                if ($this->sub_type == self::SUBTYPE_MISSIONARY_CP) {
+                    return $this->spouse_first_name ? 'Missionaries ' : 'Missionary ';
+                } elseif ($this->sub_type == self::SUBTYPE_MISSIONARY_BT) {
+                    return $this->spouse_first_name ? 'Medical Missionaries ' : 'Medical Missionary ';
+                } else {
+                    return $this->spouse_first_name ? 'Bible Translators ' : 'Bible Translator ';
+                }
+                break;
+            case self::TYPE_CHAPLAIN:
+                return $this->sub_type == self::SUBTYPE_CHAPLAIN_M ? 'Military Chaplain ' : 'Jail Chaplain ';
+                break;
+            default: return $this->type;
+            break;
+        }
+    }
+
+    /**
+     * Service times for a church profile
      * @return \yii\db\ActiveQuery
      */
     public function getSocial()
     {
-        return $this->hasOne(Social::className(), ['id' => 'social_id']);
+        return $this->hasOne(Social::className(), ['profile_id' => 'id']);
     }
 
     /**
+     * Check if at least one social link exists
+     * @return model $social || false
+     */
+    public function getHasSocial()
+    {
+        if (($social = $this->social) 
+            && !(empty($social->sermonaudio) 
+            && empty($social->facebook) 
+            && empty($social->linkedin)
+            && empty($social->twitter) 
+            && empty($social->rss)
+            && empty($social->youtube) 
+            && empty($social->vimeo) 
+            && empty($social->pinterest) 
+            && empty($social->tumblr) 
+            && empty($social->soundcloud) 
+            && empty($social->instagram) 
+            && empty($social->flickr))
+        ) {
+            return $social;
+        }
+        return false;
+    }
+
+    /**
+     * Tags linked to a special ministry
      * @return \yii\db\ActiveQuery
      */
-    public function getTag()
+    public function getTags()
     {
         return $this->hasMany(Tag::className(), ['id' => 'tag_id'])
             ->viaTable('profile_has_tag', ['profile_id' => 'id']);
     }
 
     /**
+     * Parent ministry profile of an organization or individual (staff's place of ministry)
      * @return \yii\db\ActiveQuery
      */
-    public function getMinistryOf()
+    public function getParentMinistry()
     {
-        return $this->hasOne(Profile::className(), ['id' => 'ministry_of']);
+        return $this->hasOne(self::className(), ['id' => 'ministry_of']);
     }
 
     /**
+     * Daughter ministry profiles
      * @return \yii\db\ActiveQuery
      */
-    public function getMinistry()
+    public function getMinistries()
     {
-        return $array = $this->find()->where(['ministry_of' => $this->id])->andWhere('type != "Staff"')->andWhere(['status' => self::STATUS_ACTIVE])->all();
+        return $this->hasMany(self::className(), ['ministry_of' => 'id'])
+            ->andWhere(['!=', 'type', self::TYPE_STAFF])
+            ->andWhere(['status' => self::STATUS_ACTIVE]);
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * Profiles for secondary ministries related to individual profile
+     * @return \yii\db\ActiveQuery Staff with their related ministry
      */
-    public function getProgram()
+    public function getOtherMinistries()
     {
-        return $this->hasMany(Profile::className(), ['id' => 'program_id'])
-            ->viaTable('profile_has_program', ['profile_id' => 'id']);
+        return $this->hasMany(Staff::className(), ['staff_id' => 'id'])
+            ->joinWith('ministry')
+            ->where(['staff.ministry_other' => 1, 'profile.status' => Profile::STATUS_ACTIVE])
+            ->orderBy('id Asc');
     }
 
     /**
+     * Confirmed profiles for secondary ministries related to individual profile
+     * @return \yii\db\ActiveQuery Staff with their related ministry
+     */
+    public function getOtherMinistriesConfirmed()
+    {
+        return $this->hasMany(Staff::className(), ['staff_id' => 'id'])
+            ->joinWith('ministry')
+            ->where(['staff.ministry_other' => 1, 'staff.confirmed' => 1, 'profile.status' => Profile::STATUS_ACTIVE])
+            ->orderBy('id Asc');
+    }
+
+    /**
+     * Programs linked to a church profile
      * @return \yii\db\ActiveQuery
      */
-    public function getChurches()
+    public function getPrograms()
     {
-        return $this->hasMany(Profile::className(), ['id' => 'profile_id'])
-            ->viaTable('profile_has_program', ['program_id' => 'id'])
+        return $this->hasMany(self::className(), ['id' => 'program_id'])
+            ->viaTable('profile_has_program', ['profile_id' => 'id'])
             ->where(['status' => self::STATUS_ACTIVE]);
     }
 
     /**
+     * Churches listing this profile as a program
+     * @return \yii\db\ActiveQuery
+     */
+    public function getProgramChurches()
+    {
+        return $this->hasMany(self::className(), ['id' => 'profile_id'])
+            ->viaTable('profile_has_program', ['program_id' => 'id'])
+            ->where(['type' => self::TYPE_CHURCH, 'status' => self::STATUS_ACTIVE]);
+    }
+
+    /**
+     * Missionaries sent by this church
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSentMissionaries()
+    {
+        return $this->hasMany(self::className(), ['home_church' => 'id'])
+            ->joinWith('missionary')
+            ->where(['profile.status' => self::STATUS_ACTIVE])
+            ->andWhere('profile.type="' . self::TYPE_MISSIONARY . '" OR profile.type="' . self::TYPE_CHAPLAIN . '" OR profile.type="' . self::TYPE_EVANGELIST . '"');
+    }
+
+    /**
+     * Service times for a church profile
+     * @return \yii\db\ActiveQuery
+     */
+    public function getServiceTime()
+    {
+        return $this->hasOne(ServiceTime::className(), ['profile_id' => 'id']);
+    }
+
+    /**
+     * Home church profile of an individual
      * @return \yii\db\ActiveQuery
      */
     public function getHomeChurch()
     {
-        return $this->hasOne(Profile::className(), ['id' => 'home_church'])->where(['status' => self::STATUS_ACTIVE]);
+        return $this->hasOne(self::className(), ['id' => 'home_church']);
     }
 
     /**
-     * Links a profile to a list of approved mission agencies
+     * Church members related to a church profile
      * @return \yii\db\ActiveQuery
      */
-    public function getMissionAgcy()
+    public function getChurchMembers()
+    {
+        return $this->hasMany(User::className(), ['home_church' => 'id'])
+            ->where(['user.status' => User::STATUS_ACTIVE])
+            ->andWhere(['!=', 'primary_role', User::PRIMARYROLE_PASTOR])
+            ->andWhere(['!=', 'primary_role', User::PRIMARYROLE_SENIORPASTOR]);
+    }
+
+    /**
+     * Fellow church members related to an individual/personal profile
+     * @return \yii\db\ActiveQuery Church profile with related member user models
+     */
+    public function getFellowChurchMembers()
+    {
+        return $this->hasOne(self::className(), ['id' => 'home_church'])
+            ->joinWith(['churchMembers' => function ($q) {
+                    $q->onCondition(['!=', 'user.id', $this->user_id]);
+                }]);
+    }
+    
+    /**
+     * Confirmed Sr Pastor profile related to a church profile
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSrPastorChurchConfirmed()
+    {
+        return $this->hasOne(self::className(), ['id' => 'staff_id'])
+            ->via('staffSrPastorChurchConfirmed')
+            ->where(['profile.status' => self::STATUS_ACTIVE]);
+    }
+
+    /**
+     * Staff model of a confirmed senior pastor related to this church profile
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStaffSrPastorChurchConfirmed()
+    {
+        return $this->hasOne(Staff::className(), ['ministry_id' => 'id'])
+            ->where(['staff.sr_pastor' => 1, 'staff.confirmed' => 1]);
+    }
+
+
+    /**
+     * Confirmed Sr Pastor profile related to this individual profile
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSrPastorIndConfirmed()
+    {
+        return $this->hasOne(self::className(), ['id' => 'staff_id'])
+            ->via('staffSrPastorIndConfirmed')
+            ->where(['profile.status' => self::STATUS_ACTIVE]);
+    }
+
+    /**
+     * Staff model of a confirmed senior pastor related to this individual profile
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStaffSrPastorIndConfirmed()
+    {
+        return $this->hasOne(Staff::className(), ['ministry_id' => 'home_church'])
+            ->where(['staff.sr_pastor' => 1, 'staff.confirmed' => 1]);
+    }
+
+
+    /**
+     * Mission agencies marked approved by a church
+     * @return \yii\db\ActiveQuery
+     */
+    public function getMissionAgcys()
     {
         return $this->hasMany(MissionAgcy::className(), ['id' => 'mission_agcy_id'])
             ->viaTable('profile_has_mission_agcy', ['profile_id' => 'id']);
     }
 
     /**
-     * Returns a linked missionary record
+     * Mission agency represented by (linked to) this profile
+     * @return \yii\db\ActiveQuery
+     */
+    public function getLinkedMissionAgcy()
+    {
+        return $this->hasOne(MissionAgcy::className(), ['profile_id' => 'id']);
+    }
+
+    /**
+     * Missionary model linked to missionary profile
      * @return \yii\db\ActiveQuery
      */
     public function getMissionary()
     {
-        return $this->hasOne(Missionary::className(), ['id' => 'missionary_id']);
+        return $this->hasOne(Missionary::className(), ['profile_id' => 'id']);
     }
 
     /**
+     * Missionary housing linked to this church profile
      * @return \yii\db\ActiveQuery
      */
     public function getMissHousing()
     {
-        return $this->hasOne(MissHousing::className(), ['id' => 'miss_housing_id']);
+        return $this->hasOne(MissHousing::className(), ['profile_id' => 'id']);
     }
 
     /**
+     * Schools attended by this profile owner
      * @return \yii\db\ActiveQuery
      */
-    public function getSchool()
+    public function getSchoolsAttended()
     {
         return $this->hasMany(School::className(), ['id' => 'school_id'])
             ->viaTable('profile_has_school', ['profile_id' => 'id']);
     }
 
     /**
+     * School with linked alumni profiles
      * @return \yii\db\ActiveQuery
      */
-    public function getSchoolLevel()
+    public function getAlumni()
+    {
+        return $this->hasOne(School::className(), ['profile_id' => 'id'])
+            ->joinWith('profiles')
+            ->where(['profile.status' => self::STATUS_ACTIVE]);
+    }
+
+    /**
+     * School represented by this profile
+     * @return \yii\db\ActiveQuery
+     */
+    public function getLinkedSchool()
+    {
+        return $this->hasOne(School::className(), ['profile_id' => 'id']);
+    }
+
+    /**
+     * School levels linked to this school profile
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSchoolLevels()
     {
         return $this->hasMany(SchoolLevel::className(), ['id' => 'school_level_id'])
             ->viaTable('profile_has_school_level', ['profile_id' => 'id']);
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * Fellowships of which this profile owner is a member
+     * @return \yii\db\ActiveQuery Fellowship with linked profile
      */
-    public function getFellowship()
+    public function getFellowships()
     {
         return $this->hasMany(Fellowship::className(), ['id' => 'flwship_id'])
-            ->viaTable('profile_has_fellowship', ['profile_id' => 'id']);
+            ->viaTable('profile_has_fellowship', ['profile_id' => 'id'])
+            ->joinWith('linkedProfile');
     }
 
     /**
+     * Fellowship represented by this profile
      * @return \yii\db\ActiveQuery
      */
-    public function getAssociation()
+    public function getLinkedFellowship()
     {
-        return $this->hasMany(Association::className(), ['id' => 'ass_id'])
-            ->viaTable('profile_has_association', ['profile_id' => 'id']);
+        return $this->hasOne(Fellowship::className(), ['profile_id' => 'id']);
     }
 
     /**
+     * Members (orgs & indvs) of the fellowship represented by this profile
+     * @return \yii\db\ActiveQuery Fellowship with related member profiles
+     */
+    public function getFellowshipMembers()
+    {
+        return $this->hasOne(Fellowship::className(), ['profile_id' => 'id'])
+            ->joinWith('profiles');
+    }
+
+    /**
+     * Associations of which this profile owner/organization is a member
+     * @return \yii\db\ActiveQuery Association with linked profile
+     */
+    public function getAssociations()
+    {
+        return $this->hasMany(Association::className(), ['id' => 'ass_id'])
+            ->viaTable('profile_has_association', ['profile_id' => 'id'])
+            ->joinWith('linkedProfile');
+    }
+
+    /**
+     * Association represented by this profile
+     * @return \yii\db\ActiveQuery
+     */
+    public function getLinkedAssociation()
+    {
+        return $this->hasOne(Association::className(), ['profile_id' => 'id']);
+    }
+
+    /**
+     * Member churches of the association represnted by this profile
+     * @return \yii\db\ActiveQuery  Association with related member profiles
+     */
+    public function getAssociationMembers()
+    {
+        return $this->hasOne(Association::className(), ['profile_id' => 'id'])
+            ->joinWith('profiles');
+    }
+
+    /**
+     * History events related to this profile
      * @return \yii\db\ActiveQuery
      */
     public function getHistory()
     {
-        return $this->hasMany(History::className(), ['profile_id' => 'id'])->where(['deleted' => 0])->orderBy('date ASC');
+        return $this->hasMany(History::className(), ['profile_id' => 'id'])
+            ->where(['deleted' => 0])
+            ->orderBy('date ASC');
     }
 
     /**
+     * Accreditations linked to this school profile
      * @return \yii\db\ActiveQuery
      */
-    public function getAccreditation()
+    public function getAccreditations()
     {
         return $this->hasMany(Accreditation::className(), ['id' => 'accreditation_id'])
             ->viaTable('profile_has_accreditation', ['profile_id' => 'id']);
     }
 
     /**
+     * Staff model of home church
      * @return \yii\db\ActiveQuery
      */
-    public function getLike()
+    public function getStaffHC()
+    {
+        return $this->hasOne(Staff::className(), ['staff_id' => 'id'])
+            ->andWhere(['staff.ministry_id' => $this->home_church, 'home_church' => 1]);
+    }
+
+    /**
+     * staff model of home church confirmed
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStaffHCConfirmed()
+    {
+        return $this->hasOne(Staff::className(), ['staff_id' => 'id'])
+            ->andWhere(['staff.ministry_id' => $this->home_church, 'staff.confirmed' => 1, 'home_church' => 1]);
+    }
+
+    /**
+     * Staff model of parent ministry
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStaffPM()
+    {
+        return $this->hasOne(Staff::className(), ['staff_id' => 'id'])
+            ->andWhere(['staff.ministry_id' => $this->ministry_of, 'staff_title' => $this->aName]);
+    }
+
+    /**
+     * Confirmed staff model of parent ministry
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStaffPMConfirmed()
+    {
+        return $this->hasOne(Staff::className(), ['staff_id' => 'id'])
+            ->andWhere(['staff.ministry_id' => $this->ministry_of, 'staff.confirmed' => 1, 'staff_title' => $this->aName]);
+    }
+
+    /**
+     * Staff models for an organization
+     * Exclude church sr pastor as a connection since he is listed on the profile
+     * @return \yii\db\ActiveQuery Staff models with their related profile
+     */
+    public function getOrgStaff()
+    {
+        return $this->hasMany(Staff::className(), ['ministry_id' => 'id'])
+            ->joinWith('profile')
+            ->where(['staff.sr_pastor' => NULL, 'staff.home_church' => NULL, 'profile.status' => Profile::STATUS_ACTIVE])
+            ->andWhere(['IS NOT', 'staff.staff_title', NULL])
+            ->orderBy('staff.staff_id Asc');
+    }
+
+    /**
+     * All confirmed staff models for an organization
+     * @return \yii\db\ActiveQuery Staff models with their related profile
+     */
+    public function getOrgStaffConfirmed()
+    {
+        return $this->hasMany(Staff::className(), ['ministry_id' => 'id'])
+            ->joinWith('profile')
+            ->where(['staff.sr_pastor' => NULL, 'staff.home_church' => NULL, 'staff.confirmed' => 1, 'profile.status' => Profile::STATUS_ACTIVE])
+            ->andWhere(['IS NOT', 'staff.staff_title', NULL])
+            ->orderBy('staff.staff_id Asc');
+    }
+
+    /**
+     * Whether this profile is liked by the current user
+     * @return \yii\db\ActiveQuery
+     */
+    public function getILike()
+    {
+        return $this->hasOne(ProfileHasLike::className(), ['profile_id' => 'id'])->where(['liked_by_id' => Yii::$app->user->identity->id]);
+    }
+
+    /**
+     * User that have liked this profile
+     * @return \yii\db\ActiveQuery
+     */
+    public function getLikes()
     {
         return $this->hasMany(User::className(), ['id' => 'liked_by_id'])
             ->viaTable('profile_has_like', ['profile_id' => 'id'])
@@ -2315,11 +2848,114 @@ class Profile extends \yii\db\ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * Remove users from this connection if they already have other connections
+     * @param array $users User models
+     * @param array $uids User model ids
+     * @return array $users
      */
-    public function getILike()
+    public function filterUsers($users, $uids=[])
     {
-        return $this->hasOne(ProfileHasLike::className(), ['profile_id' => 'id'])->where(['liked_by_id' => Yii::$app->user->identity->id]);
+        if (is_array($uids)) {
+            foreach ($users as $i => $u) {
+                if (in_array($u->id, $uids)) {
+                    unset($users[$i]);
+                }
+            }
+        }
+        return $users;
+    }
+
+    /**
+     * Remove users extracted from profile from this connection if they already have other connections
+     * @param array $profiles Profile models
+     * @param array $uids User model ids
+     * @return array $profiles
+     */
+    public function filterUsersByProfile($profiles, $uids=[])
+    {
+        if (is_array($uids)) {
+            foreach ($profiles as $i => $p) {
+                if (in_array($p->user_id, $uids)) {
+                    unset($profiles[$i]);
+                }
+            }
+        }
+        return $profiles;
+    }
+
+    /**
+     * Remove staff from this connection if they already have other connections
+     * @param array $staff Staff models (with connected profiles)
+     * @param array $uids User model ids
+     * @return array $users
+     */
+    public function filterStaff($staff, $uids=[])
+    {
+        if (is_array($uids)) {
+            foreach ($staff as $i => $s) {
+                if (in_array($s->profile->user_id, $uids)) {
+                    unset($staff[$i]);
+                }
+            }
+        }
+        return $staff;
+    }
+
+    /**
+     * Add user ids to uids to exclude from like connections
+     * @param array $users User models
+     * @param array $uids User model ids
+     * @return array $uids
+     */
+    public function filterUserIds($users, $uids=[], $callback=false)
+    {
+        if ($users) {
+            $userIds = $callback ? 
+                ArrayHelper::getColumn($users, function ($e) { return $e->profile->user_id; }) : 
+                ArrayHelper::getColumn($users, 'id');
+            return is_array($uids) ? array_unique(array_merge($uids, $userIds)) : $userIds;
+        }
+        return $uids;
+    }
+
+    /**
+     * Add user ids extracted from profiles to uids to exclude from like connections
+     * @param array $profiles Profile models
+     * @param array $uids User model ids
+     * @return array $uids
+     */
+    public function filterUserIdsByProfile($profiles, $uids=[])
+    {
+        if ($profiles) {
+            $userIds = ArrayHelper::getColumn($profiles, 'user_id');
+            return is_array($uids) ? array_unique(array_merge($uids, $userIds)) : $userIds;
+        }
+        return $uids;
+    }
+
+    /**
+     * Returns profiles or user models (users without profiles) of profile likers
+     * @param array $likes User models
+     * @param array $uids User model ids
+     * @return array $likeProfiles
+     */
+    public function getLikeProfiles($likes, $uids=[])
+    {
+        if (is_array($uids)) {
+            foreach ($likes as $i=>$like) {
+                if (in_array($like->id, $uids)) {
+                    unset($likes[$i]);
+                }
+            }
+        }
+        foreach($likes as $user) {
+            if($profile =  $user->indActiveProfile) {
+                $likeProfiles[] = $profile;
+            } else {
+                $likeProfiles[] = $user;
+            }
+        }
+        return $likeProfiles;
     }
 
     /**
@@ -2340,7 +2976,7 @@ class Profile extends \yii\db\ActiveRecord
                 $this->addError('ind_address1', $message);
             }
 
-        }  elseif ($this->org_city && 
+        } elseif ($this->org_city && 
             $this->org_st_prov_reg && 
             $this->org_country) {
             return $this->$attribute;
@@ -2389,7 +3025,7 @@ class Profile extends \yii\db\ActiveRecord
      */
     public function validateMissAgency($attribute, $params)
     {
-        if (($this->org_name == NULL) &&                                                            // NEED TO CREATE CONDITIONAL VALIDATOR TO REQUIRE ORG_NAME OR MISSIONAGENCY
+        if (($this->org_name == NULL) && // NEED TO CREATE CONDITIONAL VALIDATOR TO REQUIRE ORG_NAME OR MISSIONAGENCY
             (($this->missionAgency == NULL) ||
             ($this->missionAgency == ''))) {
             $this->addError($attribute, 
@@ -2426,8 +3062,8 @@ class Profile extends \yii\db\ActiveRecord
     public function validateUniqueFellowship($attribute, $params)
     {
         $uniqueFellowship = Fellowship::find()
-            ->select('fellowship')
-            ->where(['LIKE', 'fellowship', $this->name])
+            ->select('name')
+            ->where(['LIKE', 'name', $this->name])
             ->one();
         if ($uniqueFellowship > NULL) {
              $this->addError($attribute, 'This fellowship already exists.  Select it from the list above');
@@ -2444,8 +3080,8 @@ class Profile extends \yii\db\ActiveRecord
     public function validateUniqueFlwshpAcronym($attribute, $params)
     {
         $uniqueAcronym = Fellowship::find()
-            ->select('fellowship_acronym')
-            ->where(['LIKE', 'fellowship_acronym', $this->acronym])
+            ->select('acronym')
+            ->where(['LIKE', 'acronym', $this->acronym])
             ->one();
         if ($uniqueAcronym > NULL) {
              $this->addError($attribute, 'This acronym already exists. Select the fellowship from the list above or choose a different acronym.');
@@ -2462,8 +3098,8 @@ class Profile extends \yii\db\ActiveRecord
     public function validateUniqueAssociation($attribute, $params)
     {
         $uniqueAssociation = Association::find()
-            ->select('association')
-            ->where(['LIKE', 'association', $this->aName])
+            ->select('name')
+            ->where(['LIKE', 'name', $this->aName])
             ->one();
         if ($uniqueAssociation > NULL) {
              $this->addError($attribute, 'This association already exists.  Select it from the list above');
@@ -2480,8 +3116,8 @@ class Profile extends \yii\db\ActiveRecord
     public function validateUniqueAssAcronym($attribute, $params)
     {
         $uniqueAcronym = Association::find()
-            ->select('association_acronym')
-            ->where(['LIKE', 'association_acronym', $this->aAcronym])
+            ->select('acronym')
+            ->where(['LIKE', 'acronym', $this->aAcronym])
             ->one();
         if ($uniqueAcronym > NULL) {
              $this->addError($attribute, 'This acronym already exists. Select the association from the list above or choose a different acronym.');
@@ -2492,7 +3128,7 @@ class Profile extends \yii\db\ActiveRecord
 
     /**
      *  Update profile date fields: last_update, renewal_date
-     * @return object
+     * @return Profile the loaded model
      */
     public function setUpdateDate()
     {  
@@ -2508,7 +3144,7 @@ class Profile extends \yii\db\ActiveRecord
 
     /**
      *  Update profile date fields: last_update, renewal_date
-     * @return object
+     * @return Profile the loaded model
      */
     public function setInactivationDate()
     {  
@@ -2526,10 +3162,10 @@ class Profile extends \yii\db\ActiveRecord
     public function requiredFields()
     {  
         if ($this->category == self::CATEGORY_IND) {
-            if (!ProfileController::findActiveProfile($this->home_church)) {
+            if (!self::findActiveProfile($this->home_church)) {
                 return false;
             }
-            if ($this->type == 'Staff' && !ProfileController::findActiveProfile($this->ministry_of)) {
+            if ($this->type == self::TYPE_STAFF && !self::findActiveProfile($this->ministry_of)) {
                 return false;
             }
         }
@@ -2545,24 +3181,22 @@ class Profile extends \yii\db\ActiveRecord
      */
     public function validType()
     {
-        $typeArray = [
-            'Association',      
-            'Camp',             
-            'Church',           
-            'Evangelist',       
-            'Fellowship',       
-            'Special Ministry',          
-            'Mission Agency',          
-            'Music Ministry',   
-            'Pastor',
-            'Missionary',
-            'Chaplain',
-            'Staff',
-            'Print Ministry',
-            'School',     
-        ];
-
-        return in_array($this->type, $typeArray);
+        return in_array($this->type, [
+            self::TYPE_ASSOCIATION,      
+            self::TYPE_CAMP,             
+            self::TYPE_CHURCH,           
+            self::TYPE_EVANGELIST,       
+            self::TYPE_FELLOWSHIP,       
+            self::TYPE_SPECIAL,          
+            self::TYPE_MISSION_AGCY,          
+            self::TYPE_MUSIC,   
+            self::TYPE_PASTOR,
+            self::TYPE_MISSIONARY,
+            self::TYPE_CHAPLAIN,
+            self::TYPE_STAFF,
+            self::TYPE_PRINT,
+            self::TYPE_SCHOOL,     
+        ]);
     }
 
     /**
@@ -2572,20 +3206,20 @@ class Profile extends \yii\db\ActiveRecord
      */
     public function isStaff($type)
     {
-        $t = Type::find()->select('*')->where(['type' => $type])->one();
+        $t = Type::find()->where(['type' => $type])->one();
         return isset($t->staff) ? true : false;
     }
 
     /**
-     * Create a forms array to track which forms have been completed.
+     * Create a new forms array to track which forms have been completed.
      * @param string $id
-     * @return Profile the loaded model
+     * @return FormsCompleted model || false
      */
     public static function createProgress($id)
     {
         
         $progress = new FormsCompleted();
-        $progressArray = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];                    // Begin array to track which forms have been completed
+        $progressArray = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         $progress->form_array = serialize($progressArray);
         $progress->id = $id;
 
@@ -2594,8 +3228,7 @@ class Profile extends \yii\db\ActiveRecord
 
     /**
      * Update $progressArray for a given form number to indicate form completion
-     * 
-     * @return string
+     * @return true
      */
     public function setProgress($form)
     {
@@ -2607,14 +3240,12 @@ class Profile extends \yii\db\ActiveRecord
             $progressArray[$form] = 1;
             $progress->updateAttributes(['form_array' => serialize($progressArray)]);
         }
-       
         return true;
     }
 
     /**
-     * set $formsArray for a given form number to indicate form completion
-     * 
-     * @return string
+     * Get the current progress for this profile
+     * @return array Unserialized FormsCompleted array || false
      */
     public function getProgress()
     {       
@@ -2623,9 +3254,9 @@ class Profile extends \yii\db\ActiveRecord
     }
 
     /**
-     * set $formsArray for a given form number to indicate form completion
-     * 
-     * @return string
+     * Progress percent completed
+     * @param array $typeArray
+     * @return int
      */
     public function getProgressPercent($typeArray)
     {       
@@ -2633,135 +3264,112 @@ class Profile extends \yii\db\ActiveRecord
             $progress = $this->createProgress($this->id);
         }
         $progressArray = unserialize($progress->form_array);
-        $n = 100 * array_sum($progressArray) / (array_sum($typeArray)+1);                           // Add +1 to $typeArray to account for activation form
+        $n = 100 * array_sum($progressArray) / (array_sum($typeArray)+1);
 
         return Utility::roundUpToAny($n);
     }
 
     /**
-     * Return ind_names in format "First (& Spouse) Last" if spouse
-     * or "First Last" if no spouse
-     * 
+     * Return progress percent if the profile is not active
+     * @return int || NULL
+     */
+    public function getProgressIfInactive()
+    {       
+        return ($this->status != Profile::STATUS_ACTIVE) ? 
+            $this->getProgressPercent(ProfileFormController::$formArray[$this->type]) : NULL;
+    }
+
+    /**
+     * Return appropriate org input label depending on profile type
      * @return string
      */
-    public function getformattedNames()
+    public function getOrgNameLabel()
     {
-        if ($this->type == 'Missionary') {
-            if ($this->spouse_first_name != NULL) {
-                $this->formattedNames = $this->ind_first_name . ' & ' . $this->spouse_first_name . ' ' . $this->ind_last_name;
-            } else {
-                $this->formattedNames = $this->ind_first_name . ' ' . $this->ind_last_name;
-            }
-        } else {
-            if ($this->spouse_first_name != NULL) {
-                $this->formattedNames = $this->ind_first_name . ' (& ' . $this->spouse_first_name . ') ' . $this->ind_last_name;
-            } else {
-                $this->formattedNames = $this->ind_first_name . ' ' . $this->ind_last_name;
-            }
-        }
-        return $this;
-    }
-
-    /**
-     * Finds a senior pastor for a given church profile.
-     * @param string $id
-     * @return Profile the loaded model
-     */
-    public function findSrPastor()
-    {
-        if ($pastor = Staff::find()
-            ->select('staff_id')
-            ->where(['ministry_id' => $this->id])
-            ->andwhere(['sr_pastor' => 1])
-            ->one()) {
-            return ProfileController::findActiveProfile($pastor->staff_id);
-        }     
-        return NULL;
-    }
-
-    /**
-     * Finds the Profile model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param string $id
-     * @return Profile the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public static function findModel($id)
-    {
-        if (($model = Profile::findOne($id)) !== null) {
-            return $model;
-        } else {
-            throw new NotFoundHttpException('The requested page does not exist.');
-        }
+        return $this->type == self::TYPE_SPECIAL ? 'Ministry or Organization Name' : $this->type . ' Name';
     }
 
     /**
      * Return appropriate parent ministry input label depending on profile type
-     * @param string $id
-     * @return Profile the loaded model
+     * @return string
      */
-    public function getMinistryLabel($type)
+    public function getParentMinistryLabel()
     {
-        switch ($type) {
-            case 'Evangelist':
-                return $label = 'Ministering with';
+        switch ($this->type) {
+            case self::TYPE_EVANGELIST:
+                return 'Ministering with';
             break;
-            case 'Staff':
-                return $label = 'On staff at';
+            case self::TYPE_STAFF:
+                return 'On staff at';
             break;
-            case 'Special Ministry':
-                return $label = 'This ministry or organization is a ministry of';
+            case self::TYPE_SPECIAL:
+                return 'This ministry or organization is a ministry of';
             break;
             default:
-                return $label = 'This ' . strtolower($this->type) . ' is a ministry of';
+                return 'This ' . strtolower($this->type) . ' is a ministry of';
             break;
         }
     }
 
     /**
      * Return appropriate home church input label depending on profile type
-     * @param string $id
-     * @return Profile the loaded model
+     * @return string
      */
-    public function getChurchLabel($type, $sub_type)
+    public function getChurchLabel()
     {
-        switch ($type) {
-            case 'Missionary':
-                return $label = 'Sending Church:';
+        switch ($this->type) {
+            case self::TYPE_MISSIONARY:
+                return 'Sending Church:';
             break;
-             case 'Pastor':
-                return $label = $this->sub_type . ' at';
+             case self::TYPE_PASTOR:
+                return $this->sub_type . ' at';
             break;
             default:
-                return $label = 'Home Church:';
+                return 'Home Church:';
             break;
         }
     }
 
     /**
      * Delete an image file on the server
-     * @param string $name
+     * @param string $img
      * @param string $imageLink
-     * @return string
+     * @return $this
      */
     public function deleteOldImg($img, $imageLink=NULL)
     {
-        if ($img == 'image2' && 
-            ($this->type == 'Church') && 
-            ($pastorLink = $this->findSrPastor())) {
+        if ($img == 'image2' 
+            && ($this->type == self::TYPE_CHURCH) 
+            && ($pastorLink = $this->srPastorChurchConfirmed)) {
             if (isset($pastorLink->image2)) {
                 $imageLink = $pastorLink->image2;
             }
         }
 
         $oldImg = $this->getOldAttribute($img);
-        if ($oldImg && 
-            (strpos($oldImg, '/uploads/') !== false) &&                                             // Only delete if image is found in uploads folder
-            ($oldImg != $this->{$img}) &&                                                           // Only delte if image name and path has changed in db.
-            ($oldImg != $imageLink)) {                                                              // Don't delete a linked pastor image
+        if ($oldImg 
+            && (strpos($oldImg, '/uploads/') !== false) // Only delete if image is found in uploads folder
+            && ($oldImg != $this->{$img})           // Only delte if image name and path has changed in db.
+            && ($oldImg != $imageLink)) {           // Don't delete a linked pastor image
             unlink($oldImg);
         }
         return $this;
+    }
+
+    /**
+     * Check if profile has expired within last year
+     * @return true || throw exception
+     */
+    public function checkExpired($id)
+    {
+        if (!(($profile = self::findProfile($id)) && ($profile->status == Profile::STATUS_NEW))) {
+            throw new NotFoundHttpException;
+        }
+        $cutoffDate = strtotime($this->inactivation_date . '+2 years');
+        if (date("m-d-Y", $cutoffDate) > date("m-d-Y")) {
+            return true;
+        } else {
+            throw new NotFoundHttpException; 
+        }
     }
 
 }

@@ -113,7 +113,7 @@ $this->title = 'Location';
             </div>
             <div class="col-md-3">
                 <?= $form->field($profile, 'ind_po_country')->widget(Select2::classname(), [
-                    'data' => ArrayHelper::map(Country::find()->where('id>1')->all(), 'printable_name', 'printable_name'),
+                    'data' => $list,
                     'language' => 'en',
                     'theme' => 'krajee',
                     'options' => ['placeholder' => 'Select a country ...'],

@@ -1,29 +1,26 @@
 <?php
 
 use common\models\profile\Profile;
-use common\models\Utility;
 use common\widgets\Alert;
 use frontend\controllers\ProfileController;
 use kartik\markdown\Markdown;
-use yii\bootstrap\Modal;
 use yii\bootstrap\Html;
 use yii\helpers\Url;
-use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-$this->title = $profile->formattedNames;
+$this->title = $profile->mainName;
 ?>
 <?= Alert::widget() ?>
 
 <div class="profile">
 	<div class="profile-main">
 
-		<div class="img1"><?= empty($profile->image1) ? Html::img('@web/images/content/banner6.jpg', ['alt' => 'Header Image']) : Html::img($profile->image1, ['alt' => 'Header Image']) ?></div>
-		<?= empty($profile->image2) ? Html::img('@web/images/content/profile-logo.png', ['class' => 'img2', 'alt' => 'Logo Image']) : Html::img($profile->image2, ['class' => 'img2', 'alt' => 'Logo image']) ?>
+		<div class="img1"><?= $profile->image1 ? Html::img($profile->image1, ['alt' => 'Header Image']) : Html::img('@img.profile/banner6.jpg', ['alt' => 'Header Image']) ?></div>
+		<?= $profile->image2 ? Html::img($profile->image2, ['class' => 'img2', 'alt' => 'Logo image']) : Html::img('@img.profile/profile-logo.png', ['class' => 'img2', 'alt' => 'Logo Image']) ?>
 	
 		<div class="header-text-wrap">
 			<h1><?= $this->title ?></h1>
-			<p class="tagline"><?= empty($profile->tagline) ? NULL : $profile->tagline ?></p>
+			<p class="tagline"><?= $profile->tagline ? $profile->tagline : NULL ?></p>
 			<p class="type"><?= Profile::$icon[$profile->type] . ' ' . $profile->title ?></p>
 		</div>
 
@@ -32,10 +29,10 @@ $this->title = $profile->formattedNames;
 		</div>
 
 		<?= $this->render('cards/_card-staff', ['profile' => $profile, 'church' => $church, 'parentMinistry' => $parentMinistry]) ?>
-		<?= empty($otherMinistryArray) ? NULL : $this->render('cards/_card-otherministries', ['otherMinistryArray' => $otherMinistryArray]) ?>
-		<?= empty($schoolsAttended) ? NULL : $this->render('cards/_card-school', ['schoolsAttended' => $schoolsAttended]) ?>
+		<?= $otherMinistryArray ? $this->render('cards/_card-otherministries', ['otherMinistryArray' => $otherMinistryArray]) : NULL ?>
+		<?= $schoolsAttended ? $this->render('cards/_card-school', ['schoolsAttended' => $schoolsAttended]) : NULL ?>
 		<?= $this->render('cards/_card-contact-ind', ['profile' => $profile]) ?>
-		<?= empty($social) ? NULL : $this->render('cards/_card-social', ['social' => $social]) ?>
+		<?= $social ? $this->render('cards/_card-social', ['social' => $social]) : NULL ?>
 
 		<?= $this->render('_map', ['loc' => $loc]) ?>
 
@@ -50,7 +47,15 @@ $this->title = $profile->formattedNames;
 		</div>
 	<?php } elseif ($p == 'connections') { ?>
 		<div class="additional-content">
-			<?= $this->render('connection/_' . ProfileController::$profilePageArray[$profile->type] . 'Connections', ['profile' => $profile, 'church' => $church, 'parentMinistry' => $parentMinistry, 'otherMinistryArray' => $otherMinistryArray, 'sChurchArray' => $sChurchArray, 'sMinistryArray' => $sMinistryArray, 'sOtherArray' => $sOtherArray, 'pastor' => $pastor, 'memberArray' => $memberArray, 'likeArray' => $likeArray]); ?>
+			<?= $pastor ? $this->render('connection/_srPastor', ['type' => $profile->type, 'church' => $church, 'pastor' => $pastor]) : NULL ?>
+			<?= ($church && $churchStaff) ? $this->render('connection/_orgStaffWithMinistry', ['staff' => $churchStaff, 'ministry' => $church]) : NULL ?>
+			<?= $parentMinistryStaff ? $this->render('connection/_otherMinistriesStaff', ['parentMinistryStaff' => $parentMinistryStaff]) : NULL ?>
+			<?= $otherMinistriesStaff ? $this->render('connection/_otherMinistriesStaff', ['otherMinistriesStaff' => $otherMinistriesStaff]) : NULL ?>
+			<?= ($church && $churchMembers->churchMembers) ? $this->render('connection/_churchFellowMembers', ['church' => $church, 'churchMembers' => $churchMembers->churchMembers]) : NULL ?>
+			<?= $likeProfiles ? $this->render('connection/_likes', ['likeProfiles' => $likeProfiles]) : NULL ?>
+			<?php if (!$pastor && !($church && $churchStaff) && !$parentMinistryStaff && !$otherMinistriesStaff && !($church && $churchMembers->churchMembers) && !$likeProfiles) {
+				echo '<em>No connections found.</em>';
+			} ?>
 		</div>
 	<?php } elseif ($p == 'history') { ?>
 		<div class="additional-content">

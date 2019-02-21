@@ -1,4 +1,9 @@
 <?php
+/**
+ * @link http://www.ibnet.org/
+ * @copyright  Copyright (c) IBNet (http://www.ibnet.org)
+ * @author Steve McKinley <steve@themckinleys.org>
+ */
 
 namespace common\models\profile;
 
@@ -45,7 +50,7 @@ class Tag extends \yii\db\ActiveRecord
      * Links a list of schools to individual profiles
      * @return \yii\db\ActiveQuery
      */
-    public function getProfile()
+    public function getProfiles()
     {
         return $this->hasMany(Profile::className(), ['id' => 'profile_id'])
             ->viaTable('profile_has_tag', ['tag_id' => 'id']);

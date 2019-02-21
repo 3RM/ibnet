@@ -1,7 +1,6 @@
 <?php
 
 use common\models\profile\Profile;
-use common\models\Utility;
 use common\widgets\Alert;
 use frontend\controllers\ProfileController;
 use frontend\controllers\ProfileFormController;
@@ -35,12 +34,12 @@ $this->title = $profile->org_name;
 <div class="profile preview-profile">
 	<div class="profile-main">
 
-		<div class="img1"><?= empty($profile->image1) ? Html::img('@web/images/content/banner6.jpg', ['alt' => 'Header Image']) : Html::img($profile->image1, ['alt' => 'Header Image']) ?></div>
-		<?= empty($profile->image2) ? Html::img('@web/images/content/profile-logo.png', ['class' => 'img2', 'alt' => 'Logo Image']) : Html::img($profile->image2, ['class' => 'img2', 'alt' => 'Logo image']) ?>
+		<div class="img1"><?= $profile->image1 ? Html::img($profile->image1, ['alt' => 'Header Image']) : Html::img('@img.profile/banner6.jpg', ['alt' => 'Header Image']) ?></div>
+		<?= $profile->image2 ? Html::img($profile->image2, ['class' => 'img2', 'alt' => 'Logo image']) : Html::img('@img.profile/profile-logo.png', ['class' => 'img2', 'alt' => 'Logo Image']) ?>
 	
 		<div class="header-text-wrap">
 			<h1><?= $this->title ?></h1>
-			<p class="tagline"><?= empty($profile->tagline) ? NULL : $profile->tagline ?></p>
+			<p class="tagline"><?= $profile->tagline ? $profile->tagline : NULL ?></p>
 			<p class="type"><?= Profile::$icon[$profile->type] ?> Independent Baptist Church</p>
 		</div>
 
@@ -50,13 +49,13 @@ $this->title = $profile->org_name;
 
 		<?= $this->render('../profile/profilePages/cards/_card-church-pastor', ['profile' => $profile, 'pastor' => $pastor]) ?>
 		<?= $this->render('../profile/profilePages/cards/_card-servicetimes', ['profile' => $profile]) ?>
-		<?= empty($ministryArray) ? NULL : $this->render('../profile/profilePages/cards/_card-ministries', ['ministryArray' => $ministryArray]) ?>
-		<?= empty($programArray) ? NULL : $this->render('../profile/profilePages/cards/_card-programs', ['programArray' => $programArray]) ?>
-		<?= empty($assArray) ? NULL : $this->render('../profile/profilePages/cards/_card-associations', ['assArray' => $assArray]) ?>
-		<?= empty($flwshipArray) ? NULL : $this->render('../profile/profilePages/cards/_card-fellowships', ['flwshipArray' => $flwshipArray]) ?>
+		<?= $ministries ? $this->render('../profile/profilePages/cards/_card-ministries', ['ministries' => $ministries]) : NULL ?>
+		<?= $programs ? $this->render('../profile/profilePages/cards/_card-programs', ['programs' => $programs]) : NULL ?>
+		<?= $fellowships ? $this->render('../profile/profilePages/cards/_card-fellowships', ['fellowships' => $fellowships]) : NULL ?>
+		<?= $associations ? $this->render('../profile/profilePages/cards/_card-associations', ['associations' => $associations]) : NULL ?>
 		<?= $this->render('../profile/profilePages/cards/_card-distinctives', ['profile' => $profile]) ?>
 		<?= $this->render('../profile/profilePages/cards/_card-contact-org', ['profile' => $profile]) ?>
-		<?= empty($social) ? NULL : $this->render('cards/_card-social', ['social' => $social]) ?>
+		<?= $social ? $this->render('../profile/profilePages/cards/_card-social', ['social' => $social]) : NULL ?>
 
 		<?= $this->render('../profile/profilePages/_map', ['loc' => $loc]) ?>
 

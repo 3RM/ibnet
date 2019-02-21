@@ -1,4 +1,9 @@
 <?php
+/**
+ * @link http://www.ibnet.org/
+ * @copyright  Copyright (c) IBNet (http://www.ibnet.org)
+ * @author Steve McKinley <steve@themckinleys.org>
+ */
 
 namespace frontend\controllers;
 
@@ -11,6 +16,7 @@ use common\models\profile\Profile;
 use common\models\profile\Type;
 use common\models\profile\Staff;
 use common\models\profile\SubType;
+use common\rbac\PermissionProfile;
 use Yii;
 use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
@@ -31,7 +37,7 @@ class ProfileMgmtController extends ProfileController
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'except' => [],                                                                     // Apply authentication to all actions
+                'except' => [],
                 'rules' => [
                     [
                         'allow' => false,
@@ -56,17 +62,16 @@ class ProfileMgmtController extends ProfileController
             $this->redirect(['trash', 'id' => $_POST['trash']]);
         }
 
-        $profileArray = Profile::getProfileArray();
-        foreach ($profileArray as $profile) {
+        $user = Yii::$app->user->identity;
+        $profiles = $user->profiles;
+        foreach ($profiles as $profile) {
             if ($profile->category == Profile::CATEGORY_ORG) {
                 $profile->unconfirmed = Staff::checkUnconfirmed($profile->id);
-            } else {
-                $profile->getformattedNames();
             }
             $profile->events = ($profile->history != NULL);
         }
-        $isMissionary = (Yii::$app->user->identity->is_missionary == User::IS_MISSIONARY);
-        return $this->render('myProfiles', ['profileArray' => $profileArray, 'isMissionary' => $isMissionary]);
+        $isMissionary = ($user->isMissionary == User::IS_MISSIONARY);
+        return $this->render('myProfiles', ['profiles' => $profiles, 'isMissionary' => $isMissionary]);
     }
 
     /**
@@ -76,7 +81,7 @@ class ProfileMgmtController extends ProfileController
      */
     public function actionTerms()
     {
-       if (Yii::$app->request->Post()) {
+        if (Yii::$app->request->Post()) {
             return $this->redirect(['create']);
         } else {
             return $this->render('profileTerms');
@@ -85,8 +90,8 @@ class ProfileMgmtController extends ProfileController
 
     /**
      * Creates a new Profile model.
-     * If creation is successful, the browser will advance through a series of
-     * data collection views dependent on the profile type.
+     * If creation is successful, redirect to ProfileFormController where user will advance through 
+     * a series of data collection views dependent on the profile type.
      * @return mixed
      */
     public function actionCreate()
@@ -125,28 +130,35 @@ class ProfileMgmtController extends ProfileController
      */
     public function actionActivate($id)
     {
-        $profile = $this->findProfile($id);
-        if (!\Yii::$app->user->can('updateProfile', ['profile' => $profile])) {
+        $profile = Profile::findProfile($id);
+        if (!\Yii::$app->user->can(PermissionProfile::UPDATE_OWN, ['profile' => $profile])) {
             throw new NotFoundHttpException;
         }
-        if (!$progress = FormsCompleted::findOne($id)) {                                            // Check if all required forms for this profile type have been completed
+
+        // Check if user already has an individual profile
+        // $user = Yii::$app->user->identity;
+        // if ($user->hasIndActiveProfile) {
+        //     Yii::$app->session->setFlash('warning', 'You already have an individual 
+        //             profile. Only one individual profile can be active at a time.');
+        //     return $this->redirect(['preview/view-preview', 'id' => $profile->id]);
+        // }
+
+        // Check if all required forms for this profile type have been completed
+        if (!$progress = FormsCompleted::findOne($id)) {
             $progress = $profile->createProgress($id);
-        }
-        
+        }        
         $completeArray = unserialize($progress->form_array);
         $typeArray = ProfileFormController::$formArray[$profile->type];
-        $missingArray = array_diff_assoc($completeArray, $typeArray);                               // any $fmNum => 1 pairs that are missing from $completeArray  
-  
+        // any $fmNum => 1 pairs that are missing from $completeArray  
+        $missingArray = array_diff_assoc($completeArray, $typeArray);
         if (!$progress || !empty($missingArray)) {
-            if ($profile->type == 'Church') {                                                       
-                if (!((count($missingArray) == 1) &&                                                // Ignore skipped form (church profile missions housing)
+            if ($profile->type == Profile::TYPE_CHURCH) {   
+                // Ignore skipped form (church profile missions housing)                                                    
+                if (!((count($missingArray) == 1) &&
                     isset($missingArray[ProfileFormController::$form['mh']]))) {
                     
                     $missing = json_encode($missingArray);
-                    return $this->redirect(['profile-form/missing-forms', 
-                        'id' => $profile->id, 
-                        'missing' => $missing,
-                    ]);
+                    return $this->redirect(['profile-form/missing-forms', 'id' => $profile->id, 'missing' => $missing]);
                 }
             
             } else {
@@ -157,11 +169,20 @@ class ProfileMgmtController extends ProfileController
                 ]);
             }
         }
-        if ($progress->delete() && !ProfileFormController::isDuplicate($id) && $profile->activate()) {
+
+        // Check for duplicates
+        if ($dup = $profile->duplicate) {
+            return $this->redirect(['profile-form/duplicate-profile', 'id' => $profile->id, 'dupId' => $dup->id]);
+        }
+
+        // Activate
+        if ($progress->delete() && $profile->activate()) {
             return $this->render('activationComplete', ['profile' => $profile]);
+
+        // Some other errror
         } else {
             throw new HttpException(500, 'There was a problem processing your request. If this 
-                problem persits, please contact us at admin@ibnet.org.');;
+                problem persits, please contact us at admin@ibnet.org.');
         }
     }
 
@@ -172,9 +193,11 @@ class ProfileMgmtController extends ProfileController
      */
     public function actionContinueActivate($id) 
     {
-        $profile = $this->findProfile($id);
-        if ($progress = $profile->getProgress()) {                                                  // Get progress of profile completion
-            if (in_array(1, $progress)) {                                                           // If at least one form has been completed, go to forms menu
+        $profile = Profile::findProfile($id);
+        // Get progress of profile completion
+        if ($progress = $profile->getProgress()) {
+            // If at least one form has been completed, go to forms menu
+            if (in_array(1, $progress)) {
                 return $this->redirect(['profile-form/forms-menu', 'id' => $id]);
             }
         }
@@ -188,7 +211,7 @@ class ProfileMgmtController extends ProfileController
      */
     public function actionDisable($id) 
     {
-        $profile = $this->findProfile($id);
+        $profile = Profile::findProfile($id);
         if ($profile->inactivate() && $profile->setInactivationDate()) {
             Yii::$app->session->setFlash('success', 'Your Profile "' . 
                 $profile->profile_name . '" was successfully disabled.');
@@ -206,7 +229,7 @@ class ProfileMgmtController extends ProfileController
      */
     public function actionTrash($id) 
     {
-        $profile = $this->findProfile($id);
+        $profile = Profile::findProfile($id);
         if ($profile->trash()) {    
             Yii::$app->session->setFlash('success', 'Your Profile "' . 
                 $profile->profile_name . '" was successfully deleted.');
@@ -224,7 +247,7 @@ class ProfileMgmtController extends ProfileController
      */
     public function actionTransfer($id) 
     {
-        $profile = $this->findProfile($id); 
+        $profile = Profile::findProfile($id); 
         $profile->scenario = 'transfer';
 
         if ($profile->load(Yii::$app->request->Post())) {
@@ -244,7 +267,7 @@ class ProfileMgmtController extends ProfileController
      */
     public function actionTransferInitiate($id, $email)
     {
-        $profile = $this->findProfile($id);
+        $profile = Profile::findProfile($id);
 
         if (Yii::$app->request->Post()) {
             
@@ -256,7 +279,7 @@ class ProfileMgmtController extends ProfileController
             $oldUser = User::findOne(Yii::$app->user->id);
             $subject = 'IBNet Profile Transfer Request';
             $title = 'IBNet Profile Transfer Request';
-            $msg = $oldUser->first_name . ' ' . $oldUser->last_name . ' requests that you assume ownership of 
+            $msg = $oldUser->fullName . ' requests that you assume ownership of 
                 IBNet profile "' . $profile->profile_name . '".  Click the link below to complete the 
                 transfer and take ownership of this profile.  This link will remain valid for one week.';
             SendMail::sendProfileTransfer($subject, $title, $msg, $profile, $email, true);
@@ -283,7 +306,7 @@ class ProfileMgmtController extends ProfileController
      */
     public function actionTransferComplete($id, $token) 
     {
-        $profile = $this->findProfile($id);
+        $profile = Profile::findProfile($id);
         if ($profile->checkProfileTransferToken($token)) {
 
             $oldUser = User::findOne($profile->user_id);
@@ -295,7 +318,7 @@ class ProfileMgmtController extends ProfileController
             $subject = 'IBNet Profile Transfer Complete';
             $title = 'IBNet Profile Transfer Complete';
             $msg = 'Your IBNet profile "' . $profile->profile_name . '" has been successfully transferred 
-                to ' . $newUser->first_name . ' ' . $newUser->last_name;
+                to ' . $newUser->fullName;
             SendMail::sendProfileTransfer($subject, $title, $msg, $profile, $oldUser->email, false);
 
             return $this->render('transferComplete', ['profile' => $profile]);
@@ -311,7 +334,7 @@ class ProfileMgmtController extends ProfileController
      */
     public function actionHistory($id, $a = NULL) 
     {
-        $profile = $this->findProfile($id); 
+        $profile = Profile::findProfile($id); 
         $profile->scenario = 'history';
 
         $history = new History();
@@ -325,14 +348,12 @@ class ProfileMgmtController extends ProfileController
         } elseif (isset($_POST['edit'])) {
             $action = 'edit';
             $events = $profile->history;
-            $i = 0;
-            foreach ($events as $event) {
+            foreach ($events as $i=>$event) {
                 if ($event->id == $_POST['edit']) {
                     $events[$i]['edit'] = 1;
                     $events[$i]['date'] = Yii::$app->formatter->asDate($event->date, 'MM/dd/yyyy');
                     $a = $event->id;
                 }
-                $i++;
             }
             return $this->render('history', [
                 'profile' => $profile,
