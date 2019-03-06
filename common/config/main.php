@@ -35,10 +35,10 @@ return [
             'class' => 'sammaye\solr\Client',
             'options' => [
                 'endpoint' => [
-                    'ibnet' => [
-                        'host' => '62.151.181.176',
+                    'profile' => [
+                        'host' => 'localhost',
                         'port' => '8983',
-                        'path' => '/solr/ibnet',
+                        'path' => '/solr/profile',
                     ],
                 ],
             ],

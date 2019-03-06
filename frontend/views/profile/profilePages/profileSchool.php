@@ -28,11 +28,11 @@ $this->title = $profile->org_name;
 			<?= Markdown::convert($profile->description) ?>
 		</div>
 
-		<?= $parentMinistry ? $this->render('cards/_card-parentministry', ['profile' => $profile, 'parentMinistry' => $parentMinistry]) : NULL ?>
-		<?= $schoolLevel ? $this->render('cards/_card-schoollevels', ['schoolLevel' => $schoolLevel]) : NULL ?>
-		<?= $accreditations ? $this->render('cards/_card-accreditations', ['accreditations' => $accreditations]) : NULL ?>
+		<?= !empty($parentMinistry) ? $this->render('cards/_card-parentministry', ['profile' => $profile, 'parentMinistry' => $parentMinistry]) : NULL ?>
+		<?= !empty($schoolLevel) ? $this->render('cards/_card-schoollevels', ['schoolLevel' => $schoolLevel]) : NULL ?>
+		<?= !empty($accreditations) ? $this->render('cards/_card-accreditations', ['accreditations' => $accreditations]) : NULL ?>
 		<?= $this->render('cards/_card-contact-org', ['profile' => $profile]) ?>
-		<?= $social ? $this->render('cards/_card-social', ['social' => $social]) : NULL ?>
+		<?= !empty($social) ? $this->render('cards/_card-social', ['social' => $social]) : NULL ?>
 
 		<?= $this->render('_map', ['loc' => $loc]) ?>
 
@@ -47,12 +47,12 @@ $this->title = $profile->org_name;
 		</div>
 	<?php } elseif ($p == 'connections') { ?>
 		<div class="additional-content">
-			<?= $staff ? $this->render('connection/_orgStaff', ['staff' => $staff]) : NULL ?>
-			<?= ($pastor && $parentMinistry) ? $this->render('connection/_orgStaffPastor', ['pastor' => $pastor, 'parentMinistry' => $parentMinistry]) : NULL ?>
-			<?= ($parentMinistry && $parentMinistryStaff) ? $this->render('connection/_orgStaffWithMinistry', ['staff' => $parentMinistryStaff, 'ministry' => $parentMinistry]) : NULL ?>
-			<?= ($alumni) ? $this->render('connection/_alumni', ['alumni' => $alumni]) : NULL ?>
-			<?= $likeProfiles ? $this->render('connection/_likes', ['likeProfiles' => $likeProfiles]) : NULL ?>
-			<?php if (!$staff && !($pastor && $parentMinistry) && !($parentMinistry && $parentMinistryStaff) && !$alumni && !$likeProfiles) {
+			<?= !empty($staff) ? $this->render('connection/_orgStaff', ['staff' => $staff]) : NULL ?>
+			<?= (!empty($pastor) && !empty($parentMinistry)) ? $this->render('connection/_orgStaffPastor', ['pastor' => $pastor, 'parentMinistry' => $parentMinistry]) : NULL ?>
+			<?= (!empty($parentMinistry) && !empty($parentMinistryStaff)) ? $this->render('connection/_orgStaffWithMinistry', ['staff' => $parentMinistryStaff, 'ministry' => $parentMinistry]) : NULL ?>
+			<?= !empty($alumni) ? $this->render('connection/_alumni', ['alumni' => $alumni]) : NULL ?>
+			<?= !empty($likeProfiles) ? $this->render('connection/_likes', ['likeProfiles' => $likeProfiles]) : NULL ?>
+			<?php if (empty($staff) && (empty($pastor) || empty($parentMinistry)) && (empty($parentMinistry) || empty($parentMinistryStaff)) && empty($alumni) && empty($likeProfiles)) {
 				echo '<em>No connections found.</em>';
 			} ?>
 		</div>

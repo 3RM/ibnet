@@ -10,13 +10,13 @@ use Yii;
  * @property string $id
  * @property string $role
  */
-class Role extends \yii\db\ActiveRecord
+class PrimaryRole extends \yii\db\ActiveRecord
 {
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return 'role';
+        return 'primary_role';
     }
 }

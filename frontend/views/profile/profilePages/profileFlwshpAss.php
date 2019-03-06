@@ -28,7 +28,7 @@ $this->title = $profile->org_name;
 		</div>
 
 		<?= $this->render('cards/_card-contact-org', ['profile' => $profile]) ?>
-		<?= $social ? $this->render('cards/_card-social', ['social' => $social]) : NULL ?>
+		<?= !empty($social) ? $this->render('cards/_card-social', ['social' => $social]) : NULL ?>
 
 		<?= $this->render('_map', ['loc' => $loc]) ?>
 
@@ -44,10 +44,10 @@ $this->title = $profile->org_name;
 		<div class="additional-content">
 			<h3>Connections</h3>
 			<hr>
-			<?= $staff ? $this->render('connection/_orgStaff', ['staff' => $staff]) : NULL ?>
-			<?= $members ? $this->render('connection/_flwshipAssMembers', ['members' => $members]) : NULL ?>
-			<?= $likeProfiles ? $this->render('connection/_likes', ['likeProfiles' => $likeProfiles]) : NULL ?>
-			<?php if (!$staff && !$members && !$likeProfiles) {
+			<?= !empty($staff) ? $this->render('connection/_orgStaff', ['staff' => $staff]) : NULL ?>
+			<?= !empty($members) ? $this->render('connection/_flwshipAssMembers', ['members' => $members]) : NULL ?>
+			<?= !empty($likeProfiles) ? $this->render('connection/_likes', ['likeProfiles' => $likeProfiles]) : NULL ?>
+			<?php if (empty($staff) && empty($members) && empty($likeProfiles)) {
 				echo '<em>No connections found.</em>';
 			} ?>
 		</div>

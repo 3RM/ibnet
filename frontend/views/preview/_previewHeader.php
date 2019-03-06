@@ -18,7 +18,7 @@ use yii\widgets\ActiveForm;
             <br />
             <br />
             <?php $profile->status == Profile::STATUS_ACTIVE ? 
-                print('<p class="progress-menu">' . Html::a(Url::toRoute(['profile/' . ProfileController::$profilePageArray[$profile->type], 'urlLoc' => $profile->url_loc, 'urlName' => $profile->url_name, 'id' => $profile->id], 'https') . ' ' . Html::icon('new-window'), ['profile/' . ProfileController::$profilePageArray[$profile->type], 'urlLoc' => $profile->url_loc, 'urlName' => $profile->url_name, 'id' => $profile->id], ['target' => '_blank', 'rel' => 'noopener noreferrer']) . '</p>') :
+                print('<p class="progress-menu">' . Html::a(Url::toRoute(['profile/' . ProfileController::$profilePageArray[$profile->type], 'id' => $profile->id, 'urlLoc' => $profile->url_loc, 'urlName' => $profile->url_name], 'https') . ' ' . Html::icon('new-window'), ['profile/' . ProfileController::$profilePageArray[$profile->type], 'urlLoc' => $profile->url_loc, 'urlName' => $profile->url_name, 'id' => $profile->id], ['target' => '_blank', 'rel' => 'noopener noreferrer']) . '</p>') :
                 NULL; ?>
             <?php $form = ActiveForm::begin(); ?>
             <?= $activate ?

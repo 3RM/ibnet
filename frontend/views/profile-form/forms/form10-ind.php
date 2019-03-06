@@ -44,7 +44,7 @@ if ($profile->type == Profile::TYPE_STAFF) {
                             'errorLoading' => new JsExpression("function () { return 'Waiting for results...'; }"),
                         ],
                         'ajax' => [
-                            'url' => Url::to(['ajax/search', 'type' => 'ministry', 'exclude' => $exclude]),
+                            'url' => Url::to(['ajax/search', 'type' => 'ministry']),
                             'dataType' => 'json',
                             'data' => new JsExpression('function(params) { return {q:params.term}; }')
                         ],

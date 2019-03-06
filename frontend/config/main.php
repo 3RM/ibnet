@@ -60,7 +60,7 @@ return [
                 'missionary/update/<repository_key:[A-Za-z0-9\-\_]+>/<id:\d+>' => 'missionary/update',
                 '<action>'=>'site/<action>',
                 'markdown/<controller:\w+>/<action:\w+>' => 'markdown/<controller>/<action>',
-                '<action:association|fellowship|camp|chaplain|church|evangelist|mission-agency|missionary|music|special-ministry|pastor|print|school|staff>/<urlLoc:[A-Za-z0-9\-]+>/<name:[A-Za-z0-9\-]+>/<id:\d+>' => 'profile/<action>',
+                '<action:association|fellowship|camp|chaplain|church|evangelist|mission-agency|missionary|music|special-ministry|pastor|print|school|staff>/<urlLoc:[A-Za-z0-9\-]+>/<urlName:[A-Za-z0-9\-]+>/<id:\d+>' => 'profile/<action>',
                 '<controller:\w+>/<action:[A-Za-z\-]+>/<id:\d+>' => '<controller>/<action>',
                 '<controller:\w+>/<action:[A-Za-z\-]+>' => '<controller>/<action>',
             ],

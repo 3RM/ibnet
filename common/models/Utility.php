@@ -24,7 +24,7 @@ class Utility
      * 
      * @return string
      */
-    public function roundUpToAny($n,$x=5)
+    public static function roundUpToAny($n,$x=5)
     {       
         return (round($n)%$x === 0) ? round($n) : round(($n+$x/2)/$x)*$x;
     }
@@ -35,7 +35,7 @@ class Utility
      * 
      * @return string
      */
-    public function generateUniqueRandomString($model, $attribute, $length = 12) 
+    public static function generateUniqueRandomString($model, $attribute, $length = 12) 
     {
             
         $randomString = Yii::$app->getSecurity()->generateRandomString($length);
@@ -54,7 +54,7 @@ class Utility
      * @return string The output.
      * @throws Exception If the request fails.
      */
-    public function get($url, $headers = NULL)
+    public static function get($url, $headers = NULL)
     {
         //Is this a valid string?
         if (!self::isValidString($url)) {
@@ -95,7 +95,7 @@ class Utility
     /**
      * Default options for cURL.
      */
-    public static $CURL_OPTS = [
+    static $CURL_OPTS = [
       // CURLOPT_ENCODING       => "",
       // CURLOPT_FOLLOWLOCATION => TRUE,
       // CURLOPT_CONNECTTIMEOUT => 20,
@@ -116,7 +116,7 @@ class Utility
      * @return string The output.
      * @throws Exception If the request fails.
      */
-    public function post($url, $params)
+    public static function post($url, $params)
     {
         //Is this a valid string?
         if (!self::isValidString($url)) {
@@ -160,7 +160,7 @@ class Utility
      * @param mixed $var
      * @return boolean TRUE if it is a valid string. FALSE if it isn't.
      */
-    protected function isValidString($var){
+    protected static function isValidString($var){
         if(!is_string($var)){
             return false;
         } else{
@@ -181,7 +181,7 @@ class Utility
      * @param string $pad
      * @return string
      */
-    public function trimText($string, $limit, $break=".", $pad="...", $strip=true)
+    public static function trimText($string, $limit, $break=".", $pad="...", $strip=true)
     {
         // return with no change if string is shorter than $limit
         if (strlen($string) <= $limit) return $string;
@@ -206,7 +206,7 @@ class Utility
      * @param mixed $dir
      * @return boolean TRUE if it is a valid string. FALSE if it isn't.
      */
-    static function getTotalSize($dir)
+    public static function getTotalSize($dir)
     {
         $dir = rtrim(str_replace('\\', '/', $dir), '/');
     
@@ -248,7 +248,7 @@ class Utility
      * @param string $name
      * @return string
      */
-    public function urlName($name)
+    public static function urlName($name)
     {
         $convertName = self::convert_accent_characters($name);
         return preg_replace("/[^a-zA-Z0-9-]/", "", str_replace(' ', '-', strtolower(trim($convertName))));
@@ -263,7 +263,7 @@ class Utility
      * @param null $locale
      * @return string
      */
-    public function convert_accent_characters($string, $locale = null)
+    public static function convert_accent_characters($string, $locale = null)
     {
         if (!preg_match('/[\x80-\xff]/', $string)) {
             return $string;

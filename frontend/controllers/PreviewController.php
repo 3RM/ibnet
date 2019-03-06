@@ -224,8 +224,8 @@ class PreviewController extends ProfileFormController
             return $this->render('previewEvangChaplain', [
                 'profile' => $profile,
                 'church' => $church,
-                'mission' => $mission,
-                'missionLink' => $missionLink,
+                'missionAgcy' => $missionAgcy,
+                'missionAgcyProfile' => $missionAgcyProfile,
                 'otherMinistries' => $otherMinistries,
                 'schoolsAttended' => $schoolsAttended,
                 'fellowships' => $fellowships,

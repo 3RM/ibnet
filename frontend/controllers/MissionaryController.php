@@ -189,6 +189,7 @@ class MissionaryController extends Controller
             ->one();
         $missionary = $profile->missionary;
 
+        $unsynced = false;
         if (Yii::$app->request->post()) {
             if ($missionary->unsyncMC()) {
                 $unsynced = true;
@@ -263,7 +264,8 @@ class MissionaryController extends Controller
         $missionary = $profile->missionary;
         // Generic model for capturing user input
         $mcList = new MailchimpList();
-    
+        
+        $msg = NULL;
         if ($mcList->load(Yii::$app->request->Post())) {
             $missionary->deleteAllMCWebhooks();
             foreach ($mcList->select as $listId) {
@@ -274,6 +276,7 @@ class MissionaryController extends Controller
         }
 
         // Request mailing lists from Mailchimp
+        $listArray = NULL;
         if ($res = $missionary->getMCLists()) {
             $listArray = \yii\helpers\ArrayHelper::map($res, 'id', 'name');
         } else {
@@ -296,11 +299,11 @@ class MissionaryController extends Controller
     public function actionChimpRequest($id, $mc_key)
     {  
         $request = Yii::$app->request;
-        if ($request->isPost &&
-            ($request->userAgent == 'MailChimp.com') &&
-            ($request->getBodyParam('type') == 'campaign') &&
-            ($missionary = Missionary::findOne($id)) && 
-            ($mc_key == $missionary->mc_key)) {
+        if ($request->post() 
+            && ($request->userAgent == 'MailChimp') 
+            && ($request->getBodyParam('type') == 'campaign')
+            && ($missionary = Missionary::findOne($id)) 
+            && ($mc_key == $missionary->mc_key)) {
             $profile = $missionary->profile;
             $campaign = $missionary->getMCCampaign($_POST['data']['id']);
             $update = New MissionaryUpdate();
@@ -318,7 +321,7 @@ class MissionaryController extends Controller
             // email user  
             $user = $profile->user;
             ProfileMail::sendMailchimp($user->email, $missionary->repository_key, $missionary->id);     
-        }
+        }       
         die;
     }
 }

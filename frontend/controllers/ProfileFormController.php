@@ -535,7 +535,8 @@ class ProfileFormController extends ProfileController
             }
 
         } else {  // Give option to share linked pastor image with church profile
-    
+            
+            $imageLink = NULL;
             if (($profile->type == Profile::TYPE_CHURCH) && ($pastorLink = $profile->srPastorChurchConfirmed)) {
                 if (isset($pastorLink->image2)) {
                     $imageLink = $pastorLink->image2;
@@ -768,11 +769,11 @@ class ProfileFormController extends ProfileController
                 $this->render($fm . '-church', [
                     'profile' => $profile, 
                     'srPastor' => $srPastor,
-                    'staffArray' => $staff,
+                    'staff' => $staff,
                     'pp' => $pp]) :
                 $this->render($fm . '-org', [
                     'profile' => $profile, 
-                    'staffArray' => $staff, 
+                    'staff' => $staff, 
                     'fmNum' => $fmNum, 
                     'pp' => $pp]);
         }
@@ -955,7 +956,8 @@ class ProfileFormController extends ProfileController
                 $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
 
         }
-            
+        
+        $initialData = NULL;
         if ($chLink = $profile->homeChurch) {  
             if ($chLink->status == Profile::STATUS_ACTIVE) { 
                 $initialData = [$chLink->id => $chLink->org_name];
@@ -964,20 +966,18 @@ class ProfileFormController extends ProfileController
                     $chLink->org_name . ' is currently inactive. Reactivate the 
                     profile or choose a different home church to proceed.');
                 $profile->home_church = NULL;
-                $initialData = NULL;
             }
         }
         // Exclude church plant church from home church search
-        if ($missionary = $profile->missionary) {
-            $exclude = $missionary->cp_pastor_at;
-        }
+        $exclude = ($missionary = $profile->missionary) ? $missionary->cp_pastor_at : NULL;  
+              
         $profile->map = $profile->show_map == Profile::MAP_CHURCH ? 1 : NULL;
 
         return $this->render($fm, [
             'profile' => $profile,
             'initialData' => $initialData,
             'pp' => $pp,
-            'chId' => $exclude]);
+            'exclude' => $exclude]);
     }
 
      /**
@@ -1019,6 +1019,7 @@ class ProfileFormController extends ProfileController
 
         } else {
 
+            $initialData = NULL;
             if ($churchPlant = $missionary->churchPlant) {
                 if ($churchPlant->status == Profile::STATUS_ACTIVE) {
                     $initialData = [$churchPlant->id => $churchPlant->org_name];
@@ -1028,7 +1029,6 @@ class ProfileFormController extends ProfileController
                         the profile in order to list it as a parent ministry here.');
                     $profile->cp_pastor = NULL;
                     $missionary->cp_pastor_at = NULL;
-                    $initialData = NULL;
                 }
             }
             $pp = $profile->progressIfInactive;
@@ -1071,6 +1071,7 @@ class ProfileFormController extends ProfileController
             return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
         }
 
+        $initialData = NULL;
         if ($parentMinistry = $profile->parentMinistry) {
             if ($parentMinistry->status == Profile::STATUS_ACTIVE) {
                 $initialData = [$parentMinistry->id => $parentMinistry->org_name];
@@ -1079,7 +1080,6 @@ class ProfileFormController extends ProfileController
                     $parentMinistry->org_name . ' is currently inactive. Consider reactivating 
                     the profile in order to list it as a parent ministry here.');
                 $profile->ministry_of = NULL;
-                $initialData = NULL;
             }
         }
         

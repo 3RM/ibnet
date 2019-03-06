@@ -29,12 +29,12 @@ $this->title = $profile->mainName;
 		<?= $profile->type == Profile::TYPE_EVANGELIST ? 
 			$this->render('cards/_card-evangelist', ['church' => $church, 'parentMinistry' => $parentMinistry]) :
 			$this->render('cards/_card-chaplain', ['church' => $church, 'missionAgcyProfile' => $missionAgcyProfile]) ?>
-		<?= $otherMinistries ? $this->render('cards/_card-otherministries', ['otherMinistries' => $otherMinistries]) : NULL ?>
-		<?= $schoolsAttended ? $this->render('cards/_card-school', ['schoolsAttended' => $schoolsAttended]) : NULL ?>
-		<?= $fellowships ? $this->render('cards/_card-fellowships', ['fellowships' => $fellowships]) : NULL ?>
+		<?= !empty($otherMinistries) ? $this->render('cards/_card-otherministries', ['otherMinistries' => $otherMinistries]) : NULL ?>
+		<?= !empty($schoolsAttended) ? $this->render('cards/_card-school', ['schoolsAttended' => $schoolsAttended]) : NULL ?>
+		<?= !empty($fellowships) ? $this->render('cards/_card-fellowships', ['fellowships' => $fellowships]) : NULL ?>
 		<?= $this->render('cards/_card-distinctives', ['profile' => $profile]) ?>
 		<?= $this->render('cards/_card-contact-ind', ['profile' => $profile]) ?>
-		<?= $social ? $this->render('cards/_card-social', ['social' => $social]) : NULL ?>
+		<?= !empty($social) ? $this->render('cards/_card-social', ['social' => $social]) : NULL ?>
 
 		<?= $this->render('_map', ['loc' => $loc]) ?>
 
@@ -48,13 +48,13 @@ $this->title = $profile->mainName;
 		</div>
 	<?php } elseif ($p == 'connections') { ?>
 		<div class="additional-content">
-			<?= $pastor ? $this->render('connection/_srPastor', ['type' => $profile->type, 'church' => $church, 'pastor' => $pastor]) : NULL ?>
-			<?= ($church && $churchStaff) ? $this->render('connection/_orgStaffWithMinistry', ['staff' => $churchStaff, 'ministry' => $church]) : NULL ?>
-			<?= $parentMinistryStaff ? $this->render('connection/_otherMinistriesStaff', ['parentMinistryStaff' => $parentMinistryStaff]) : NULL ?>
-			<?= $otherMinistriesStaff ? $this->render('connection/_otherMinistriesStaff', ['otherMinistriesStaff' => $otherMinistriesStaff]) : NULL ?>
-			<?= ($church && $churchMembers->churchMembers) ? $this->render('connection/_churchFellowMembers', ['church' => $church, 'churchMembers' => $churchMembers->churchMembers]) : NULL ?>
-			<?= $likeProfiles ? $this->render('connection/_likes', ['likeProfiles' => $likeProfiles]) : NULL ?>
-			<?php if (!$pastor && !($church && $churchStaff) && !$parentMinistryStaff && !$otherMinistriesStaff && !($church && $churchMembers->churchMembers) && !$likeProfiles) {
+			<?= !empty($pastor) ? $this->render('connection/_srPastor', ['type' => $profile->type, 'church' => $church, 'pastor' => $pastor]) : NULL ?>
+			<?= (!empty($church) && !empty($churchStaff)) ? $this->render('connection/_orgStaffWithMinistry', ['staff' => $churchStaff, 'ministry' => $church]) : NULL ?>
+			<?= !empty($parentMinistryStaff) ? $this->render('connection/_otherMinistriesStaff', ['parentMinistryStaff' => $parentMinistryStaff]) : NULL ?>
+			<?= !empty($otherMinistriesStaff) ? $this->render('connection/_otherMinistriesStaff', ['otherMinistriesStaff' => $otherMinistriesStaff]) : NULL ?>
+			<?= (!empty($church) && !empty($churchMembers) && !empty($churchMembers->churchMembers)) ? $this->render('connection/_churchFellowMembers', ['church' => $church, 'churchMembers' => $churchMembers->churchMembers]) : NULL ?>
+			<?= !empty($likeProfiles) ? $this->render('connection/_likes', ['likeProfiles' => $likeProfiles]) : NULL ?>
+			<?php if (empty($pastor) && (empty($church) || empty($churchStaff)) && empty($parentMinistryStaff) && empty($otherMinistriesStaff) && (empty($church) || empty($churchMembers) || empty($churchMembers->churchMembers)) && empty($likeProfiles)) {
 				echo '<em>No connections found.</em>';
 			} ?>
 		</div>

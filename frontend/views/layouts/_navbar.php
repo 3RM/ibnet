@@ -40,7 +40,7 @@ use yii\widgets\ActiveForm;
         $menuItems[] =
             '<li class="dropdown" id="menuLogin">'.
                 (Yii::$app->user->identity->usr_image ?
-                    Html::a(Html::img(Yii::$app->user->identity->usr_image), '#', ['id' => 'navLogin', 'class' => 'dropdown-toggle navbar-user', 'data-toggle' => 'dropdown']) : 
+                    Html::a(Html::img(realpath(ltrim(Yii::$app->user->identity->usr_image, '/')) ? Yii::$app->user->identity->usr_image : '@img.site/user.png'), '#', ['id' => 'navLogin', 'class' => 'dropdown-toggle navbar-user', 'data-toggle' => 'dropdown']) : 
                     Html::a(Html::img('@img.site/user.png'), '#', ['id' => 'navLogin', 'class' => 'dropdown-toggle navbar-user', 'data-toggle' => 'dropdown'])) .
                '<div id="dropdown-menu-user" class="dropdown-menu">
                     <h4>' . Yii::$app->user->identity->fullName . '</h4>' .

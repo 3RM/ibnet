@@ -253,7 +253,13 @@ class ProfileController extends Controller
             $likeCount = ($likes = $profile->likes) ? count($likes) : 0;
             $iLike = $profile->iLike ? true : false;
 
+            $staff = NULL;
+            $members = NULL;
+            $likeProfiles = NULL;
+            $events = NULL;
             if ($p == 'connections') {
+                
+                $uids = NULL;
                 
                 // $staff Staff
                 if ($staff = $profile->orgStaffConfirmed) {
@@ -312,8 +318,14 @@ class ProfileController extends Controller
             $likeCount = ($likes = $profile->likes) ? count($likes) : 0;
             $iLike = $profile->iLike ? true : false;
 
+            $staff = NULL;
+            $members = NULL;
+            $likeProfiles = NULL;
+            $events = NULL;
             if ($p == 'connections') {
 
+                $uids = NULL;
+                
                 // $staff Staff
                 if ($staff = $profile->orgStaffConfirmed) {
                     $uids = $profile->filterUserIds($staff, $uids, true);
@@ -372,22 +384,29 @@ class ProfileController extends Controller
             $likeCount = ($likes = $profile->likes) ? count($likes) : 0;
             $iLike = $profile->iLike ? true : false;
 
+            $staff = NULL;
+            $pastor = NULL;
+            $parentMinistryStaff = NULL;
+            $likeProfiles = NULL;
+            $events = NULL;
             if ($p == 'connections') {
 
+                $uids = NULL;
+                
                 // $staff Staff
                 if ($staff = $profile->orgStaffConfirmed) {
                     $uids = $profile->filterUserIds($staff, $uids, true);
                 }
 
                 // $pastor Pastor if parent ministry is a church
-                if (($parentMinistry->type == Profile::TYPE_CHURCH)
+                if ($parentMinistry && ($parentMinistry->type == Profile::TYPE_CHURCH)
                     && ($pastor = $parentMinistry->srPastorChurchConfirmed)) {
                     $pastor = $profile->filterUsersByProfile($pastor, $uids);
                     $uids = $profile->filterUserIdsByProfile($pastor, $uids);
                 }
 
                 // $parentMinistryStaff Parent ministry staff
-                if ($parentMinistryStaff = $parentMinistry->orgStaffConfirmed) {
+                if ($parentMinistry && ($parentMinistryStaff = $parentMinistry->orgStaffConfirmed)) {
                     $parentMinistryStaff = $profile->filterStaff($parentMinistryStaff, $uids);
                     $uids = $profile->filterUserIds($parentMinistryStaff, $uids, true);
                 }
@@ -446,7 +465,15 @@ class ProfileController extends Controller
             $likeCount = ($likes = $profile->likes) ? count($likes) : 0;
             $iLike = $profile->iLike ? true : false;
 
+            $pastor = NULL;
+            $churchStaff = NULL;
+            $otherMinistriesStaff = NULL;
+            $churchMembers = NULL;
+            $likeProfiles = NULL;
+            $events = NULL;
             if ($p == 'connections') {
+                
+                $uids = NULL;
                 
                 // $pastor Home church pastor
                 $pastor = $profile->srPastorChurchConfirmed;
@@ -546,7 +573,14 @@ class ProfileController extends Controller
             $likeCount = ($likes = $profile->likes) ? count($likes) : 0;
             $iLike = $profile->iLike ? true : false;
 
+            $staff = NULL;
+            $sentMissionaries = NULL;
+            $churchMembers = NULL;
+            $likeProfiles = NULL;
+            $events = NULL;
             if ($p == 'connections') {
+
+                $uids = NULL;
                 
                 // $staff Staff
                 if ($staff = $profile->orgStaffConfirmed) {
@@ -622,8 +656,17 @@ class ProfileController extends Controller
             $likeCount = ($likes = $profile->likes) ? count($likes) : 0;
             $iLike = $profile->iLike ? true : false;
 
+            $pastor = NULL;
+            $churchStaff = NULL;
+            $parentMinistryStaff = NULL;
+            $otherMinistriesStaff = NULL;
+            $churchMembers = NULL;
+            $likeProfiles = NULL;
+            $events = NULL;
             if ($p == 'connections') {
-                
+
+                $uids = NULL;
+                                
                 // $pastor Home church pastor
                 $pastor = $profile->srPastorIndConfirmed;
                 $uids = $pastor ? [$pastor->user_id, $profile->user_id] : [$profile->user_id];
@@ -635,7 +678,7 @@ class ProfileController extends Controller
                 }
 
                 // $parentMinistryStaff Parent ministry staff
-                if ($parentMinistryStaff = $parentMinistry->orgStaffConfirmed) {
+                if ($parentMinistry && ($parentMinistryStaff = $parentMinistry->orgStaffConfirmed)) {
                     $parentMinistryStaff = $profile->filterStaff($parentMinistryStaff, $uids);
                     $uids = $profile->filterUserIds($parentMinistryStaff, $uids, true);
                 }
@@ -726,22 +769,31 @@ class ProfileController extends Controller
             $likeCount = ($likes = $profile->likes) ? count($likes) : 0;
             $iLike = $profile->iLike ? true : false;
 
+            $staff = NULL;
+            $passtor = NULL;
+            $parentMinistryStaff = NULL;
+            $missionaries = NULL;
+            $likeProfiles = NULL;
+            $events = NULL;
             if ($p == 'connections') {
 
+                $uids = NULL;
+                
                 // $staff Staff
                 if ($staff = $profile->orgStaffConfirmed) {
                     $uids = $profile->filterUserIds($staff, $uids, true);
                 }
 
                 // $pastor Pastor if parent ministry is a church
-                if (($parentMinistry->type == Profile::TYPE_CHURCH)
+                $pastor = NULL;
+                if ($parentMinistry && ($parentMinistry->type == Profile::TYPE_CHURCH)
                     && ($pastor = $parentMinistry->srPastorChurchConfirmed)) {
                     $pastor = $profile->filterUsersByProfile($pastor, $uids);
                     $uids = $profile->filterUserIdsByProfile($pastor, $uids);
                 }
 
                 // $parentMinistryStaff Parent ministry staff
-                if ($parentMinistryStaff = $parentMinistry->orgStaffConfirmed) {
+                if ($parentMinistry && ($parentMinistryStaff = $parentMinistry->orgStaffConfirmed)) {
                     $parentMinistryStaff = $profile->filterStaff($parentMinistryStaff, $uids);
                     $uids = $profile->filterUserIds($parentMinistryStaff, $uids, true);
                 }
@@ -807,7 +859,18 @@ class ProfileController extends Controller
             $likeCount = ($likes = $profile->likes) ? count($likes) : 0;
             $iLike = $profile->iLike ? true : false;
 
+            $pastor = NULL;
+            $churchStaff = NULL;
+            $missionAgcyStaff = NULL;
+            $churchPlantStaff = NULL;
+            $otherMinistriesStaff = NULL;
+            $churchMembers = NULL;
+            $churchPlantMembers = NULL;
+            $likeProfiles = NULL;
+            $events = NULL;
             if ($p == 'connections') {
+                
+                $uids = NULL;
                 
                 // $pastor Home church pastor
                 $pastor = $profile->srPastorIndConfirmed;
@@ -927,7 +990,14 @@ class ProfileController extends Controller
             $likeCount = ($likes = $profile->likes) ? count($likes) : 0;
             $iLike = $profile->iLike ? true : false;
 
+            $staff = NULL;
+            $pastor = NULL;
+            $parentMinistryStaff = NULL;
+            $likeProfiles = NULL;
+            $events = NULL;
             if ($p == 'connections') {
+                
+                $uids = NULL;
                 
                 // $staff Staff
                 if ($staff = $profile->orgStaffConfirmed) {
@@ -935,14 +1005,14 @@ class ProfileController extends Controller
                 }
 
                 // $pastor Pastor if parent ministry is a church
-                if (($parentMinistry->type == Profile::TYPE_CHURCH)
+                if ($parentMinistry && ($parentMinistry->type == Profile::TYPE_CHURCH)
                     && ($pastor = $parentMinistry->srPastorChurchConfirmed)) {
                     $pastor = $profile->filterUsersByProfile($pastor, $uids);
                     $uids = $profile->filterUserIdsByProfile($pastor, $uids);
                 }
 
                 // $parentMinistryStaff Parent ministry staff
-                if ($parentMinistryStaff = $parentMinistry->orgStaffConfirmed) {
+                if ($parentMinistry && ($parentMinistryStaff = $parentMinistry->orgStaffConfirmed)) {
                     $parentMinistryStaff = $profile->filterStaff($parentMinistryStaff, $uids);
                     $uids = $profile->filterUserIds($parentMinistryStaff, $uids, true);
                 }
@@ -999,6 +1069,11 @@ class ProfileController extends Controller
             $likeCount = ($likes = $profile->likes) ? count($likes) : 0;
             $iLike = $profile->iLike ? true : false;
 
+            $churchStaff = NULL;
+            $otherMinistriesStaff = NULL;
+            $churchMembers = NULL;
+            $likeProfiles = NULL;
+            $events = NULL;
             if ($p == 'connections') {
 
                 $uids = [$profile->user_id];
@@ -1090,7 +1165,14 @@ class ProfileController extends Controller
             $likeCount = ($likes = $profile->likes) ? count($likes) : 0;
             $iLike = $profile->iLike ? true : false;
 
+            $staff = NULL;
+            $pastor = NULL;
+            $parentMinistryStaff = NULL;
+            $likeProfiles = NULL;
+            $events = NULL;
             if ($p == 'connections') {
+                
+                $uids = NULL;
                 
                 // $staff Staff
                 if ($staff = $profile->orgStaffConfirmed) {
@@ -1098,14 +1180,14 @@ class ProfileController extends Controller
                 }
 
                 // $pastor Pastor if parent ministry is a church
-                if (($parentMinistry->type == Profile::TYPE_CHURCH)
+                if ($parentMinistry && ($parentMinistry->type == Profile::TYPE_CHURCH)
                     && ($pastor = $parentMinistry->srPastorChurchConfirmed)) {
                     $pastor = $profile->filterUsersByProfile($pastor, $uids);
                     $uids = $profile->filterUserIdsByProfile($pastor, $uids);
                 }
 
                 // $parentMinistryStaff Parent ministry staff
-                if ($parentMinistryStaff = $parentMinistry->orgStaffConfirmed) {
+                if ($parentMinistry && ($parentMinistryStaff = $parentMinistry->orgStaffConfirmed)) {
                     $parentMinistryStaff = $profile->filterStaff($parentMinistryStaff, $uids);
                     $uids = $profile->filterUserIds($parentMinistryStaff, $uids, true);
                 }
@@ -1155,7 +1237,7 @@ class ProfileController extends Controller
 
         if ($profile->type == Profile::TYPE_SCHOOL) {
             $parentMinistry = $profile->parentMinistry;
-            $schoolLevels = $profile->schoolLevels;
+            $schoolLevels = $profile->schoolLevels ? $profile->schoolLevels : NULL;
             // Sort the multidimensional array
             usort($schoolLevels, [$this, 'level_sort']);
             $accreditations = $profile->accreditations;
@@ -1163,7 +1245,15 @@ class ProfileController extends Controller
             $likeCount = ($likes = $profile->likes) ? count($likes) : 0;
             $iLike = $profile->iLike ? true : false;
 
+            $staff = NULL;
+            $pastor = NULL;
+            $parentMinistryStaff = NULL;
+            $alumni = NULL;
+            $likeProfiles = NULL;
+            $events = NULL;
             if ($p == 'connections') {
+                
+                $uids = NULL;
                 
                 // $staff Staff
                 if ($staff = $profile->orgStaffConfirmed) {
@@ -1171,14 +1261,14 @@ class ProfileController extends Controller
                 }
 
                 // $pastor Pastor if parent ministry is a church
-                if (($parentMinistry->type == Profile::TYPE_CHURCH)
+                if ($parentMinistry && ($parentMinistry->type == Profile::TYPE_CHURCH)
                     && ($pastor = $parentMinistry->srPastorChurchConfirmed)) {
                     $pastor = $profile->filterUsersByProfile($pastor, $uids);
                     $uids = $profile->filterUserIdsByProfile($pastor, $uids);
                 }
 
                 // $parentMinistryStaff Parent ministry staff
-                if ($parentMinistryStaff = $parentMinistry->orgStaffConfirmed) {
+                if ($parentMinistry && ($parentMinistryStaff = $parentMinistry->orgStaffConfirmed)) {
                     $parentMinistryStaff = $profile->filterStaff($parentMinistryStaff, $uids);
                     $uids = $profile->filterUserIds($parentMinistryStaff, $uids, true);
                 }
@@ -1240,22 +1330,30 @@ class ProfileController extends Controller
             $likeCount = ($likes = $profile->likes) ? count($likes) : 0;
             $iLike = $profile->iLike ? true : false;
 
+            $staff = NULL;
+            $pastor = NULL;
+            $parentMinistryStaff = NULL;
+            $programChurches = NULL;
+            $likeProfiles = NULL;
+            $events = NULL;
             if ($p == 'connections') {
              
+                $uids = NULL;
+                
                 // $staff Staff
                 if ($staff = $profile->orgStaffConfirmed) {
                     $uids = $profile->filterUserIds($staff, $uids, true);
                 }
 
                 // $pastor Pastor if parent ministry is a church
-                if (($parentMinistry->type == Profile::TYPE_CHURCH)
+                if ($parentMinistry && ($parentMinistry->type == Profile::TYPE_CHURCH)
                     && ($pastor = $parentMinistry->srPastorChurchConfirmed)) {
                     $pastor = $profile->filterUsersByProfile($pastor, $uids);
                     $uids = $profile->filterUserIdsByProfile($pastor, $uids);
                 }
 
                 // $parentMinistryStaff Parent ministry staff
-                if ($parentMinistryStaff = $parentMinistry->orgStaffConfirmed) {
+                if ($parentMinistry && ($parentMinistryStaff = $parentMinistry->orgStaffConfirmed)) {
                     $parentMinistryStaff = $profile->filterStaff($parentMinistryStaff, $uids);
                     $uids = $profile->filterUserIds($parentMinistryStaff, $uids, true);
                 }
@@ -1316,8 +1414,17 @@ class ProfileController extends Controller
             $likeCount = ($likes = $profile->likes) ? count($likes) : 0;
             $iLike = $profile->iLike ? true : false;
 
+            $pastor = NULL;
+            $churchStaff = NULL;
+            $parentMinistryStaff = NULL;
+            $otherMinistriesStaff = NULL;
+            $churchMembers = NULL;
+            $likeProfiles = NULL;
+            $events = NULL;
             if ($p == 'connections') {
 
+                $uids = NULL;
+                
                 // $pastor Home church pastor
                 $pastor = $profile->srPastorIndConfirmed;
                 $uids = $pastor ? [$pastor->user_id, $profile->user_id] : [$profile->user_id];
@@ -1329,7 +1436,7 @@ class ProfileController extends Controller
                 }
 
                 // $parentMinistryStaff Parent ministry staff
-                if ($parentMinistryStaff = $parentMinistry->orgStaffConfirmed) {
+                if ($parentMinistry && ($parentMinistryStaff = $parentMinistry->orgStaffConfirmed)) {
                     $parentMinistryStaff = $profile->filterStaff($parentMinistryStaff, $uids);
                     $uids = $profile->filterUserIds($parentMinistryStaff, $uids, true);
                 }

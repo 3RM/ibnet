@@ -100,7 +100,7 @@ AjaxAsset::register($this);
 					        'method' => 'post',
 					        'class' => 'btn btn-danger',
 					        'name' => 'flag',
-					        'value' => $id
+					        'value' => $profile->id
 					    ]) ?>
 					<?php $form = ActiveForm::end(); ?>
 				</div>

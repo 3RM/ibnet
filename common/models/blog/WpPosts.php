@@ -33,7 +33,7 @@ class WpPosts extends Model
      * @param mixed $n
      * @return array
      */
-	public function getPosts($n=6) 
+	public static function getPosts($n=6) 
 	{
 		$query = (new \yii\db\Query());
 		$query->select(' 
@@ -67,7 +67,7 @@ class WpPosts extends Model
      * 
      * @return array
      */
-	public function getWeeksPosts() 
+	public static function getWeeksPosts() 
 	{
 		$query = (new \yii\db\Query());
 		$query->select(' 
@@ -92,7 +92,7 @@ class WpPosts extends Model
      * @param array $postIds
      * @return array reindexed as ['comment_post_id' => 'COUNT(comment_id)']
      */
-	public function getComments($postIds) 
+	public static function getComments($postIds)
 	{
 		$query = (new \yii\db\Query());
 		$query->select('COUNT(comment_id), comment_post_id')

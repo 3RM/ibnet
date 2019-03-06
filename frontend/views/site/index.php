@@ -60,7 +60,10 @@ $this->title = '';
         <div class="blog-card">
           <?= '<div class="blog-crop">' . Html::a(Html::img($posts[$i]['image_url']) . '</div>' .
             '<h3>' . $posts[$i]['post_title'] . '</h3>' .
-            '<p>' . $posts[$i]['author_name'] . ' &#8226 ' . $date . '<span class="comments"><span class="glyphicons glyphicons-chat"></span> (' . ($comments[$posts[$i]['post_id']]['COUNT(comment_id)'] ? $comments[$posts[$i]['post_id']]['COUNT(comment_id)'] : 0) . ')</span></p>' .
+            '<p>' . 
+                $posts[$i]['author_name'] . ' &#8226 ' . $date . '<span class="comments"><span class="glyphicons glyphicons-chat"></span> (' . 
+                (isset($comments[$posts[$i]['post_id']]['COUNT(comment_id)']) ? $comments[$posts[$i]['post_id']]['COUNT(comment_id)'] : 0) . ')</span>
+            </p>' .
             '<p>' . Utility::trimText($posts[$i]['post_content'], 300, " ") . '</p>', $posts[$i]['post_url']); ?>
         </div>
     <?php } ?>
@@ -71,7 +74,10 @@ $this->title = '';
         <div class="blog-card">
           <?= '<div class="blog-crop">' . Html::a(Html::img($posts[$i]['image_url']) . '</div>' .
             '<h3>' . $posts[$i]['post_title'] . '</h3>' .
-            '<p>' . $posts[$i]['author_name'] . ' &#8226 ' . $date . '<span class="comments"><span class="glyphicons glyphicons-chat"></span> (' . ($comments[$posts[$i]['post_id']]['COUNT(comment_id)'] ? $comments[$posts[$i]['post_id']]['COUNT(comment_id)'] : 0) . ')</span></p>' .
+            '<p>' . 
+                $posts[$i]['author_name'] . ' &#8226 ' . $date . '<span class="comments"><span class="glyphicons glyphicons-chat"></span> (' . 
+                (isset($comments[$posts[$i]['post_id']]['COUNT(comment_id)']) ? $comments[$posts[$i]['post_id']]['COUNT(comment_id)'] : 0) . ')</span>
+            </p>' .
             '<p>' . Utility::trimText($posts[$i]['post_content'], 300, " ") . '</p>', $posts[$i]['post_url']); ?>
         </div>
     <?php } ?>

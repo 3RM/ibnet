@@ -8,7 +8,7 @@
 namespace frontend\controllers;
 
 use common\models\profile\Profile;
-use common\models\profile\ProfileBrowse;
+use common\models\profile\ProfileBrowse; use common\models\Utility;
 use frontend\models\GeoCoder;
 use Yii;
 use yii\filters\AccessControl;
@@ -199,9 +199,7 @@ class FacetController extends Controller
         }
 
         // Populate browseModel from session or POST
-        isset($spatial['distance']) ?
-            $browseModel->distance = $spatial['distance'] :
-            $browseModel->distance = 60;
+        $browseModel->distance = isset($spatial['distance']) ? $spatial['distance'] : 60;
         $browseModel->location = $spatial['location'];
         $browseModel->lat = $spatial['lat'];
         $browseModel->lng = $spatial['lng'];
@@ -214,23 +212,22 @@ class FacetController extends Controller
                 $spatial['lat'] = $res['lat'];
                 $spatial['lng'] = $res['lng'];
             }
-            $helper = $query->getHelper();
-            $query->createFilterQuery('org_loc')->setQuery(
-                $helper->geofilt('org_loc', 
-                    $spatial['lat'], 
-                    $spatial['lng'], 
-                    $browseModel->distance
-                )
-            );
-            $query->setQuery('{!func}' . $helper->geodist('org_loc', 
-                doubleval($spatial['lat']), 
-                doubleval($spatial['lng'])
-            ));
-            $query->addField('_distance_:' . $helper->geodist('org_loc', 
-                doubleval($spatial['lat']), 
-                doubleval($spatial['lng'])
-            ));
-            $query->addSort('score', 'asc');        
+            
+            // get the dismax component and set a boost query
+            $sp = $query->getSpatial();
+            $sp->setPoint(doubleval($spatial['lat']) . ',' . doubleval($spatial['lng']));
+            $sp->setField('org_loc');
+            $sp->setDistance($browseModel->distance);
+
+            // apply 'geofilt' filtering
+            $query->createFilterQuery('org_loc')->setQuery('{!geofilt}');
+
+            // add distance to results fields
+            $query->addField('_distance_:geodist()');
+
+            // apply sorting by distance
+            $query->addSort('geodist()', 'ASC');
+      
         }
         $session->set('spatial', $spatial);
 
@@ -283,7 +280,7 @@ class FacetController extends Controller
     // =================== Toggle more/less button =======================
         $more = $session->get('more');
         // If session has expired and any elements are missing from $more, reset browse
-        if (count($more) < 12) {
+        if (!isset($more) || (count($more) < 12)) {
             return $this->redirect(['/profile/browse']);
         }  
         if ($constraint == false && !empty($cat)) {

@@ -9,7 +9,7 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 ?>
-<?= $this->render('../site/_userAreaHeader', ['menuItems' => $menuItems, 'active' => 'profiles']) ?>
+<?= $this->render('../site/_userAreaHeader', ['active' => 'profiles']) ?>
 <div class="container">
     <?= $this->render('../site/_userAreaLeftNav', ['active' => 'profiles']) ?>
 

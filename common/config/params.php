@@ -15,6 +15,6 @@ return [
 
     // API Keys
     'apiKey.Google-client' => 'AIzaSyBtE_w8tdgpSwEse8qTsEZoR-Vw776xg6I',
-    'apiKey.Google-server' => 'AIzaSyBX5uu_ymFtKRdw-0uVJMa7CPUvMS-8Xmo',
+    'apiKey.Google-server' => 'AIzaSyDylFZ5rIu9zpubJ5TKV2WsmkEybS4t3HA',
     'apiKey.Google-no-restrictions' => 'AIzaSyDvsfbC0RbT8TLJFYFxBiCYzWgUd51xDg8',
 ];

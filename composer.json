@@ -14,7 +14,7 @@
     },
     "minimum-stability": "dev",
     "require": {
-        "php": ">=5.4.0",
+        "php": ">=7.0.0",
         "yiisoft/yii2": "~2.0.14",
         "yiisoft/yii2-bootstrap": "~2.0.0",
         "yiisoft/yii2-swiftmailer": "~2.0.0 || ~2.1.0",
@@ -23,7 +23,6 @@
         "sadovojav/yii2-image-cutter": "dev-master",
         "kartik-v/yii2-widget-select2": "@dev",
         "kartik-v/yii2-markdown": "dev-master",
-        "johnitvn/yii2-rbac-plus": "*",
         "borales/yii2-phone-input": "=0.0.5",
         "ruskid/yii2-csv-importer": "dev-master",
         "tugmaks/yii2-google-maps": "dev-master",
@@ -43,7 +42,8 @@
         "sammaye/yii2-yiichimp": "^1.0",
         "geocoder-php/google-maps-provider": "^4.0@dev",
         "php-http/guzzle6-adapter": "^2.0@dev",
-        "php-http/message": "^1.6@dev"
+        "php-http/message": "^1.6@dev",
+        "yiisoft/yii2-elasticsearch": "~2.0.0"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",
@@ -55,9 +55,6 @@
     },
      "config": {
         "process-timeout": 1800,
-        "platform": {
-            "php": "7.1.0"
-        },
         "fxp-asset": {
             "installer-paths": {
                 "npm-asset-library": "vendor/npm",

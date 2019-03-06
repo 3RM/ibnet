@@ -19,7 +19,7 @@ $this->title = 'Activation';
     <p>Your profile "<?= $profile->profile_name ?>" is now active and will be searchable in the directory shortly.</p>
 
     <p>
-        Return to your account at any time to update your profile. Come back within one year and update or confirm 
+        Return to your account at any time to update your profile. Come back within two years and update or confirm 
         the accuracy of your information to keep your profile active.
     </p>
 

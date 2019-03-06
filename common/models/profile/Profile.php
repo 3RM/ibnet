@@ -112,7 +112,7 @@ use yii\web\UploadedFile;
  * @property int $inappropriate
  */
 
-class Profile extends \yii\db\ActiveRecord
+class Profile extends yii\db\ActiveRecord
 {
 
     /**
@@ -946,6 +946,10 @@ class Profile extends \yii\db\ActiveRecord
         }
     }
 
+    /**
+     * Create a new profile
+     * @return Profile the loaded model
+     */
     public function profileCreate()
     {
         $this->status = self::STATUS_NEW;
@@ -2237,7 +2241,7 @@ class Profile extends \yii\db\ActiveRecord
      * @param string $name
      * @return Profile the loaded model
      */
-    public function findViewProfile($id, $urlLoc, $urlName)
+    public static function findViewProfile($id, $urlLoc, $urlName)
     {
         return self::find()
             ->where(['id' => $id])
@@ -2248,15 +2252,15 @@ class Profile extends \yii\db\ActiveRecord
     }
 
     /**
-     * Check if profile has expired within the last year
+     * Check if profile has expired within the last two years
      * @param string $id
      * @return boolean
      */
-    public function isExpired($id) 
+    public static function isExpired($id) 
     {
         $profile = self::findProfile($id);
         if ($profile->status != Profile::STATUS_NEW) {
-            $cutoffDate = strtotime($profile->inactivation_date . '+1 year');
+            $cutoffDate = strtotime($profile->inactivation_date . '+2 year');
             if (date("m-d-Y", $cutoffDate) > date("m-d-Y")) {
                 return true;
             }
@@ -2955,7 +2959,7 @@ class Profile extends \yii\db\ActiveRecord
                 $likeProfiles[] = $user;
             }
         }
-        return $likeProfiles;
+        return isset($likeProfiles) ? $likeProfiles : NULL;
     }
 
     /**
@@ -3135,7 +3139,7 @@ class Profile extends \yii\db\ActiveRecord
         if ($this->status != self::STATUS_NEW) {
             if ($this->status != self::STATUS_ACTIVE || $this->requiredFields()) {
                 $update = new Expression('CURDATE()');
-                $renewal = new Expression('DATE_ADD(CURDATE(), INTERVAL 1 YEAR)');
+                $renewal = new Expression('DATE_ADD(CURDATE(), INTERVAL 2 YEARS)');
                 $this->updateAttributes(['last_update' => $update, 'renewal_date' => $renewal]);
             } 
         }
@@ -3143,7 +3147,7 @@ class Profile extends \yii\db\ActiveRecord
     }
 
     /**
-     *  Update profile date fields: last_update, renewal_date
+     *  Set date profile was inactivated
      * @return Profile the loaded model
      */
     public function setInactivationDate()
@@ -3354,22 +3358,4 @@ class Profile extends \yii\db\ActiveRecord
         }
         return $this;
     }
-
-    /**
-     * Check if profile has expired within last year
-     * @return true || throw exception
-     */
-    public function checkExpired($id)
-    {
-        if (!(($profile = self::findProfile($id)) && ($profile->status == Profile::STATUS_NEW))) {
-            throw new NotFoundHttpException;
-        }
-        $cutoffDate = strtotime($this->inactivation_date . '+2 years');
-        if (date("m-d-Y", $cutoffDate) > date("m-d-Y")) {
-            return true;
-        } else {
-            throw new NotFoundHttpException; 
-        }
-    }
-
 }

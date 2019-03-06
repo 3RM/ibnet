@@ -252,6 +252,8 @@ class SiteController extends Controller
             $content = new Box3Content();
             $box3Content = $content->getBox3Content();
 
+            $posts = NULL;
+            $comments = NULL;
             $posts = WpPosts::getPosts();
             $postIds = ArrayHelper::getColumn($posts, 'post_id');
             $comments = WpPosts::getComments($postIds);
@@ -600,7 +602,6 @@ class SiteController extends Controller
         return $this->render('settings', [
             'userP' => $userP,
             'userA' => $userA,
-            'account' => $account,
             'list' => $list,
             'home_church' => $home_church,
         ]);
