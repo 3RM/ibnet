@@ -24,7 +24,7 @@ $this->title = 'Login';
     <div class="row">
         <div class="col-md-1"></div>
         <div class="col-md-4 center top-margin-40">
-            <?= Html::img('@web/images/ibnet-large.png'); ?>
+            <?= Html::img('@img.site/ibnet-large.png'); ?>
         </div>
         <div class="col-md-4">
 

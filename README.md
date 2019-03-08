@@ -32,6 +32,7 @@ This installation assumes Ubuntu server and php7.1.
  * Add common/config/main-local.php (configure db and mailer)
  * Add frontend/config/main-local.php (set unique cookie validation key)
  * Add frontend/web/index.php
+ 
  Consult the Yii advanced template or contact admin@ibnet.org for help with these files.
 
 ### Run Composer
@@ -58,6 +59,8 @@ php yii migrate/up --migrationPath=@vendor/rmrevin/yii2-comments/migrations/
 php yii migrate --migrationPath=@vendor/uguranyum/yii2-icalender/migration --interactive=0
 ```
 A future update of this repository will include instructions for using fake data using yiisoft/yii2-faker.
+
+Access the application at frontend/web
 
 ### Send a pull request
 Make your updates and send a pull request.  All contributors are invited to review and discuss.

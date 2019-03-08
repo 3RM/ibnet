@@ -30,7 +30,7 @@ use yii\widgets\ActiveForm;
                         Html::submitButton('Sign In', ['class' => 'btn btn-primary']) .
                     Html::endForm() .
                     '<div id="login-result"></div>' .
-                    Html::a('I forgot my password', 'site/request-password-reset', ['style' => 'font-size:0.8em;']) .'
+                    Html::a('I forgot my password', '/site/request-password-reset', ['style' => 'font-size:0.8em;']) .'
                     <hr>'.
                     Html::a('Register', 'site/register', ['class' => 'btn btn-primary register-link']) .
                 '</div> 

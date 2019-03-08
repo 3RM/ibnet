@@ -338,6 +338,7 @@ class ProfileMgmtController extends ProfileController
         $profile->scenario = 'history';
 
         $history = new History();
+        $action = NULL;
         if (isset($_POST['add'])) {
             $action = 'add';
 

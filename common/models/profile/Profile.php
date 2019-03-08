@@ -3139,7 +3139,7 @@ class Profile extends yii\db\ActiveRecord
         if ($this->status != self::STATUS_NEW) {
             if ($this->status != self::STATUS_ACTIVE || $this->requiredFields()) {
                 $update = new Expression('CURDATE()');
-                $renewal = new Expression('DATE_ADD(CURDATE(), INTERVAL 2 YEARS)');
+                $renewal = new Expression('DATE_ADD(CURDATE(), INTERVAL 2 YEAR)');
                 $this->updateAttributes(['last_update' => $update, 'renewal_date' => $renewal]);
             } 
         }
