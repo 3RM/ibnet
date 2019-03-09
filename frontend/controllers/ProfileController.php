@@ -15,6 +15,7 @@ use common\models\profile\MissionAgcy;
 use common\models\profile\Profile;
 use common\models\profile\ProfileBrowse;
 use common\models\profile\ProfileSearch; use common\models\Utility;
+use common\models\profile\ProfileGuestSearch;
 use common\models\profile\Staff;
 use common\models\profile\Social;
 use Yii;
@@ -81,7 +82,7 @@ class ProfileController extends Controller
     public function actionSearch($term)
     {
         $this->layout="main";
-        $searchModel = new ProfileSearch();
+        $searchModel = Yii::$app->user->isGuest ? new ProfileGuestSearch() : new ProfileSearch();
 
         if ($searchModel->load(Yii::$app->request->Post())) {
             if ($searchModel->term == '') {

@@ -8,7 +8,7 @@
 namespace common\models\profile;
 
 use common\models\profile\Profile;
-use sammaye\solr\SolrDataProvider;
+use sammaye\solr\SolrDataProvider; use common\models\Utility;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -17,7 +17,7 @@ use yii\db\Query;
 /**
  * ProfileSearch represents the model behind the search form about `common\models\profile\Profile`.
  */
-class ProfileSearch extends Profile
+class ProfileGuestSearch extends Profile
 {
     /**
      * @param string $term User entered search string
@@ -48,10 +48,12 @@ class ProfileSearch extends Profile
      * Returns Profile rows based on user search string
      */
     public function query($term)
-    {
-        $query = Yii::$app->solr->createSelect();
+    {   
+        $solr = Yii::$app->solr;
+        $solr->setDefaultEndpoint('profile-guest-dev');
+        $query = $solr->createSelect();
         $EDisMax = $query->getEDisMax();
-        $EDisMax->setBoostQuery('org_name^2 ind_last_name^2');
+        $EDisMax->setBoostQuery('org_name^2');
         $query->setQuery($term);
         //$this->result = Yii::$app->solr->select($query);
 

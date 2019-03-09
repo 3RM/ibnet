@@ -15,6 +15,7 @@ use common\models\profile\Profile;
 use common\models\profile\ProfileBrowse;
 use common\models\profile\ProfileMail;
 use common\models\profile\ProfileSearch;
+use common\models\profile\ProfileGuestSearch;
 use common\models\PrimaryRole;
 use common\models\User;
 use common\models\Utility;
@@ -220,8 +221,8 @@ class SiteController extends Controller
      * @return mixed
      */
     public function actionIndex()
-    {
-        $searchModel = new ProfileSearch();
+    {   
+        $searchModel = Yii::$app->user->isGuest ? new ProfileGuestSearch() : new ProfileSearch();
 
         if ($searchModel->load(Yii::$app->request->Post()) &&
             $searchModel->term != '') {
