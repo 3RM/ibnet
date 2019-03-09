@@ -254,9 +254,9 @@ class SiteController extends Controller
 
             $posts = NULL;
             $comments = NULL;
-            $posts = WpPosts::getPosts();
-            $postIds = ArrayHelper::getColumn($posts, 'post_id');
-            $comments = WpPosts::getComments($postIds);
+            // $posts = WpPosts::getPosts();
+            // $postIds = ArrayHelper::getColumn($posts, 'post_id');
+            // $comments = WpPosts::getComments($postIds);
         
             $this->layout = 'bg-gray';
             return $this->render('/site/index', [
