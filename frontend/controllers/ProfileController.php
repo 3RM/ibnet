@@ -251,7 +251,7 @@ class ProfileController extends Controller
         if ($profile->type == Profile::TYPE_ASSOCIATION) {
             $social = $profile->hasSocial;
             $likeCount = ($likes = $profile->likes) ? count($likes) : 0;
-            $iLike = $profile->iLike ? true : false;
+            $iLike = (!Yii::$app->user->isGuest && $profile->iLike) ? true : false;
 
             $staff = NULL;
             $members = NULL;
@@ -316,7 +316,7 @@ class ProfileController extends Controller
         if ($profile->type == Profile::TYPE_FELLOWSHIP) {
             $social = $profile->hasSocial;
             $likeCount = ($likes = $profile->likes) ? count($likes) : 0;
-            $iLike = $profile->iLike ? true : false;
+            $iLike = (!Yii::$app->user->isGuest && $profile->iLike) ? true : false;
 
             $staff = NULL;
             $members = NULL;
@@ -382,7 +382,7 @@ class ProfileController extends Controller
             $parentMinistry = $profile->parentMinistry;
             $social = $profile->hasSocial;
             $likeCount = ($likes = $profile->likes) ? count($likes) : 0;
-            $iLike = $profile->iLike ? true : false;
+            $iLike = (!Yii::$app->user->isGuest && $profile->iLike) ? true : false;
 
             $staff = NULL;
             $pastor = NULL;
@@ -463,7 +463,7 @@ class ProfileController extends Controller
             $schoolsAttended = $profile->schoolsAttended;
             $social = $profile->hasSocial;
             $likeCount = ($likes = $profile->likes) ? count($likes) : 0;
-            $iLike = $profile->iLike ? true : false;
+            $iLike = (!Yii::$app->user->isGuest && $profile->iLike) ? true : false;
 
             $pastor = NULL;
             $churchStaff = NULL;
@@ -571,7 +571,7 @@ class ProfileController extends Controller
             $programs = $profile->programs;
             $social = $profile->hasSocial;
             $likeCount = ($likes = $profile->likes) ? count($likes) : 0;
-            $iLike = $profile->iLike ? true : false;
+            $iLike = (!Yii::$app->user->isGuest && $profile->iLike) ? true : false;
 
             $staff = NULL;
             $sentMissionaries = NULL;
@@ -654,7 +654,7 @@ class ProfileController extends Controller
             $schoolsAttended = $profile->schoolsAttended;
             $social = $profile->hasSocial;
             $likeCount = ($likes = $profile->likes) ? count($likes) : 0;
-            $iLike = $profile->iLike ? true : false;
+            $iLike = (!Yii::$app->user->isGuest && $profile->iLike) ? true : false;
 
             $pastor = NULL;
             $churchStaff = NULL;
@@ -767,7 +767,7 @@ class ProfileController extends Controller
             $parentMinistry = $profile->parentMinistry;
             $social = $profile->hasSocial;
             $likeCount = ($likes = $profile->likes) ? count($likes) : 0;
-            $iLike = $profile->iLike ? true : false;
+            $iLike = (!Yii::$app->user->isGuest && $profile->iLike) ? true : false;
 
             $staff = NULL;
             $passtor = NULL;
@@ -857,7 +857,7 @@ class ProfileController extends Controller
             $schoolsAttended = $profile->schoolsAttended;
             $social = $profile->hasSocial;
             $likeCount = ($likes = $profile->likes) ? count($likes) : 0;
-            $iLike = $profile->iLike ? true : false;
+            $iLike = (!Yii::$app->user->isGuest && $profile->iLike) ? true : false;
 
             $pastor = NULL;
             $churchStaff = NULL;
@@ -988,7 +988,7 @@ class ProfileController extends Controller
             $parentMinistry = $profile->parentMinistry;
             $social = $profile->hasSocial;
             $likeCount = ($likes = $profile->likes) ? count($likes) : 0;
-            $iLike = $profile->iLike ? true : false;
+            $iLike = (!Yii::$app->user->isGuest && $profile->iLike) ? true : false;
 
             $staff = NULL;
             $pastor = NULL;
@@ -1067,7 +1067,7 @@ class ProfileController extends Controller
             $schoolsAttended = $profile->schoolsAttended;
             $social = $profile->hasSocial;
             $likeCount = ($likes = $profile->likes) ? count($likes) : 0;
-            $iLike = $profile->iLike ? true : false;
+           $iLike = (!Yii::$app->user->isGuest && $profile->iLike) ? true : false;
 
             $churchStaff = NULL;
             $otherMinistriesStaff = NULL;
@@ -1163,7 +1163,7 @@ class ProfileController extends Controller
             $parentMinistry = $profile->parentMinistry;
             $social = $profile->hasSocial;
             $likeCount = ($likes = $profile->likes) ? count($likes) : 0;
-            $iLike = $profile->iLike ? true : false;
+            $iLike = (!Yii::$app->user->isGuest && $profile->iLike) ? true : false;
 
             $staff = NULL;
             $pastor = NULL;
@@ -1243,7 +1243,7 @@ class ProfileController extends Controller
             $accreditations = $profile->accreditations;
             $social = $profile->hasSocial;
             $likeCount = ($likes = $profile->likes) ? count($likes) : 0;
-            $iLike = $profile->iLike ? true : false;
+            $iLike = (!Yii::$app->user->isGuest && $profile->iLike) ? true : false;
 
             $staff = NULL;
             $pastor = NULL;
@@ -1328,7 +1328,7 @@ class ProfileController extends Controller
             $parentMinistry = $profile->parentMinistry;
             $social = $profile->hasSocial;
             $likeCount = ($likes = $profile->likes) ? count($likes) : 0;
-            $iLike = $profile->iLike ? true : false;
+            $iLike = (!Yii::$app->user->isGuest && $profile->iLike) ? true : false;
 
             $staff = NULL;
             $pastor = NULL;
@@ -1412,7 +1412,7 @@ class ProfileController extends Controller
             $schoolsAttended = $profile->schoolsAttended;
             $social = $profile->hasSocial;
             $likeCount = ($likes = $profile->likes) ? count($likes) : 0;
-            $iLike = $profile->iLike ? true : false;
+            $iLike = (!Yii::$app->user->isGuest && $profile->iLike) ? true : false;
 
             $pastor = NULL;
             $churchStaff = NULL;
