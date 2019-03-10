@@ -258,7 +258,7 @@ class AjaxController extends Controller
         if (!($profile->load(Yii::$app->request->Post()) && 
             $profile->validate())) {
 
-            if ($profile->email_pvt == NULL) {
+            if (empty($profile->email_pvt)) {
 
                 return [
                     'body' => 'A private email is required.',

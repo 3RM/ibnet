@@ -55,21 +55,21 @@ $this->title = 'Contact Information';
                     ]); ?>
                         <div class="modal-body">
                             <h3>How it works:</h3>
-                            <?= isset($profile->email_pvt) ?
-                                '<p>You already have a private email set up.  If you would like to update your private email, enter your new email below and click "Update."  That\'s it! We\'ll take care of the rest.</p>' :
-                                '<p>Enter your email below.  Click "Set it Up."  That\'s it! We\'ll take care of the rest.</p>' ?>
-                            <?= isset($profile->email_pvt) ?
-                                '<p>Your profile will continue to list your ibnet.org email address.  Any emails sent to this address will be automatically forwarded to your private email.  You get to choose if you want to respond and divulge your private email address. This has the added benefit of letting you know which email enquiries come from ibnet.org.</p>' :
-                                '<p>Your profile will list your new ibnet.org email address.  Any emails sent to this address will be automatically forwarded to your private email.  You get to choose if you want to respond and divulge your private email address. This has the added benefit of letting you know which email enquiries come from ibnet.org.</p>' ?>
+                            <?= empty($profile->email_pvt) ?
+                                '<p>Enter your email below.  Click "Set it Up."  That\'s it! We\'ll take care of the rest.</p>' :
+                                '<p>You already have a private email set up.  If you would like to update your private email, enter your new email below and click "Update."  That\'s it! We\'ll take care of the rest.</p>' ?>
+                            <?= empty($profile->email_pvt) ?
+                                '<p>Your profile will list your new ibnet.org email address.  Any emails sent to this address will be automatically forwarded to your private email.  You get to choose if you want to respond and divulge your private email address. This has the added benefit of letting you know which email enquiries come from ibnet.org.</p>' :
+                                '<p>Your profile will continue to list your ibnet.org email address.  Any emails sent to this address will be automatically forwarded to your private email.  You get to choose if you want to respond and divulge your private email address. This has the added benefit of letting you know which email enquiries come from ibnet.org.</p>' ?>
                             <p>Note that this is a <i>forwarding email</i>, which means that no emails will be saved and there is no inbox associated with the address. Please allow 48 hours for your new email address to become active and visible on your profile.</p> 
                             <br>
                             <div class="modal-footer">
                                 <div class="row">
                                     <div class="col-md-8">
                                         <h4>
-                                        <?= isset($profile->email_pvt) ?
-                                            'Your public email: <b> ' . $ibnetEmail . '</b>' :
-                                            'Your new public email: <b> ' . $ibnetEmail . '</b>' ?>
+                                        <?= empty($profile->email_pvt) ?
+                                            'Your new public email: <b> ' . $ibnetEmail . '</b>' :
+                                            'Your public email: <b> ' . $ibnetEmail . '</b>' ?>
                                         </h4>
                                     </div>
                                 </div>
@@ -88,7 +88,7 @@ $this->title = 'Contact Information';
                                                 'class' => 'btn btn-primary'
                                             ]
                                         ) ?>
-                                        <?php if (!isset($profile->email_pvt)) {  // populate private email input from main email input if private email is NULL
+                                        <?php if (empty($profile->email_pvt)) {  // populate private email input from main email input if private email is NULL
                                             $this->registerJs("$('#request-email').click(function() { $('#profile-email_pvt').val($('#profile-email').val());});", \yii\web\View::POS_READY);
                                         }
                                         $this->registerJs("$('#email-id').click(handleAjaxLink);", \yii\web\View::POS_READY); ?>

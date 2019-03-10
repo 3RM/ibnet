@@ -30,7 +30,7 @@ class ProfileMailController extends Controller
      * @param string $dir               Direction of link (link/unlink)
      * @return boolean
      */
-    public function initSendLink($linkingProfile, $profile, $profileOwner, $lType, $dir)
+    public static function initSendLink($linkingProfile, $profile, $profileOwner, $lType, $dir)
     {   
         // check if profile owner has email preferences set to receive link notifications
         if ($profileOwner->emailPrefLinks != 1) {
@@ -83,7 +83,7 @@ class ProfileMailController extends Controller
      * @param int $id
      * @return boolean
      */
-    public function dbSendLink($id)
+    public static function dbSendLink($id)
     {
         $mailArray = ProfileMail::find()->where(['linking_profile' => $id])->all();
         
