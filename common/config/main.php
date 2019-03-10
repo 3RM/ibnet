@@ -38,12 +38,12 @@ return [
                     'profile-dev' => [
                         'host' => 'localhost',
                         'port' => '8983',
-                        'path' => '/solr/profile-dev',
+                        'path' => '/solr/profile',
                     ],
                     'profile-guest-dev' => [
                         'host' => 'localhost',
                         'port' => '8983',
-                        'path' => '/solr/profile-guest-dev',
+                        'path' => '/solr/profile-guest',
                     ],
                 ],
             ],

@@ -67,7 +67,7 @@ class ProfileGuestBrowse extends Profile
         
         // Initialize Query
         $solr = Yii::$app->solr;
-        $solr->setDefaultEndpoint('profile-guest-dev');
+        $solr->setDefaultEndpoint('profile-guest');
         $query = $solr->createSelect();
         $EDisMax = $query->getEDisMax();
         $EDisMax->setBoostQuery('org_name^2');
