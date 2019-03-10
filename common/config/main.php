@@ -35,10 +35,15 @@ return [
             'class' => 'sammaye\solr\Client',
             'options' => [
                 'endpoint' => [
-                    'profile' => [
+                    'profile-dev' => [
                         'host' => 'localhost',
                         'port' => '8983',
-                        'path' => '/solr/profile',
+                        'path' => '/solr/profile-dev',
+                    ],
+                    'profile-guest-dev' => [
+                        'host' => 'localhost',
+                        'port' => '8983',
+                        'path' => '/solr/profile-guest-dev',
                     ],
                 ],
             ],

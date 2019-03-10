@@ -2,7 +2,7 @@
 namespace frontend\controllers;
 
 use common\models\Utility;
-use common\models\profile\Mail;
+use common\models\profile\ProfileMail;
 use common\models\profile\Profile;
 use frontend\controllers\ProfileController;
 use Yii;
@@ -32,7 +32,7 @@ class MailController extends Controller
 
         if ($linkingProfile->status != Profile::STATUS_ACTIVE) {                                    // linking profile is new or inactive (don't save for active profiless, emails are sent in real time)
             
-            if ($mail = Mail::find()
+            if ($mail = ProfileMail::find()
                 ->where(['linking_profile' => $linkingProfile->id])
                 ->andWhere(['profile' => $profile->id])
                 ->andWhere(['profile_owner' => $profileOwner->id])
@@ -41,7 +41,7 @@ class MailController extends Controller
                 $mail->dir = $dir;                                                                  // update direction in case it is opposite
                 $mail->save();
             } else {                                                                                // Link doens't exist in db, add it  
-                $mail = new Mail;
+                $mail = new ProfileMail;
                 $mail->linking_profile = $linkingProfile->id;
                 $mail->profile = $profile->id;
                 $mail->profile_owner = $profileOwner->id;
@@ -70,7 +70,7 @@ class MailController extends Controller
      */
     public function dbSendLink($id)
     {
-        $mailArray = Mail::find()->where(['linking_profile' => $id])->all();
+        $mailArray = ProfileMail::find()->where(['linking_profile' => $id])->all();
         
         foreach ($mailArray as $mail) {
         

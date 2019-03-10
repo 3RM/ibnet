@@ -39,26 +39,32 @@ $this->title = $profile->mainName;
 
 	</div>
 	<?= $this->render('_profileFooter', ['profile' => $profile, 'iLike' => $iLike, 'likeCount' => $likeCount]) ?>
-	<?= $this->render('_addContent') ?>
 
-    <?php if ($p == 'comments') { ?>
-		<div class="additional-content">
-			<?= $this->render('comment/_comments', ['profile' => $profile]); ?>
-		</div>
-	<?php } elseif ($p == 'connections') { ?>
-		<div class="additional-content">
-			<?= !empty($churchStaff) ? $this->render('connection/_orgStaff', ['staff' => $churchStaff]) : NULL ?>
-			<?= !empty($otherMinistriesStaff) ? $this->render('connection/_otherMinistriesStaff', ['otherMinistriesStaff' => $otherMinistriesStaff]) : NULL ?>
-			<?= (!empty($churchMembers) && !empty($churchMembers->churchMembers)) ? $this->render('connection/_churchFellowMembers', ['church' => $church, 'churchMembers' => $churchMembers->churchMembers]) : NULL ?>
-			<?= !empty($likeProfiles) ? $this->render('connection/_likes', ['likeProfiles' => $likeProfiles]) : NULL ?>
-			<?php if (empty($churchStaff) && empty($otherMinistriesStaff) && (empty($churchMembers) || empty($churchMembers->churchMembers)) && empty($likeProfiles)) {
-				echo '<em>No connections found.</em>';
-			} ?>
-		</div>
-	<?php } elseif ($p == 'history') { ?>
-		<div class="additional-content">
-			<?= $this->render('_history', ['profile' => $profile, 'events' => $events]); ?>
-		</div>
+	<?php if (!Yii::$app->user->isGuest) { ?>
+		<?= $this->render('_addContent') ?>
+
+    	<?php if ($p == 'comments') { ?>
+			<div class="additional-content">
+				<?= $this->render('comment/_comments', ['profile' => $profile]); ?>
+			</div>
+			
+		<?php } elseif ($p == 'connections') { ?>
+			<div class="additional-content">
+				<?= !empty($churchStaff) ? $this->render('connection/_orgStaff', ['staff' => $churchStaff]) : NULL ?>
+				<?= !empty($otherMinistriesStaff) ? $this->render('connection/_otherMinistriesStaff', ['otherMinistriesStaff' => $otherMinistriesStaff]) : NULL ?>
+				<?= (!empty($churchMembers) && !empty($churchMembers->churchMembers)) ? $this->render('connection/_churchFellowMembers', ['church' => $church, 'churchMembers' => $churchMembers->churchMembers]) : NULL ?>
+				<?= !empty($likeProfiles) ? $this->render('connection/_likes', ['likeProfiles' => $likeProfiles]) : NULL ?>
+				<?php if (empty($churchStaff) && empty($otherMinistriesStaff) && (empty($churchMembers) || empty($churchMembers->churchMembers)) && empty($likeProfiles)) {
+					echo '<em>No connections found.</em>';
+				} ?>
+			</div>
+
+		<?php } elseif ($p == 'history') { ?>
+			<div class="additional-content">
+				<?= $this->render('_history', ['profile' => $profile, 'events' => $events]); ?>
+			</div>
+		<?php } ?>
+
 	<?php } ?>
 
 </div>

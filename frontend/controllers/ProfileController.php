@@ -14,7 +14,9 @@ use common\models\profile\Fellowship;
 use common\models\profile\MissionAgcy;
 use common\models\profile\Profile;
 use common\models\profile\ProfileBrowse;
+use common\models\profile\ProfileGuestBrowse;
 use common\models\profile\ProfileSearch; use common\models\Utility;
+use common\models\profile\ProfileGuestSearch;
 use common\models\profile\Staff;
 use common\models\profile\Social;
 use Yii;
@@ -81,7 +83,7 @@ class ProfileController extends Controller
     public function actionSearch($term)
     {
         $this->layout="main";
-        $searchModel = new ProfileSearch();
+        $searchModel = Yii::$app->user->isGuest ? new ProfileGuestSearch() : new ProfileSearch();
 
         if ($searchModel->load(Yii::$app->request->Post())) {
             if ($searchModel->term == '') {
@@ -107,7 +109,7 @@ class ProfileController extends Controller
      */
     public function actionBrowse()
     {
-        $browseModel = new ProfileBrowse();
+        $browseModel = Yii::$app->user->isGuest ? new ProfileGuestBrowse() : new ProfileBrowse();
         $browseModel->scenario = 'browse';
         $session = Yii::$app->session;
         $this->layout = "main";
@@ -213,7 +215,7 @@ class ProfileController extends Controller
         } elseif (Profile::isExpired($id)) {
             $this->redirect(['profile-expired', 'id' => $id]);
         } else {
-            throw NotFoundHttpException;
+            throw new NotFoundHttpException;
         }
     }
 
@@ -454,6 +456,10 @@ class ProfileController extends Controller
             return $this->redirect(['profile/profile-expired', 'id' => $id]);
         }
 
+        if (Yii::$app->user->isGuest) {
+            throw new NotFoundHttpException;
+        }
+
         if (($profile->type == Profile::TYPE_CHAPLAIN) && ($missionary = $profile->missionary)) {
             $church = $profile->homeChurch;
             $fellowships = $profile->fellowships;
@@ -646,6 +652,10 @@ class ProfileController extends Controller
             return $this->redirect(['profile/profile-expired', 'id' => $id]);
         }
 
+        if (Yii::$app->user->isGuest) {
+            throw new NotFoundHttpException;
+        }
+
         if ($profile->type == Profile::TYPE_EVANGELIST) {
             $church = $profile->homeChurch;
             $parentMinistry = $profile->parentMinistry;
@@ -770,7 +780,7 @@ class ProfileController extends Controller
             $iLike = (!Yii::$app->user->isGuest && $profile->iLike) ? true : false;
 
             $staff = NULL;
-            $passtor = NULL;
+            $pastor = NULL;
             $parentMinistryStaff = NULL;
             $missionaries = NULL;
             $likeProfiles = NULL;
@@ -784,8 +794,7 @@ class ProfileController extends Controller
                     $uids = $profile->filterUserIds($staff, $uids, true);
                 }
 
-                // $pastor Pastor if parent ministry is a church
-                $pastor = NULL;
+                // $pastor Pastor if parent ministry is a churcη
                 if ($parentMinistry && ($parentMinistry->type == Profile::TYPE_CHURCH)
                     && ($pastor = $parentMinistry->srPastorChurchConfirmed)) {
                     $pastor = $profile->filterUsersByProfile($pastor, $uids);
@@ -845,6 +854,10 @@ class ProfileController extends Controller
     {
         if (!($profile = Profile::findViewProfile($id, $urlLoc, $urlName)) && Profile::isExpired($id)) {
             return $this->redirect(['profile/profile-expired', 'id' => $id]);
+        }
+
+        if (Yii::$app->user->isGuest) {
+            throw new NotFoundHttpException;
         }
 
         if (($profile->type == Profile::TYPE_MISSIONARY) && ($missionary = $profile->missionary)) {
@@ -1060,6 +1073,10 @@ class ProfileController extends Controller
             return $this->redirect(['profile/profile-expired', 'id' => $id]);
         }
 
+        if (Yii::$app->user->isGuest) {
+            throw new NotFoundHttpException;
+        }
+
         if ($profile->type == Profile::TYPE_PASTOR) {
             $church = $profile->homeChurch;
             $fellowships = $profile->fellowships;
@@ -1067,7 +1084,7 @@ class ProfileController extends Controller
             $schoolsAttended = $profile->schoolsAttended;
             $social = $profile->hasSocial;
             $likeCount = ($likes = $profile->likes) ? count($likes) : 0;
-           $iLike = (!Yii::$app->user->isGuest && $profile->iLike) ? true : false;
+            $iLike = (!Yii::$app->user->isGuest && $profile->iLike) ? true : false;
 
             $churchStaff = NULL;
             $otherMinistriesStaff = NULL;
@@ -1403,6 +1420,10 @@ class ProfileController extends Controller
     {
         if (!($profile = Profile::findViewProfile($id, $urlLoc, $urlName)) && Profile::isExpired($id)) {
             return $this->redirect(['profile/profile-expired', 'id' => $id]);
+        }
+
+        if (Yii::$app->user->isGuest) {
+            throw new NotFoundHttpException;
         }
 
         if ($profile->type == Profile::TYPE_STAFF) {
