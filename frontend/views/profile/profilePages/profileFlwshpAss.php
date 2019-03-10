@@ -34,27 +34,33 @@ $this->title = $profile->org_name;
 
 	</div>
 	<?= $this->render('_profileFooter', ['profile' => $profile, 'iLike' => $iLike, 'likeCount' => $likeCount]) ?>
-	<?= $this->render('_addContent') ?>
 
-    <?php if ($p == 'comments') { ?>
-		<div class="additional-content">
-			<?= $this->render('comment/_comments', ['profile' => $profile]); ?>
-		</div>
-	<?php } elseif ($p == 'connections') { ?>
-		<div class="additional-content">
-			<h3>Connections</h3>
-			<hr>
-			<?= !empty($staff) ? $this->render('connection/_orgStaff', ['staff' => $staff]) : NULL ?>
-			<?= !empty($members) ? $this->render('connection/_flwshipAssMembers', ['members' => $members]) : NULL ?>
-			<?= !empty($likeProfiles) ? $this->render('connection/_likes', ['likeProfiles' => $likeProfiles]) : NULL ?>
-			<?php if (empty($staff) && empty($members) && empty($likeProfiles)) {
-				echo '<em>No connections found.</em>';
-			} ?>
-		</div>
-	<?php } elseif ($p == 'history') { ?>
-		<div class="additional-content">
-			<?= $this->render('_history', ['profile' => $profile, 'events' => $events]); ?>
-		</div>
+	<?php if (!Yii::$app->user->isGuest) { ?>
+		<?= $this->render('_addContent') ?>
+
+    	<?php if ($p == 'comments') { ?>
+			<div class="additional-content">
+				<?= $this->render('comment/_comments', ['profile' => $profile]); ?>
+			</div>
+
+		<?php } elseif ($p == 'connections') { ?>
+			<div class="additional-content">
+				<h3>Connections</h3>
+				<hr>
+				<?= !empty($staff) ? $this->render('connection/_orgStaff', ['staff' => $staff]) : NULL ?>
+				<?= !empty($members) ? $this->render('connection/_flwshipAssMembers', ['members' => $members]) : NULL ?>
+				<?= !empty($likeProfiles) ? $this->render('connection/_likes', ['likeProfiles' => $likeProfiles]) : NULL ?>
+				<?php if (empty($staff) && empty($members) && empty($likeProfiles)) {
+					echo '<em>No connections found.</em>';
+				} ?>
+			</div>
+
+		<?php } elseif ($p == 'history') { ?>
+			<div class="additional-content">
+				<?= $this->render('_history', ['profile' => $profile, 'events' => $events]); ?>
+			</div>
+		<?php } ?>
+
 	<?php } ?>
 
 </div>

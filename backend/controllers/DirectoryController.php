@@ -12,9 +12,9 @@ use common\models\Utility;
 use common\models\missionary\Missionary;
 use common\models\profile\Association;
 use common\models\profile\Fellowship;
-use common\models\profile\Mail;
 use common\models\profile\MissHousing;
 use common\models\profile\Profile;
+use common\models\profile\ProfileMail;
 use common\models\profile\Social;
 use common\models\profile\Staff;
 use frontend\controllers\ProfileController;
@@ -869,7 +869,7 @@ class DirectoryController extends Controller
             $profile->updateAttributes(['email_pvt_status' => Profile::PRIVATE_EMAIL_ACTIVE]);
         }
 
-        if (Mail::sendForwardingEmailNotif($profile->email)) {                                      // Send request to admin
+        if (ProfileMail::sendForwardingEmailNotif($profile->email)) {                                      // Send request to admin
             Yii::$app->session->setFlash('success', 
                 'Private email status has been set to <i>Active</i> for profile ' . $profile->id . ' and a notification email has 
                 been sent to the user.');

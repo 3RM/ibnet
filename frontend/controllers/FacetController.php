@@ -9,6 +9,7 @@ namespace frontend\controllers;
 
 use common\models\profile\Profile;
 use common\models\profile\ProfileBrowse; use common\models\Utility;
+use common\models\profile\ProfileGuestBrowse;
 use frontend\models\GeoCoder;
 use Yii;
 use yii\filters\AccessControl;
@@ -52,7 +53,7 @@ class FacetController extends Controller
         // Retrieve user selections from session
         $session = Yii::$app->session; 
         
-        $browseModel = new ProfileBrowse();
+        $browseModel = Yii::$app->user->isGuest ? new ProfileGuestBrowse() : new ProfileBrowse();
         $browseModel->scenario = 'browse';
         $query = $browseModel->query();
         $fqs = $session->get('fqs');

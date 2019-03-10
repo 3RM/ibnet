@@ -51,30 +51,36 @@ $this->title = $profile->coupleName;
 	</div>
 
 	<?= $this->render('_profileFooter', ['profile' => $profile, 'iLike' => $iLike, 'likeCount' => $likeCount]) ?>
-	<?= $this->render('_addContent') ?>
 
-    <?php if ($p == 'comments') { ?>
-		<div class="additional-content">
-			<?= $this->render('comment/_comments', ['profile' => $profile]); ?>
-		</div>
-	<?php } elseif ($p == 'connections') { ?>
-		<div class="additional-content">
-			<?= !empty($pastor) ? $this->render('connection/_srPastor', ['type' => $profile->type, 'church' => $church, 'pastor' => $pastor]) : NULL ?>
-			<?= (!empty($church) && !empty($churchStaff)) ? $this->render('connection/_orgStaffWithMinistry', ['ministry' => $church, 'staff' => $churchStaff]) : NULL ?>
-			<?= (!empty($missionAgcy) && !empty($missionAgcyStaff)) ? $this->render('connection/_orgStaffWithMinistry', ['ministry' => $missionAgcy, 'staff' => $missionAgcyStaff]) : NULL ?>
-			<?= (!empty($churchPlant) && !empty($churchPlantStaff)) ? $this->render('connection/_orgStaffWithMinistry', ['ministry' => $churchPlant, 'staff' => $churchPlantStaff]) : NULL ?>
-			<?= !empty($otherMinistriesStaff) ? $this->render('connection/_otherMinistriesStaff', ['otherMinistriesStaff' => $otherMinistriesStaff]) : NULL ?>
-			<?= (!empty($church) && !empty($churchMembers) && !empty($churchMembers->churchMembers)) ? $this->render('connection/_churchFellowMembers', ['church' => $church, 'churchMembers' => $churchMembers->churchMembers]) : NULL ?>
-			<?= (!empty($churchPlant) && !empty($churchPlantMembers) && !empty($churchPlantMembers->churchMembers)) ? $this->render('connection/_churchFellowMembers', ['church' => $churchPlant, 'churchMembers' => $churchPlantMembers->churchMembers]) : NULL ?>
-			<?= !empty($likeProfiles) ? $this->render('connection/_likes', ['likeProfiles' => $likeProfiles]) : NULL ?>
-			<?php if (empty($pastor) && (empty($church) || empty($churchStaff)) && (empty($missionAgcy) || empty($missionAgcyStaff)) && (empty($churchPlant) || empty($churchPlantStaff)) && empty($otherMinistriesStaff) && (empty($church) || empty($churchMembers) || empty($churchMembers->churchMembers)) && (empty($churchPlant) || empty($churchPlantMembers) || empty($churchPlantMembers->churchMembers)) && empty($likeProfiles)) {
+	<?php if (!Yii::$app->user->isGuest) { ?>
+		<?= $this->render('_addContent') ?>
+
+    	<?php if ($p == 'comments') { ?>
+			<div class="additional-content">
+				<?= $this->render('comment/_comments', ['profile' => $profile]); ?>
+			</div>
+
+		<?php } elseif ($p == 'connections') { ?>
+			<div class="additional-content">
+				<?= !empty($pastor) ? $this->render('connection/_srPastor', ['type' => $profile->type, 'church' => $church, 'pastor' => $pastor]) : NULL ?>
+				<?= (!empty($church) && !empty($churchStaff)) ? $this->render('connection/_orgStaffWithMinistry', ['ministry' => $church, 'staff' => $churchStaff]) : NULL ?>
+				<?= (!empty($missionAgcy) && !empty($missionAgcyStaff)) ? $this->render('connection/_orgStaffWithMinistry', ['ministry' => $missionAgcy, 'staff' => $missionAgcyStaff]) : NULL ?>
+				<?= (!empty($churchPlant) && !empty($churchPlantStaff)) ? $this->render('connection/_orgStaffWithMinistry', ['ministry' => $churchPlant, 'staff' => $churchPlantStaff]) : NULL ?>
+				<?= !empty($otherMinistriesStaff) ? $this->render('connection/_otherMinistriesStaff', ['otherMinistriesStaff' => $otherMinistriesStaff]) : NULL ?>
+				<?= (!empty($church) && !empty($churchMembers) && !empty($churchMembers->churchMembers)) ? $this->render('connection/_churchFellowMembers', ['church' => $church, 'churchMembers' => $churchMembers->churchMembers]) : NULL ?>
+				<?= (!empty($churchPlant) && !empty($churchPlantMembers) && !empty($churchPlantMembers->churchMembers)) ? $this->render('connection/_churchFellowMembers', ['church' => $churchPlant, 'churchMembers' => $churchPlantMembers->churchMembers]) : NULL ?>
+				<?= !empty($likeProfiles) ? $this->render('connection/_likes', ['likeProfiles' => $likeProfiles]) : NULL ?>
+				<?php if (empty($pastor) && (empty($church) || empty($churchStaff)) && (empty($missionAgcy) || empty($missionAgcyStaff)) && (empty($churchPlant) || empty($churchPlantStaff)) && empty($otherMinistriesStaff) && (empty($church) || empty($churchMembers) || empty($churchMembers->churchMembers)) && (empty($churchPlant) || empty($churchPlantMembers) || empty($churchPlantMembers->churchMembers)) && empty($likeProfiles)) {
 				echo '<em>No connections found.</em>';
 			} ?>
-		</div>
-	<?php } elseif ($p == 'history') { ?>
-		<div class="additional-content">
-			<?= $this->render('_history', ['profile' => $profile, 'events' => $events]); ?>
-		</div>
+			</div>
+
+		<?php } elseif ($p == 'history') { ?>
+			<div class="additional-content">
+				<?= $this->render('_history', ['profile' => $profile, 'events' => $events]); ?>
+			</div>
+		<?php }	?>
+
 	<?php }	?>
 
 </div>

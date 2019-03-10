@@ -46,10 +46,10 @@ use yii\widgets\ActiveForm;
                                     '<h1>' . $profile->formatName . '</h1>';
                                 ?>
                             </div>
-                            <?php if (time() > strtotime($profile->renewal_date) && ($profile->status == Profile::STATUS_ACTIVE)) {                           // Profile is in grace period
-                                echo '<div class="notification"><p>This profile is set to expire soon. ' . Html::a('Click here', ['preview/view-preview', 'id' => $profile->id]) . ' and hit the update button to keep it active.</p></div>';
-                            } elseif (time() > (strtotime($profile->renewal_date) - 1209600) && ($profile->status == Profile::STATUS_ACTIVE)) {               // Profile will expire in two weeks
-                                echo '<div class="notification"><p>Your profile is in the expiration grace period. ' . Html::a('Click here', ['preview/view-preview', 'id' => $profile->id]) . ' and hit the update button to keep it active.</p></div>';
+                            <?php if ((time() > (strtotime($profile->renewal_date) - 1209600)) && (time() < strtotime($profile->renewal_date)) && ($profile->status == Profile::STATUS_ACTIVE)) {  // Profile will expire within two weeks
+                                echo '<div class="notification"><p>This profile is set to expire soon. ' . Html::a('Click here', ['preview/view-preview', 'id' => $profile->id]) . ' and hit the "Finished" button to keep it active.</p></div>';
+                            } elseif (time() > strtotime($profile->renewal_date) && ($profile->status == Profile::STATUS_ACTIVE)) {               // Profile is in grace period
+                                echo '<div class="notification"><p>This profile is in the expiration grace period. ' . Html::a('Click here', ['preview/view-preview', 'id' => $profile->id]) . ' and hit the "Finished" button to keep it active.</p></div>';
                             } elseif ($profile->status == Profile::STATUS_EXPIRED) {
                                 echo '<div class="notification"><p>Your profile is expired due to inactivity.  To keep it active, simply review and update as necessary at least once per year. ' .  Html::a('Click here', ['profile-mgmt/continue-activate', 'id' => $profile->id]) . ' to reactive it.</p></div>';
                             } elseif ($profile->unconfirmed) {

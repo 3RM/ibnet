@@ -44,7 +44,7 @@ class ProfileMail extends \yii\db\ActiveRecord
      * 
      * @return boolean
      */
-    public function sendProfileTransfer($subject, $title, $msg, $profile, $email, $link)
+    public static function sendProfileTransfer($subject, $title, $msg, $profile, $email, $link)
     {       
         Yii::$app
             ->mailer
@@ -65,7 +65,7 @@ class ProfileMail extends \yii\db\ActiveRecord
      * 
      * @return boolean
      */
-    public function sendMailchimp($email, $repoKey, $id)
+    public static function sendMailchimp($email, $repoKey, $id)
     {       
         $repoUrl = Url::toRoute(['//site/login', 'url' => Url::toRoute(['/missionary/update-repository'], 'https')], 'https');
         $updateUrl = Url::toRoute(['missionary/update', 'repository_key' => $repoKey, 'id' => $id], 'https');
@@ -91,7 +91,7 @@ class ProfileMail extends \yii\db\ActiveRecord
      * 
      * @return boolean
      */
-    public function sendForwardingEmailNotif($email)
+    public static function sendForwardingEmailNotif($email)
     {
         $msg = 'Your forwarding email ' . $email . ' has been set up.<br><br>Administrator<br><b>IBNet</b> | https://ibnet.org';
         Yii::$app
@@ -113,7 +113,7 @@ class ProfileMail extends \yii\db\ActiveRecord
      * 
      * @return boolean
      */
-    public function sendForwardingEmailRqst($id, $email, $email_pvt)
+    public static function sendForwardingEmailRqst($id, $email, $email_pvt)
     {
         Yii::$app
             ->mailer
@@ -134,7 +134,7 @@ class ProfileMail extends \yii\db\ActiveRecord
      * 
      * @return boolean
      */
-    public function sendLink($linkingProfile, $profile, $profileOwner, $lType, $dir)
+    public static function sendLink($linkingProfile, $profile, $profileOwner, $lType, $dir)
     {
         switch ($lType) { 
             case 'HC':                                                                              // Home Church
@@ -400,7 +400,7 @@ class ProfileMail extends \yii\db\ActiveRecord
      * 
      * @return boolean
      */
-    public function sendComment($id, $createdBy)
+    public static function sendComment($id, $createdBy)
     {
         $user = User::findOne($profile->user_id);
         if ($user->emailPrefComments != 1) {
@@ -440,7 +440,7 @@ class ProfileMail extends \yii\db\ActiveRecord
      * 
      * @return boolean
      */
-    public function sendLike($profile, $likedBy)
+    public static function sendLike($profile, $likedBy)
     {
         if ($likedBy->emailPrefLinks != 1) {
             return true;
@@ -504,7 +504,7 @@ class ProfileMail extends \yii\db\ActiveRecord
      * 
      * @return boolean
      */
-    public function sendAdminNewProfile($id)
+    public static function sendAdminNewProfile($id)
     {
         $profile = Profile::findOne($id);
         $user = User::findOne($profile->user_id);
@@ -531,7 +531,7 @@ class ProfileMail extends \yii\db\ActiveRecord
      * 
      * @return boolean
      */
-    public function sendAdminActiveProfile($id)
+    public static function sendAdminActiveProfile($id)
     {
         $profile = Profile::findOne($id);
         $user = User::findOne($profile->user_id);
