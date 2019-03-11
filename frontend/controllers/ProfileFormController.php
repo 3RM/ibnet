@@ -646,10 +646,10 @@ class ProfileFormController extends ProfileController
         } elseif (isset($_POST['exit'])) {
             return $this->redirect(['/profile-mgmt/my-profiles']); 
 
-        } elseif ($social->load(Yii::$app->request->Post()) &&
-            $profile->load(Yii::$app->request->Post()) &&
-            $profile->handleFormCO($social) &&
-            $profile->setProgress($fmNum)) {
+        } elseif ($social->load(Yii::$app->request->Post())
+            && $profile->load(Yii::$app->request->Post()) 
+            && $profile->handleFormCO($social) 
+            && $profile->setProgress($fmNum)) {
             return isset($_POST['save']) ?
                 $this->redirect(['/preview/view-preview', 'id' => $id]) :
                 $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);

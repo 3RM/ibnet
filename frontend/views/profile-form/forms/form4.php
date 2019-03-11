@@ -79,8 +79,8 @@ $this->title = 'Contact Information';
                                     </div>
                                     <div class="col-md-1">
                                         <?php empty($profile->email_pvt) ?
-                                            $btn = 'Update ' . Html::icon('thumbs-up') :
-                                            $btn = 'Set it Up ' . Html::icon('thumbs-up'); ?>
+                                            $btn = 'Set it Up ' . Html::icon('thumbs-up') :
+                                            $btn = 'Update ' . Html::icon('thumbs-up'); ?>
                                         <?= Html::a($btn, ['ajax/forwarding', 'id' => $profile->id], [
                                                 'id' => 'email-id',
                                                 'data-on-done' => 'emailDone',

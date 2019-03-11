@@ -1236,6 +1236,9 @@ class Profile extends yii\db\ActiveRecord
      */
     public function handleFormCO($social)
     {
+        if ($this->email_pvt_status === NULL) {
+            $this->email_pvt = NULL;
+        }
         if ($this->validate() && $this->save() && $social->validate() && $social->save()) {
             $this->setUpdateDate();
             if (!$this->social) {
