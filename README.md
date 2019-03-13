@@ -53,10 +53,10 @@ This will create a vendor directory and install all third-party extensions (incl
 
 ### Run Database Migrations
 ```
-php yii migrate 
 php yii migrate --migrationPath=@fedemotta/cronjob/migrations
 php yii migrate/up --migrationPath=@vendor/rmrevin/yii2-comments/migrations/
 php yii migrate --migrationPath=@vendor/uguranyum/yii2-icalender/migration --interactive=0
+php yii migrate
 ```
 A future update of this repository will include instructions for using fake data using yiisoft/yii2-faker.
 

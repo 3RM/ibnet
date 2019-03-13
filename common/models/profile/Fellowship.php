@@ -16,11 +16,16 @@ use Yii;
  * @property string $name
  * @property string $acronym
  * @property int $profile_id FOREIGN KEY (profile_id) REFERENCES profile(id)
- * @property int $status
- * @property int $reviewed
  */
 class Fellowship extends \yii\db\ActiveRecord
 {
+    /**
+     * @const int $STATUS_* The status of the fellowship
+     */
+    const STATUS_ACTIVE = 10;
+    const STATUS_INACTIVE = 20; // No longer active
+    const STATUS_BLOCKED = 30; // Admin blocked
+
     /**
      * @inheritdoc
      */

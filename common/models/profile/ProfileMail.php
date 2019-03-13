@@ -26,7 +26,6 @@ use yii\helpers\Url;
  * @property int $profile_owner
  * @property string $l_type
  * @property string $dir
- * @property string $orig_dir
  */
 class ProfileMail extends \yii\db\ActiveRecord
 {

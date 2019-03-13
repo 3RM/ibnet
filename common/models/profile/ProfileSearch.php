@@ -30,7 +30,7 @@ class ProfileSearch extends Profile
     public function rules()
     {
         return [
-            ['term', 'string', 'max' => 20],
+            ['term', 'string', 'max' => 100],
             ['term', 'filter', 'filter' => 'strip_tags'],
         ];
     }

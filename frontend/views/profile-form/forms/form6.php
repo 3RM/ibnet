@@ -1,6 +1,7 @@
 <?php
 
 use common\models\profile\Profile;
+use common\models\profile\ServiceTime;
 use kartik\select2\Select2;
 use yii\bootstrap\Alert;
 use yii\bootstrap\Html;
@@ -25,7 +26,7 @@ $this->title = 'Church Service Times';
         <div class="row">
             <div class="col-md-2">
                 <?= $form->field($serviceTime, 'day_1')->widget(Select2::classname(), [
-                    'data' => $days,
+                    'data' => ServiceTime::DAY,
                     'language' => 'en',
                     'theme' => 'krajee',
                     'hideSearch' => true,
@@ -61,7 +62,7 @@ $this->title = 'Church Service Times';
         <div class="row">
             <div class="col-md-2">
                 <?= $form->field($serviceTime, 'day_2')->widget(Select2::classname(), [
-                    'data' => $days,
+                    'data' => ServiceTime::DAY,
                     'language' => 'en',
                     'theme' => 'krajee',
                     'hideSearch' => true,
@@ -97,7 +98,7 @@ $this->title = 'Church Service Times';
         <div class="row">
             <div class="col-md-2">
                 <?= $form->field($serviceTime, 'day_3')->widget(Select2::classname(), [
-                    'data' => $days,
+                    'data' => ServiceTime::DAY,
                     'language' => 'en',
                     'theme' => 'krajee',
                     'hideSearch' => true,
@@ -133,7 +134,7 @@ $this->title = 'Church Service Times';
         <div class="row">
             <div class="col-md-2">
                 <?= $form->field($serviceTime, 'day_4')->widget(Select2::classname(), [
-                    'data' => $days,
+                    'data' => ServiceTime::DAY,
                     'language' => 'en',
                     'theme' => 'krajee',
                     'hideSearch' => true,
@@ -169,7 +170,7 @@ $this->title = 'Church Service Times';
         <div class="row">
             <div class="col-md-2">
                 <?= $form->field($serviceTime, 'day_5')->widget(Select2::classname(), [
-                    'data' => $days,
+                    'data' => ServiceTime::DAY,
                     'language' => 'en',
                     'theme' => 'krajee',
                     'hideSearch' => true,
@@ -205,7 +206,7 @@ $this->title = 'Church Service Times';
         <div class="row">
             <div class="col-md-2">
                 <?= $form->field($serviceTime, 'day_6')->widget(Select2::classname(), [
-                    'data' => $days,
+                    'data' => ServiceTime::DAY,
                     'language' => 'en',
                     'theme' => 'krajee',
                     'hideSearch' => true,
