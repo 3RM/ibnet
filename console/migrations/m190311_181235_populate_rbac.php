@@ -8,9 +8,9 @@ use common\rbac\PermissionNetwork;
 use yii\db\Migration;
 
 /**
- * Class m190130_222359_init_rbac
+ * Class m190130_222359_populate_rbac
  */
-class m190130_222359_populate_rbac extends Migration
+class m190311_181235_populate_rbac extends Migration
 {
     /**
      * {@inheritdoc}
@@ -39,7 +39,7 @@ class m190130_222359_populate_rbac extends Migration
 
 
         /*********************************
-         * Create Profile Permissions
+         * Profile Permissions
          *********************************/
         $myProfileRule = new MyProfileRule();
         $auth->add($myProfileRule);
@@ -132,9 +132,9 @@ class m190130_222359_populate_rbac extends Migration
      */
     public function down()
     {
-        $this->emptyTable('auth_item');
-        $this->emptyTable('auth_item_child');
-        $this->emptyTable('auth_item_rule');
+        $this->truncateTable('auth_item');
+        $this->truncateTable('auth_item_child');
+        $this->truncateTable('auth_item_rule');
 
         return false;
     }

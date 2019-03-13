@@ -25,6 +25,7 @@ use frontend\models\GeoCoder;
 use sadovojav\cutter\behaviors\CutterBehavior;
 use yii;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveRecord;
 use yii\db\Query;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
@@ -46,8 +47,8 @@ use yii\web\UploadedFile;
  * @property string $url_name
  * @property string $url_loc
  * @property string $created_at
+ * @property string $updated_at
  * @property string $last_update User update
- * @property string $last_modified record altered
  * @property string $renewal_date
  * @property string $inactivation_date
  * @property int $has_been_inactivated
@@ -60,7 +61,7 @@ use yii\web\UploadedFile;
  * @property int $home_church
  * @property string $image1
  * @property string $image2
- * @property string $flwsp_ass_level
+ * @property int $flwsp_ass_level
  * @property string $org_name
  * @property string $org_address1
  * @property string $org_address2
@@ -182,6 +183,17 @@ class Profile extends yii\db\ActiveRecord
     const MAP_CHURCH = 20;
     const MAP_MINISTRY = 30;
     const MAP_CHURCH_PLANT = 40;
+
+     /**
+     * @const int $FLW_ASS_LEVEL Level of association for associations and fellowships
+     * Default is NULL
+     */
+    const FLW_ASS_LEVEL = [
+        10 => 'Regional',
+        20 => 'State',
+        30 => 'National',
+        40 => 'International',
+    ];
 
     /**
      * @const int $EDIT_* Indicates if profile is newly created or edited as existing; Affects progression through profile forms.
@@ -313,8 +325,10 @@ class Profile extends yii\db\ActiveRecord
         return [
             [
                 'class' => TimestampBehavior::className(),
-                'updatedAtAttribute' => 'last_modified',
-                'value' => new Expression('NOW()'),                                                 // UTC time; this is important for Solr delta-import, which checks records against UTC time
+                'attributes' => [
+                    ActiveRecord::EVENT_BEFORE_INSERT => ['created_at', 'updated_at'],
+                    ActiveRecord::EVENT_BEFORE_UPDATE => ['updated_at'],
+                ],
             ],
             'image' => [
                 'class' => CutterBehavior::className(),

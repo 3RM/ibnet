@@ -9,7 +9,7 @@ use Yii\helpers\Html;
 <?php if (Yii::$app->user->isGuest) {
 	echo '<p class="msg">' . Html::a('Register', ['/site/register']) . ' or ' . Html::a('login', ['/site/login']) . ' in order to comment.</p>';
 } elseif(!(($CommentModel = \Yii::createObject(Comments\Module::instance()->model('comment'))) && $CommentModel::canCreate())) {
-	echo '<p class="msg">Set your screen name and identify a home church in your ' . Html::a('personal settings', ['site/settings']) . ' in order to comment.</p>';
+	echo '<p class="msg">Set your display name and identify a home church in your ' . Html::a('personal settings', ['site/settings']) . ' in order to comment.</p>';
 } ?>
 
 	<?= Comments\widgets\CommentListWidget::widget([

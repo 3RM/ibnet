@@ -40,7 +40,7 @@ $this->title = $profile->org_name;
 		<div class="header-text-wrap">
 			<h1><?= $this->title ?></h1>
 			<p class="tagline"><?= $profile->tagline ? $profile->tagline : NULL ?></p>
-			<p class="type"><?= Profile::$icon[$profile->type] . ' ' . $profile->flwsp_ass_level . ' ' . $profile->type ?></p>
+			<p class="type"><?= Profile::$icon[$profile->type] . ' ' . Profile::FLW_ASS_LEVEL[$profile->flwsp_ass_level] . ' ' . $profile->type ?></p>
 		</div>
 
 		<div class="description">

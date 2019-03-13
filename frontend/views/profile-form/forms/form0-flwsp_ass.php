@@ -57,12 +57,7 @@ $this->title = 'Name and Description'; //Utility::pp($profile->select);
             </div>
             <div class="col-md-3">
                 <?= $form->field($profile, 'flwsp_ass_level')->widget(Select2::classname(), [
-                    'data' => [
-                        'Regional' => 'Regional', 
-                        'State' => 'State', 
-                        'National' => 'National',
-                        'International' => 'International',
-                    ],
+                    'data' => Profile::FLW_ASS_LEVEL,
                     'language' => 'en',
                     'theme' => 'krajee',
                     'hideSearch' => true,

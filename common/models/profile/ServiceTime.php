@@ -37,6 +37,19 @@ use Yii;
 class ServiceTime extends \yii\db\ActiveRecord
 {
 
+    /**
+     * @const string $TYPE_* The profile types
+     */
+    const DAY = [
+        1 => 'Sun',
+        2 => 'Mon',
+        3 => 'Tue',
+        4 => 'Wed',
+        5 => 'Thu',
+        6 => 'Fri',
+        7 => 'Sat',
+    ];
+
     // Containers for collecting hours and minutes from form
     Public $hour_1;
     Public $minutes_1;
@@ -80,27 +93,27 @@ class ServiceTime extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'day_1' => '',
+            'day_1' => NULL,
             'hour_1' => '',
             'minutes_1' => '',
             'description_1' => '',
-            'day_2' => '',
+            'day_2' => NULL,
             'hour_2' => '',
             'minutes_2' => '',
             'description_2' => '',
-            'day_3' => '',
+            'day_3' => NULL,
             'hour_3' => '',
             'minutes_3' => '',
             'description_3' => '',
-            'day_4' => '',
+            'day_4' => NULL,
             'hour_4' => '',
             'minutes_4' => '',
             'description_4' => '',
-            'day_5' => '',
+            'day_5' => NULL,
             'hour_5' => '',
             'minutes_5' => '',
             'description_5' => '',
-            'day_6' => '',
+            'day_6' => NULL,
             'hour_6' => '',
             'minutes_6' => '',
             'description_6' => '',
@@ -178,7 +191,7 @@ class ServiceTime extends \yii\db\ActiveRecord
             }
         } else {
         // If hour or minutes is NULL, ensure that all fields are NULL to avoid saving an incomplete record
-            $this->time_3 = NULL;
+            $this->time_4 = NULL;
             $this->day_4 = NULL;
             $this->description_4 = NULL;
         }
