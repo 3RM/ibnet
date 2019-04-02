@@ -32,10 +32,8 @@ class m190311_132910_create_profile_tables extends Migration
             'profile_name' => $this->string(60)->notNull(),
             'url_name' => $this->string(60),
             'url_loc' => $this->string(60),
-            'created_at' => $this->dateTime(),
-            'created' => $this->integer(),
-            'updated_at' => $this->dateTime(),
-            'updated' => $this->integer(),
+            'created_at' => $this->integer(),
+            'updated_at' => $this->integer(),
             'last_update' => $this->date(),
             'renewal_date' => $this->date(),
             'inactivation_date' => $this->date(),
@@ -156,7 +154,7 @@ class m190311_132910_create_profile_tables extends Migration
          **/
         $this->createTable('{{%profile_tracking}}', [
             'id' => $this->primaryKey(),
-            'date' => $this->timeStamp()->notNull(),
+            'date' => $this->integer()->notNull(),
             'users' => $this->integer(),
             'type_array' => $this->string(),
             'sub_type_array' => $this->string(),

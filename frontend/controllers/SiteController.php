@@ -627,7 +627,7 @@ class SiteController extends Controller
             // Update roles
             $role = array_keys(Yii::$app->authManager->getRolesByUser($user->id))[0];            
             if ($user->home_church && ($role == User::ROLE_USER)) {  
-                // Revoke current SafeUser role
+                // Revoke current User role
                 $auth = Yii::$app->authManager;
                 $item = $auth->getRole(User::ROLE_USER);
                 $auth->revoke($item, $user->id);  

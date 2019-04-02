@@ -42,7 +42,11 @@
         "sammaye/yii2-yiichimp": "^1.0",
         "geocoder-php/google-maps-provider": "^4.0@dev",
         "php-http/guzzle6-adapter": "^2.0@dev",
-        "php-http/message": "^1.6@dev"
+        "php-http/message": "^1.6@dev",
+        "dompdf/dompdf": "dev-master",
+        "philippfrenzel/yii2fullcalendar":"*",
+        "kartik-v/yii2-date-range": "*",
+        "kartik-v/yii2-widget-colorinput": "*"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",
