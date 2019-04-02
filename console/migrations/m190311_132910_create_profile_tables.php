@@ -559,6 +559,7 @@ class m190311_132910_create_profile_tables extends Migration
             'pdf' => $this->string(),
             'youtube_url' => $this->string(),
             'vimeo_url' => $this->string(),
+            'drive_url' => $this->string(),
             'thumbnail' => $this->string(),
             'description' => $this->text(),
             'from_date' => $this->date()->notNull(),
