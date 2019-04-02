@@ -24,16 +24,11 @@ NetworkAsset::register($this);
 AjaxAsset::register($this);
 
 if (isset($_SESSION['html'])) {
-
-    $html = Prayer::getHtmlStart();
-    $html .= $_SESSION['html'];
-    $html .= Prayer::getHtmlEnd();
-
     $pdf = new Dompdf();
-    $pdf->loadHtml($html);
+    $pdf->loadHtml($prayer->html);
 
     //Set options
-    $pdf->setPaper($_SESSION['size']);
+    isset($_SESSION['size']) ? $pdf->setPaper($_SESSION['size']) : NULL;
 
     // Render and send to browser
     $pdf->render();

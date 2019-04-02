@@ -223,10 +223,10 @@ class Prayer extends \yii\db\ActiveRecord
      * Html for prayer list pdf export
      * @return string
      */
-    public static function getHtmlStart()
+    public function getHtml()
     {
-        $html = '
-            <html lang="en-US">
+        return 
+            ' <html lang="en-US">
                 <head>
                   <meta charset="UTF-8" />
                   <title>Prayer List</title>
@@ -242,21 +242,9 @@ class Prayer extends \yii\db\ActiveRecord
                     ul { margin:0 0 0 12px; }              
                   </style>
                 </head>
-                <body>';
-
-        return $html;
-    }
-
-     /** 
-     * Html for prayer list pdf export
-     * @return string
-     */
-    public static function getHtmlEnd()
-    {
-        $html = '
-                </body>
+                <body> ' . 
+                    $_SESSION['html'] .
+                '</body>
             </html>';
-
-        return $html;
     }
 }
