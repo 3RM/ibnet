@@ -37,7 +37,7 @@ $this->title = $profile->coupleName;
           echo $this->render('cards/_card-mailchimp', ['update' => $update]);
         } elseif ($update->pdf) {
           echo $this->render('cards/_card-pdf', ['update' => $update]);
-        } elseif ($update->vimeo_url || $update->youtube_url) {
+        } elseif ($update->vimeo_url || $update->youtube_url || $update->drive_url) {
           echo $this->render('cards/_card-video', ['update' => $update]);
         }
       }

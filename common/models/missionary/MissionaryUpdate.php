@@ -88,7 +88,12 @@ class MissionaryUpdate extends \yii\db\ActiveRecord
     {
         return [
             [['pdf'], 'file', 'extensions' => 'pdf', 'mimeTypes' => 'application/pdf', 'maxFiles' => 1, 'maxSize' => 1024 * 6000, 'skipOnEmpty' => true],
-            [['youtube_url', 'vimeo_url'], 'url', 'defaultScheme' => 'http', 'skipOnEmpty' =>true],
+            [['youtube_url', 'vimeo_url', 'drive_url'], 'url', 'defaultScheme' => 'http', 'skipOnEmpty' =>true],
+            ['drive_url', function ($attribute, $params, $validator) {
+                if (!preg_match('%https:\/\/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)\/view\?usp=sharing%', $this->$attribute)) {
+                    $this->addError($attribute, 'Incorrect format for a Google Drive video url. Ensure you copied the link from the video preview window in your Google Drive account.');
+                }
+            }],
             [['title'], 'string', 'max' => 60, 'message' => 'Your text exceeds 60 characters.'],
             [['description'], 'string', 'max' => 1500, 'message' => 'Your text exceeds 1500 characters.'],
             [['active', 'profile_inactive', 'thumbnail'], 'safe'],
@@ -104,6 +109,7 @@ class MissionaryUpdate extends \yii\db\ActiveRecord
             'title' => 'Title',
             'active' => 'Keep active for:',
             'editActive' => 'Keep active for:',
+            'drive_url' => 'Google Drive Video Url',
             'pdf' => 'PDF',
 
         ];
@@ -114,7 +120,16 @@ class MissionaryUpdate extends \yii\db\ActiveRecord
      */
     public function handleForm()
     {
-    	if ($this->validate()) {
+        if ((NULL == $this->edit) 
+            && (NULL == $this->pdf) 
+            && (NULL == $this->vimeo_url) 
+            && (NULL == $this->youtube_url)
+            && (NULL == $this->drive_url)) {
+            Yii::$app->session->setFlash('info', 'Your update was not saved.  Be sure to upload a pdf or video link.');
+            return $this;
+        }
+    	
+        if ($this->validate()) {
 
     		$this->from_date = new Expression('CURDATE()');
     		if (NULL != $this->editActive) {
@@ -148,11 +163,18 @@ class MissionaryUpdate extends \yii\db\ActiveRecord
         	if ($this->vimeo_url || $this->youtube_url) {
                 if (!$this->thumbnail = $this->getVideo(false, true)) {
                     Yii::$app->session->setFlash('danger', 'The Url you supplied does not appear to be a valid Vimeo Url. Ensure your video privacy settings allow embedding. Please contact us if you think this is in error.');
-                    return false;
-                }        	
+                    return $this;
+                }
+
+            } elseif ($this->drive_url) {
+                // Put url into correct format for embed
+                $this->drive_url = 
+                    preg_match('%https:\/\/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)%', $this->drive_url, $match) ? $match[0] . '/preview' : 
+                    NULL;
       
         // ************************* Process PDF upload *****************************
-    		} elseif ($pdf = UploadedFile::getInstance($this, 'pdf')) {                           // Create subfolders on server and store uploaded pdf
+    		// Create subfolders on server and store uploaded pdf
+            } elseif ($pdf = UploadedFile::getInstance($this, 'pdf')) {
         	    $fileName = md5(microtime() . $pdf->name);
         	    $fileExt = strrchr($pdf->name, '.');
         	    $fileDir = substr($pdf, 0, 2);
@@ -172,15 +194,8 @@ class MissionaryUpdate extends \yii\db\ActiveRecord
         	} else {
         	    $this->pdf = $this->getOldAttribute('pdf');
         	}
-
-    		if ((NULL == $this->edit) 
-                && (NULL == $this->pdf) 
-                && (NULL == $this->vimeo_url) 
-                && (NULL == $this->youtube_url)) {
-    			Yii::$app->session->setFlash('info', 'Your update was not saved.  Be sure to upload a pdf or video link.');
-    		} else {
-    			$this->save();
-    		}
+            
+            $this->save(false);
     		return $this;
     	}
     }

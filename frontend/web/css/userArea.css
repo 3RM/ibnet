@@ -429,6 +429,7 @@ button.repo-url-refresh:focus {
   padding: 20px;
   border: 6px solid #eee;
   border-radius: 20px;
+  background-color: #dedede;
 }
 .repo-form button {
   margin-top: 15px;
@@ -441,6 +442,19 @@ button.repo-url-refresh:focus {
 .repo-form-warning h4 {
   margin: 80px 0;
   color: #ef9a00;
+}
+.repo-tooltip {
+  margin: 5px 5px -10px 5px;
+  padding: 0px;
+  width: 20px!important;
+  background-color: unset;
+  color: gray;
+  border: none;
+  position: relative;
+  top: -12px;
+}
+.repo-tooltip:focus {
+  outline: none;
 }
 .select2 .select2-container .select2-container--krajee {
   border-radius: 10px !important;

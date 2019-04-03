@@ -21,6 +21,8 @@ use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\JsExpression;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
+use yii\widgets\ActiveForm;
 
 /**
  * Missionary controller
@@ -82,6 +84,12 @@ class MissionaryController extends Controller
         $missionary = $profile->missionary;
         $updates = $missionary->updatesAll;
         $newUpdate = New MissionaryUpdate(); 
+
+        // Ajax validation of Google Drive url
+        if (Yii::$app->request->isAjax && $newUpdate->load(Yii::$app->request->post())) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return ActiveForm::validate($newUpdate);
+        }
 
         if (isset($_POST['remove'])) {
             $update = MissionaryUpdate::findOne($_POST['remove']);
