@@ -1093,8 +1093,9 @@ class ProfileFormController extends ProfileController
         } elseif (isset($_POST['removeM']) && $staff = Staff::findOne($_POST['removeM'])) {
             
             // Notify ministry profile owner of unlink
-            $parentMinistryOwner = $parentMinistry->user;
-            ProfileMailController::initSendLink($profile, $parentMinistry, $parentMinistryOwner, 'PM', 'UL');
+            $ministry = $staff->ministry;
+            $ministryOwner = $ministry->user;
+            ProfileMailController::initSendLink($profile, $ministry, $ministryOwner, 'PM', 'UL');
             $staff->delete();
             return $this->redirect(['form' . $fmNum, 'id' => $profile->id]);
 
