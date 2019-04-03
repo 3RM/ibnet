@@ -29,7 +29,7 @@ AjaxAsset::register($this);
                 'bodyOptions' => ['class' => 'link-modal-body'],
                 ]); ?>
                 <div class="videoWrapper">
-                    <iframe id="video" src="https://player.vimeo.com/video/261478010?byline=0&portrait=0" width="640" height="341" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>                    
+                    <iframe id="video" src="https://player.vimeo.com/video/261478010?byline=0&portrait=0" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>                    
                 </div>
             <?php Modal::end() ?>
             <?= Html::a('<i class="fa fa-close"></i>', ['ajax/viewed', 'mid' => $missionary->id], [
@@ -74,11 +74,20 @@ AjaxAsset::register($this);
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6">
-                        <?= $form->field($newUpdate, 'youtube_url')->textInput(['maxlength' => true, 'placeholder' => 'e.g. https://youtu.be/abC-dEFgHij']) ?>
+                    <div class="col-md-12">
+                        <?= $form->field($newUpdate, 'youtube_url', ['enableAjaxValidation' => true])->textInput(['maxlength' => true, 'placeholder' => 'e.g. https://youtu.be/abC-dEFgHij']) ?>
                     </div>
-                    <div class="col-md-6">    
-                        <?= $form->field($newUpdate, 'vimeo_url')->textInput(['maxlength' => true, 'placeholder' => 'e.g. https://vimeo.com/123456789']) ?>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">    
+                        <?= $form->field($newUpdate, 'vimeo_url', ['enableAjaxValidation' => true])->textInput(['maxlength' => true, 'placeholder' => 'e.g. https://vimeo.com/123456789']) ?>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">     
+                        <?= Html::button(Html::icon('info-sign'), ['class' => 'repo-tooltip', 'data-toggle' => 'tooltip', 'data-placement' => 'top', 
+                            'title' => 'Navigate to Google Drive. Double-click on your video to open a preview. Select the three-dot menu in the top right corner and click "Share."  Copy the link provided there.']); ?>
+                        <?= $form->field($newUpdate, 'drive_url', ['enableAjaxValidation' => true])->textInput(['maxlength' => false, 'placeholder' => 'e.g. https://drive.google.com/file/d/1SHf.../view?usp=sharing']) ?>
                     </div>
                 </div>
                 <div class="row">
@@ -147,6 +156,9 @@ AjaxAsset::register($this);
                                                 <?= ($update->pdf || $update->mailchimp_url) ? $form->field($update, 'pdf')->fileInput() : NULL ?>
                                                 <?= $update->youtube_url ? $form->field($update, 'youtube_url')->textInput(['maxlength' => true, 'placeholder' => 'e.g. https://youtu.be/abC-dEFgHij']) : NULL ?>
                                                 <?= $update->vimeo_url ? $form->field($update, 'vimeo_url')->textInput(['maxlength' => true, 'placeholder' => 'e.g. https://vimeo.com/123456789']) : NULL ?>
+                                                <?= $update->drive_url ? Html::button(Html::icon('info-sign'), ['class' => 'repo-tooltip', 'data-toggle' => 'tooltip', 'data-placement' => 'top', 
+                                                    'title' => 'Navigate to Google Drive. Double-click on your video to open a preview. Select the three-dot menu in the top right corner and click "Share."  Copy the link provided there.']) : NULL; ?>
+                                                <?= $update->drive_url ? $form->field($update, 'drive_url')->textInput(['maxlength' => true, 'placeholder' => 'e.g. https://drive.google.com/file/d/1SHf.../view?usp=sharing']) : NULL ?>
                                             </div>
                                         </div>
                                         <div class="row">
@@ -187,6 +199,7 @@ AjaxAsset::register($this);
                                     <?= empty($update->pdf) ? NULL : \Eddmash\Clipboard\Clipboard::input($this, 'text', 'url', Url::base(true) . $update->pdf, ['id' => 'update_link_' . $update->id, 'readonly' => true])?>
                                     <?= (1 == $update->vid_not_accessible) ? '<div class="alert alert-danger">' . Html::icon('warning-sign') . ' We could not retrieve this video. Ensure your video privacy settings allow embedding on this site.</div>' : NULL; ?>
                                     <?= empty($update->thumbnail) ? NULL : Html::img($update->thumbnail, ['class' => 'repo-thumb']); ?>
+                                    <?= empty($update->drive_url) ? NULL : '<iframe src="' . $update->drive_url . '" width="100%" height="405"></iframe>'; ?>
                                 </td>
                                 <td>
                                     <div class="repo-table-buttons">

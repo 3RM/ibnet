@@ -48,6 +48,24 @@ class Utility
     }
 
     /**
+     * Check if remote file exists
+     * Credit: https://stackoverflow.com/questions/10444059/file-exists-returns-false-even-if-file-exist-remote-url/24654023
+     * 
+     * @return string
+     */
+    public static function remoteFileExists($url)
+    {
+        $file_headers = @get_headers($url);
+        if($file_headers[0] == 'HTTP/1.0 404 Not Found') {
+            return false; // The file at $url does not exist
+        } else if ($file_headers[0] == 'HTTP/1.0 302 Found' && $file_headers[7] == 'HTTP/1.0 404 Not Found'){
+            return false; // The file at $url does not exist, and I got redirected to a custom 404 page
+        } else {
+            return true;
+        }
+    }
+
+    /**
      * Performs a GET request on a given URL.
      * 
      * @param string $url The URL that you want to send the GET request to.
