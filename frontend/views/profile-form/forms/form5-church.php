@@ -100,7 +100,7 @@ EOD
                         <table class="table table-hover">
                             <?php foreach($staff as $stf) { ?>
                             <tr>
-                                <td class="center"><b><?= $stf->{'profile'}->sub_type == Profile::TYPE_MISSIONARY ? 'Church Planting Pastor' : $stf->stf_title ?></b></td>
+                                <td class="center"><b><?= $stf->{'profile'}->sub_type == Profile::TYPE_MISSIONARY ? 'Church Planting Pastor' : $stf->staff_title ?></b></td>
                                 <td class="center"><?= $stf->{'profile'}->spouse_first_name ? $stf->{'profile'}->ind_first_name . ' (& ' . $stf->{'profile'}->spouse_first_name . ') ' . $stf->{'profile'}->ind_last_name : $stf->{'profile'}->ind_first_name . ' ' . $stf->{'profile'}->ind_last_name; ?></td>
                                 <td class="center"><?= $stf->{'profile'}->ind_city . ', ' ?><?= $stf->{'profile'}->ind_st_prov_reg ? $stf->{'profile'}->ind_st_prov_reg : NULL ?></td>
                                 <td class="center"><?= $stf->confirmed == NULL ? 'Uncomfirmed' : 'Confirmed Staff' ?></td>
