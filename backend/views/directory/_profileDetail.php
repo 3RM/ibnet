@@ -8,10 +8,10 @@ use yii\bootstrap\Html;
 ?>
 
 <div class="user-detail">
-	<?= $profile->image1 ? Html::img(Yii::$app->params['frontendUrl'] . '/' . $profile->image1) : NULL ?>
+	<?= $profile->image1 ? Html::img(Yii::$app->params['frontendUrl'] . $profile->image1, ['class' => 'image1']) : NULL ?>
 	<div class="picture-name">
 		<div class="picture">
-			<?= $profile->image2 ? Html::img(Yii::$app->params['frontendUrl'] . '/' . $profile->image2) : Html::img(Yii::$app->params['frontendUrl'] . '/' . '@img.profile/profile-logo.png') ?>
+			<?= $profile->image2 ? Html::img(Yii::$app->params['frontendUrl'] . $profile->image2) : Html::img('@img.profile/profile-logo.png') ?>
 		</div>
 		<div class="name">
 			<h2><?= $profile->formatName ?></h2>

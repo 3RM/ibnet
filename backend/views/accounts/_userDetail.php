@@ -11,13 +11,14 @@ use yii\bootstrap\Html;
 <div class="user-detail">
 	<div class="picture-name">
 		<div class="picture">
-			<?= $user->usr_image ? Html::img('@images/user.png') : Html::img('@images/user.png') ?>
+			<?= $user->usr_image ? Html::img(Yii::$app->params['frontendUrl'] . $user->usr_image) : Html::img('@images/user.png') ?>
 		</div>
 		<div class="name">
 			<h2><?= $user->fullName ?></h2>
 			<h5><em><?= $user->first_name . ' ' . $user->last_name ?></em></h5>
 		</div>
 	</div>
+	<p>ID: <?= $profile->id ?></p>
 	<p>Home Church: <?= $church ? $church->org_name : '--' ?></p>
 	<p>Primary Role: <?= $user->primary_role ?? '--' ?></p>
 	<p>Username: <?= $user->username ?></p> 

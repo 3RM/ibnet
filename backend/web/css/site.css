@@ -99,6 +99,9 @@ p.profile-link {
 #profile-detail-modal .profile-detail-modal-body {
     padding: 20px 40px;
 }
+.image1 {
+    width: 100%;
+}
 .picture-name {
     overflow: auto;
     padding: 10px 0;
