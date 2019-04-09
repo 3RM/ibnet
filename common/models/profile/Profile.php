@@ -165,6 +165,7 @@ class Profile extends yii\db\ActiveRecord
     const STATUS_INACTIVE = 20;
     const STATUS_EXPIRED = 25;
     const STATUS_TRASH = 30;
+    const STATUS_BANNED = 40;
 
     /**
      * @const int $PRIVATE_EMAIL_* Private email request status
@@ -2091,6 +2092,29 @@ class Profile extends yii\db\ActiveRecord
         $this->setUpdateDate(); 
         $this->updateAttributes([
             'status' => Profile::STATUS_INACTIVE, 
+            'renewal_date' => NULL,
+            'inactivation_date' => new Expression('NOW()'),
+            'has_been_inactivated' => 1,
+            'edit' => self::EDIT_NO,
+        ]);
+
+        return true;
+    }
+
+    /**
+     * Set profile status to "Banned" 
+     * Update last_update and renewal_date fields
+     * @return boolean
+     */
+    public function ban()
+    {
+        // Delete progress
+        if ($progress = FormsCompleted::findOne($this->id)) {
+            $progress->delete();
+        }
+        $this->setUpdateDate(); 
+        $this->updateAttributes([
+            'status' => Profile::STATUS_BANNED, 
             'renewal_date' => NULL,
             'inactivation_date' => new Expression('NOW()'),
             'has_been_inactivated' => 1,

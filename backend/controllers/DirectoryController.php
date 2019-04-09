@@ -18,7 +18,6 @@ use common\models\profile\ProfileMail;
 use common\models\profile\Social;
 use common\models\profile\Staff;
 use frontend\controllers\ProfileController;
-use kartik\grid\EditableColumnAction;
 use Yii;
 use yii\bootstrap\Html;
 use yii\data\ActiveDataProvider;
@@ -145,136 +144,32 @@ class DirectoryController extends Controller
     {
         $searchModel = new ProfileSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->get());
-        $gridColumns = [
-            [
-                'attribute' => '',
-                'format' => 'raw',
-                'value' => function ($model) {                      
-                    return $model->reviewed === 1 ? '' : Html::a(Html::icon('check'), ['review-profile', 'id' => $model->id]);
-                },
-            ],
-            [
-                'attribute' => 'id',
-                'format' => 'raw',
-                'value' => function ($model) {                      
-                    return $model->status === Profile::STATUS_TRASH ? 
-                        '<span style="color: #CCC;">' . $model->id . '</span>' : 
-                        $model->id;
-                }, 
-                'hAlign'=>'center',
-                'vAlign' => 'middle',
-                'width'=>'1%',
-            ], 
-            [
-                'attribute' => 'user_id',
-                'format' => 'raw',
-                'value' => function ($model) {                      
-                     return $model->status === Profile::STATUS_TRASH ? 
-                        '<span style="color: #CCC;">' . Html::a($model->user_id, ['accounts/view', 'id' => $model->user_id]) . '</span>' :
-                        Html::a($model->user_id, ['accounts/view', 'id' => $model->user_id]);
-                },
-                'hAlign'=>'center',
-                'vAlign' => 'middle',
-                'width'=>'1%',
-            ],
-            [
-                'attribute' => 'type',
-                'format' => 'raw',
-                'value' => function ($model) {                      
-                    return $model->status === Profile::STATUS_TRASH ? 
-                        '<span style="color: #CCC;">' . $model->type . '</span>' : 
-                        $model->type;
-                }, 
-            ],
-            [
-                'attribute' => 'org_name',
-                'format' => 'raw',
-                'value' => function ($model) {                      
-                    return $model->status === Profile::STATUS_TRASH ? 
-                        '<span style="color: #CCC;">' . $model->org_name . '</span>' : 
-                        $model->org_name;
-                }, 
-            ],
-            [
-                'attribute' => 'ind_last_name',
-                'format' => 'raw',
-                'value' => function ($model) {
-                    if ($model->status === Profile::STATUS_TRASH) {                      
-                        return $model->spouse_first_name ? 
-                            '<span style="color: #CCC;">' . $model->ind_first_name . ' & ' . $model->spouse_first_name . ' ' . $model->ind_last_name . '</span>' : 
-                            '<span style="color: #CCC;">' . $model->ind_first_name . ' ' . $model->ind_last_name . '</span>';
-                    } else {
-                        return $model->spouse_first_name ? 
-                            $model->ind_first_name . ' & ' . $model->spouse_first_name . ' ' . $model->ind_last_name : 
-                            $model->ind_first_name . ' ' . $model->ind_last_name;
-                    }
-                },
-            ],
-            [
-                'attribute' => 'created_at',
-                'format' => 'raw',
-                'value' => function ($model) {                      
-                    return $model->status === Profile::STATUS_TRASH ? 
-                        '<span style="color: #CCC;">' . $model->created_at . '</span>' : 
-                        $model->created_at;
-                }, 
-            ],
-            // [
-            //     'attribute' => 'last_update',
-            //     'format' => 'raw',
-            //     'value' => function ($model) {                      
-            //         return $model->status === Profile::STATUS_TRASH ? 
-            //             '<span style="color: #CCC;">' . $model->last_update . '</span>' : 
-            //             $model->last_update;
-            //     }, 
-            // ],
-            [
-                'attribute' => 'renewal_date',
-                'format' => 'raw',
-                'value' => function ($model) {                      
-                    return $model->status === Profile::STATUS_TRASH ? 
-                        '<span style="color: #CCC;">' . $model->renewal_date . '</span>' : 
-                        $model->renewal_date;
-                }, 
-            ],
-            // [
-            //     'attribute' => 'inactivation_date',
-            //     'format' => 'raw',
-            //     'value' => function ($model) {                      
-            //         return $model->status === Profile::STATUS_TRASH ? 
-            //             '<span style="color: #CCC;">' . $model->inactivation_date . '</span>' : 
-            //             $model->inactivation_date;
-            //     }, 
-            // ],
-            [
-                'attribute' => 'status',
-                'format' => 'raw',
-                'value' => function ($model) {  
-                    if ($model->status == Profile::STATUS_NEW) {
-                        return '<span style="color:blue">New</span>';
-                    } elseif ($model->status == Profile::STATUS_ACTIVE) {
-                        return '<span style="color:green">Active</span>';
-                    } elseif ($model->status == Profile::STATUS_INACTIVE) {
-                        return '<span style="color: orange;">Inactive</span>';  
-                    } elseif ($model->status == Profile::STATUS_EXPIRED) {
-                        return '<span style="color: red;">Expired</span>';  
-                    } elseif ($model->status == Profile::STATUS_TRASH) {
-                        return '<span style="color: #CCC;">Trash</span>';    
-                    }             
-                },
-            ],
-            [
-                'class' => '\kartik\grid\ActionColumn',
-                'header' => 'Actions',
-                'deleteOptions' => ['label' => '', 'icon' => '']
-            ],
-        ];
 
         return $this->render('profiles', [
             'searchModel' => $searchModel, 
             'dataProvider' => $dataProvider,
-            'gridColumns' => $gridColumns,
-            'page' => $page,
+        ]);
+    }
+
+    /**
+     * Render content for profile detail modal
+     *
+     * @return mixed
+     */
+    public function actionProfileDetail($id)
+    {
+        $profile = Profile::findOne($id);
+        // $church = $user->homeChurch ?? NULL;
+        // $profiles = Profile::find()->where(['id' => $user->id])->count();
+        // $comments = Comment::find()->where(['created_by' => $user->id])->count();
+        // $networks = NULL;
+
+        return $this->renderAjax('_profileDetail', [
+            'profile' => $profile,
+            // 'church' => $church,
+            // 'profiles' => $profiles,
+            // 'comments' => $comments,
+            // 'networks' => $networks,
         ]);
     }
 
@@ -656,100 +551,28 @@ class DirectoryController extends Controller
     /**
      * Displays flagged profiles
      *
-     * @return string
+     * @return mixed
      */
     public function actionFlagged()
     {
-        $query = (new Query())->from('profile')->where(['inappropriate' => 1]);
-        $dataProvider = new ActiveDataProvider([
-            'query' => $query,
-            'pagination' => [
-                'pageSize' => 10,
-            ],
-        ]);
-        $gridColumns = [
-            [
-                'attribute' => '',
-                'format' => 'raw',
-                'value' => function ($model) {                      
-                    return $model['status'] == Profile::STATUS_ACTIVE ? 
-                        Html::a(Html::icon('new-window'), ['frontend/profile/view-profile-by-id', 'id' => $model['id']], ['target' => '_blank']) :
-                        '';
-                },
-            ],
-            [
-                'attribute' => 'id',
-                'format' => 'raw',
-                'value' => function ($model) {                      
-                    return $model['status'] === Profile::STATUS_TRASH ? 
-                        '<span style="color: #CCC;">' . $model['id'] . '</span>' : 
-                        $model['id'];
-                }, 
-                'hAlign'=>'center',
-                'width'=>'1%',
-            ],
-            [
-                'attribute' => 'user_id',
-                'format' => 'raw',
-                'value' => function ($model) {                      
-                     return Html::a($model['user_id'], ['accounts/view', 'id' => $model['user_id']]);
-                },
-                'hAlign'=>'center',
-                'width'=>'1%'
-            ],
-            'type',
-            'org_name',
-            'ind_last_name',
-            'created_at',
-            'last_update',
-            [
-                'attribute' => 'status',
-                'format' => 'raw',
-                'value' => function ($model) {  
-                    if ($model['status'] == Profile::STATUS_NEW) {
-                        return '<span style="color:blue">New</span>';
-                    } elseif ($model['status'] == Profile::STATUS_ACTIVE) {
-                        return '<span style="color:green">Active</span>';
-                    } elseif ($model['status'] == Profile::STATUS_INACTIVE) {
-                        return '<span style="color: orange;">Inactive</span>'; 
-                    } elseif ($model->status == Profile::STATUS_EXPIRED) {
-                        return '<span style="color: red;">Expired</span>';  
-                    } else {
-                        return '<span style="color: #CCC;">Trash</span>';    
-                    }             
-                },
-            ],
-            [
-                'class' => 'yii\grid\ActionColumn',
-                'header' => 'Actions',
-                'template' => '{clear} {disable}',
-                'buttons' =>
-                [
-                    'clear' => function ($url, $model, $key) {
-                        return Html::a(Html::icon('check'), ['clear-flag', 'id' => $model['id']]);
-                    },
-                    'disable' => function ($url, $model, $key) {
-                        return Html::a(Html::icon('ban-circle'), ['disable-profile', 'id' => $model['id']]);
-                    }
-                ],
-            ],
-        ];
+        $flaggedProfiles = Profile::find()->where(['inappropriate' => 1])->all();
+        $bannedProfiles = Profile::find()->where(['status' => Profile::STATUS_BANNED])->all();
 
-        return $this->render('flagged', [ 
-            'dataProvider' => $dataProvider,
-            'gridColumns' => $gridColumns,
+        return $this->render('flagged', [
+            'flaggedProfiles' => $flaggedProfiles,
+            'bannedProfiles' => $bannedProfiles,
         ]);
     }
 
     /**
      * Clear a profile flag
      *
-     * @return string
+     * @return mixed
      */
     public function actionClearFlag($id)
     {
         if ($profile = Profile::findOne($id)) {
-            $profile->updateAttributes(['inappropriate' => NULL]);
+            $profile->updateAttributes(['inappropriate' => NULL, 'status' => Profile::STATUS_INACTIVE]);
         }
 
         return $this->redirect(['flagged']);
@@ -763,7 +586,10 @@ class DirectoryController extends Controller
     public function actionDisableProfile($id)
     {
         if ($profile = Profile::findOne($id)) {
-            $profile->inactivate();
+            $profile->ban();
+        }
+        if ($user = $profile->user) {
+            $user->freezeAccount();
         }
 
         return $this->redirect(['flagged']);
@@ -772,95 +598,24 @@ class DirectoryController extends Controller
     /**
      * Displays forwarding email requests
      *
-     * @return string
+     * @return mixed
      */
     public function actionForwarding()
     {
 
-       $query = Profile::find()
-            ->where(['email_pvt_status' => Profile::PRIVATE_EMAIL_PENDING])
-            ->indexBy('id');
-        $dataProvider = new ActiveDataProvider([
-            'query' => $query,
-            'pagination' => [
-                'pageSize' => 10,
-            ],
-        ]);
-        foreach($dataProvider->getModels() as $model) {                                             // Set model scenarios
-            $model->scenario = 'co-befe';
-        }
-        $gridColumns = [
-            [
-                'attribute' => 'id',
-                'format' => 'raw',
-                'value' => function ($model) {                      
-                     return Html::a($model['id'], ['view', 'id' => $model['id']]);
-                },
-            ],
-            [
-                'attribute' => 'user_id',
-                'format' => 'raw',
-                'value' => function ($model) {                      
-                     return Html::a($model['user_id'], ['accounts/view', 'id' => $model['user_id']]);
-                },
-            ],
-            [
-                'attribute' => 'status',
-                'format' => 'raw',
-                'value' => function ($model) {  
-                    if ($model['status'] == Profile::STATUS_NEW) {
-                        return '<span style="color:blue">New</span>';
-                    } elseif ($model['status'] == Profile::STATUS_ACTIVE) {
-                        return '<span style="color:green">Active</span>';
-                    } elseif ($model['status'] == Profile::STATUS_INACTIVE) {
-                        return '<span style="color: orange;">Inactive</span>'; 
-                    } elseif ($model->status == Profile::STATUS_EXPIRED) {
-                        return '<span style="color: red;">Expired</span>';  
-                    } else {
-                        return '<span style="color: #CCC;">Trash</span>';    
-                    }             
-                },
-            ],
-            'type',
-            'org_name',
-            'ind_last_name',
-            [
-                'class' => 'kartik\grid\EditableColumn',
-                'attribute' => 'email',
-                'editableOptions'=>[
-                    'inputType'=>\kartik\editable\Editable::INPUT_TEXT,
-                    'formOptions'=>['action' => ['updateForward']],
-                ],
-            ],
-            'email_pvt',
-            'email_pvt_status',
-            [
-                'class' => 'yii\grid\ActionColumn',
-                'header' => 'Actions',
-                'template' => '{activate} {cancel}',
-                'buttons' =>
-                [
-                    'activate' => function ($url, $model, $key) {
-                        return Html::a(Html::icon('check'), ['activate-forward', 'id' => $model['id']]);
-                    },
-                    'cancel' => function ($url, $model, $key) {
-                        return Html::a(Html::icon('unchecked'), ['cancel-forward', 'id' => $model['id']]);
-                    }
-                ],
-            ],
-        ];
+        $profiles = Profile::find()->where(['email_pvt_status' => Profile::PRIVATE_EMAIL_PENDING])->all();
 
-        
-        return $this->render('forwarding', [
-            'dataProvider' => $dataProvider,
-            'gridColumns' => $gridColumns,
-        ]);
+        foreach($profiles as $profile) {
+            $profile->scenario = 'co-befe';
+        }
+
+        return $this->render('forwarding', ['profiles' => $profiles]);
     }
 
     /**
      * Activate a private email & send new forwarding email request notification to admin
      *
-     * @return string
+     * @return mixed
      */
     public function actionActivateForward($id)
     {
@@ -881,7 +636,7 @@ class DirectoryController extends Controller
     /**
      * Activate a private email & send new forwarding email request notification to admin
      *
-     * @return string
+     * @return mixed
      */
     public function actionCancelForward($id)
     {
@@ -895,20 +650,5 @@ class DirectoryController extends Controller
         }
 
         return $this->redirect(['forwarding']);
-    }
-
-    /**
-     * Update editable columns in Gridview widget
-     *
-     * @return string
-     */
-    public function actions()
-    {
-        return ArrayHelper::merge(parent::actions(), [
-            'updateForward' => [                                                                    // identifier for the editable action
-                'class' => EditableColumnAction::className(),
-                'modelClass' => Profile::className(),
-            ],
-        ]);
     }
 }

@@ -592,6 +592,14 @@ class User extends ActiveRecord implements
     }
 
     /**
+     * @return string
+     */
+    public function getHomeChurch()
+    {
+        return $this->hasOne(Profile::className(), ['id' => 'home_church']);
+    }
+
+    /**
      * @return string|false
      */
     public function getAvatar()

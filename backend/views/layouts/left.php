@@ -39,22 +39,7 @@ use yii\helpers\Html;
                 'items' => [
                     ['label' => 'Tools Menu', 'options' => ['class' => 'header']],
                     ['label' => 'Stats', 'icon' => 'bar-chart', 'url' => ['stats/stats']],
-                    [
-                        'label' => 'Users', 
-                        'icon' => 'user', 
-                        'items' => [
-                            ['label' => 'Accounts', 'icon' => 'id-badge', 'url' => ['/accounts/users'],],
-                            ['label' => 'RBAC', 
-                                'icon' => 'sitemap', 
-                                'items' => [
-                                    ['label' => 'Assignments', 'icon' => 'sitemap', 'url' => ['/accounts/assignment'],],
-                                    ['label' => 'Roles', 'icon' => 'sitemap', 'url' => ['/accounts/role'],],
-                                    ['label' => 'Permissions', 'icon' => 'sitemap', 'url' => ['/accounts/permission'],],
-                                    ['label' => 'Rules', 'icon' => 'sitemap', 'url' => ['/accounts/rule'],],
-                                ],
-                            ],
-                        ],
-                    ],
+                    ['label' => 'Users', 'icon' => 'user', 'url' => ['/accounts/users'],],
                     [
                         'label' => 'Directory',
                         'icon' => 'address-book',

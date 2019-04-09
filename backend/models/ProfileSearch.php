@@ -31,7 +31,7 @@ class ProfileSearch extends \common\models\profile\Profile
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
-    		        'pageSize' => 100,
+    		        'pageSize' => 50,
     		    ],
         ]);
 

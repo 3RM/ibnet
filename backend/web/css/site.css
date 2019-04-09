@@ -1,6 +1,14 @@
+/*************
+ * Title:    IBNet User Backend Admin Design
+ * Designer: Steve McKinley
+ * Website:  https://www.admin17.ibnet.org
+ *
+ ************/
+
 html,
 body {
     height: 100%;
+    color: #363636;
 }
 
 .wrap {
@@ -9,33 +17,132 @@ body {
     margin: 0 auto -60px;
     padding: 0 0 60px;
 }
-
 .wrap > .container {
     padding: 70px 15px 20px;
 }
-
-.footer {
-    height: 60px;
-    background-color: #f5f5f5;
-    border-top: 1px solid #ddd;
-    padding-top: 20px;
+.content-wrapper {
+    background-color: #fff !important;
 }
 
-.jumbotron {
-    text-align: center;
-    background-color: transparent;
+
+/*
+ *  Listview Rows
+ *******************************/
+.list-row, .header-row {
+    display: flex;
+    padding: 10px;
+    border-top: 1px solid #e1e1e1;
+}
+.header-row {
+    font-weight: bold;
+    background-color: #f9f9f9;
+}
+.list-row:hover {
+    background-color: #f9f9f9;
+}
+.list-row.flagged:hover {
+    background-color: #ffabab;
+}
+.list-row p, .header-row p {
+    width: 30px;
+    padding:0 20px;
+    font-size: 1.1em;
+}
+.list-row p.col-60.button {
+    padding: 0 10px;
+}
+.review .glyphicon-check {
+    color: #545454;
+}
+p.col-60 {
+    width: 60px;
+}
+p.col-100 {
+    width: 100px;
+}
+p.col-150 {
+    width: 150px;
+}
+p.col-180 {
+    width: 180px;
+}
+p.col-240 {
+    width: 240px;
+}
+p.col-300 {
+    width: 300px;
+}
+.list-row input {
+    height: 50px;
+    border-radius: 10px;
+    width: 300px;
+}
+.list-row a.action {
+    font-size: 1.4em;
+    padding: 5px;
+}
+p.profile-link {
+    margin-left: 40px;
+    border-left: 4px solid #bbb;
 }
 
-.jumbotron .btn {
-    font-size: 21px;
-    padding: 14px 24px;
+
+/*
+ *  Detail view modals
+ *******************************/
+#user-detail-modal .modal-header,
+#profile-detail-modal .modal-header {
+    background-color: gray;
+    color: #a1a1a1;
+}
+#user-detail-modal .user-detail-modal-body,
+#profile-detail-modal .profile-detail-modal-body {
+    padding: 20px 40px;
+}
+.picture-name {
+    overflow: auto;
+    padding: 10px 0;
+    margin-bottom: 20px;
+    border-bottom: 1px dotted gray;
+}
+.user-detail p {
+    background-color: #f9f9f9;
+    border-radius: 6px;
+    padding: 15px 10px;
+}
+.picture-name .picture {
+    float: left;
+    width: 30%;
+}
+.picture-name .name {
+    float: right;
+    width: 70%;
+}
+.picture-name img {
+    border-radius: 50%;
+    width: 100px;
+}
+.personal-details p {
+    background-color: #adadea;;
+    color: white;
+}
+.account-details p {
+    background-color: #e4e4e4;
+    color: #6c6c6c;
+}
+.account-access p {
+    background-color: #bababa;
+    color: white;
+}
+.community p {
+    background-color: #899e8b;
+    color: white;
 }
 
-.not-set {
-    color: #c55;
-    font-style: italic;
-}
 
+/*
+ *  Gridview
+ *******************************/
 /* add sorting icons to gridview sort links */
 a.asc:after, a.desc:after {
     position: relative;
@@ -47,41 +154,48 @@ a.asc:after, a.desc:after {
     line-height: 1;
     padding-left: 5px;
 }
-
 a.asc:after {
     content: /*"\e113"*/ "\e151";
 }
-
 a.desc:after {
     content: /*"\e114"*/ "\e152";
 }
-
 .sort-numerical a.asc:after {
     content: "\e153";
 }
-
 .sort-numerical a.desc:after {
     content: "\e154";
 }
-
 .sort-ordinal a.asc:after {
     content: "\e155";
 }
-
 .sort-ordinal a.desc:after {
     content: "\e156";
 }
-
 .grid-view td {
     white-space: nowrap;
 }
-
 .grid-view .filters input,
 .grid-view .filters select {
     min-width: 50px;
 }
 
-.hint-block {
+
+/*
+ *  Footer
+ *******************************/
+.footer {
+    height: 60px;
+    background-color: #f5f5f5;
+    border-top: 1px solid #ddd;
+    padding-top: 20px;
+}
+
+
+/*
+ *  Misc
+ *******************************/
+ .hint-block {
     display: block;
     margin-top: 5px;
     color: #999;
@@ -94,12 +208,43 @@ a.desc:after {
     padding: 10px 20px;
     margin: 0 0 15px 0;
 }
-
 /* align the logout "link" (button in form) of the navbar */
 .nav li > form > button.logout {
     padding: 15px;
     border: none;
 }
+/* style button to look like link */
+button.link-btn {
+  background-color: transparent;
+  border: none;
+  color: #337ab7;
+  padding-left: 4px;
+}
+button.link-btn:hover {
+  text-decoration: underline;
+  color: #23527c;
+}
+.margin-200 {
+    margin: 100px 0;
+}
+.jumbotron {
+    text-align: center;
+    background-color: transparent;
+}
+
+.jumbotron .btn {
+    font-size: 21px;
+    padding: 14px 24px;
+}
+.not-set {
+    color: #c55;
+    font-style: italic;
+}
+
+
+
+
+
 
 @media(max-width:767px) {
     .nav li > form > button.logout {

@@ -9,7 +9,7 @@ use yii\helpers\Html;
 
 <header class="main-header">
 
-    <?= Html::a('<span class="logo-mini">' . html::img('@web/images/ibnet-header-sm.png') . '</span><span class="logo-lg">' . html::img('@web/images/ibnet-header.png') . '</span>', Yii::$app->homeUrl, ['class' => 'logo']) ?>
+    <?= Html::a('<span class="logo-mini">' . html::img('@images/ibnet-header-sm.png') . '</span><span class="logo-lg">' . html::img('@images/ibnet-header.png') . '</span>', Yii::$app->homeUrl, ['class' => 'logo']) ?>
 
     <nav class="navbar navbar-static-top" role="navigation">
 
@@ -162,7 +162,7 @@ use yii\helpers\Html;
                 <li class="dropdown user user-menu">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                         <?= empty($user->usr_image) ? 
-                            Html::img('@web/images/user.png', ['class' => 'user-image img-circle', 'alt' => 'User image']) :
+                            Html::img('@images/user.png', ['class' => 'user-image img-circle', 'alt' => 'User image']) :
                             Html::img(\Yii::$app->params['frontendUrl'] . $user->usr_image, ['class' => 'user-image img-circle', 'alt' => 'User image']) ?>
                         <span class="hidden-xs"><?= $user->first_name . ' ' . $user->last_name ?></span>
                     </a>
@@ -170,7 +170,7 @@ use yii\helpers\Html;
                         <!-- User image -->
                         <li class="user-header">
                             <?= empty($user->usr_image) ? 
-                                Html::img('@web/images/user.png', ['class' => 'img-circle', 'alt' => 'User image']) :
+                                Html::img('@images/user.png', ['class' => 'img-circle', 'alt' => 'User image']) :
                                 Html::img(\Yii::$app->params['frontendUrl'] . $user->usr_image, ['class' => 'img-circle', 'alt' => 'User image']) ?>
 
                             <p>

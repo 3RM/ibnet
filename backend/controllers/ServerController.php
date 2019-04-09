@@ -59,7 +59,6 @@ class ServerController extends Controller
         //$searchModel = new CSearch();
 
         $query = CronJob::find()->orderBy(['id_cron_job' => SORT_DESC]);
-
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
@@ -98,7 +97,7 @@ class ServerController extends Controller
         ];
 
         return $this->render('cron', [
-            'searchModel' => $searchModel, 
+            // 'searchModel' => $searchModel, 
             'dataProvider' => $dataProvider,
             'gridColumns' => $gridColumns,
         ]);

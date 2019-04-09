@@ -137,11 +137,11 @@ class ProfileMgmtController extends ProfileController
 
         // Check if user already has an individual profile
         $user = Yii::$app->user->identity;
-        if ($user->hasIndActiveProfile) {
-            Yii::$app->session->setFlash('warning', 'You already have an individual 
-                    profile. Only one individual profile can be active at a time.');
-            return $this->redirect(['preview/view-preview', 'id' => $profile->id]);
-        }
+        // if ($user->hasIndActiveProfile) {
+        //     Yii::$app->session->setFlash('warning', 'You already have an individual 
+        //             profile. Only one individual profile can be active at a time.');
+        //     return $this->redirect(['preview/view-preview', 'id' => $profile->id]);
+        // }
 
         // Check if all required forms for this profile type have been completed
         if (!$progress = FormsCompleted::findOne($id)) {
