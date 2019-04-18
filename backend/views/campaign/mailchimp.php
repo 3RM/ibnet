@@ -11,12 +11,14 @@ $this->title = 'Manage Mailchimp';
 
 <div class="site-index">
 
+    <p>Sync the "New Feature" Mailchimp mailing list with current user email preferences.  Run this prior to sending a new feature campaign.</p>
+
 	<?php $form = ActiveForm::begin(); ?>
         <div class="row top-margin">
             <div class="col-md-8">
-                <?= Html::submitButton('Build Feature Mailing List', [
+                <?= Html::submitButton('Sync', [
                     'method' => 'POST',
-                    'class' => 'btn btn-primary',
+                    'class' => 'btn btn-main',
                     'name' => 'feature'
                 ]) ?>
             </div>

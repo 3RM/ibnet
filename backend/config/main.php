@@ -10,13 +10,24 @@ return [
     'basePath' => dirname(__DIR__),
     'controllerNamespace' => 'backend\controllers',
     'name' => '',
-    'bootstrap' => ['log'],
+    'bootstrap' => [
+        'log',
+        'logreader',
+    ],
     'modules' => [
         'gridview'=> [
             'class'=>'\kartik\grid\Module',
         ],
         'datecontrol' =>  [
             'class' => '\kartik\datecontrol\Module',
+        ],
+        'logreader' => [
+            'class' => 'zhuravljov\yii\logreader\Module',
+            'aliases' => [
+                'Frontend Errors' => '@frontend/runtime/logs/app.log',
+                'Backend Errors' => '@backend/runtime/logs/app.log',
+                'Console Errors' => '@console/runtime/logs/app.log',
+            ],
         ],
     ],
     'components' => [

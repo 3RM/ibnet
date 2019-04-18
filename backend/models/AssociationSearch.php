@@ -14,7 +14,7 @@ class AssociationSearch extends \common\models\profile\Association
         // only fields in rules() are searchable
         return [
             [['id', 'profile_id'], 'integer'],
-            [['association', 'association_acronym'], 'safe'],
+            [['name', 'acronym'], 'safe'],
         ];
     }
 
@@ -43,8 +43,8 @@ class AssociationSearch extends \common\models\profile\Association
         // adjust the query by adding the filters
         $query->andFilterWhere(['id' => $this->id]);
         $query->andFilterWhere(['like', 'profile_id', $this->profile_id])
-              ->andFilterWhere(['like', 'association', $this->association])
-              ->andFilterWhere(['like', 'association_acronym', $this->association_acronym]);
+              ->andFilterWhere(['like', 'name', $this->name])
+              ->andFilterWhere(['like', 'acronym', $this->acronym]);
 
         return $dataProvider;
     }

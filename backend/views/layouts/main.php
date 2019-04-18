@@ -6,12 +6,8 @@ use yii\filters\AccessControl;
 /* @var $content string */
 
 
-if (class_exists('backend\assets\AppAsset')) {
-    backend\assets\AppAsset::register($this);
-} else {
-    app\assets\AppAsset::register($this);
-}
 
+backend\assets\AppAsset::register($this);
 dmstr\web\AdminLteAsset::register($this);
 
 $directoryAsset = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed2010/adminlte/dist');

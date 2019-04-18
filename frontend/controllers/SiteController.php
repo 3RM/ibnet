@@ -253,6 +253,7 @@ class SiteController extends Controller
             $content = new Box3Content();
             $box3Content = $content->getBox3Content();
 
+            // Get Blog posts
             $posts = NULL;
             $comments = NULL;
             $posts = WpPosts::getPosts();

@@ -5,7 +5,7 @@
 use yii\grid\GridView;
 use yii\bootstrap\Html;
 
-$this->title = 'Missionary Update Table';
+$this->title = 'History Table';
 ?>
 
 <div class="site-index">
@@ -14,6 +14,7 @@ $this->title = 'Missionary Update Table';
 	    'dataProvider'=>$dataProvider,
 	    'filterModel'=>$searchModel,
 	    'columns'=>$gridColumns,
+	    'options' => [ 'style' => 'table-layout:fixed;' ],
 	]); ?>
 
 </div>

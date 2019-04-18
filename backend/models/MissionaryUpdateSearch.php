@@ -26,7 +26,7 @@ class MissionaryUpdateSearch extends \common\models\missionary\MissionaryUpdate
 
     public function search($params)
     {
-        $query = MissionaryUpate::find()->orderBy(['id' => SORT_DESC]);
+        $query = MissionaryUpdate::find()->orderBy(['id' => SORT_DESC]);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,

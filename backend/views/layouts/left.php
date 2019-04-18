@@ -39,7 +39,14 @@ use yii\helpers\Html;
                 'items' => [
                     ['label' => 'Tools Menu', 'options' => ['class' => 'header']],
                     ['label' => 'Stats', 'icon' => 'bar-chart', 'url' => ['stats/stats']],
-                    ['label' => 'Users', 'icon' => 'user', 'url' => ['/accounts/users'],],
+                    [
+                        'label' => 'Accounts', 
+                        'icon' => 'user', 
+                        'url' => '#',
+                        'items' => [
+                            ['label' => 'Users', 'icon' => 'address-card', 'url' => ['/accounts/users'],],
+                        ],
+                    ],
                     [
                         'label' => 'Directory',
                         'icon' => 'address-book',
@@ -52,9 +59,11 @@ use yii\helpers\Html;
                                     ['label' => 'Social', 'icon' => 'sitemap', 'url' => ['/directory/social'],],
                                     ['label' => 'Staff', 'icon' => 'sitemap', 'url' => ['/directory/staff'],],
                                     ['label' => 'Missionary', 'icon' => 'sitemap', 'url' => ['/directory/missionary'],],
+                                    ['label' => 'Missionary Update', 'icon' => 'sitemap', 'url' => ['/directory/missionary-update'],],
                                     ['label' => 'Mission Housing', 'icon' => 'sitemap', 'url' => ['/directory/housing'],],
                                     ['label' => 'Association', 'icon' => 'sitemap', 'url' => ['/directory/association'],],
                                     ['label' => 'Fellowship', 'icon' => 'sitemap', 'url' => ['/directory/fellowship'],],
+                                    ['label' => 'History', 'icon' => 'sitemap', 'url' => ['/directory/history'],],
                                 ],
                             ],
                             ['label' => 'Forwarding Email Requests', 'icon' => 'send', 'url' => ['/directory/forwarding'],],
@@ -65,10 +74,11 @@ use yii\helpers\Html;
                     ['label' => 'Solr', 'icon' => 'sun-o', 'url' => '/solr/panel'],
                     ['label' => 'Database', 'icon' => 'database', 'url' => '/database/db'],
                     [
-                        'label' => 'Server', 
+                        'label' => 'Application', 
                         'icon' => 'server', 
                         'url' => ['#'],
                         'items' => [
+                            ['label' => 'Logs', 'icon' => 'file-text-o', 'url' => '/logreader'],
                             ['label' => 'Cron Jobs', 'icon' => 'clock-o', 'url' => ['/server/cron'],],
                             ['label' => 'Clear Yii Cache', 'icon' => 'minus-circle', 'url' => ['/server/cache'],],
                         ],

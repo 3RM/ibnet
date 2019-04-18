@@ -29,7 +29,7 @@ class BlogController extends Controller
                     $users = User::find()->where(['status' => User::STATUS_ACTIVE, 'emailPrefBlog' => 1])->andWhere('email IS NOT NULL')->all();
                     
                     foreach ($users as $user) {
-                        $emailPrefLink = Html::a('click here', \Yii::$app->params['frontendUrl'] . '/site/login?url=' . \Yii::$app->params['frontendUrl'] . '/site/settings/#account-settings', ['target' => '_blank'])
+                        $emailPrefLink = Html::a('click here', \Yii::$app->params['frontendUrl'] . '/site/login?url=' . \Yii::$app->params['frontendUrl'] . '/site/settings/#account-settings', ['target' => '_blank']);
                         Yii::$app
                             ->mailer
                             ->compose(

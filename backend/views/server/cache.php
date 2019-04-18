@@ -16,7 +16,7 @@ $this->title = 'Clear Yii Cache';
             <div class="col-md-8">
                 <?= Html::submitButton('Flush /backend Cache', [
                     'method' => 'POST',
-                    'class' => 'btn btn-primary',
+                    'class' => 'btn btn-main',
                     'name' => 'backendClear'
                 ]) ?>
             </div>
@@ -25,7 +25,7 @@ $this->title = 'Clear Yii Cache';
             <div class="col-md-8">
             	<?= Html::submitButton('Flush /frontend Cache', [
                     'method' => 'POST',
-                    'class' => 'btn btn-primary',
+                    'class' => 'btn btn-main',
                     'name' => 'frontendClear'
                 ]) ?>
             </div>

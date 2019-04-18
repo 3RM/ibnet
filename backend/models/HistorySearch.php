@@ -2,19 +2,18 @@
 
 namespace backend\models;
 
-use common\models\profile\Fellowship;
+use common\models\profile\History;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
-class FellowshipSearch extends \common\models\profile\Fellowship
+class HistorySearch extends \common\models\profile\History
 {
     public function rules()
     { 
         // only fields in rules() are searchable
         return [
-            [['id', 'profile_id'], 'integer'],
-            [['name', 'acronym'], 'safe'],
+           [['id', 'profile_id', 'date', 'title', 'description', 'event_image', 'deleted'], 'safe'],
         ];
     }
 
@@ -26,13 +25,13 @@ class FellowshipSearch extends \common\models\profile\Fellowship
 
     public function search($params)
     {
-        $query = Fellowship::find()->orderBy(['id' => SORT_DESC]);
+        $query = History::find()->orderBy(['id' => SORT_DESC]);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
-    		    'pageSize' => 100,
-    		],
+    		        'pageSize' => 50,
+    		    ],
         ]);
 
         // load the search form data and validate
@@ -42,9 +41,11 @@ class FellowshipSearch extends \common\models\profile\Fellowship
 
         // adjust the query by adding the filters
         $query->andFilterWhere(['id' => $this->id]);
-        $query->andFilterWhere(['like', 'profile_id', $this->profile_id])
-              ->andFilterWhere(['like', 'name', $this->name])
-              ->andFilterWhere(['like', 'acronym', $this->acronym]);
+        $query->andFilterWhere(['profile_id' => $this->profile_id])
+              ->andFilterWhere(['like', 'date', $this->date])
+              ->andFilterWhere(['like', 'title', $this->title])
+              ->andFilterWhere(['like', 'description', $this->description])
+              ->andFilterWhere(['deleted' => $this->deleted]);
 
         return $dataProvider;
     }

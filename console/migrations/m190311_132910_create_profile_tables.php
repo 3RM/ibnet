@@ -163,6 +163,51 @@ class m190311_132910_create_profile_tables extends Migration
 
 
         /**
+         * Table ban_meta
+         **/
+        $this->createTable('{{%ban_meta}}', [
+            'id' => $this->primaryKey(),
+            'user_id' => $this->integer(),
+            'profile_id' => $this->integer(),
+            'created_at' => $this->integer()->notNULL(),
+            'description' => $this->text()->notNULL(),
+            'action' => $this->integer()->notNULL(),
+        ], $tableOptions);
+
+        $this->addCommentOnColumn(
+            'ban_meta',
+            'user_id',
+            'FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE NO ACTION ON UPDATE NO ACTION'
+        );
+
+        $this->addCommentOnColumn(
+            'ban_meta',
+            'profile_id',
+            'FOREIGN KEY (profile_id) REFERENCES profile (id) ON DELETE NO ACTION ON UPDATE NO ACTION'
+        );
+
+        $this->addForeignKey(
+            'fk-ban_meta-user_id',
+            'ban_meta',
+            'user_id',
+            'user',
+            'id',
+            'NO ACTION',
+            'NO ACTION'
+        );
+
+        $this->addForeignKey(
+            'fk-ban_meta-profile_id',
+            'ban_meta',
+            'profile_id',
+            'profile',
+            'id',
+            'NO ACTION',
+            'NO ACTION'
+        );
+
+
+        /**
          * Table state
          **/
         $this->createTable('{{%state}}', [
@@ -469,7 +514,7 @@ class m190311_132910_create_profile_tables extends Migration
             'mission_agcy_id' => $this->integer(),
             'packet' => $this->string(),
             'cp_pastor_at' => $this->integer(),
-            'repository_key' => $this->integer(60),
+            'repository_key' => $this->string(60),
             'mc_token' => $this->string(),
             'mc_key' => $this->string(12),
             'viewed_update' => $this->tinyInteger(1),

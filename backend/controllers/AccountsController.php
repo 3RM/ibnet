@@ -3,6 +3,7 @@ namespace backend\controllers;
 
 use backend\models\Assignment;
 use backend\models\AssignmentSearch;
+use backend\models\BanMeta;
 use backend\models\Comment;
 use backend\models\Permission;
 use backend\models\Role;
@@ -17,6 +18,7 @@ use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Url;
 use yii\web\Controller;
 
 /**
@@ -69,12 +71,13 @@ class AccountsController extends Controller
      *
      * @return mixed
      */
-    public function actionAccountDetail($id)
+    public function actionViewDetail($id)
     {
         $user = User::findOne($id);
         $church = $user->homeChurch ?? NULL;
-        $profiles = Profile::find()->where(['id' => $user->id])->all();
+        $profiles = Profile::find()->where(['user_id' => $user->id])->all();
         $comments = Comment::find()->where(['created_by' => $user->id])->count();
+        $hasBanHistory = BanMeta::find()->where(['user_id' => $user->id])->exists();
         $networks = NULL;
 
         return $this->renderAjax('_userDetail', [
@@ -82,8 +85,122 @@ class AccountsController extends Controller
             'church' => $church,
             'profiles' => $profiles,
             'comments' => $comments,
+            'hasBanHistory' => $hasBanHistory,
             'networks' => $networks,
         ]);
+    }
+
+    /**
+     * Render content for User edit modal
+     *
+     * @return mixed
+     */
+    public function actionViewEdit($id)
+    {
+        $user = User::findOne($id);
+        return $this->renderAjax('_userEdit', ['user' => $user]);
+    }
+
+    /**
+     * Render content for User ban/restore modal
+     *
+     * @return mixed
+     */
+    public function actionViewBan($id)
+    {
+        $user = User::findOne($id);
+        $user->scenario = 'backend-banned';
+        return $this->renderAjax('_userBan', ['user' => $user]);
+    }
+
+    /**
+     * Render content for ban history modal
+     *
+     * @return mixed
+     */
+    public function actionViewHistory($id)
+    {
+        $user = User::findOne($id);
+        $history = $user->banMeta;
+        return $this->renderAjax('_banHistory', ['user' => $user, 'history' => $history]);
+    }
+
+    /**
+     * Render content for User auth assignment modal
+     *
+     * @return mixed
+     */
+    public function actionViewRole($id)
+    {
+        $user = User::findOne($id);
+        $user->select = array_keys(Yii::$app->authManager->getRolesByUser($user->id))[0];
+        return $this->renderAjax('_userRole', ['user' => $user]);
+    }
+
+    /**
+     * Update user account
+     *
+     * @return string
+     */
+    public function actionUpdate()
+    {
+        $user = NULL; 
+
+        // Ban user
+        if (isset($_POST['ban']) && $user = User::findOne($_POST['ban'])) {
+            $user->scenario = 'backend-banned';
+            if ($user->load(Yii::$app->request->Post()) && $user->ban()) {
+                Yii::$app->session->setFlash('success', 'User ' . $user->id . ' has been banned.');
+            } else {
+                throw New \yii\web\ServerErrorHttpException;
+            }
+
+        // Restore user account after ban
+        } elseif (isset($_POST['restore']) && $user = User::findOne($_POST['restore'])) {
+            $user->scenario = 'backend-banned';
+            if ($user->load(Yii::$app->request->Post()) && $user->restore()) {
+                Yii::$app->session->setFlash('success', 'Account for user ' . $user->id . ' has been reactivated.');
+            } else {
+                throw New \yii\web\ServerErrorHttpException;
+            }
+
+
+        // Change user rbac role
+        } elseif (isset($_POST['role'])) {
+
+            $user = User::findOne($_POST['role']);
+            $user->scenario = 'backend';
+            $user->load(Yii::$app->request->Post());
+
+            $role = array_keys(Yii::$app->authManager->getRolesByUser($user->id))[0];
+            if ($role != $user->select) {
+                // Revoke current role
+                $auth = Yii::$app->authManager;
+                $item = $auth->getRole($role);
+                $auth->revoke($item, $user->id);  
+                // Set new role      
+                $auth = Yii::$app->authManager;
+                $userRole = $auth->getRole($user->select);
+                $auth->assign($userRole, $user->id);
+            }
+
+
+        // Save changes
+        } elseif (isset($_POST['save'])) {
+
+            $user = User::findOne($_POST['save']);
+            $user->load(Yii::$app->request->Post());
+            $user->scenario = 'backend';
+            $user->validate();
+            $user->save();
+
+            Yii::$app->session->setFlash('success', 'Record for User ' . $user->id . ' has been updated.');
+
+        } else {
+            Yii::$app->session->setFlash('warning', 'An error occurred.  The record was not updated.');
+        }
+
+        return $this->redirect(Url::previous());
     }
 
     /**
@@ -95,7 +212,7 @@ class AccountsController extends Controller
     {
         $user = User::findOne($id);
         $user->updateAttributes(['reviewed' => 1]);
-        return $this->redirect(['users']);
+        return $this->redirect(Url::previous());
     }
 
     /**
@@ -147,43 +264,6 @@ class AccountsController extends Controller
             'model' => $model,
             'attributes' => $attributes,
         ]);
-    }
-
-    /**
-     * Displays Update user account
-     *
-     * @return string
-     */
-    public function actionUpdate($id)
-    {
-        $user = User::findOne($id);
-        $user->scenario = 'backend';
-
-        if (isset($_POST['cancel'])) {
-            return $this->redirect(['users']); 
-        } elseif ($user->load(Yii::$app->request->Post())) {
-            $user->email = ($user->email == '' || $user->email == NULL) ? NULL : $user->email;
-            $user->validate();
-            $user->save();
-            Yii::$app->session->setFlash('success', 'User record has been updated.');
-
-            return $this->redirect(['users']);
-        }
-
-        return $this->render('update', ['user' => $user]);
-    }
-
-    /**
-     * Displays delete user account
-     *
-     * @return string
-     */
-    public function actionDelete($id)
-    {
-        if ($user = User::findOne($id)) {
-            $user->delete();
-        }
-        return $this->redirect(['users']);
     }
 
 }

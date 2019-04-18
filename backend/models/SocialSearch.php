@@ -14,7 +14,7 @@ class SocialSearch extends \common\models\profile\Social
         // only fields in rules() are searchable
         return [
             [['id'], 'integer'],
-            [['sermonaudio', 'facebook', 'linkedin', 'twitter', 'google', 'rss', 'youtube', 'vimeo', 'pinterest', 'tumblr', 'soundcloud', 'instagram', 'flickr'], 'safe'],
+            [['sermonaudio', 'facebook', 'linkedin', 'twitter', 'rss', 'youtube', 'vimeo', 'pinterest', 'tumblr', 'soundcloud', 'instagram', 'flickr'], 'safe'],
         ];
     }
 
@@ -31,7 +31,7 @@ class SocialSearch extends \common\models\profile\Social
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
-    		        'pageSize' => 100,
+    		        'pageSize' => 50,
     		    ],
         ]);
 
@@ -45,7 +45,6 @@ class SocialSearch extends \common\models\profile\Social
         $query->andFilterWhere(['like', 'facebook', $this->facebook])
               ->andFilterWhere(['like', 'instagram', $this->instagram])
               ->andFilterWhere(['like', 'flickr', $this->flickr])
-              ->andFilterWhere(['like', 'google', $this->google])
               ->andFilterWhere(['like', 'linkedin', $this->linkedin])
               ->andFilterWhere(['like', 'pinterest', $this->pinterest])
               ->andFilterWhere(['like', 'rss', $this->rss])

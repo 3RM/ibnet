@@ -5,6 +5,9 @@
  *
  ************/
 
+/*
+ *  Site
+ *******************************/
 html,
 body {
     height: 100%;
@@ -23,6 +26,14 @@ body {
 .content-wrapper {
     background-color: #fff !important;
 }
+.btn-main {
+    background-color: gray;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    min-width: 100px;
+    height: 40px;
+}
 
 
 /*
@@ -37,11 +48,17 @@ body {
     font-weight: bold;
     background-color: #f9f9f9;
 }
+.header-row a {
+    color: #363636;
+}
 .list-row:hover {
     background-color: #f9f9f9;
 }
-.list-row.flagged:hover {
-    background-color: #ffabab;
+.row-flagged {
+    background-color: #f00;
+}
+.row-trash {
+    color: #ccc;
 }
 .list-row p, .header-row p {
     width: 30px;
@@ -72,56 +89,99 @@ p.col-240 {
 p.col-300 {
     width: 300px;
 }
-.list-row input {
-    height: 50px;
-    border-radius: 10px;
+/*.select {
+    width: 40%;
+    height: 40px;
+    margin: 10px 0;
+}*/
+#user-select:-moz-focusring {
+    color: transparent;
+    text-shadow: 0 0 0 #000;
+}
+/*#user-select option:not(:checked) {
+  color: black;
+}*/
+#user-select,
+#profile-email {
+    border-radius: 6px;
     width: 300px;
+    height: 40px;
+    padding: 0 10px;
+    border: 1px solid gray;
 }
-.list-row a.action {
+.list-row a.action,
+.list-row button.action {
     font-size: 1.4em;
-    padding: 5px;
+    color: gray;
+    height: 40px;
+    padding: 0 5px;
+    margin-top: -5px;
 }
-p.profile-link {
+p.indent {
     margin-left: 40px;
     border-left: 4px solid #bbb;
 }
+.indent img {
+    width: 45px;
+    border-radius: 50%;
+    margin: 0 20px;
+}
+
 
 
 /*
  *  Detail view modals
  *******************************/
-#user-detail-modal .modal-header,
-#profile-detail-modal .modal-header {
+.modal-header {
     background-color: gray;
     color: #a1a1a1;
 }
-#user-detail-modal .user-detail-modal-body,
-#profile-detail-modal .profile-detail-modal-body {
+.modal-body {
     padding: 20px 40px;
+}
+#user-edit,
+#user-ban,
+#user-role,
+#profile-edit, 
+#profile-inactivate, 
+#profile-trash,
+#profile-flag {
+    display: none;
 }
 .image1 {
     width: 100%;
 }
-.picture-name {
+.detail-head {
     overflow: auto;
     padding: 10px 0;
     margin-bottom: 20px;
     border-bottom: 1px dotted gray;
 }
-.user-detail p {
+.actions {
+    float: right;
+    clear: both;
+    font-size: 1.6em;
+    margin: 0 15px;
+}
+.actions button {
+    width: 45px;
+    margin: 0 -10px;
+    color: gray;
+}
+.detail p {
     background-color: #f9f9f9;
     border-radius: 6px;
     padding: 15px 10px;
 }
-.picture-name .picture {
+.detail-head .picture {
     float: left;
     width: 30%;
 }
-.picture-name .name {
+.detail-head .name {
     float: right;
     width: 70%;
 }
-.picture-name img {
+.detail-head img {
     border-radius: 50%;
     width: 100px;
 }
@@ -140,6 +200,50 @@ p.profile-link {
 .community p {
     background-color: #899e8b;
     color: white;
+}
+p.Trash {
+    color: #ccc;
+}
+span.New,
+span.User {
+    color: blue;
+}
+span.Active,
+span.SafeUser {
+    color: green;
+}
+span.Inactive,
+span.Deleted,
+span.Admin {
+    color: orange;
+}
+span.Expired {
+    color: red;
+}
+span.Trash {
+    color: #ccc;
+}
+span.Banned {
+    color: red;
+}
+table.role {
+    background-color: #f9f9f9;
+    border-radius: 6px;
+    border-collapse: separate;
+    margin: 20px 0;
+} 
+table.role td {
+    padding: 20px;
+}
+.wrap-anywhere {
+    word-wrap: anywhere;
+}
+.ban-history-date {
+    color: gray;
+    font-style: italic;
+}
+.mb-label {
+    display: none;
 }
 
 
@@ -183,6 +287,22 @@ a.desc:after {
     min-width: 50px;
 }
 
+/*Cron schedule*/
+.schedule {
+    width: 600px;
+}
+.schedule p {
+    background-color: #f9f9f9;
+    border-radius: 6px;
+    padding: 15px 10px;
+}
+
+/*DB table*/
+.db-table {
+    width: 100%;
+    max-width: 500px;
+}
+
 
 /*
  *  Footer
@@ -216,6 +336,13 @@ a.desc:after {
     padding: 15px;
     border: none;
 }
+.nav > li > form > button.logout:focus,
+.nav > li > form > button.logout:hover {
+    text-decoration: none;
+}
+.nav > li > form > button.logout:focus {
+    outline: none;
+}
 /* style button to look like link */
 button.link-btn {
   background-color: transparent;
@@ -227,6 +354,9 @@ button.link-btn:hover {
   text-decoration: underline;
   color: #23527c;
 }
+.top-margin {
+  margin-top: 20px;
+}
 .margin-200 {
     margin: 100px 0;
 }
@@ -234,7 +364,6 @@ button.link-btn:hover {
     text-align: center;
     background-color: transparent;
 }
-
 .jumbotron .btn {
     font-size: 21px;
     padding: 14px 24px;
@@ -243,12 +372,53 @@ button.link-btn:hover {
     color: #c55;
     font-style: italic;
 }
+.ago {
+    color: #aeaeae;
+    font-style: italic;
+    font-size: 0.9em;
+}
 
 
+/*
+ *  Media Queries
+ *******************************/
 
+/* Desktops, laptops and iPads (landscape) ----------- */ 
+@media(max-width:1024px) {
+    .header-row {
+        display: none;
+    }
+    .list-row {
+        flex-direction: column;
+    }
+    .mb-label {
+        display: inline;
+        font-weight: bold;
+    }
+    .col-60,
+    .col-100,
+    .col-150,
+    .col-180,
+    .col-240,
+    .col-300 {
+        width: 100% !important;
+    }
+    .list-row {
+        padding: 20px;
+    }
+    .list-row p {
+        padding: 0px;
+    }
+    .list-row button.action {
+        width: 50px;
+        margin-left: -10px;
+    }
+    .col-60.button {
+        padding: 0 !important;
+    }
+}
 
-
-
+/* iPads (portrait) ----------- */
 @media(max-width:767px) {
     .nav li > form > button.logout {
         display:block;
@@ -256,26 +426,23 @@ button.link-btn:hover {
         width: 100%;
         padding: 10px 15px;
     }
-}
-
-.nav > li > form > button.logout:focus,
-.nav > li > form > button.logout:hover {
-    text-decoration: none;
-}
-
-.nav > li > form > button.logout:focus {
-    outline: none;
-}
-
- /* 
-   * Pages
-  ------------------------------------*/
-
-
-/* 
-   * Misc
-  ------------------------------------*/
-
-.top-margin {
-  margin-top: 20px;
+    .detail-head {
+        display: flex;
+        flex-direction: column;
+    }
+    .detail-head .name {
+        float: none;
+        width: 100%;
+    }
+    .detail-head .actions {
+        text-align: right;
+        margin-top: 15px;
+    }
+    #profile-email {
+        width: 100%;
+    }
+    #user-select {
+        width: 100%;
+        max-width: 300px;
+    }
 }

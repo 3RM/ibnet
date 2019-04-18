@@ -7,6 +7,7 @@
 
 namespace common\models\profile;
 
+use backend\models\BanMeta;
 use borales\extensions\phoneInput\PhoneInputBehavior;
 use borales\extensions\phoneInput\PhoneInputValidator;
 use common\models\missionary\Missionary;
@@ -400,6 +401,16 @@ class Profile extends yii\db\ActiveRecord
             'as-church' => ['select', 'name', 'acronym', 'selectM', 'aName', 'aAcronym'],
     // ta: Tag
             'ta' => ['select'],
+
+            'backend' => ['profile_name', 'type', 'sub_type', 'category', 'transfer_token', 'url_name', 'url_loc', 'has_been_inactivated', 'edit', 'tagline', 'title', 
+                        'description', 'ministry_of', 'home_church', 'image1', 'image2', 'flwsp_ass_level', 'org_name', 'org_address1', 'org_address2', 'org_po_box', 
+                        'org_city', 'org_st_prov_reg', 'org_state_long', 'org_zip', 'org_country', 'org_po_address1', 'org_po_address2', 'org_po_city', 
+                        'org_po_st_prov_reg', 'org_po_state_long', 'org_po_zip', 'org_po_country', 'ind_first_name', 'ind_last_name', 'spouse_first_name', 
+                        'ind_address1', 'ind_address2', 'ind_city', 'ind_po_box', 'ind_st_prov_reg', 'ind_state_long', 'ind_zip', 'ind_country', 'ind_po_address1', 
+                        'ind_po_address2', 'ind_po_city', 'ind_po_st_prov_reg', 'ind_po_state_long', 'ind_po_zip', 'ind_po_country', 'show_map', 'phone', 'email', 
+                        'email_pvt', 'email_pvt_status', 'website', 'pastor_interim', 'cp_pastor', 'bible', 'worship_style', 'polity', 'select'],
+
+            'backend-flagged' => ['select'],
         ];
     }
 
@@ -509,7 +520,8 @@ class Profile extends yii\db\ActiveRecord
     // i2: Image 2 ('image2')
             ['image2', 'image', 'extensions' => 'jpg, jpeg, gif, png', 'mimeTypes' => 'image/jpeg, image/png', 'maxFiles' => 1, 'maxSize' => 1024 * 10000, 'skipOnEmpty' => true, 'on' => 'i2'],
 
-    // lo-org: Location Organization ('org_address1', 'org_address2', 'org_city', 'org_st_prov_reg', 'org_zip', 'org_country', 'map', 'org_po_address1', 'org_po_address2', 'org_po_box', 'org_po_city', 'org_po_st_prov_reg', 'org_po_zip', 'org_po_country')
+    // lo-org: Location Organization ('org_address1', 'org_address2', 'org_city', 'org_st_prov_reg', 'org_zip', 'org_country', 'map', 'org_po_address1', 'org_po_address2', 'org_po_box', 
+        // 'org_po_city', 'org_po_st_prov_reg', 'org_po_zip', 'org_po_country')
             ['org_address1', 'required', 'when' => function($profile) {                             // address1 is required if po_address1 and po_box are missing
                 return (empty($profile->org_po_address1) && empty($profile->org_po_box));
             }, 'whenClient' => "function (attribute, value) {
@@ -700,6 +712,16 @@ class Profile extends yii\db\ActiveRecord
 
     // ta: Tag ('select')
             ['select', 'safe', 'on' => 'ta'],
+
+            [['profile_name', 'type', 'sub_type', 'category', 'transfer_token', 'url_name', 'url_loc', 'has_been_inactivated', 'edit', 'tagline', 'title', 
+            'description', 'ministry_of', 'home_church', 'image1', 'image2', 'flwsp_ass_level', 'org_name', 'org_address1', 'org_address2', 'org_po_box', 
+            'org_city', 'org_st_prov_reg', 'org_state_long', 'org_zip', 'org_country', 'org_po_address1', 'org_po_address2', 'org_po_city', 
+            'org_po_st_prov_reg', 'org_po_state_long', 'org_po_zip', 'org_po_country', 'ind_first_name', 'ind_last_name', 'spouse_first_name', 
+            'ind_address1', 'ind_address2', 'ind_city', 'ind_po_box', 'ind_st_prov_reg', 'ind_state_long', 'ind_zip', 'ind_country', 'ind_po_address1', 
+            'ind_po_address2', 'ind_po_city', 'ind_po_st_prov_reg', 'ind_po_state_long', 'ind_po_zip', 'ind_po_country', 'show_map', 'phone', 'email', 
+            'email_pvt', 'email_pvt_status', 'website', 'pastor_interim', 'cp_pastor', 'bible', 'worship_style', 'polity', 'select'], 'safe', 'on' => 'backend'],
+
+            ['select', 'required', 'on' => 'backend-flagged']
         ];
     }
 
@@ -953,6 +975,11 @@ class Profile extends yii\db\ActiveRecord
                 'aName' => 'Or enter a new name here',
                 'aAcronym' => 'Acronym',
             ];
+            break;
+
+    // backend-banned
+            case 'backend-banned':
+            return ['select' => 'Description'];
             break;
 
     // Default labels
@@ -2079,61 +2106,56 @@ class Profile extends yii\db\ActiveRecord
     }
 
     /**
-     * Set profile status to "Inactive" 
+     * Set profile status to "Inactive"
      * Update last_update and renewal_date fields
+     * @param  $reverse upgrades profile status to inactive (e.g. from trash)
      * @return boolean
      */
-    public function inactivate()
+    public function inactivate($reverse=NULL)
     {
+        if (!isset($reverse) && ($this->status != self::STATUS_ACTIVE)) {
+            return false;
+        }
+
         // Delete progress
         if ($progress = FormsCompleted::findOne($this->id)) {
             $progress->delete();
         }
-        $this->setUpdateDate(); 
-        $this->updateAttributes([
-            'status' => Profile::STATUS_INACTIVE, 
-            'renewal_date' => NULL,
-            'inactivation_date' => new Expression('NOW()'),
-            'has_been_inactivated' => 1,
-            'edit' => self::EDIT_NO,
-        ]);
+
+        // Set status to inactive
+        $this->updateAttributes(['status' => Profile::STATUS_INACTIVE]);
+
+        // These params were already set for previously inactivated profiles
+        if (!isset($reverse)) {
+            $this->updateAttributes([
+                'inactivation_date' => new Expression('NOW()'),
+                'renewal_date' => NULL,
+                'has_been_inactivated' => 1,
+                'edit' => self::EDIT_NO,
+            ]);
+        }  
+
+        $this->setUpdateDate();
 
         return true;
     }
 
     /**
-     * Set profile status to "Banned" 
-     * Update last_update and renewal_date fields
-     * @return boolean
-     */
-    public function ban()
-    {
-        // Delete progress
-        if ($progress = FormsCompleted::findOne($this->id)) {
-            $progress->delete();
-        }
-        $this->setUpdateDate(); 
-        $this->updateAttributes([
-            'status' => Profile::STATUS_BANNED, 
-            'renewal_date' => NULL,
-            'inactivation_date' => new Expression('NOW()'),
-            'has_been_inactivated' => 1,
-            'edit' => self::EDIT_NO,
-        ]);
-
-        return true;
-    }
-
-    /**
-     * Set profile status to "Trash"
+     * Set profile status to "Trash" (soft delete)
      * Set last_update to current date and set renewal_date to NULL
      * For profiles that are Schools, Mission Agencies, or Fellowships/Associations, remove the link
      *     to each respective table to enable other profiles to claim those names
      * Leave all other links in tact in the event there is a need to restore the profile
-     * @return
+     * @param  $ban whether the operation is the result of a ban
+     * @return boolean
      */
-    public function trash()
+    public function trash($ban=NULL)
     {
+        if ($this->status == self::STATUS_ACTIVE 
+            || (($this->status == self::STATUS_TRASH) && !isset($ban))) {
+            return false;
+        }
+
     // *********************** Remove forms_completed***************************
         if ($fc = FormsCompleted::findOne($this->id)) {
             $fc->delete();
@@ -2165,21 +2187,76 @@ class Profile extends yii\db\ActiveRecord
             }
         }
 
-        // Set Status to "trash"
+        // Set Status to "trash" or "banned"
+        $status = isset($ban) ? self::STATUS_BANNED : self::STATUS_TRASH;
         $date = new Expression('CURDATE()');
         $this->updateAttributes([
-            'status' => self::STATUS_TRASH,
+            'status' => $status,
             'last_update' => $date,
-            'renewal_date' => NULL]);
+            'renewal_date' => NULL
+        ]);
 
         return true;
+    }
+
+    /**
+     * Set profile status to "Banned"
+     * @param  $userBan Whether the ban is the result of banning the user
+     * @return $this the loaded model
+     */
+    public function ban($userBan=NULL)
+    {
+        // Inactivate if active
+        if ($this->status == Profile::STATUS_ACTIVE) {
+            $this->inactivate();
+        }
+
+        // Set meta data
+        $banned = new BanMeta;
+        $banned->user_id = isset($userBan) ? $this->user_id : NULL;
+        $banned->profile_id = $this->id;
+        $banned->profile_previous_status = $this->status;
+        $banned->description = $this->select;
+        $banned->action = BanMeta::ACTION_BAN;
+        
+        // Soft delete profile
+        $this->trash(TRUE);
+        $this->inappropriate = NULL;
+
+        return $banned->save() && $this->save();
+    }
+
+    /**
+     * Set profile status back to "Inactive"
+     * @param  $userRestore Whether the restore is the result of restoring the user
+     * @return $this the loaded model
+     */
+    public function restore($userRestore=NULL)
+    {
+        // Reset original status if trash, otherwise upgrade to status inactive
+        $banned = BanMeta::find()
+            ->where(['profile_id' => $this->id, 'action' => BanMeta::ACTION_BAN])
+            ->orderBy('id DESC')
+            ->One();
+        $banned->profile_previous_status == Profile::STATUS_TRASH ?
+            $this->status = Profile::STATUS_TRASH :
+            $this->inactivate(TRUE);
+
+        // Set meta data
+        $restored = new BanMeta;
+        $restored->user_id = isset($userRestore) ? $this->user_id : NULL;
+        $restored->profile_id = $this->id;
+        $restored->description = $this->select;
+        $restored->action = BanMeta::ACTION_RESTORE;
+        
+        return $restored->save() && $this->save();
     }
 
     /**
      * Permanently delete profile along with links
      * @return
      */
-    public function annihilate()
+    public function hardDelete()
     {
         // Remove forms_completed
         if ($fc = FormsCompleted::findOne($this->id)) {
@@ -2338,6 +2415,15 @@ class Profile extends yii\db\ActiveRecord
     }
 
     /**
+     * Profile ban meta
+     * @return \yii\db\ActiveQuery
+     */
+    public function getBanMeta()
+    {
+        return $this->hasMany(BanMeta::className(), ['profile_id' => 'id'])->orderBy('id ASC');
+    }
+
+    /**
      * Update $show_map to user selection
      * @var string $mapType
      * @return $this
@@ -2421,21 +2507,16 @@ class Profile extends yii\db\ActiveRecord
      */
     public function getPluralType()
     {
-        switch ($this->type) {
-            case self::TYPE_MISSIONARY:
-                if ($this->sub_type == self::SUBTYPE_MISSIONARY_CP) {
-                    return $this->spouse_first_name ? 'Missionaries ' : 'Missionary ';
-                } elseif ($this->sub_type == self::SUBTYPE_MISSIONARY_BT) {
-                    return $this->spouse_first_name ? 'Medical Missionaries ' : 'Medical Missionary ';
-                } else {
-                    return $this->spouse_first_name ? 'Bible Translators ' : 'Bible Translator ';
-                }
-                break;
-            case self::TYPE_CHAPLAIN:
-                return $this->sub_type == self::SUBTYPE_CHAPLAIN_M ? 'Military Chaplain ' : 'Jail Chaplain ';
-                break;
-            default: return $this->type;
-            break;
+        if ($this->type == self::TYPE_MISSIONARY) {
+            if ($this->sub_type == self::SUBTYPE_MISSIONARY_CP) {
+                return $this->spouse_first_name ? 'Missionaries ' : 'Missionary ';
+            } elseif ($this->sub_type == self::SUBTYPE_MISSIONARY_BT) {
+                return $this->spouse_first_name ? 'Medical Missionaries ' : 'Medical Missionary ';
+            } else {
+                return $this->spouse_first_name ? 'Bible Translators ' : 'Bible Translator ';
+            }
+        } elseif ($this->type == self::TYPE_CHAPLAIN) {
+            return $this->sub_type == self::SUBTYPE_CHAPLAIN_M ? 'Military Chaplain ' : 'Jail Chaplain ';
         }
     }
 

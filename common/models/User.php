@@ -8,6 +8,7 @@
 namespace common\models;
 
 use backend\models\Assignment;
+use backend\models\BanMeta;
 use common\models\network\Network;
 use common\models\network\NetworkMember;
 use common\models\profile\Profile;
@@ -82,6 +83,11 @@ class User extends ActiveRecord implements
     public $emailMaintenance = 1;
 
     /**
+     * @var string $select Selection from dropdown list
+     */
+    public $select;
+
+    /**
      * @const int ROLE_* User assignments
      */
     const ROLE_ADMIN = 'Admin';
@@ -93,6 +99,7 @@ class User extends ActiveRecord implements
      */
     const STATUS_DELETED = 0;
     const STATUS_ACTIVE = 10;
+    const STATUS_FROZEN = 15;
     const STATUS_BANNED = 20;
 
     /**
@@ -151,7 +158,8 @@ class User extends ActiveRecord implements
             'personal' => ['display_name', 'home_church', 'primary_role', 'usr_image'],
             'account' => ['newUsername', 'newEmail', 'newPassword', 'emailPrefProfile', 'emailPrefLinks', 'emailPrefComments',   'emailPrefFeatures', 'emailPrefBlog'],
             'emailPref' => ['emailPrefProfile', 'emailPrefLinks', 'emailPrefComments',   'emailPrefFeatures', 'emailPrefBlog'],
-            'backend' => ['first_name', 'last_name', 'email', 'new_email', 'new_email_token', 'username', 'auth_key', 'password_hash', 'password_reset_token', 'created_at', 'updated_at', 'last_login', 'status', 'display_name', 'home_church', 'primary_role', 'email_pref_links', 'emailPrefComments', 'emailPrefFeatures', 'emailPrefBlog', 'reviewed'],
+            'backend' => ['first_name', 'last_name', 'email', 'new_email', 'new_email_token', 'username', 'password_reset_token', 'display_name', 'home_church', 'select'],
+            'backend-banned' => ['select'],
         ];
     }
 
@@ -181,7 +189,9 @@ class User extends ActiveRecord implements
             ['username', 'string', 'min' => 4, 'max' => 255, 'on' => 'backend'],
             ['newEmail', 'email', 'message' => 'Please provide a valid email address.', 'on' => 'backend'],
             ['newPassword', 'string', 'max' => 20, 'on' => 'backend'],
-            [['first_name', 'last_name', 'email', 'new_email_token', 'auth_key', 'password_hash', 'password_reset_token', 'created_at', 'updated_at', 'last_login', 'status', 'display_name', 'home_church', 'primary_role', 'emailPrefProfile', 'emailPrefLinks', 'emailPrefComments', 'emailPrefFeatures', 'reviewed'], 'safe', 'on' => 'backend'],
+            [['first_name', 'last_name', 'email', 'new_email_token', 'password_reset_token', 'display_name', 'home_church', 'primary_role', 'select'], 'safe', 'on' => 'backend'],
+
+            ['select', 'required', 'on' => 'backend-banned'],
         
             [['fullName'], 'safe'],
         ];
@@ -194,7 +204,7 @@ class User extends ActiveRecord implements
     {
         return [
             'usr_image' => '',
-            'display_name' => 'display Name',
+            'display_name' => 'Display Name',
             'home_church' => 'Home Church',
             'primary_role' => 'Primary Role',
             'newUsername' => '',
@@ -207,6 +217,7 @@ class User extends ActiveRecord implements
             'emailPrefComments' => 'Tell me when someone comments on my profiles',
             'emailPrefFeatures' => 'Notify me of new or updated website features',
             'emailPrefBlog' => 'Send me weekly blog digests',
+            'select' => 'Description'
         ];
     }
 
@@ -494,9 +505,110 @@ class User extends ActiveRecord implements
                 Yii::$app->session->setFlash('success', 'Your settings have been updated.') :
                 Yii::$app->session->setFlash('success', 'Your settings have been updated.  An email with a confirmation link has been sent to your new email address.');
 
-            return true;
+            return TRUE;
         }
-        return false;
+        return FALSE;
+    }
+
+    /**
+     * Set user status to "Banned"
+     * Process updates to account settings
+     * @return $this the loaded model
+     */
+    public function ban()
+    {
+        // Set meta data
+        $banned = new BanMeta;
+        $banned->user_id = $this->id;
+        $banned->description = $this->select;
+        $banned->action = BanMeta::ACTION_BAN;
+        $banned->save();
+            
+        // Ban profiles
+        if ($profiles = $this->profiles) {
+            foreach ($profiles as $profile) {
+                $profile->scenario = 'backend-flagged';
+                $profile->select = $this->select;
+                if (!$profile->ban(TRUE)) { // TRUE = profile ban is result of user ban
+                    throw New ServerErrorHttpException;
+                }
+            }
+        }
+
+        // Demote role to User
+        $role = array_keys(Yii::$app->authManager->getRolesByUser($this->id))[0];
+        if ($role != User::ROLE_USER) {
+            // Revoke current role
+            $auth = Yii::$app->authManager;
+            $item = $auth->getRole($role);
+            $auth->revoke($item, $this->id);  
+            // Set role to User         
+            $auth = Yii::$app->authManager;
+            $userRole = $auth->getRole(User::ROLE_USER);
+            $auth->assign($userRole, $this->id);
+        }
+
+        // Set status banned
+        $this->updateAttributes(['status' => User::STATUS_BANNED]);
+
+        // Notify account owner
+        Yii::$app->mailer
+            ->compose(
+                ['html' => 'site/notification-html', 'text' => 'site/notification-text'],
+                [
+                    'title' => 'Change to your IBNet account', 
+                    'message' => 'Your account at ibnet.org has been disabled.  If you feel this is in error, please contact us at admin@ibnet.org.',
+                ])
+            ->setFrom(Yii::$app->params['email.admin'])
+            ->setTo($this->email)
+            ->setSubject(Yii::$app->params['email.systemSubject'])
+            ->send();
+
+        return TRUE;
+    }
+
+    /**
+     * Set user status to "Banned"
+     * Process updates to account settings
+     * @return $this the loaded model
+     */
+    public function restore()
+    {
+        // Set meta data
+        $restore = new BanMeta;
+        $restore->user_id = $this->id;
+        $restore->description = $this->select;
+        $restore->action = BanMeta::ACTION_RESTORE;
+        $restore->save();
+
+        // Restore profiles
+        if ($profiles = $this->profiles) {
+            foreach ($profiles as $profile) {
+                $profile->scenario = 'backend-flagged';
+                $profile->select = $this->select;
+                if (!$profile->restore(TRUE)) { // TRUE = profile restore is result of user restore
+                    throw New ServerErrorHttpException;
+                }
+            }
+        }
+
+        // Set status active
+        $this->updateAttributes(['status' => User::STATUS_ACTIVE]); 
+
+        // Notify account owner
+        Yii::$app->mailer
+            ->compose(
+                ['html' => 'site/notification-html', 'text' => 'site/notification-text'],
+                [
+                    'title' => 'Change to your IBNet account', 
+                    'message' => 'Your account at ibnet.org has been reenabled.  If you any questions, please contact us at admin@ibnet.org.',
+                ])
+            ->setFrom(Yii::$app->params['email.admin'])
+            ->setTo($this->email)
+            ->setSubject(Yii::$app->params['email.systemSubject'])
+            ->send();
+
+        return TRUE;
     }
 
     /**
@@ -508,6 +620,15 @@ class User extends ActiveRecord implements
         return $this->hasMany(Profile::className(), ['user_id' => 'id'])
             ->where(['!=', 'status', Profile::STATUS_TRASH])
             ->orderBy('id ASC');
+    }
+
+    /**
+     * Profiles owned by the current user
+     * @return array (of objects)
+     */
+    public function getBannedProfiles()
+    {
+        return $this->hasMany(Profile::className(), ['user_id' => 'id'])->where(['status' => Profile::STATUS_BANNED]);
     }
 
     /**
@@ -527,6 +648,15 @@ class User extends ActiveRecord implements
         return Profile::find()
             ->where(['user_id' => $this->id, 'category' => Profile::CATEGORY_IND, 'status' => Profile::STATUS_ACTIVE])
             ->exists();
+    }
+
+    /**
+     * User ban meta
+     * @return \yii\db\ActiveQuery
+     */
+    public function getBanMeta()
+    {
+        return $this->hasMany(BanMeta::className(), ['user_id' => 'id'])->orderBy('id ASC');
     }
 
     /**

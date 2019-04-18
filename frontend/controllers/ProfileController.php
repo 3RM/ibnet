@@ -15,7 +15,7 @@ use common\models\profile\MissionAgcy;
 use common\models\profile\Profile;
 use common\models\profile\ProfileBrowse;
 use common\models\profile\ProfileGuestBrowse;
-use common\models\profile\ProfileSearch; use common\models\Utility;
+use common\models\profile\ProfileSearch;
 use common\models\profile\ProfileGuestSearch;
 use common\models\profile\Staff;
 use common\models\profile\Social;

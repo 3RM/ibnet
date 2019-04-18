@@ -72,7 +72,7 @@ class LoginForm extends Model
         if (!$this->hasErrors()) {
             $user = $this->getUser();
             if ($user && $user->status == User::STATUS_BANNED) {
-                $this->addError($attribute, 'Your account has been banned.');
+                $this->addError($attribute, 'You are not authorized to access this site.');
             } else if (!$user || !$user->validatePassword($this->password)) {
                 $this->addError($attribute, 'Incorrect username/email or password.');
             }
@@ -87,13 +87,10 @@ class LoginForm extends Model
     public function login()
     {
         if ($this->validate()) {
-            $user = $this->user;
-            $user->last_login = date('Y-m-d H:i:s');                        // Set date to GMT timezone; Will need to take into account user location when reading back the date/time
-            $user->updateAttributes($user); 
-            return Yii::$app->user->login($this->user, $this->rememberMe ? 3600 * 24 * 30 : 0);
-        } else {
-            return false;
+            return Yii::$app->user->login($this->user, $this->rememberMe ? Yii::$app->params['user.rememberMeDuration'] : 0);
         }
+        
+        return false;
     }
 
     /**

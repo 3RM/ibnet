@@ -1,22 +1,20 @@
 <?php
 namespace backend\controllers;
 
+use backend\models\BanMeta;
 use backend\models\ProfileSearch;
 use backend\models\SocialSearch;
 use backend\models\StaffSearch;
 use backend\models\MissionarySearch;
+use backend\models\MissionaryUpdateSearch;
+use backend\models\HistorySearch;
 use backend\models\HousingSearch;
 use backend\models\AssociationSearch;
 use backend\models\FellowshipSearch;
 use common\models\Utility;
-use common\models\missionary\Missionary;
-use common\models\profile\Association;
-use common\models\profile\Fellowship;
-use common\models\profile\MissHousing;
 use common\models\profile\Profile;
 use common\models\profile\ProfileMail;
 use common\models\profile\Social;
-use common\models\profile\Staff;
 use frontend\controllers\ProfileController;
 use Yii;
 use yii\bootstrap\Html;
@@ -25,7 +23,9 @@ use yii\db\Query;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Url;
 use yii\web\Controller;
+use yii\web\Response;
 
 /**
  * Accounts controller
@@ -64,78 +64,6 @@ class DirectoryController extends Controller
     }
 
     /**
-     * Mark a profile as reviewed
-     *
-     * @return string
-     */
-    public function actionReviewProfile($id)
-    {
-        $model = Profile::findOne($id);
-        $model->updateAttributes(['reviewed' => 1]);
-        return $this->redirect(['profiles']);
-    }
-
-    /**
-     * Mark staff as reviewed
-     *
-     * @return string
-     */
-    public function actionReviewStaff($id)
-    {
-        $model = Staff::findOne($id);
-        $model->updateAttributes(['reviewed' => 1]);
-        return $this->redirect(['staff']);
-    }
-
-    /**
-     * Mark missionary as reviewed
-     *
-     * @return string
-     */
-    public function actionReviewMiss($id)
-    {
-        $model = Missionary::findOne($id);
-        $model->updateAttributes(['reviewed' => 1]);
-        return $this->redirect(['missionary']);
-    }
-
-    /**
-     * Mark missionary housing as reviewed
-     *
-     * @return string
-     */
-    public function actionReviewHousing($id)
-    {
-        $model = MissHousing::findOne($id);
-        $model->updateAttributes(['reviewed' => 1]);
-        return $this->redirect(['housing']);
-    }
-
-    /**
-     * Mark association as reviewed
-     *
-     * @return string
-     */
-    public function actionReviewAss($id)
-    {
-        $model = Association::findOne($id);
-        $model->updateAttributes(['reviewed' => 1]);
-        return $this->redirect(['association']);
-    }
-
-    /**
-     * Mark fellowship as reviewed
-     *
-     * @return string
-     */
-    public function actionReviewFlwship($id)
-    {
-        $model = Fellowship::findOne($id);
-        $model->updateAttributes(['reviewed' => 1]);
-        return $this->redirect(['fellowship']);
-    }
-
-    /**
      * Displays a detail view of single profile.
      *
      * @return string
@@ -152,154 +80,123 @@ class DirectoryController extends Controller
     }
 
     /**
+     * Mark a profile as reviewed
+     *
+     * @return string
+     */
+    public function actionReviewProfile($id)
+    {
+        $model = Profile::findOne($id);
+        $model->updateAttributes(['reviewed' => 1]);
+        return $this->redirect(Url::previous());
+    }
+
+    /**
      * Render content for profile detail modal
      *
      * @return mixed
      */
-    public function actionProfileDetail($id)
+    public function actionViewDetail($id)
     {
         $profile = Profile::findOne($id);
-        // $church = $user->homeChurch ?? NULL;
-        // $profiles = Profile::find()->where(['id' => $user->id])->count();
-        // $comments = Comment::find()->where(['created_by' => $user->id])->count();
-        // $networks = NULL;
-
-        return $this->renderAjax('_profileDetail', [
-            'profile' => $profile,
-            // 'church' => $church,
-            // 'profiles' => $profiles,
-            // 'comments' => $comments,
-            // 'networks' => $networks,
-        ]);
+        return $this->renderAjax('_profileDetail', ['profile' => $profile]);
     }
 
     /**
-     * Displays review user account
+     * Render content for profile edit modal
+     *
+     * @return mixed
+     */
+    public function actionViewEdit($id)
+    {
+        $profile = Profile::findOne($id);
+        return $this->renderAjax('_profileEdit', ['profile' => $profile]);
+    }
+
+    /**
+     * Render content for profile inactivate modal
+     *
+     * @return mixed
+     */
+    public function actionViewInactivate($id)
+    {
+        $profile = Profile::findOne($id);
+        return $this->renderAjax('_profileInactivate', ['profile' => $profile]);
+    }
+
+    /**
+     * Render content for profile trash modal
+     *
+     * @return mixed
+     */
+    public function actionViewTrash($id)
+    {
+        $profile = Profile::findOne($id);
+        return $this->renderAjax('_profileTrash', ['profile' => $profile]);
+    }
+
+    /**
+     * Render content for profile flag modal
+     *
+     * @return mixed
+     */
+    public function actionViewFlag($id)
+    {
+        $profile = Profile::findOne($id);
+        return $this->renderAjax('_profileFlag', ['profile' => $profile]);
+    }
+
+    /**
+     * Update profile
      *
      * @return string
      */
-    public function actionView($id)
+    public function actionUpdate()
     {
-        $model = Profile::findOne($id);
-        $attributes = [
-            'id',
-            [
-                'attribute' => 'user_id',
-                'format' => 'raw',
-                'value' => function ($model) {                      
-                     return Html::a($model->user_id, ['accounts/view', 'id' => $model->user_id], ['target' => '_blank']);
-                },
-            ],
-            'transfer_token',
-            'type',
-            'sub_type',
-            'profile_name',
-            'url_name',
-            'url_loc',
-            'created_at:date',                                     
-            'last_update:date',
-            'last_modified:date',
-            'renewal_date',
-            'inactivation_date',
-            [
-                'attribute' => 'status',
-                'format' => 'raw',
-                'value' => function ($model) {  
-                    if ($model->status == Profile::STATUS_NEW) {
-                        return '<span style="color:blue">New</span>';
-                    } elseif ($model->status == Profile::STATUS_ACTIVE) {
-                        return '<span style="color:green">Active</span>';
-                    } elseif ($model->status == Profile::STATUS_INACTIVE) {
-                        return '<span style="color: orange;">Inactive</span>'; 
-                    } elseif ($model->status == Profile::STATUS_EXPIRED) {
-                        return '<span style="color: red;">Expired</span>';  
-                    } elseif ($model->status == Profile::STATUS_TRASH) {
-                        return '<span style="color: #CCC;">Trash</span>';    
-                    }             
-                },
-            ],
-            'tagline',
-            'title',
-            'description',
-            'ministry_of',
-            [
-                'attribute' => 'home_church',
-                'format' => 'raw',
-                'value' => function ($model) {                      
-                    return Html::a($model->home_church, ['view', 'id' => $model->home_church], ['target' => '_blank']);
-                }, 
-            ],
-            'image1',
-            'image2',
-            'flwsp_ass_level',
-            'org_name',
-            'org_address1',
-            'org_address2',
-            'org_po_box',
-            'org_city',
-            'org_st_prov_reg',
-            'org_zip',
-            'org_country',
-            'org_loc',
-            'org_po_address1',
-            'org_po_address2',
-            'org_po_city',
-            'org_po_st_prov_reg',
-            'org_po_state_long',
-            'org_po_zip',
-            'org_po_country',
-            'ind_first_name',
-            'ind_last_name',
-            'spouse_first_name',
-            'ind_address1',
-            'ind_address2',
-            'ind_po_box',
-            'ind_city',
-            'ind_st_prov_reg',
-            'ind_state_long',
-            'ind_zip',
-            'ind_country',
-            'ind_loc',
-            'ind_po_address1',
-            'ind_po_address2',
-            'ind_po_city',
-            'ind_po_st_prov_reg',
-            'ind_po_state_long',
-            'ind_po_zip',
-            'ind_po_country',
-            [
-                'attribute' => 'show_map',
-                'format' => 'raw',
-                'value' => function ($model) {  
-                    if ($model->status == Profile::MAP_PRIMARY) {
-                        return 'Primary';
-                    } elseif ($model->status == Profile::MAP_CHURCH) {
-                        return 'Church';
-                    } elseif ($model->status == Profile::MAP_MINISTRY) {
-                        return 'Ministry';  
-                    } elseif ($model->status == Profile::MAP_CHURCH_PLANT) {
-                        return 'Church Plant';    
-                    }             
-                },
-            ],
-            'phone',
-            'email',
-            'email_pvt',
-            'email_pvt_status',
-            'website',
-            'pastor_interim',
-            'cp_pastor',
-            'bible',
-            'worship_style',
-            'polity',
-            'packet',
-            'inappropriate',
-        ];
+        if (isset($_POST['inactivate']) && $profile = Profile::findOne($_POST['inactivate'])) {
+            $status = $profile->status;
+            if ($profile->inactivate()) {
+                $status == Profile::STATUS_TRASH ?
+                    Yii::$app->session->setFlash('success', 'Profile ' . $profile->id . ' was successfully restored.') :
+                    Yii::$app->session->setFlash('success', 'Profile ' . $profile->id . ' was successfully inactivated.');
+            } else {
+                throw New ServerErrorHttpException;
+            }
         
-        return $this->render('view', [
-            'model' => $model,
-            'attributes' => $attributes,
-        ]);
+        } elseif (isset($_POST['trash']) && $profile = Profile::findOne($_POST['trash'])) {
+            if ($profile->trash()) {
+                Yii::$app->session->setFlash('success', 'Profile ' . $profile->id . ' was successfully deleted.');
+            } else {
+                throw New ServerErrorHttpException;
+            }
+
+        } elseif (isset($_POST['restore']) && $profile = Profile::findOne($_POST['restore'])) {
+            if ($profile->inactivate(TRUE)) {
+                Yii::$app->session->setFlash('success', 'Profile ' . $profile->id . ' was successfully restored.');
+            } else {
+                throw New ServerErrorHttpException;
+            }
+
+        } elseif (isset($_POST['flag']) && $profile = Profile::findOne($_POST['flag'])) {
+            $profile->updateAttributes(['inappropriate' => 1]);
+            Yii::$app->session->setFlash('success', 'Profile ' . $profile->id . ' was has been flagged for review.');
+            
+        
+        } elseif (isset($_POST['save']) && $profile = Profile::findOne($_POST['save'])) {
+            $profile->scenario = 'backend';
+            if ($profile->load(Yii::$app->request->Post())
+                && $profile->validate()
+                && $profile->save()) {
+                Yii::$app->session->setFlash('success', 'Record for Profile ' . $profile->id . ' has been updated.');
+            } else {
+                throw New ServerErrorHttpException;
+            }
+
+        } else {
+            throw New ServerErrorHttpException;
+        }
+
+        return $this->redirect(Url::previous());
     }
 
     /**
@@ -312,12 +209,18 @@ class DirectoryController extends Controller
         $searchModel = new SocialSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->get());
         $gridColumns = [
+            [
+                'attribute' => '',
+                'format' => 'raw',
+                'value' => function ($model) {                      
+                    return $model->reviewed === 1 ? '' : Html::a(Html::icon('check'), ['review-staff', 'id' => $model->id]);
+                },
+            ],
             'id',
             'sermonaudio',
             'facebook',
             'linkedin',
             'twitter',
-            'google',
             'rss',
             'youtube',
             'vimeo',
@@ -336,6 +239,18 @@ class DirectoryController extends Controller
     }
 
     /**
+     * Mark a social as reviewed
+     *
+     * @return string
+     */
+    public function actionReviewSocial($id)
+    {
+        $model = Social::findOne($id);
+        $model->updateAttributes(['reviewed' => 1]);
+        return $this->redirect(Url::previous());
+    }
+
+    /**
      * Displays staff table
      *
      * @return string
@@ -345,44 +260,30 @@ class DirectoryController extends Controller
         $searchModel = new StaffSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->get());
         $gridColumns = [
-            [
-                'attribute' => '',
-                'format' => 'raw',
-                'value' => function ($model) {                      
-                    return $model->reviewed === 1 ? '' : Html::a(Html::icon('check'), ['review-staff', 'id' => $model->id]);
-                },
-                'hAlign'=>'center',
-                'vAlign' => 'middle',
-                'width'=>'1%',
-            ],
-            [
-                'attribute' => 'staff_id',
-                'format' => 'raw',
-                'value' => function ($model) {                      
-                     return Html::a($model->staff_id, ['view', 'id' => $model->staff_id]);
-                },
-                'hAlign'=>'center',
-                'vAlign' => 'middle',
-                //'width'=>'1%',
-            ],
+            'id',
+            'staff_id',
+            // [
+            //     'attribute' => 'staff_id',
+            //     'format' => 'raw',
+            //     'value' => function ($model) {                      
+            //         return Html::a($model->staff_id, ['view', 'id' => $model->staff_id]);
+            //     },
+            // ],
             'staff_type',
             'staff_title',
-            [
-                'attribute' => 'ministry_id',
-                'format' => 'raw',
-                'value' => function ($model) {                      
-                     return Html::a($model->ministry_id, ['view', 'id' => $model->ministry_id]);
-                },
-                'hAlign'=>'center',
-                'vAlign' => 'middle',
-                //'width'=>'1%',
-            ],
+            'ministry_id',
+            // [
+            //     'attribute' => 'ministry_id',
+            //     'format' => 'raw',
+            //     'value' => function ($model) {                      
+            //         return Html::a($model->ministry_id, ['view', 'id' => $model->ministry_id]);
+            //     },
+            // ],
             'home_church', 
             'church_pastor', 
             'ministry_of',
             'ministry_other', 
             'sr_pastor', 
-            'confirmed',
         ];
 
         return $this->render('staff', [
@@ -408,8 +309,6 @@ class DirectoryController extends Controller
                 'value' => function ($model) {                      
                      return Html::a($model->profile->id, ['/directory/view', 'id' => $model->profile->id]);
                 },
-                'hAlign'=>'center',
-                'vAlign' => 'middle',
             ],
             'id',
             'mission_agcy_id',
@@ -492,19 +391,9 @@ class DirectoryController extends Controller
         $searchModel = new AssociationSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->get());
         $gridColumns = [
-            [
-                'attribute' => '',
-                'format' => 'raw',
-                'value' => function ($model) {                      
-                    return $model->reviewed === 1 ? '' : Html::a(Html::icon('check'), ['review-ass', 'id' => $model->id]);
-                },
-                'hAlign'=>'center',
-                'vAlign' => 'middle',
-                'width'=>'1%',
-            ],
             'id',
-            'association',
-            'association_acronym',
+            'name',
+            'acronym',
             'profile_id',
         ];
 
@@ -525,19 +414,9 @@ class DirectoryController extends Controller
         $searchModel = new FellowshipSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->get());
         $gridColumns = [
-            [
-                'attribute' => '',
-                'format' => 'raw',
-                'value' => function ($model) {                      
-                    return $model->reviewed === 1 ? '' : Html::a(Html::icon('check'), ['review-flwship', 'id' => $model->id]);
-                },
-                'hAlign'=>'center',
-                'vAlign' => 'middle',
-                'width'=>'1%',
-            ],
             'id',
-            'fellowship',
-            'fellowship_acronym',
+            'name',
+            'acronym',
             'profile_id',
         ];
 
@@ -549,50 +428,112 @@ class DirectoryController extends Controller
     }
 
     /**
+     * Displays history table
+     *
+     * @return string
+     */
+    public function actionHistory()
+    {
+        $searchModel = new HistorySearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->get());
+        $gridColumns = [
+            'id',
+            'profile_id',
+            'date',
+            'title',
+            [
+                'attribute' => 'description',
+                'contentOptions' => ['style' => 'width:35%;'],
+            ],
+            'event_image',
+            'deleted',
+        ];
+
+        return $this->render('history', [
+            'searchModel' => $searchModel, 
+            'dataProvider' => $dataProvider,
+            'gridColumns' => $gridColumns,
+        ]);
+    }
+
+    /**
+     * Render content for profile ban modal
+     *
+     * @return mixed
+     */
+    public function actionViewRestore($id)
+    {
+        $profile = Profile::findOne($id);
+        $profile->scenario = 'backend-flagged';
+        return $this->renderAjax('_profileBan', ['profile' => $profile]);
+    }
+
+    /**
+     * Render content for profile ban/restore modal
+     *
+     * @return mixed
+     */
+    public function actionViewBan($id)
+    {
+        $profile = Profile::findOne($id);
+        $profile->scenario = 'backend-flagged';
+        return $this->renderAjax('_profileBan', ['profile' => $profile]);
+    }
+
+    /**
+     * Render content for ban history modal
+     *
+     * @return mixed
+     */
+    public function actionViewHistory($id)
+    {
+        $profile = Profile::findOne($id);
+        $history = $profile->banMeta;
+        return $this->renderAjax('_banHistory', ['profile' => $profile, 'history' => $history]);
+    }
+
+    /**
      * Displays flagged profiles
      *
      * @return mixed
      */
     public function actionFlagged()
-    {
+    {  
+        if (isset($_POST['clear']) && $profile = Profile::findOne($_POST['clear'])) {
+            $profile->updateAttributes(['inappropriate' => NULL]);
+            Yii::$app->session->setFlash('success', 'Profile ' . $profile->id . ' flag has been cleared.');
+        
+        } elseif (isset($_POST['ban']) && $profile = Profile::findOne($_POST['ban'])) {
+            $profile->scenario = 'backend-flagged'; 
+            if ($profile->load(Yii::$app->request->Post()) && $profile->ban()) {
+                Yii::$app->session->setFlash('success', 'Profile ' . $profile->id . ' was successfully banned.');
+            } else {
+                Yii::$app->session->setFlash('warning', 'Something went wrong and the record was not saved. Note that description is a required field.');
+            }
+
+        } elseif (isset($_POST['restore']) && $profile = Profile::findOne($_POST['restore'])) {
+            $profile->scenario = 'backend';
+            if ($profile->load(Yii::$app->request->Post()) && $profile->restore()) {      
+                Yii::$app->session->setFlash('success', 'Profile ' . $profile->id . ' was successfully restored.');
+            } else {
+                Yii::$app->session->setFlash('warning', 'Something went wrong and the record was not saved. Note that description is a required field.');
+            }
+
+        } elseif (isset($_POST['delete']) && $profile = Profile::findOne($_POST['delete'])) {
+            if ($profile->hardDelete()) {
+                Yii::$app->session->setFlash('success', 'Profile ' . $profile->id . ' was has been permanently deleted.');
+            } else {
+                throw new \yii\web\ServerErrorHttpException;
+            }        
+        }
+
         $flaggedProfiles = Profile::find()->where(['inappropriate' => 1])->all();
         $bannedProfiles = Profile::find()->where(['status' => Profile::STATUS_BANNED])->all();
 
         return $this->render('flagged', [
             'flaggedProfiles' => $flaggedProfiles,
-            'bannedProfiles' => $bannedProfiles,
+            'bannedProfiles' => $bannedProfiles
         ]);
-    }
-
-    /**
-     * Clear a profile flag
-     *
-     * @return mixed
-     */
-    public function actionClearFlag($id)
-    {
-        if ($profile = Profile::findOne($id)) {
-            $profile->updateAttributes(['inappropriate' => NULL, 'status' => Profile::STATUS_INACTIVE]);
-        }
-
-        return $this->redirect(['flagged']);
-    }
-
-    /**
-     * Disable a flagged profile
-     *
-     * @return string
-     */
-    public function actionDisableProfile($id)
-    {
-        if ($profile = Profile::findOne($id)) {
-            $profile->ban();
-        }
-        if ($user = $profile->user) {
-            $user->freezeAccount();
-        }
-
-        return $this->redirect(['flagged']);
     }
 
     /**
@@ -619,36 +560,37 @@ class DirectoryController extends Controller
      */
     public function actionActivateForward($id)
     {
-        $profile = Profile::findOne($id);
-        if ($profile) {
-            $profile->updateAttributes(['email_pvt_status' => Profile::PRIVATE_EMAIL_ACTIVE]);
+        if (!$profile = Profile::findOne($id)) {
+            throw new ServerErrorHttpException;
         }
 
-        if (ProfileMail::sendForwardingEmailNotif($profile->email)) {                                      // Send request to admin
-            Yii::$app->session->setFlash('success', 
-                'Private email status has been set to <i>Active</i> for profile ' . $profile->id . ' and a notification email has 
-                been sent to the user.');
+        // Send request to admin
+        if (!ProfileMail::sendForwardingEmailNotif($profile->email)) {
+            throw new \yii\web\ServerErrorHttpException;
         }
+
+        $profile->updateAttributes(['email_pvt_status' => Profile::PRIVATE_EMAIL_ACTIVE]);
+        Yii::$app->session->setFlash('success', 'Private email status has been set to <i>Active</i> for 
+                profile ' . $profile->id . ' and a notification email has been sent to the user.');
 
         return $this->redirect(['forwarding']);
     }
 
     /**
-     * Activate a private email & send new forwarding email request notification to admin
+     * Cancel private email forwarding request
      *
      * @return mixed
      */
     public function actionCancelForward($id)
     {
-        $profile = Profile::findOne($id);
-        if ($profile) {
-            $profile->updateAttributes(['email_pvt' => NULL, 'email_pvt_status' => NULL]);
-
-            Yii::$app->session->setFlash('success', 
-                'Private email has been canceled for profile ' . $profile->id . '. "status" and "email_pvt" were set 
-                to NULL.');
+        if (!$profile = Profile::findOne($id)) {
+            throw new \yii\web\ServerErrorHttpException;
         }
-
+        
+        $profile->updateAttributes(['email_pvt' => NULL, 'email_pvt_status' => NULL]);
+        Yii::$app->session->setFlash('success', 'Private email has been canceled for profile ' . 
+            $profile->id . '. "status" and "email_pvt" were set to NULL.');
+        
         return $this->redirect(['forwarding']);
     }
 }

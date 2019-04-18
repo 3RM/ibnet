@@ -10,6 +10,6 @@ $this->title = '';
 
     <div class="body-content">
         
-
+		<p>TODO ideas: maps of user logins and ministries; Email & other alert; Pull new errors from log and alert?</p>
     </div>
 </div>
