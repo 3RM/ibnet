@@ -543,54 +543,27 @@ class DirectoryController extends Controller
      */
     public function actionForwarding()
     {
+        if (isset($_POST['save']) && $profile = Profile::findOne($_POST['save'])) {
+            // Send request to admin
+            if (!ProfileMail::sendForwardingEmailNotif($profile->email)) {
+                throw new \yii\web\ServerErrorHttpException;
+            }
+            $profile->updateAttributes(['email_pvt_status' => Profile::PRIVATE_EMAIL_ACTIVE]);
+            Yii::$app->session->setFlash('success', 'Private email status has been set to <i>Active</i> for 
+                    profile ' . $profile->id . ' and a notification email has been sent to the user.');
+        
+        } elseif (isset($_POST['remove']) && $profile = Profile::findOne($_POST['remove'])) {
+            $profile->updateAttributes(['email_pvt' => NULL, 'email_pvt_status' => NULL]);
+            Yii::$app->session->setFlash('success', 'Private email has been canceled for profile ' . 
+                $profile->id . '. "status" and "email_pvt" were set to NULL.');
+        
+        }
 
         $profiles = Profile::find()->where(['email_pvt_status' => Profile::PRIVATE_EMAIL_PENDING])->all();
-
         foreach($profiles as $profile) {
             $profile->scenario = 'co-befe';
         }
 
         return $this->render('forwarding', ['profiles' => $profiles]);
-    }
-
-    /**
-     * Activate a private email & send new forwarding email request notification to admin
-     *
-     * @return mixed
-     */
-    public function actionActivateForward($id)
-    {
-        if (!$profile = Profile::findOne($id)) {
-            throw new ServerErrorHttpException;
-        }
-
-        // Send request to admin
-        if (!ProfileMail::sendForwardingEmailNotif($profile->email)) {
-            throw new \yii\web\ServerErrorHttpException;
-        }
-
-        $profile->updateAttributes(['email_pvt_status' => Profile::PRIVATE_EMAIL_ACTIVE]);
-        Yii::$app->session->setFlash('success', 'Private email status has been set to <i>Active</i> for 
-                profile ' . $profile->id . ' and a notification email has been sent to the user.');
-
-        return $this->redirect(['forwarding']);
-    }
-
-    /**
-     * Cancel private email forwarding request
-     *
-     * @return mixed
-     */
-    public function actionCancelForward($id)
-    {
-        if (!$profile = Profile::findOne($id)) {
-            throw new \yii\web\ServerErrorHttpException;
-        }
-        
-        $profile->updateAttributes(['email_pvt' => NULL, 'email_pvt_status' => NULL]);
-        Yii::$app->session->setFlash('success', 'Private email has been canceled for profile ' . 
-            $profile->id . '. "status" and "email_pvt" were set to NULL.');
-        
-        return $this->redirect(['forwarding']);
     }
 }

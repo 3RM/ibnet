@@ -102,7 +102,7 @@ p.col-300 {
   color: black;
 }*/
 #user-select,
-#profile-email {
+.forward-email {
     border-radius: 6px;
     width: 300px;
     height: 40px;

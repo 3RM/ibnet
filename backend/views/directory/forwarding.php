@@ -30,7 +30,7 @@ $this->title = 'Forwarding Email Requests';
             <p class="col-60 button" id=<?= '"user-' . $profile->id . '-' . $profile->user_id . '"' ?>><?= Html::button($profile->user_id, ['class' => 'btn-link']) ?></p>
     		<p class="col-100"><?= $profile->type ?></p>
     		<p class="col-180"><?= $profile->category == Profile::CATEGORY_ORG ? $profile->org_name : $profile->formattedNames ?></p>
-    		<?= $form->field($profile, 'email')->textInput()->label(false) ?>
+    		<?= $form->field($profile, 'email')->textInput(['class' => 'forward-email'])->label(false) ?>
     		<p class="col-300"><?= $profile->email_pvt ?></p>
     		<p class="col-180"><?= $profile->email_pvt_status == Profile::PRIVATE_EMAIL_PENDING ? 'Pending (20)' : NULL ?></p>
             <?= Html::submitButton(Html::icon('save'), [
@@ -47,9 +47,6 @@ $this->title = 'Forwarding Email Requests';
                 'title' => 'Cancel Request',
                 'class' => 'btn-link action',
             ]); ?>
-
-    		<?php // Html::button(Html::icon('save'), ['activate-forward', 'id' => $profile->id], ['class' => 'btn-link action', 'title' => 'Save']) ?>
-    		<?php // Html::button(Html::icon('remove'), ['cancel-forward', 'id' => $profile->id], ['class' => 'btn-link action', 'title' => 'Cancel request']) ?>
 		</div>
         <?php $this->registerJS("$('#profile-" . $profile->id . "').click(function(e) {
             $.get('/directory/view-detail', {id: " . $profile->id . "}, function(data) {
