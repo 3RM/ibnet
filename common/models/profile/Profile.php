@@ -946,7 +946,7 @@ class Profile extends yii\db\ActiveRecord
             case 'di':
             return [
                 'bible' => 'Bible',
-                'worship_style' => 'Worship Style',
+                'worship_style' => 'Worship',
                 'polity' => 'Church Government',
             ];
             break;
@@ -984,6 +984,32 @@ class Profile extends yii\db\ActiveRecord
 
     // Default labels
             default:
+            return [
+               'edit' => 'In Edit Mode (not new)',
+               'url_loc' => 'Url Location',
+               'flwsp_ass_level' => 'Fellowship/Association Level',
+               'ministry_of' => 'Parent Ministry',
+               'org_po_box' => 'Org PO Box',
+               'org_po_address1' => 'Org Mailing Address 1',
+               'org_po_address2' => 'Org Mailing Address 2',
+               'org_po_city' => 'Org Mailing City',
+               'org_po_st_prov_reg' => 'Org Mailing State',
+               'org_po_state_long' => 'Org Mailing State Long',
+               'org_po_zip' => 'Org Mailing Zip',
+               'org_po_country' => 'Org Mailing Country',
+               'ind_po_box' => 'Ind PO Box',
+               'ind_po_address1' => 'Ind Mailing Address 1',
+               'ind_po_address2' => 'Ind Mailing Address 2',
+               'ind_po_city' => 'Ind Mailing City',
+               'ind_po_st_prov_reg' => 'Ind Mailing State',
+               'ind_po_state_long' => 'Ind Mailing State Long',
+               'ind_po_zip' => 'Ind Mailing Zip',
+               'ind_po_country' => 'Ind Mailing Country',
+               'email_pvt' => 'Private Email',
+               'email_pvt_status' => 'Private Email Status',
+               'cp_pastor' => 'Church Planting Pastor',
+               'worship_style' => 'Worship',
+            ];
             break;
         }
     }

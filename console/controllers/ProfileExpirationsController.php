@@ -6,7 +6,9 @@ use common\models\profile\Profile;
 use console\models\ProfileExpirations;
 use console\models\Mail;
 use fedemotta\cronjob\models\CronJob;
+use yii;
 use yii\console\Controller;
+use yii\helpers\Html;
 
 class ProfileExpirationsController extends Controller
 {
@@ -41,12 +43,12 @@ class ProfileExpirationsController extends Controller
                     Yii::$app
                         ->mailer
                         ->compose(
-                            ['html' => 'notification-html', 'text' => 'notification-text'], 
+                            ['html' => 'site/notification-html', 'text' => 'site/notification-text'], 
                             [
                                 'title' => 'Your IBNet Profile Expires Soon', 
                                 'message' => $msg,
                             ])
-                        ->setFrom([\yii::$app->params['email.admin']])
+                        ->setFrom([Yii::$app->params['email.admin']])
                         ->setTo([$user->email])
                         ->setSubject(Yii::$app->params['email.systemSubject'])
                         ->send();
@@ -64,12 +66,12 @@ class ProfileExpirationsController extends Controller
                     Yii::$app
                         ->mailer
                         ->compose(
-                            ['html' => 'notification-html', 'text' => 'notification-text'], 
+                            ['html' => 'site/notification-html', 'text' => 'site/notification-text'], 
                             [
                                 'title' =>  'Your IBNet Profile is About to Expire.', 
                                 'message' => $msg
                             ])
-                        ->setFrom([\yii::$app->params['email.admin']])
+                        ->setFrom([Yii::$app->params['email.admin']])
                         ->setTo([$user->email])
                         ->setSubject(Yii::$app->params['email.systemSubject'])
                         ->send();
@@ -88,12 +90,12 @@ class ProfileExpirationsController extends Controller
                     Yii::$app
                         ->mailer
                         ->compose(
-                            ['html' => 'notification-html', 'text' => 'notification-text'], 
+                            ['html' => 'site/notification-html', 'text' => 'site/notification-text'], 
                             [
                                 'title' => 'Your IBNet Profile Has Expired.',
                                 'message' => $msg,
                             ])
-                        ->setFrom([\yii::$app->params['email.admin']])
+                        ->setFrom([Yii::$app->params['email.admin']])
                         ->setTo([$user->email])
                         ->setSubject(Yii::$app->params['email.systemSubject'])
                         ->send();
