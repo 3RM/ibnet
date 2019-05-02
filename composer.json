@@ -46,7 +46,8 @@
         "dompdf/dompdf": "dev-master",
         "philippfrenzel/yii2fullcalendar":"*",
         "kartik-v/yii2-date-range": "*",
-        "kartik-v/yii2-widget-colorinput": "*"
+        "kartik-v/yii2-widget-colorinput": "*",
+        "sammaye/yii2-discourse-sso": "dev-master"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",

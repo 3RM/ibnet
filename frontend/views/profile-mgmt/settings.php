@@ -11,6 +11,7 @@ use yii\widgets\ActiveForm;
 /* @var $profilemodel app\models\Profile */
 
 $this->title = 'My Account';
+Url::Remember();
 ?>
 <div class="wrap my-profiles">
     <div class="container">

@@ -9,7 +9,7 @@ namespace common\models\missionary;
 
 use common\models\User;
 use common\models\Utility;
-use common\models\network\NetworkMember;
+use common\models\group\GroupMember;
 use common\models\profile\Profile;
 use Yii;
 use yii\behaviors\TimestampBehavior;
@@ -213,7 +213,7 @@ class MissionaryUpdate extends \yii\db\ActiveRecord
             if (0 == $this->vid_not_accessible) {
                 $this->updateAttributes(['vid_not_accessible' => 1]);
             }
-            return $errorImage ? Html::img('@img.network/broken-vid.jpg', ['style' => 'width:100%']) : false;
+            return $errorImage ? Html::img('@img.group/broken-vid.jpg', ['style' => 'width:100%']) : false;
         } else {
             if (1 == $this->vid_not_accessible) {
                 $this->updateAttributes(['vid_not_accessible' => 0]);
@@ -244,18 +244,18 @@ class MissionaryUpdate extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getNetworkMember()
+    public function getGroupMember()
     {
-        return $this->hasOne(NetworkMember::className(), ['missionary_id' => 'missionary_id']);
+        return $this->hasOne(GroupMember::className(), ['missionary_id' => 'missionary_id']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getNetworkMemberProfile()
+    public function getGroupMemberProfile()
     {
         return $this->hasOne(Profile::className(), ['id' => 'profile_id'])
-            ->via('networkMember');
+            ->via('groupMember');
     }
 
     /**

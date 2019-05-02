@@ -11,10 +11,11 @@ use yii\widgets\ActiveForm;
 /* @var $profilemodel app\models\Profile */
 AjaxAsset::register($this);
 \Eddmash\Clipboard\ClipboardAsset::register($this);
+Url::Remember();
 ?>
 <?= $this->render('../site/_userAreaHeader', ['active' => 'update']) ?>
 <div class="container">
-    <?= $this->render('../site/_userAreaLeftNav', ['active' => 'updates']) ?>
+    <?= $this->render('../site/_userAreaLeftNav', ['active' => 'updates', 'joinedGroups' => $joinedGroups]) ?>
 
     <div class="right-content">
         <div id="video-container" class="feature-video-container" <?= $displayNone ?>>
@@ -43,12 +44,20 @@ AjaxAsset::register($this);
 
         <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
         <div class="repo-url">
-            <?= '' // 'Private Url to share with your mailing list:<br>' . \Eddmash\Clipboard\Clipboard::input($this, 'text', 'url', $repo_url, ['id' => 'repository_link', 'readonly' => true]) ?>
             <?= 'Private Url to share with your mailing list:<br>' . \Eddmash\Clipboard\Clipboard::input($this, 'text', 'url', $repo_url, ['id' => 'repository_link', 'readonly' => true]) ?>
         </div>
         <div class="repo-links">
-            <?= Html::submitButton(Html::icon('refresh') . ' Generate new url', ['class' => 'repo-url-refresh', 'name' => 'new_url', 'onclick' => 'return confirm("Are you sure? This will lock out everyone who has bookmarked this link to access your updates.")']) ?>
-            <?= Html::a(Html::icon('new-window') . ' Take me there', $repo_url, ['target' => '_blank', 'rel' => 'noopener noreferrer']) ?>
+            <?= Html::submitButton(Html::icon('refresh') . ' <span class="mb-hide">Generate new url</span>', [
+                'class' => 'repo-url-refresh', 
+                'name' => 'new_url', 
+                'title' => 'Generate new url', 
+                'onclick' => 'return confirm("Are you sure? This will lock out everyone who has bookmarked this link to access your updates.")'
+            ]) ?>
+            <?= Html::a(Html::icon('new-window') . ' <span class="mb-hide">Take me there</span>', $repo_url, [
+                'target' => '_blank', 
+                'rel' => 'noopener noreferrer', 
+                'title' => 'Take me there'
+            ]) ?>
         </div>
 
         <?php if ($profileActive) { ?>

@@ -71,7 +71,14 @@ class ProfileMgmtController extends ProfileController
             $profile->events = ($profile->history != NULL);
         }
         $isMissionary = ($user->isMissionary == User::IS_MISSIONARY);
-        return $this->render('myProfiles', ['profiles' => $profiles, 'isMissionary' => $isMissionary]);
+
+        $joinedGroups = $user->joinedGroups;
+
+        return $this->render('myProfiles', [
+            'profiles' => $profiles, 
+            'isMissionary' => $isMissionary, 
+            'joinedGroups' => $joinedGroups
+        ]);
     }
 
     /**

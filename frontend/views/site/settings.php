@@ -14,10 +14,10 @@ use yii\widgets\ActiveForm;
 ?>
 <?= $this->render('_userAreaHeader', ['active' => 'settings']) ?>
 <div class="container">
-    <?= $this->render('../site/_userAreaLeftNav', ['active' => 'settings']) ?>
+    <?= $this->render('../site/_userAreaLeftNav', ['active' => 'settings', 'joinedGroups' => $joinedGroups]) ?>
 
     <div class="right-content">
-        <h2>Profile Settings</h2>
+        <h2>Personal Profile Settings</h2>
         <div class="personal-settings">
             <?= empty($userP->usr_image) ?
                 Html::img('@img.site/user.png', ['class' => 'img-circle']) :
@@ -107,6 +107,7 @@ use yii\widgets\ActiveForm;
             </div>
         </div>
         <?php $form = ActiveForm::end(); ?>
+        <?= $userP->home_church ? NULL: '<div class="top-margin">&nbsp;</div><p>' . Html::icon('info-sign') . ' List your home church from the directory to unlock additional features!</p>' ?>
         <div class="top-margin">&nbsp;</div>
 
         <hr>

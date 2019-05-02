@@ -50,7 +50,7 @@ class StaffSearch extends \common\models\profile\Staff
               ->andFilterWhere(['like', 'church_pastor', $this->church_pastor])
               ->andFilterWhere(['like', 'ministry_of', $this->ministry_of])
               ->andFilterWhere(['like', 'sr_pastor', $this->sr_pastor])
-              ->andFilterWhere(['like', 'confirmed', $this->confirmed]);
+              ->andFilterWhere(['confirmed' => $this->confirmed]);
 
         return $dataProvider;
     }

@@ -56,7 +56,7 @@ function handleAjaxLink(e) {
         formId = $link.data('formId'),
         onDone = $link.data('onDone');
 
-    //$("#show_msg").html("Loading.... please wait...");
+    // $("#show-result").html('<div class="loader"></div>');
  
     ajaxRequest = $.ajax({
         type: "post",

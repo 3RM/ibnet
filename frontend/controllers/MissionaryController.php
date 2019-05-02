@@ -131,12 +131,15 @@ class MissionaryController extends Controller
         $mcSynced = $missionary->mc_token ? true : false;
         $displayNone = $missionary->viewed_update ? 'style="display:none"' : NULL;
 
+        $joinedGroups = $user->joinedGroups;
+
         return $this->render('repositoryAdmin', [
             'profileActive' => $profileActive,
             'missionary' => $missionary,
             'repo_url' => $repo_url,
             'updates' => $updates, 
             'newUpdate' => $newUpdate,
+            'joinedGroups' => $joinedGroups,
             'active' => $active,
             'mcSynced' => $mcSynced,
             'displayNone' => $displayNone,

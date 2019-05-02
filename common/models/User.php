@@ -8,8 +8,8 @@
 namespace common\models;
 
 use backend\models\Assignment;
-use common\models\network\Network;
-use common\models\network\NetworkMember;
+use common\models\group\Group;
+use common\models\group\GroupMember;
 use common\models\profile\Profile;
 use frontend\controllers\ProfileController;
 use sadovojav\cutter\behaviors\CutterBehavior;
@@ -534,7 +534,7 @@ class User extends ActiveRecord implements
      */
     public function getIsMissionary()
     {
-        return Profile::find()->where(['id' => $this->id, 'type' => Profile::TYPE_MISSIONARY])->exists();
+        return Profile::find()->where(['user_id' => $this->id, 'type' => Profile::TYPE_MISSIONARY])->exists();
     }
 
     /**
@@ -602,35 +602,46 @@ class User extends ActiveRecord implements
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getNetworkMembers()
+    public function getGroupMembers()
     {
-        return $this->hasMany(NetworkMember::className(), ['user_id' => 'id']);
+        return $this->hasMany(GroupMember::className(), ['user_id' => 'id']);
     } 
 
     /**
-     * @var int $ids Own network Ids to exclude from query
+     * @var int $ids Own group Ids to exclude from query
      * @return \yii\db\ActiveQuery
      */
-    public function getJoinedNetworks($ids=NULL)
+    public function getJoinedGroups($ids=NULL)
     { 
         if ($ids) {
-            return $this->hasMany(Network::className(), ['id' => 'network_id'])
-                ->via('networkMembers')
-                ->where('`network`.`id` NOT IN (' . implode(',', array_map('intval', $ids)) . ')')
-                ->andWhere('`network`.`status`=' . Network::STATUS_ACTIVE . ' OR `network`.`status`=' . Network::STATUS_INACTIVE);
+            return $this->hasMany(Group::className(), ['id' => 'group_id'])
+                ->via('groupMembers')
+                ->where('`group`.`id` NOT IN (' . implode(',', array_map('intval', $ids)) . ')')
+                ->andWhere('`group`.`status`=' . Group::STATUS_ACTIVE . ' OR `group`.`status`=' . Group::STATUS_INACTIVE);
         } else {
-            return $this->hasMany(Network::className(), ['id' => 'network_id'])
-                ->via('networkMembers')
-                ->andWhere('`network`.`status`=' . Network::STATUS_ACTIVE . ' OR `network`.`status`=' . Network::STATUS_INACTIVE);
+            return $this->hasMany(Group::className(), ['id' => 'group_id'])
+                ->via('groupMembers')
+                ->andWhere('`group`.`status`=' . Group::STATUS_ACTIVE . ' OR `group`.`status`=' . Group::STATUS_INACTIVE);
         }
+    }
+
+    /**
+     * @var int $ids Own group Ids to exclude from query
+     * @return \yii\db\ActiveQuery
+     */
+    public function getActiveJoinedGroups()
+    { 
+        return $this->hasMany(Group::className(), ['id' => 'group_id'])
+            ->via('groupMembers')
+            ->andWhere('`group`.`status`=' . Group::STATUS_ACTIVE);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getOwnNetworks()
+    public function getOwnGroups()
     {
-        return $this->hasMany(Network::className(), ['user_id' => 'id'])->where(['<>', 'status', Network::STATUS_TRASH]);
+        return $this->hasMany(Group::className(), ['user_id' => 'id'])->where(['<>', 'status', Group::STATUS_TRASH]);
     }
 
 }

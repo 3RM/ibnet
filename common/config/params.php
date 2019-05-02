@@ -11,7 +11,7 @@ return [
     'tokenExpire.passwordReset' => 3600,     // 60 * 60 (1 hour)
     'tokenExpire.newEmailT' => 604800,	     // 7 * 24 * 60 * 60 (1 week)
     'tokenExpire.profileTransfer' => 604800,
-    'tokenExpire.networkTransfer' => 604800,
+    'tokenExpire.groupTransfer' => 604800,
 
     // API Keys
     'apiKey.Google-client' => 'AIzaSyBtE_w8tdgpSwEse8qTsEZoR-Vw776xg6I',

@@ -12,13 +12,13 @@ namespace frontend\controllers;
 use common\models\LoginForm;
 use common\models\missionary\Missionary;
 use common\models\missionary\MissionaryUpdate;
-use common\models\network\Network;
-use common\models\network\NetworkMember;
-use common\models\network\NetworkKeyword;
-use common\models\network\NetworkPlace;
-use common\models\network\Prayer;
-use common\models\network\PrayerUpdate;
-use common\models\network\PrayerTag;
+use common\models\group\Group;
+use common\models\group\GroupMember;
+use common\models\group\GroupKeyword;
+use common\models\group\GroupPlace;
+use common\models\group\Prayer;
+use common\models\group\PrayerUpdate;
+use common\models\group\PrayerTag;
 use common\models\profile\ProfileMail;
 use common\models\profile\Profile;
 use common\models\profile\ProfileSearch;
@@ -56,7 +56,6 @@ class AjaxController extends Controller
 
     /**
      * Logs in a user from the Nav bar.
-     *
      * @return array
      */
     public function actionNavLogin()
@@ -102,7 +101,6 @@ class AjaxController extends Controller
 
     /**
      * Retrieve next new profile for content box 3 on index page.
-     *
      * @return array
      */
     public function actionNext()
@@ -112,17 +110,14 @@ class AjaxController extends Controller
         $content = new Box3Content();
         $box3Content = $content->getBox3Content();
 
-        $response = [
+        return [
             'body' => $box3Content,
             'success' => true,
         ];
-
-        return $response;
     }
 
     /**
      * Mark a feature video as viewed.
-     *
      * @return array
      */
     public function actionViewed($mid=NULL)
@@ -134,16 +129,15 @@ class AjaxController extends Controller
             $missionary->updateAttributes(['viewed_update' => 1]);
         }
 
-        $response = [
+        return [
             'body' => '',
             'success' => true,
         ];
-
-        return $response;
     }
 
     /**
      * Search box results for churches, ministries, and programs
+     * @return array
      */
     public function actionSearch($type='church', $q=NULL, $exclude=NULL) 
     {
@@ -180,7 +174,6 @@ class AjaxController extends Controller
   
     /**
      * Process "like" link.
-     *
      * @return array
      */
     public function actionLike($iLike, $likeCount, $pid)
@@ -216,12 +209,10 @@ class AjaxController extends Controller
             }
         }
 
-        $response = [
+        return [
             'body' => $body,
             'success' => true,
         ];
-
-        return $response;
     }
 
 
@@ -231,8 +222,7 @@ class AjaxController extends Controller
 
     /**
      * Process request for forwarding email on form4 modal
-     *
-    * @return array
+     * @return array
      */
     public function actionForwarding($id) 
     { 
@@ -315,7 +305,6 @@ class AjaxController extends Controller
 
     /**
      * Toggle visible switch in missionary update table
-     *
      * @return array
      */
     public function actionUpdateVisible($id)
@@ -339,116 +328,100 @@ class AjaxController extends Controller
                     'id' => 'visible-' . $update->id, 
                     'data-on-done' => 'visibleDone', 
                 ]);
-            $response = [
+            return [
                 'body' => $body,
                 'updateId' => $update->id,
                 'success' => true,
             ];
-        } else {
-            $response = ['success' => false];
         }
-
-        return $response;
+        return ['success' => false];
     }
 
 
 
-    // ************************** Network *******************************
+    // ************************** Groups *******************************
 
     /**
-     * Add a network place
-     *
+     * Add a group place
      * @return array
      */
-    public function actionNetworkPlace()
+    public function actionGroupPlace()
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
 
-        $place = New NetworkPlace();
+        $place = New GroupPlace();
         $place->scenario = 'new';
 
         if ($place->load(Yii::$app->request->Post())) { 
             list($place->country, $place->state, $place->city) = array_reverse(explode(',', $place->place));
-            $place->network_id = $_POST['add'];
+            $place->group_id = $_POST['add'];
             if ($place->validate() &&  $place->save()) {
-                return $response = [
+                return [
                     'pid' => $place->id, 
                     'place' => $place->place, 
                     'success' => true
                 ];
             }
-        } else {
-            $response = ['success' => false];
         }
-        return $response;
+        return ['success' => false];
     }
 
     /**
-     * Delete a network place
-     *
+     * Delete a group place
      * @return array
      */
-    public function actionDeleteNetworkPlace($pid)
+    public function actionDeleteGroupPlace($pid)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
 
-        if ($place = NetworkPlace::findOne($pid)) {
+        if ($place = GroupPlace::findOne($pid)) {
             $place->delete();
-            $response = ['pid' => $pid, 'success' => true];
-        } else {
-            $response = ['success' => false];
+            return ['pid' => $pid, 'success' => true];
         }
-        return $response;
+        return ['success' => false];
     }
 
     /**
-     * Add a network keyword
-     *
+     * Add a group keyword
      * @return array
      */
-    public function actionNetworkKeyword()
+    public function actionGroupKeyword()
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
 
-        $keyword = New NetworkKeyword();
+        $keyword = New GroupKeyword();
         $keyword->scenario = 'new';
 
         if ($keyword->load(Yii::$app->request->Post())) { 
-            $keyword->network_id = $_POST['add'];
+            $keyword->group_id = $_POST['add'];
             if ($keyword->validate() &&  $keyword->save()) {
-                return $response = [
+                return [
                     'kid' => $keyword->id, 
                     'keyword' => $keyword->keyword, 
                     'success' => true
                 ];
             }
-        } else {
-            $response = ['success' => false];
         }
-        return $response;
+        return ['success' => false];
     }
 
     /**
-     * Delete a network keyword
-     *
+     * Delete a group keyword
      * @return array
      */
-    public function actionDeleteNetworkKeyword($kid)
+    public function actionDeleteGroupKeyword($kid)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
 
-        if ($keyword = NetworkKeyword::findOne($kid)) {
+        if ($keyword = GroupKeyword::findOne($kid)) {
             $keyword->delete();
-            $response = ['kid' => $kid, 'success' => true];
-        } else {
-            $response = ['success' => false];
+            return ['kid' => $kid, 'success' => true];
         }
-        return $response;
+        return ['success' => false];
     }
 
     /**
-     * Delete tag on network prayer request tag form
-     *
+     * Delete tag on group prayer request tag form
      * @return array
      */
     public function actionDeleteTag($tid)
@@ -457,16 +430,13 @@ class AjaxController extends Controller
 
         if ($tag = PrayerTag::findOne($tid)) {
             $tag->delete();
-            $response = ['tid' => $tid, 'success' => true];
-        } else {
-            $response = ['success' => false];
+            return ['tid' => $tid, 'success' => true];
         }
-        return $response;
+        return ['success' => false];
     }
 
     /**
-     * Return network prayer request on answer list back to prayer list
-     *
+     * Return group prayer request on answer list back to prayer list
      * @return array
      */
     public function actionReturnRequest($id)
@@ -475,16 +445,13 @@ class AjaxController extends Controller
 
         if ($prayer = Prayer::findOne($id)) {
             $prayer->updateAttributes(['answered' => NULL, 'answer_date' => NULL]);
-            $response = ['requestId' => $prayer->id, 'success' => true];
-        } else {
-            $response = ['success' => false, 'requestId' => $id];
+            return ['requestId' => $prayer->id, 'success' => true];
         }
-        return $response;
+        return ['success' => false, 'requestId' => $id];
     }
 
     /**
-     * Delete network prayer request on prayer list
-     *
+     * Delete group prayer request on prayer list
      * @return array
      */
     public function actionDeleteRequest($id)
@@ -493,16 +460,13 @@ class AjaxController extends Controller
 
         if ($prayer = Prayer::findOne($id)) {
             $prayer->updateAttributes(['deleted' => 1]);
-            $response = ['requestId' => $prayer->id, 'success' => true];
-        } else {
-            $response = ['success' => false, 'requestId' => $id];
+            return ['requestId' => $prayer->id, 'success' => true];
         }
-        return $response;
+        return ['success' => false, 'requestId' => $id];
     }
 
     /**
-     * Delete prayer update on network prayer list
-     *
+     * Delete prayer update on group prayer list
      * @return array
      */
     public function actionDeleteUpdate($id)
@@ -511,52 +475,71 @@ class AjaxController extends Controller
 
         if ($update = PrayerUpdate::findOne($id)) {
             $update->updateAttributes(['deleted' => 1]);
-            $response = ['updateId' => $update->id, 'success' => true];
-        } else {
-            $response = ['success' => false, 'updateId' => $id];
-        }
-        return $response;
+            return ['updateId' => $update->id, 'success' => true];
+        } 
+        return ['success' => false, 'updateId' => $id];
     }
 
     /**
      * Process email_prayer_alert checkbox
-     *
      * @return array
      */
     public function actionPrayerAlert()
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        $member = NetworkMember::findOne($_POST['mid']);
-        $value = $member->email_prayer_alert == 1 ? 0 : 1;
-        $member->updateAttributes(['email_prayer_alert' => $value]);
-        return ['success' => true];
+        if (isset($_POST['mid']) && $member = GroupMember::findOne($_POST['mid'])) {
+            $value = $member->email_prayer_alert == 1 ? 0 : 1;
+            $member->updateAttributes(['email_prayer_alert' => $value]);
+            return ['success' => true];
+        }
+        return ['success' => false];
     }
 
     /**
      * Process email_prayer_summary checkbox
-     *
      * @return array
      */
     public function actionPrayerSummary()
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        $member = NetworkMember::findOne($_POST['mid']);
-        $value = $member->email_prayer_summary == 1 ? 0 : 1;
-        $member->updateAttributes(['email_prayer_summary' => $value]);
-        return ['success' => true];
+        if (isset($_POST['mid']) && $member = GroupMember::findOne($_POST['mid'])) {
+            $value = $member->email_prayer_summary == 1 ? 0 : 1;
+            $member->updateAttributes(['email_prayer_summary' => $value]);
+            return ['success' => true];
+        }
+        return ['success' => false];
     }
 
     /**
      * Process email_update_alert checkbox
-     *
      * @return array
      */
     public function actionUpdateAlert()
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        $member = NetworkMember::findOne($_POST['mid']);
-        $value = $member->email_update_alert == 1 ? 0 : 1;
-        $member->updateAttributes(['email_update_alert' => $value]);
-        return ['success' => true];
+        if (isset($_POST['mid']) && $member = GroupMember::findOne($_POST['mid'])) {
+            $value = $member->email_update_alert == 1 ? 0 : 1;
+            $member->updateAttributes(['email_update_alert' => $value]);
+            return ['success' => true];
+        }
+        return ['success' => false];
+    }
+
+    /**
+     * Toggle missionary update sharing with group
+     * @return array
+     */
+    public function actionShowUpdates()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        if (isset($_POST['mid']) && $member = GroupMember::findOne($_POST['mid'])) {
+            $value = $member->show_updates == 1 ? 0 : 1;
+            $member->updateAttributes(['show_updates' => $value]);
+            $body = $member->show_updates ? 
+                Html::button('<i class="far fa-times-circle"></i> Stop sharing updates', ['id' => 'show-updates', 'class' => 'link-btn']) :
+                Html::button('<i class="far fa-check-circle"></i> Start sharing updates', ['id' => 'show-updates', 'class' => 'link-btn']);
+            return ['body' => $body, 'success' => true];
+        } 
+        return ['success' => false];
     }
 }

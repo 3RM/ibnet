@@ -18,7 +18,6 @@ use common\models\profile\ProfileSearch;
 use common\models\profile\ProfileGuestSearch;
 use common\models\PrimaryRole;
 use common\models\User;
-use common\models\Utility;
 use frontend\controllers\ProfileController;
 use frontend\models\Box3Content;
 use frontend\models\ContactForm;
@@ -292,6 +291,15 @@ class SiteController extends Controller
 
         // =============== login successful =======================
                 if ($user->email != NULL && $model->login()) {
+
+                    // Redirect to Discourse if SSO login
+                    if ($sso = Yii::$app->getSession()->get('sso')) {
+                        return $this->redirect(['discourse-sso', 
+                            'sso' => $sso['sso'], 
+                            'sig' => $sso['sig']
+                        ]);
+                    }
+
                     return $url == NULL ?
                         $this->goHome() :
                         $this->redirect($url);
@@ -589,6 +597,8 @@ class SiteController extends Controller
         $userA = Yii::$app->user->identity;
         $userA->scenario = 'account';
 
+        $joinedGroups = $userP->joinedGroups;
+
         // Set default role
         if ($userP->primary_role == NULL) {
             $userP->primary_role = 'Church Member';
@@ -605,6 +615,7 @@ class SiteController extends Controller
             'userA' => $userA,
             'list' => $list,
             'home_church' => $home_church,
+            'joinedGroups' => $joinedGroups,
         ]);
     }
 

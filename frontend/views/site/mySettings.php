@@ -10,6 +10,7 @@ use yii\bootstrap\Html;
 /* @var $this yii\web\View */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 $this->title = 'My Account';
+Url::Remember();
 ?>
 <div class="wrap my-profiles">
     <div class="container">

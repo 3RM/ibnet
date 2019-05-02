@@ -32,7 +32,7 @@ class ProfileExpirationsController extends Controller
 
                 // Send two weeks notice
                 foreach ($twoWeeksProfiles as $profile) {
-                    $user = User::findOne($profile->user_id);
+                    $user = $profile->user;
                     $params = '?url=' . Yii::$app->params['frontendUrl'] . '/preview/view-preview?id=' . $profile->id;
                     $link = Html::a('profile edit page', Yii::$app->params['frontendUrl'] . '/site/login' . $params);
                     $msg = 'Your IBNet profile "' . $profile->profile_name . '" is set to expire in two weeks.  Visit your ' . 
@@ -46,7 +46,7 @@ class ProfileExpirationsController extends Controller
                                 'title' => 'Your IBNet Profile Expires Soon', 
                                 'message' => $msg,
                             ])
-                        ->setFrom([\yii::$app->params['email.admin']])
+                        ->setFrom([Yii::$app->params['email.admin']])
                         ->setTo([$user->email])
                         ->setSubject(Yii::$app->params['email.systemSubject'])
                         ->send();
@@ -54,7 +54,7 @@ class ProfileExpirationsController extends Controller
 
                 // Send grace period notice
                 foreach ($graceProfiles as $profile) {
-                    $user = User::findOne($profile->user_id);
+                    $user = $profile->user;
                     $params = '?url=' . Yii::$app->params['frontendUrl'] . '/preview/view-preview?id=' . $profile->id;
                     $link = Html::a('profile edit page', Yii::$app->params['frontendUrl'] . '/site/login' . $params);
                     $msg = 'Your IBNet profile "' . $profile->profile_name . '" has expired, but we have added a one week grace period
@@ -69,7 +69,7 @@ class ProfileExpirationsController extends Controller
                                 'title' =>  'Your IBNet Profile is About to Expire.', 
                                 'message' => $msg
                             ])
-                        ->setFrom([\yii::$app->params['email.admin']])
+                        ->setFrom([Yii::$app->params['email.admin']])
                         ->setTo([$user->email])
                         ->setSubject(Yii::$app->params['email.systemSubject'])
                         ->send();
@@ -77,7 +77,7 @@ class ProfileExpirationsController extends Controller
 
                 // Send profile expired notice
                 foreach ($expiredProfiles as $profile) {
-                    $user = User::findOne($profile->user_id);
+                    $user = $profile->user;
                     $profile->inactivate();
                     $profile->updateAttributes(['profile_status' => Profile::STATUS_EXPIRED]);
                     $params = '?url=' . Yii::$app->params['frontendUrl'] . '/profile-mgmt/my-profiles';
@@ -93,7 +93,7 @@ class ProfileExpirationsController extends Controller
                                 'title' => 'Your IBNet Profile Has Expired.',
                                 'message' => $msg,
                             ])
-                        ->setFrom([\yii::$app->params['email.admin']])
+                        ->setFrom([Yii::$app->params['email.admin']])
                         ->setTo([$user->email])
                         ->setSubject(Yii::$app->params['email.systemSubject'])
                         ->send();
