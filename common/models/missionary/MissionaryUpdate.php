@@ -120,15 +120,6 @@ class MissionaryUpdate extends \yii\db\ActiveRecord
      */
     public function handleForm()
     {
-        if ((NULL == $this->edit) 
-            && (NULL == $this->pdf) 
-            && (NULL == $this->vimeo_url) 
-            && (NULL == $this->youtube_url)
-            && (NULL == $this->drive_url)) {
-            Yii::$app->session->setFlash('info', 'Your update was not saved.  Be sure to upload a pdf or video link.');
-            return $this;
-        }
-    	
         if ($this->validate()) {
 
     		$this->from_date = new Expression('CURDATE()');
@@ -194,6 +185,15 @@ class MissionaryUpdate extends \yii\db\ActiveRecord
         	} else {
         	    $this->pdf = $this->getOldAttribute('pdf');
         	}
+
+            if ((NULL == $this->edit) 
+                && (NULL == $this->pdf) 
+                && (NULL == $this->vimeo_url) 
+                && (NULL == $this->youtube_url)
+                && (NULL == $this->drive_url)) {
+                Yii::$app->session->setFlash('info', 'Your update was not saved.  Be sure to upload a pdf or video link.');
+                return $this;
+            }
             
             $this->save(false);
     		return $this;

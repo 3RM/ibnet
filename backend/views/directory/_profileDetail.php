@@ -73,7 +73,7 @@ use yii\widgets\ActiveField;
     </p>
     <?= $profile->inactivation_date ? '<p>Inactivated: ' . $profile->inactivation_date . ' (' . Utility::time_elapsed_string($profile->inactivation_date) . ')</p>' : NULL; ?>
     <p>Has been inactivated: <?= $profile->has_been_inactivated ? ' Yes' : ' No' ?></p>
-    <p>In edit mode (not active): <?= $profile->edit ? ' Yes' : ' No' ?></p>
+    <p>In edit mode (not new): <?= $profile->edit ? ' Yes' : ' No' ?></p>
     <?= $profile->title ? '<p>Staff Title: ' . $profile->title . '</p>' : NULL; ?>
     <?= $profile->flwsp_ass_level ? '<p>Fellowship/Association level: ' . $profile->flwsp_ass_level . '</p>' : NULL; ?>
     <?= ($profile->org_city && $profile->org_st_prov_reg) ? 
