@@ -35,8 +35,8 @@ class ProfileExpirationsController extends Controller
                 // Send two weeks notice
                 foreach ($twoWeeksProfiles as $profile) {
                     $user = User::findOne($profile->user_id);
-                    $params = '?url=' . Yii::$app->params['frontendUrl'] . '/preview/view-preview?id=' . $profile->id;
-                    $link = Html::a('profile edit page', Yii::$app->params['frontendUrl'] . '/site/login' . $params);
+                    $params = '?url=' . Yii::$app->params['frontendUrl'] . 'preview/view-preview?id=' . $profile->id;
+                    $link = Html::a('profile edit page', Yii::$app->params['frontendUrl'] . 'site/login' . $params);
                     $msg = 'Your IBNet profile "' . $profile->profile_name . '" is set to expire in two weeks.  Visit your ' . 
                         $link . ' and make any necessary updates.  When you are finished, press the "Finsihed" button 
                         to reset your expiration date and keep your profile active in the directory.';
@@ -57,11 +57,11 @@ class ProfileExpirationsController extends Controller
                 // Send grace period notice
                 foreach ($graceProfiles as $profile) {
                     $user = User::findOne($profile->user_id);
-                    $params = '?url=' . Yii::$app->params['frontendUrl'] . '/preview/view-preview?id=' . $profile->id;
-                    $link = Html::a('profile edit page', Yii::$app->params['frontendUrl'] . '/site/login' . $params);
+                    $params = '?url=' . Yii::$app->params['frontendUrl'] . 'preview/view-preview?id=' . $profile->id;
+                    $link = Html::a('profile edit page', Yii::$app->params['frontendUrl'] . 'site/login' . $params);
                     $msg = 'Your IBNet profile "' . $profile->profile_name . '" has expired, but we have added a one week grace period
                         before final expiration.  Please visit your ' . $link . ' right away and make any necessary updates.  When you are 
-                        finished, press the "Finsihed" button to reset your expiration date and keep your profile active in the 
+                        finished, press the "Finished" button to reset your expiration date and keep your profile active in the 
                         directory.';
                     Yii::$app
                         ->mailer
@@ -82,8 +82,8 @@ class ProfileExpirationsController extends Controller
                     $user = User::findOne($profile->user_id);
                     $profile->inactivate();
                     $profile->updateAttributes(['profile_status' => Profile::STATUS_EXPIRED]);
-                    $params = '?url=' . Yii::$app->params['frontendUrl'] . '/profile-mgmt/my-profiles';
-                    $link = Html::a('profiles page', Yii::$app->params['frontendUrl'] . '/site/login' . $params);
+                    $params = '?url=' . Yii::$app->params['frontendUrl'] . 'profile-mgmt/my-profiles';
+                    $link = Html::a('profiles page', Yii::$app->params['frontendUrl'] . 'site/login' . $params);
                     $msg = 'Your IBNet profile "' . $profile->profile_name . '" has expired and is no longer visible in the public directory. 
                         But you can reactivate it at any time.  Simply visit your ' . $link . ', click the activate link, and follow the 
                         instructions to reactivae your profile.';
