@@ -40,7 +40,7 @@ class BlogController extends Controller
                                     'posts' => $posts, 
                                     'emailPrefLink' => $emailPrefLink
                                 ])
-                            ->setFrom([\Yii::$app->params['blogDigestEmail']])
+                            ->setFrom([\Yii::$app->params['email.blogDigestEmail']])
                             ->setTo($user->email)
                             ->setSubject('IBNet Blog')
                             ->send();

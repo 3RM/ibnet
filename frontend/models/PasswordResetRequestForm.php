@@ -58,10 +58,10 @@ class PasswordResetRequestForm extends Model
         return Yii::$app
             ->mailer
             ->compose(
-                ['html' => 'site/passwordResetToken-html', 'text' => 'site/passwordResetToken-text'],
+                ['html' => 'site/password-reset-token-html', 'text' => 'site/password-reset-token-text'],
                 ['user' => $user]
             )
-            ->setFrom([Yii::$app->params['no-replyEmail'] => Yii::$app->params['no-replyEmail']])
+            ->setFrom([Yii::$app->params['email.noReply'] => Yii::$app->params['email.noReply']])
             ->setTo($this->email)
             ->setSubject('Password reset for IBNet.org')
             ->send();

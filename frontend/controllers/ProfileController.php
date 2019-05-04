@@ -1558,7 +1558,7 @@ class ProfileController extends Controller
                         ['html' => 'profile/flag-profile-html', 'text' => 'profile/flag-profile-text'], 
                         ['url' => $url, 'user' => $user]
                     )
-                    ->setFrom([\yii::$app->params['email.no-reply']])
+                    ->setFrom([\yii::$app->params['email.noReply']])
                     ->setTo([\yii::$app->params['email.admin']])
                     ->setSubject('Inappropriate Profile Flag')
                     ->send();

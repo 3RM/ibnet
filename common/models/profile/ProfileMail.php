@@ -120,7 +120,7 @@ class ProfileMail extends \yii\db\ActiveRecord
                 ['html' => 'system/forwarding-email-html'], 
                 ['id' => $id, 'email' => $email, 'email_pvt' => $email_pvt]
             )
-            ->setFrom([\yii::$app->params['email.no-reply']])
+            ->setFrom([\yii::$app->params['email.noReply']])
             ->setTo([\yii::$app->params['email.admin']])
             ->setSubject('Forwarding Address Request')
             ->send();

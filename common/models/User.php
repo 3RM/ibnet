@@ -411,7 +411,7 @@ class User extends ActiveRecord implements
         }
 
         $timestamp = (int) substr($token, strrpos($token, '_') + 1);
-        $expire = Yii::$app->params['tokenExpire.newEmailTokenExpire'];
+        $expire = Yii::$app->params['tokenExpire.newEmail'];
         return $timestamp + $expire >= time();
     }
 

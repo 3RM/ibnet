@@ -5,14 +5,15 @@ return [
 
 	// Emails
     'email.admin' => 'admin@ibnet.org',
-    'email.no-reply' => 'no-reply@ibnet.org',
+    'email.noReply' => 'no-reply@ibnet.org',
     'email.team' => 'team@ibnet.org',
+    'email.blogDigestEmail' => 'no-reply@ibnet.org',
     'email.systemTitle' => 'Notification from Independent Baptist Network',
     'email.systemSubject' => 'Notification from IBNet.org',
 
     // Token Expirations
     'tokenExpire.passwordReset' => 3600,     // 60 * 60 (1 hour)
-    'tokenExpire.newEmailT' => 604800,	     // 7 * 24 * 60 * 60 (1 week)
+    'tokenExpire.newEmail' => 604800,	     // 7 * 24 * 60 * 60 (1 week)
     'tokenExpire.profileTransfer' => 604800,
     'tokenExpire.networkTransfer' => 604800,
 

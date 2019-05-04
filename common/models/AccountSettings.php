@@ -69,7 +69,7 @@ class AccountSettings extends Model
                 $message = 'Your IBNet username has been changed.  If you did not change your username,   
                     or if you feel that this message is in error, please contact us at     
                     <a href="mailto:admin@ibnet.org">admin@ibnet.org</a>.';
-                $this->sendNotificationEmail(Yii::$app->params['emailTitle'], $message);
+                $this->sendNotificationEmail(Yii::$app->params['email.systemTitle'], $message);
                                 
                 Yii::$app->session->setFlash('success', 'Your username has been updated.');
                 return $this;
@@ -87,11 +87,11 @@ class AccountSettings extends Model
                 Yii::$app->mailer                                                                   // Send notification to new email
                 ->compose(
                     ['html' => 'site/notification-html'],
-                    ['title' => Yii::$app->params['emailTitle'], 'message' => $message]
+                    ['title' => Yii::$app->params['email.systemTitle'], 'message' => $message]
                 )
-                ->setFrom(Yii::$app->params['no-replyEmail'])
+                ->setFrom(Yii::$app->params['email.noReply'])
                 ->setTo($user->new_email)
-                ->setSubject(Yii::$app->params['emailSubject'])
+                ->setSubject(Yii::$app->params['email.systemSubject'])
                 ->send();
 
                 $message = 'We recieved a request to update your account email.  If you did not
@@ -100,11 +100,11 @@ class AccountSettings extends Model
                 Yii::$app->mailer                                                                   // send notification to old email
                 ->compose(
                     ['html' => 'site/notification-html'],
-                    ['title' => Yii::$app->params['emailTitle'], 'message' => $message]
+                    ['title' => Yii::$app->params['email.systemTitle'], 'message' => $message]
                 )
-                ->setFrom(Yii::$app->params['no-replyEmail'])
+                ->setFrom(Yii::$app->params['email.noReply'])
                 ->setTo($user->email)
-                ->setSubject(Yii::$app->params['emailSubject'])
+                ->setSubject(Yii::$app->params['email.systemSubject'])
                 ->send();
                 
                 Yii::$app->session->setFlash('success', 'An email with a confirmation link has been sent 
@@ -121,7 +121,7 @@ class AccountSettings extends Model
                 $message = 'Your password has been changed.  If you did not change your password,   
                     or if you feel that this message is in error, please contact us at     
                     <a href="mailto:admin@ibnet.org">admin@ibnet.org</a>.';
-                $this->sendNotificationEmail(Yii::$app->params['emailTitle'], $message);
+                $this->sendNotificationEmail(Yii::$app->params['email.systemTitle'], $message);
                 $this->toggle = 'none';
                 
                 Yii::$app->session->setFlash('success', 'Your password has been updated.');
@@ -138,7 +138,7 @@ class AccountSettings extends Model
                 $message = 'Your email preferences have been changed.  If you did not change your email preferences,   
                     or if you feel that this message is in error, please contact us at 
                     <a href="mailto:admin@ibnet.org">admin@ibnet.org</a>.';
-                $this->sendNotificationEmail(Yii::$app->params['emailTitle'], $message);
+                $this->sendNotificationEmail(Yii::$app->params['email.systemTitle'], $message);
                 
                 Yii::$app->session->setFlash('success', 'Your email preferences have been updated.');
                 return $this;
@@ -177,9 +177,9 @@ class AccountSettings extends Model
                     ['html' => 'site/notification-html'],
                     ['title' => $title, 'message' => $message]
                 )
-                ->setFrom(Yii::$app->params['no-replyEmail'])
+                ->setFrom(Yii::$app->params['email.noReply'])
                 ->setTo($user->email)
-                ->setSubject(Yii::$app->params['emailSubject'])
+                ->setSubject(Yii::$app->params['email.systemSubject'])
                 ->send();
         }
         return NULL;
