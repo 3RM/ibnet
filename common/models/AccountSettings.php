@@ -86,7 +86,7 @@ class AccountSettings extends Model
                 $message = 'Follow this link to confirm your new email address: ' . $link;
                 Yii::$app->mailer                                                                   // Send notification to new email
                 ->compose(
-                    ['html' => 'notification-html'],
+                    ['html' => 'site/notification-html'],
                     ['title' => Yii::$app->params['emailTitle'], 'message' => $message]
                 )
                 ->setFrom(Yii::$app->params['no-replyEmail'])
@@ -99,7 +99,7 @@ class AccountSettings extends Model
                     <a href="mailto:admin@ibnet.org">admin@ibnet.org</a>..';
                 Yii::$app->mailer                                                                   // send notification to old email
                 ->compose(
-                    ['html' => 'notification-html'],
+                    ['html' => 'site/notification-html'],
                     ['title' => Yii::$app->params['emailTitle'], 'message' => $message]
                 )
                 ->setFrom(Yii::$app->params['no-replyEmail'])
@@ -174,7 +174,7 @@ class AccountSettings extends Model
         if ($user = Yii::$app->user->identity) {
             return Yii::$app->mailer
                 ->compose(
-                    ['html' => 'notification-html'],
+                    ['html' => 'site/notification-html'],
                     ['title' => $title, 'message' => $message]
                 )
                 ->setFrom(Yii::$app->params['no-replyEmail'])
