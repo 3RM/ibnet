@@ -447,7 +447,7 @@ class User extends ActiveRecord implements
                 $this->new_email = $this->newEmail;
                 
                 // Send confirm email to new address
-                $link =  Yii::$app->urlManager->createAbsoluteUrl(['site/email-confirmed', 'token' => $new_email_token]);
+                $link =  Yii::$app->urlManager->createAbsoluteUrl(['site/email-confirmed', 'token' => $this->new_email_token]);
                 Yii::$app
                     ->mailer
                     ->compose(
@@ -457,7 +457,7 @@ class User extends ActiveRecord implements
                             'message' => 'Follow this link to confirm your new email address: ' . $link
                         ])
                     ->setFrom([\yii::$app->params['email.admin']])
-                    ->setTo([$new_email])
+                    ->setTo([$this->new_email])
                     ->setSubject(Yii::$app->params['email.systemSubject'])
                     ->send();
 
@@ -475,7 +475,7 @@ class User extends ActiveRecord implements
                                           change, please contact us at ' .  Yii::$app->params['email.admin']
                         ])
                     ->setFrom([\yii::$app->params['email.admin']])
-                    ->setTo([$email])
+                    ->setTo([$this->email])
                     ->setSubject(Yii::$app->params['email.systemSubject'])
                     ->send();
             } 
@@ -494,7 +494,7 @@ class User extends ActiveRecord implements
                                       that this message is in error, please contact us at ' . Yii::$app->params['email.admin'],     
                     ])
                 ->setFrom([Yii::$app->params['email.admin']])
-                ->setTo([$email])
+                ->setTo([$this->email])
                 ->setSubject(Yii::$app->params['email.systemSubject'])
                 ->send();
 
