@@ -13,27 +13,6 @@ use yii\helpers\Html;
     <title><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
     <style>
-   		#container { 
-   			border: 1px solid #eee;
-			border-radius: 20px;
-    		width: 100%;
-    		max-width: 500px;
-    	}
-    	p#title {
-    		margin: 20px; 
-    		font-size: 1.6em;
-    	}
-    	#content {
-    		margin: 0 20px;
-    		font-size: 1.2em;
-    	}
-    	#footer {
-    		margin: 20px; 
-    	}
-    	#footer hr {
-    		margin: 5px 0;
-    		color: #eee;
-    	}
     </style>
 </head>
 <body>

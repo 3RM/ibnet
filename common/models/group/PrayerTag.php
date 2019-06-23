@@ -28,7 +28,7 @@ class PrayerTag extends \yii\db\ActiveRecord
         return [
             [['tag'], 'required'],
             [['tag'], 'string', 'max' => 20],
-            ['deleted', 'safe'],
+            [['group_id', 'deleted'], 'safe'],
         ];
     }
 

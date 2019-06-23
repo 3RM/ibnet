@@ -2,9 +2,11 @@
 
 namespace common\models\group;
 
+use common\models\Subscription;
+use common\models\User;
 use common\models\group\GroupMember;
 use common\models\group\PrayerTag;
-use common\models\User;
+use common\models\group\PrayerAlertQueue;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
@@ -29,7 +31,7 @@ class Prayer extends \yii\db\ActiveRecord
     /**
      * @const array $duration The duration of the prayer request.
      */
-    public static $duration = [
+    const DURATIONLIST = [
         10 => 'Urgent',
         20 => 'Short-term',
         30 => 'Long-term',
@@ -50,6 +52,16 @@ class Prayer extends \yii\db\ActiveRecord
      * @var array $fSelect Stores filture tag selections.
      */
     public $fSelect;
+
+    /**
+     * @var string $toEmail to address
+     */
+    public $toEmail;
+
+    /**
+     * @var string $toName to name
+     */
+    public $toName;
 
     /**
      * {@inheritdoc}
@@ -90,11 +102,10 @@ class Prayer extends \yii\db\ActiveRecord
             [['request'], 'string', 'max' => 255, 'on' => 'prayer'],
             [['request'], 'trim'],
             [['request'], 'filter', 'filter' => 'strip_tags'],
-            [['duration'], 'integer', 'on' => 'prayer'],
             [['description'], 'string', 'on' => 'prayer'],
             [['description'], 'trim'],
             [['description'], 'filter', 'filter' => 'strip_tags'],
-            [['group_id', 'group_member_id', 'select'], 'safe', 'on' => 'prayer'],
+            [['group_id', 'group_member_id', 'duration', 'select'], 'safe', 'on' => 'prayer'],
 
             [['answer_description'], 'string', 'on' => 'answer'],
             [['answer_description'], 'trim'],
@@ -165,6 +176,100 @@ class Prayer extends \yii\db\ActiveRecord
     }
 
     /**
+     * Send a reply administrative message to requester
+     * @return \yii\db\ActiveQuery
+     */
+    public function sendAdmin()
+    {
+        // Check subscription
+        $sub = Subscription::getSubscriptionByEmail($this->groupUser->email);
+        if ($sub->token && $sub->unsubscribe) {
+            return false;
+        }
+
+        // Assemble message;
+        $mailer = Yii::$app->mailer->compose(
+                ['html' => 'group/newPrayerRequestAdmin-html', 'text' => 'group/newPrayerRequestAdmin-text'], 
+                ['prayer' => $this, 'unsubTok' => $sub->token]
+            )
+            ->setFrom([$this->group->prayer_email => $this->group->name])
+            ->setTo([$this->groupUser->email => $this->groupUser->fullName])
+            ->setSubject($this->request);
+
+        // Save message id for matching up reply emails
+        $this->updateAttributes(['message_id' => $mailer->getSwiftMessage()->getId()]);
+
+        return $mailer->send();
+    }
+
+    /**
+     * Send a confirmation reply to a request update or answer
+     * @return \yii\db\ActiveQuery
+     */
+    public function sendConfirmation($status)
+    {
+        // Check subscriptions
+        $sub = Subscription::getSubscriptionByEmail($this->groupUser->email);
+        if ($sub->token && $sub->unsubscribe) {
+            return false;
+        }
+
+        // Assemble message;
+        $subject = ($status == 'update') ? 'Prayer update received' : 'Prayer answer received';
+        $message = ($status == 'update') ?
+            'Your prayer request update was received.' :
+            'Your prayer request answer was received.';
+        return Yii::$app->mailer->compose(
+                ['html' => 'group/prayerConfirmation-html', 'text' => 'group/prayerConfirmation-text'], 
+                ['prayer' => $this, 'message' => $message, 'unsubTok' => $sub->token]
+            )
+            ->setFrom([$this->group->prayer_email => $this->group->name])
+            ->setTo([$this->groupUser->email => $this->groupUser->fullName])
+            ->setSubject($subject)
+            ->send();
+    }
+
+    /**
+     * Add prayer request to alert queue
+     * @param  $status string prayer status (new|update|answer)
+     * @return \yii\db\ActiveQuery
+     */
+    public function addToAlertQueue($status=PrayerAlertQueue::STATUS_NEW)
+    {
+        $queue = PrayerAlertQueue::findOne(['prayer_id' => $this->id]) ?? new PrayerAlertQueue();
+        $queue->group_id = $this->group_id;
+        $queue->prayer_id = $this->id;
+        $queue->status = $status;
+        $queue->save();
+    }
+
+    /**
+     * Prepare immediate prayer alert message
+     * @param  $status string prayer status (new|update|answer)
+     * @return \yii\db\ActiveQuery
+     */
+    public function prepareAlert($status=PrayerAlertQueue::STATUS_NEW)
+    {
+        // Check subscriptions
+        $sub = Subscription::getSubscriptionByEmail($this->toEmail);
+        if ($sub->token && $sub->unsubscribe) {
+            return false;
+        }
+
+        // Assemble message;
+        $updates = $this->prayerUpdates;
+        $mailer = Yii::$app->mailer->compose(
+                ['html' => 'group/prayerAlert-html', 'text' => 'group/prayerAlert-text'], 
+                ['prayer' => $this, 'status' => $status, 'updates' => $updates, 'unsubTok' => $sub->token]
+            )
+            ->setFrom([$this->group->prayer_email => $this->group->name])
+            ->setTo([$this->toEmail => $this->toName])
+            ->setSubject('Prayer Alert');
+            
+        return $mailer;
+    }
+
+    /**
      * @return \yii\db\ActiveQuery
      */
     public function getGroupMember()
@@ -187,6 +292,12 @@ class Prayer extends \yii\db\ActiveRecord
         return $this->groupUser->fullName;
     }
 
+    /* Getter for requester email */
+    public function getEmail()
+    {
+        return $this->groupUser->email;
+    }
+
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -196,11 +307,21 @@ class Prayer extends \yii\db\ActiveRecord
     }
 
     /**
+     * Updates for prayer
      * @return \yii\db\ActiveQuery
      */
     public function getPrayerUpdates()
     {
         return $this->hasMany(PrayerUpdate::className(), ['prayer_id' => 'id'])->where(['deleted' => 0]);
+    }
+
+    /**
+     * Updates for prayer that haven't been alerted
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAlertUpdates()
+    {
+        return $this->hasMany(PrayerUpdate::className(), ['prayer_id' => 'id'])->where(['alerted' => 0])->andWhere(['deleted' => 0]);
     }
 
     /**

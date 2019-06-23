@@ -10,8 +10,10 @@ namespace common\models;
 use backend\models\Assignment;
 use common\models\group\Group;
 use common\models\group\GroupMember;
+use common\models\missionary\Missionary;
 use common\models\profile\Profile;
 use frontend\controllers\ProfileController;
+use GuzzleHttp\Client;
 use sadovojav\cutter\behaviors\CutterBehavior;
 use Yii;
 use yii\base\NotSupportedException;
@@ -43,11 +45,6 @@ use common\models\Utility;
  * @property string $display_name
  * @property int $home_church
  * @property string $primary_role
- * @property int $emailPrefProfile
- * @property int $emailPrefLinks
- * @property int $emailPrefComments
- * @property int $emailPrefFeatures
- * @property int $emailPrefBlog
  * @property int $reviewed
  */
 class User extends ActiveRecord implements 
@@ -80,6 +77,31 @@ class User extends ActiveRecord implements
      * @var string $emailMaintenance Read-only checkbox for email preference
      */
     public $emailMaintenance = 1;
+
+    /**
+     * @var string $subscriptionProfile Profile page view stats
+     */
+    public $subscriptionProfile;
+
+    /**
+     * @var string $subscriptionLinks Profile link/unlink alert
+     */
+    public $subscriptionLinks;
+
+    /**
+     * @var string $subscriptionComments Profile comment alerts
+     */
+    public $subscriptionComments;
+
+    /**
+     * @var string $subscriptionFeatures New feature updaes
+     */
+    public $subscriptionFeatures;
+
+    /**
+     * @var string $subscriptionBlog Weekly blog digest
+     */
+    public $subscriptionBlog;
 
     /**
      * @const int ROLE_* User assignments
@@ -149,9 +171,9 @@ class User extends ActiveRecord implements
         return[
             'passwordReset' => ['password_reset_token'],
             'personal' => ['display_name', 'home_church', 'primary_role', 'usr_image'],
-            'account' => ['newUsername', 'newEmail', 'newPassword', 'emailPrefProfile', 'emailPrefLinks', 'emailPrefComments',   'emailPrefFeatures', 'emailPrefBlog'],
-            'emailPref' => ['emailPrefProfile', 'emailPrefLinks', 'emailPrefComments',   'emailPrefFeatures', 'emailPrefBlog'],
-            'backend' => ['first_name', 'last_name', 'email', 'new_email', 'new_email_token', 'username', 'auth_key', 'password_hash', 'password_reset_token', 'created_at', 'updated_at', 'last_login', 'status', 'display_name', 'home_church', 'primary_role', 'email_pref_links', 'emailPrefComments', 'emailPrefFeatures', 'emailPrefBlog', 'reviewed'],
+            'account' => ['newUsername', 'newEmail', 'newPassword', 'timezone', 'subscriptionProfile', 'subscriptionLinks', 'subscriptionComments',   'subscriptionFeatures', 'subscriptionBlog'],
+            'sub' => ['subscriptionProfile', 'subscriptionLinks', 'subscriptionComments',   'subscriptionFeatures', 'subscriptionBlog'],
+            'backend' => ['first_name', 'last_name', 'email', 'new_email', 'new_email_token', 'username', 'auth_key', 'password_hash', 'password_reset_token', 'created_at', 'updated_at', 'last_login', 'status', 'display_name', 'home_church', 'primary_role', 'email_pref_links', 'subscriptionComments', 'subscriptionFeatures', 'subscriptionBlog', 'reviewed'],
         ];
     }
 
@@ -174,14 +196,14 @@ class User extends ActiveRecord implements
             ['newEmail', 'email', 'message' => 'Please provide a valid email address.', 'on' => 'account'],
             ['newPassword', 'string', 'max' => 20, 'on' => 'account'],
             ['currentPassword', 'validateCurrentPass', 'on' => 'account'],
-            [['emailPrefProfile', 'emailPrefLinks', 'emailPrefComments', 'emailPrefFeatures', 'emailPrefBlog'], 'safe', 'on' => 'account'],
-            [['emailPrefProfile', 'emailPrefLinks', 'emailPrefComments', 'emailPrefFeatures', 'emailPrefBlog'], 'safe', 'on' => 'emailPref'],
+            [['timezone', 'subscriptionProfile', 'subscriptionLinks', 'subscriptionComments', 'subscriptionFeatures', 'subscriptionBlog'], 'safe', 'on' => 'account'],
+            [['subscriptionProfile', 'subscriptionLinks', 'subscriptionComments', 'subscriptionFeatures', 'subscriptionBlog'], 'safe', 'on' => 'sub'],
 
             ['username', 'unique', 'targetClass' => '\common\models\User', 'message' => 'This username has already been taken.', 'on' => 'backend'],
             ['username', 'string', 'min' => 4, 'max' => 255, 'on' => 'backend'],
             ['newEmail', 'email', 'message' => 'Please provide a valid email address.', 'on' => 'backend'],
             ['newPassword', 'string', 'max' => 20, 'on' => 'backend'],
-            [['first_name', 'last_name', 'email', 'new_email_token', 'auth_key', 'password_hash', 'password_reset_token', 'created_at', 'updated_at', 'last_login', 'status', 'display_name', 'home_church', 'primary_role', 'emailPrefProfile', 'emailPrefLinks', 'emailPrefComments', 'emailPrefFeatures', 'reviewed'], 'safe', 'on' => 'backend'],
+            [['first_name', 'last_name', 'email', 'new_email_token', 'auth_key', 'password_hash', 'password_reset_token', 'created_at', 'updated_at', 'last_login', 'timezone', 'status', 'display_name', 'home_church', 'primary_role', 'subscriptionProfile', 'subscriptionLinks', 'subscriptionComments', 'subscriptionFeatures', 'reviewed'], 'safe', 'on' => 'backend'],
         
             [['fullName'], 'safe'],
         ];
@@ -201,12 +223,13 @@ class User extends ActiveRecord implements
             'newEmail' => '',
             'currentPassword' => '',
             'newPassword' => '',
+            'timezone' => '',
             'emailMaintenance' => 'Email me regarding my account maintenance',
-            'emailPrefProfile' => 'Keep me updated on visitor stats for my profile pages',
-            'emailPrefLinks' => 'Tell me when someone links to or unlinks from my profiles',
-            'emailPrefComments' => 'Tell me when someone comments on my profiles',
-            'emailPrefFeatures' => 'Notify me of new or updated website features',
-            'emailPrefBlog' => 'Send me weekly blog digests',
+            'subscriptionProfile' => 'Update me on visitor stats for my profile pages',
+            'subscriptionLinks' => 'Tell me when someone links to or unlinks from my profiles',
+            'subscriptionComments' => 'Tell me when someone comments on my profiles',
+            'subscriptionFeatures' => 'Alert me to new or updated website features',
+            'subscriptionBlog' => 'Send me weekly blog digests',
         ];
     }
 
@@ -400,7 +423,7 @@ class User extends ActiveRecord implements
         }
 
         $timestamp = (int) substr($token, strrpos($token, '_') + 1);
-        $expire = Yii::$app->params['tokenExpire.newEmailTokenExpire'];
+        $expire = Yii::$app->params['tokenExpire.newEmail'];
         return $timestamp + $expire >= time();
     }
 
@@ -428,64 +451,42 @@ class User extends ActiveRecord implements
     public function handleAccount()
     {
         if ($this->validate()) {
-            if ($this->newUsername) {
-                $this->username = $this->newUsername;
-            }
+            $this->username = $this->newUsername ?? $this->username;
             if ($this->newEmail != NULL) {
                 $this->generateNewEmailToken();
                 $this->new_email = $this->newEmail;
                 
                 // Send confirm email to new address
+                $mail = $this->subscription ?? new Subscription();
+                $mail->to = $this->new_email;
+                $mail->subject = Yii::$app->params['email.systemSubject'];
+                $mail->title = 'Confirm Your Email Address';
                 $link =  Yii::$app->urlManager->createAbsoluteUrl(['site/email-confirmed', 'token' => $new_email_token]);
-                Yii::$app
-                    ->mailer
-                    ->compose(
-                        ['html' => 'site/notification-html', 'text' => 'notification-text'], 
-                        [
-                            'title' => 'Confirm Your Email Address', 
-                            'message' => 'Follow this link to confirm your new email address: ' . $link
-                        ])
-                    ->setFrom([\yii::$app->params['email.admin']])
-                    ->setTo([$new_email])
-                    ->setSubject(Yii::$app->params['email.systemSubject'])
-                    ->send();
+                $mail->message = 'Follow this link to confirm your new email address: ' . $link;
+                $mail->sendNotification(NULL, TRUE);
 
                 // Send alert message to old email address
-                $title = 'Your Account Has Changed';
-                $msg = 'We recieved a request to update your account email.  If you did not
-                    request this change, please contact us at <a href="mailto:admin@ibnet.org">admin@ibnet.org</a>.';
-                Yii::$app
-                    ->mailer
-                    ->compose(
-                        ['html' => 'site/notification-html'], 
-                        ['
-                            title' => 'Your Account Has Changed', 
-                            'message' => 'We recieved a request to update your account email.  If you did not request this 
-                                          change, please contact us at ' .  Yii::$app->params['email.admin']
-                        ])
-                    ->setFrom([\yii::$app->params['email.admin']])
-                    ->setTo([$email])
-                    ->setSubject(Yii::$app->params['email.systemSubject'])
-                    ->send();
+                $mail = $this->subscription ?? new Subscription();
+                $mail->to = $this->email;
+                $mail->subject = Yii::$app->params['email.systemSubject'];
+                $mail->title = 'Your Account Has Changed';
+                $link =  Yii::$app->urlManager->createAbsoluteUrl(['site/email-confirmed', 'token' => $new_email_token]);
+                $mail->message = 'We received a request to update your account email.  If you did not request this change, please contact 
+                    us at <a href="mailto:' . Yii::$app->params['email.admin'] . '">' . Yii::$app->params['email.admin'] . '</a>.';
+                $mail->sendNotification();
             } 
             if ($this->newPassword != NULL) {
                 $this->updateAttributes(['password_hash' => 
                         Yii::$app->security->generatePasswordHash($this->newPassword)]);
 
-            // Send alert message of changed password
-            Yii::$app
-                ->mailer
-                ->compose(
-                    ['html' => 'site/notification-html'], 
-                    [
-                        'title' => 'Your Account Has Changed', 
-                        'message' => 'Your password has been changed.  If you did not change your password, or if you feel 
-                                      that this message is in error, please contact us at ' . Yii::$app->params['email.admin'],     
-                    ])
-                ->setFrom([Yii::$app->params['email.admin']])
-                ->setTo([$email])
-                ->setSubject(Yii::$app->params['email.systemSubject'])
-                ->send();
+                // Send alert message of changed password
+                $mail = $this->subscription ?? new Subscription();
+                $mail->to = $this->email;
+                $mail->subject = Yii::$app->params['email.systemSubject'];
+                $mail->title = 'Your Account Has Changed';
+                $mail->message = 'Your password has been changed.  If you did not change your password, or if you feel 
+                    that this message is in error, please contact us at ' . Yii::$app->params['email.admin'];
+                $mail->sendNotification();
 
                 $this->newPassword = '';
                 $this->currentPassword = '';
@@ -493,6 +494,16 @@ class User extends ActiveRecord implements
             $this->newEmail == NULL ?
                 Yii::$app->session->setFlash('success', 'Your settings have been updated.') :
                 Yii::$app->session->setFlash('success', 'Your settings have been updated.  An email with a confirmation link has been sent to your new email address.');
+
+            if ($sub = $this->subscription) {
+                $sub->updateAttributes([
+                    'profile' => $this->subscriptionProfile,
+                    'links' => $this->subscriptionLinks,
+                    'comments' => $this->subscriptionComments,
+                    'features' => $this->subscriptionFeatures,
+                    'blog' => $this->subscriptionBlog,
+                ]);
+            }
 
             return true;
         }
@@ -535,6 +546,23 @@ class User extends ActiveRecord implements
     public function getIsMissionary()
     {
         return Profile::find()->where(['user_id' => $this->id, 'type' => Profile::TYPE_MISSIONARY])->exists();
+    }
+
+    /**
+     * @return string|false
+     */
+    public function getIsPrimaryRoleMissionary()
+    {
+        $role = Yii::$app->user->identity->primary_role;
+        return (($role == User::PRIMARYROLE_CHURCHPLANTER) || ($role == User::PRIMARYROLE_MEDICALMISSIONARY) || ($role == User::PRIMARYROLE_BIBLETRANSLATOR));
+    }
+
+    /**
+     * @return string|false
+     */
+    public function getMissionary()
+    {
+        return $this->hasOne(Missionary::className(), ['user_id' => 'id']);
     }
 
     /**
@@ -592,6 +620,16 @@ class User extends ActiveRecord implements
     }
 
     /**
+     * @return string
+     */
+    public function getIsSafeUser()
+    {
+        $role = array_keys(Yii::$app->authManager->getRolesByUser(Yii::$app->user->identity->id))[0];
+        return (($role == User::ROLE_SAFEUSER) || ($role == User::ROLE_ADMIN));
+    }
+
+
+    /**
      * @return string|false
      */
     public function getAvatar()
@@ -602,9 +640,41 @@ class User extends ActiveRecord implements
     /**
      * @return \yii\db\ActiveQuery
      */
+    public function getSubscription()
+    {
+        return $this->hasOne(Subscription::className(), ['email' => 'email']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public static function getAllSubscribedFeature()
+    {
+        return User::find()->joinWith('subscription')->where('email IS NOT NULL')->andWhere(['status' => User::STATUS_ACTIVE])->andWhere(['subscription.feature' => 1])->all();
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public static function getAllSubscribedBlog()
+    {
+        return User::find()->joinWith('subscription')->where('email IS NOT NULL')->andWhere(['status' => User::STATUS_ACTIVE])->andWhere(['subscription.blog' => 1])->all();
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
     public function getGroupMembers()
     {
-        return $this->hasMany(GroupMember::className(), ['user_id' => 'id']);
+        return $this->hasMany(GroupMember::className(), ['user_id' => 'id'])->where(['status' => GroupMember::STATUS_ACTIVE]);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPendingGroupMembers()
+    {
+        return $this->hasMany(GroupMember::className(), ['user_id' => 'id'])->where(['status' => GroupMember::STATUS_PENDING]);
     } 
 
     /**
@@ -626,7 +696,6 @@ class User extends ActiveRecord implements
     }
 
     /**
-     * @var int $ids Own group Ids to exclude from query
      * @return \yii\db\ActiveQuery
      */
     public function getActiveJoinedGroups()
@@ -634,6 +703,19 @@ class User extends ActiveRecord implements
         return $this->hasMany(Group::className(), ['id' => 'group_id'])
             ->via('groupMembers')
             ->andWhere('`group`.`status`=' . Group::STATUS_ACTIVE);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPendingGroups($aids=NULL)
+    {
+        return $aids ?
+            $this->hasMany(Group::className(), ['id' => 'group_id'])->via('pendingGroupMembers')
+                ->where('`group`.`status`=' . Group::STATUS_ACTIVE . ' OR `group`.`status`=' . Group::STATUS_INACTIVE)
+                ->andWhere('`group`.`id` NOT IN (' . implode(',', array_map('intval', $aids)) . ')') :
+            $this->hasMany(Group::className(), ['id' => 'group_id'])->via('pendingGroupMembers')
+                ->andWhere('`group`.`status`=' . Group::STATUS_ACTIVE . ' OR `group`.`status`=' . Group::STATUS_INACTIVE);
     }
 
     /**

@@ -29,10 +29,6 @@ $this->title = 'Update User';
 	<?= $form->field($user, 'display_name')->textInput(['maxlength' => true]) ?>
 	<?= $form->field($user, 'home_church')->textInput(['maxlength' => true]) ?>
 	<?= $form->field($user, 'primary_role')->textInput(['maxlength' => true]) ?>
-	<?= $form->field($user, 'emailPrefLinks')->checkbox() ?>
-	<?= $form->field($user, 'emailPrefComments')->checkbox() ?>
-	<?= $form->field($user, 'emailPrefFeatures')->checkbox() ?>
-	<?= $form->field($user, 'emailPrefBlog')->checkbox() ?>
 	<?= $form->field($user, 'reviewed')->checkbox() ?>
 
 	<?= Html::a('Cancel', ['/accounts/users'], ['class' => 'btn btn-primary']) ?>

@@ -55,7 +55,7 @@ $this->title = 'Prayer List';
                 <h4 class="box-title">Sort</h4>
             </div>
             <div class="box-body">
-                <?= isset($l) ?
+                <?= $l == 1 ?
                     '<div class="sort">
                         <p>Answer Date </p>
                         <p>' . Html::a(Html::icon('arrow-up'), Url::current(['f' => $f, 'l' => $l, 'sort' => 'answer_date'])) . ' ' . Html::a(Html::icon('arrow-down'), Url::current(['sort' => '-answer_date'])) . '</p>
@@ -105,7 +105,7 @@ $this->title = 'Prayer List';
                 <?= Select2::widget([
                     'id' => 'duration-id',
                     'name' => 'durationSelect',
-                    'data' => Prayer::$duration,
+                    'data' => Prayer::DURATIONLIST,
                     'hideSearch' => true,
                     'disabled' => $f,
                     'options' => ['class' => 'filter-select', 'placeholder' => 'Duration'],
@@ -147,7 +147,7 @@ $this->title = 'Prayer List';
         <!-- /filter box -->
         </div>
 
-        <!-- new request box -->
+        <!-- new prayer box -->
         <div class="box box-solid">
             <div class="box-header with-border">
                 <h4 class="box-title">New Prayer Request</h4>
@@ -157,7 +157,7 @@ $this->title = 'Prayer List';
                 <?php Modal::begin([
                     'header' => '<h3>' . Html::icon('send') . ' Send Requests By Email</h3>',
                     'toggleButton' => [
-                        'id' => 'email-request-id',
+                        'id' => 'email-prayer-id',
                         'label' => 'Send Requests by Email',
                         'class' => 'link-btn',
                     ],
@@ -165,10 +165,10 @@ $this->title = 'Prayer List';
                     'bodyOptions' => ['class' => 'email-request-modal-body'],
                 ]); ?>
                     <p>
-                        Send requests to: <?= $group->prayer_email ? '<b>' . $group->prayer_email . '</b>' : '<i>Pending</i>' ?><br>
+                        Send requests to: <?= $group->prayer_email ? '<b>' . $group->prayer_email . '</b>' : '<i>Group Email Pending</i>' ?><br>
                         Be sure to use the email you are registered with (<?= $member->email ?>).
                     </p>
-                    <p><b>Subject: </b><span class="user-input">Request: Your Request</span></p>
+                    <p><b>Subject: </b><span class="user-input">Your Request</span></p>
                     <p>
                         <b>Email Body: </b><br>
                         <span class="user-input">
@@ -191,7 +191,7 @@ $this->title = 'Prayer List';
                                 <b>To:</b>
                             </div>
                             <div class="col-md-10">
-                                <?= Html::textInput('to', 'net2.request@ibnet.org') ?>
+                                <?= Html::textInput('to', $group->prayer_email ? $group->prayer_email : 'Group Email Pending') ?>
                             </div>
                         </div>
                         <div class="row">
@@ -199,7 +199,7 @@ $this->title = 'Prayer List';
                                 <b>Subject:</b>
                             </div>
                             <div class="col-md-10">
-                                <?= Html::textInput('subject', 'Request: Pray for my brother Jim to be saved') ?>
+                                <?= Html::textInput('subject', 'Pray for my brother Jim to be saved') ?>
                             </div>
                         </div>
                         <div class="row">
@@ -222,23 +222,17 @@ $this->title = 'Prayer List';
                     </div>
                 <?php Modal::end(); ?>
 
-                <?php $form = ActiveForm::begin(['options' => ['onsubmit' => 'clearStorage()']]); ?>
+                <p class="top-margin"></p>
+                <?php $form = ActiveForm::begin(['id' => 'new-prayer', 'options' => ['onsubmit' => 'clearStorage()']]); ?>
                 <?= $form->field($prayer, 'request')->textInput(['onkeyup' => 'saveValue(this)', 'maxlength' => true]) ?>
                 <?= $form->field($prayer, 'description')->textArea(['onkeyup' => 'saveValue(this)', 'maxlength' => true]) ?>
                 <?= $form->field($prayer, 'duration')->widget(Select2::classname(), [
-                    'data' => Prayer::$duration,
-                    'language' => 'en',
-                    'theme' => 'krajee',
-                    'options' => [ 
-                        'placeholder' => '',
-                        'onchange' => 'saveValue(this)',
-                    ],
-                    'pluginOptions' => ['allowClear' => true],
-                ]); ?>
+                    'data' => Prayer::DURATIONLIST,
+                    'options' => ['onchange' => 'saveValue(this)'],
+                    'hideSearch' => true,
+                ]) ?>
                 <?= $form->field($prayer, 'select')->widget(Select2::classname(), [
                     'data' => ArrayHelper::map($tagList, 'id', 'tag'),
-                    'language' => 'en',
-                    'theme' => 'krajee',
                     'options' => [
                         'placeholder' => 'Select...', 
                         'multiple' => true,
@@ -246,46 +240,24 @@ $this->title = 'Prayer List';
                     ],
                     'pluginOptions' => ['allowClear' => true],
                 ]) ?>
-                <div id="add-tag">
-                    <?php Modal::begin([
-                        'header' => '<h3>New Tag <span class="glyphicons glyphicons-tag light drop"></span></h3>',
-                        'toggleButton' => [
-                            'label' => 'Manage Tags',
-                            'alt' => 'Add a new prayer list tag',
-                            'class' => 'link-btn'],
-                        'headerOptions' => ['class' => 'modal-header'],
-                        'bodyOptions' => ['class' => 'link-modal-body'],
-                    ]); ?>
-                    <?php $form = ActiveForm::begin(); ?>
-                    <?= $form->field($tag, 'tag')->textInput(['maxlength' => true]) ?>
-                    <?= Html::submitButton('Save', [
-                        'id' => 'submit-tag',
-                        'method' => 'POST',
-                        'class' => 'btn btn-primary',
-                        'name' => 'main',
-                    ]) ?>
-                    <?php $form = ActiveForm::end(); ?>
-                    <div class="modal-footer">
-                        <?php foreach ($tagList as $tagItem) {
-                           echo '<div id="tag-' . $tagItem->id . '" class="tag-row">';
-                                echo $tagItem->tag . ' ' . Html::a(Html::icon('remove'), ['ajax/delete-tag', 'tid' => $tagItem->id], [
-                                   'id' => 'tagitem-' . $tagItem->id, 
-                                   'data-on-done' => 'tagDone']) . '<br>';
-                           echo '</div>';
-                           $this->registerJs("$('#tagitem-" . $tagItem->id . "').click(handleAjaxSpanLink);", \yii\web\View::POS_READY);
-                        } ?>
-                    </div>
-                    <?php Modal::end() ?>
-                </div>
+                <!-- <div id="add-tag"> -->
+                <p><?= Html::button('Manage Tags', ['id' => 'new-tag-btn', 'class' => 'link-btn']) ?></p>
+                <?php $this->registerJs("$('#new-tag-btn').click(function(e) {
+                    $.get('/group/new-tag', {id:" . $group->id . "}, function(data) {
+                        $('#new-tag-modal').modal('show').find('#new-tag-content').html(data);
+                    });
+                })", \yii\web\View::POS_READY); ?>
+                <!-- </div> -->
                 <?= Html::submitButton('Save', [
+                    'id' => 'save-prayer',
                     'method' => 'POST',
                     'class' => 'btn btn-primary-nw',
-                    'name' => 'request',
+                    'name' => 'prayer',
                 ]) ?>
                 <?php $form = ActiveForm::end(); ?>
 
             </div>
-        <!-- /new request box -->
+        <!-- /new prayer box -->
         </div>
 
         <!-- export box -->
@@ -432,19 +404,28 @@ $this->title = 'Prayer List';
 
 <?php Modal::begin([
     'header' => '<h3>' . Html::icon('pencil') . ' Update</h3>',
-    'id' => 'update-request-modal',
+    'id' => 'update-prayer-modal',
     'headerOptions' => ['class' => 'modal-header'],
     'bodyOptions' => ['class' => 'link-modal-body'],
 ]);
-    echo '<div id="update-request-content"></div>';
+    echo '<div id="update-prayer-content"></div>';
 Modal::end(); ?>
 <?php Modal::begin([
     'header' => '<h3><span class="glyphicons glyphicons-message-in"></span> Answered</h3>',
-    'id' => 'answer-request-modal',
+    'id' => 'answer-prayer-modal',
     'headerOptions' => ['class' => 'modal-header'],
     'bodyOptions' => ['class' => 'link-modal-body'],
 ]);
-    echo '<div id="answer-request-content"></div>';  
+    echo '<div id="answer-prayer-content"></div>';  
+Modal::end(); ?>
+<?php Modal::begin([
+    'header' => '<h3>New Tag <span class="glyphicons glyphicons-tag light drop"></span></h3>',
+    'id' => 'new-tag-modal',
+    'size' => 'modal-sm',
+    'headerOptions' => ['class' => 'modal-header'],
+    'bodyOptions' => ['class' => 'modal-body'],
+]);
+    echo '<div id="new-tag-content"></div>';  
 Modal::end(); ?>
 
 <script type="text/javascript">

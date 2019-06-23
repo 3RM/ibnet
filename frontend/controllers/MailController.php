@@ -26,7 +26,7 @@ class MailController extends Controller
      */
     public function initSendLink($linkingProfile, $profile, $profileOwner, $lType, $dir)
     {   
-        if ($profileOwner->emailPrefLinks != 1) {                                                   // check if profile owner has email preferences set to receive link notifications
+        if ($profileOwner->subscription->links == 0) {                                              // check if profile owner has email preferences set to receive link notifications
             return true;
         }
 

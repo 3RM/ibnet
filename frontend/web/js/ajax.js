@@ -124,7 +124,7 @@ var ajaxCallbacks = {
         document.getElementById('tag-'+response.tid).style.display = 'none';
         // can also try .empty() https://api.jquery.com/empty/
     },
-    'requestDone': function (response) {
+    'prayerDone': function (response) {
         $('#item-'+response.requestId).parent().toggle();
     },
     'updateDone': function (response) {

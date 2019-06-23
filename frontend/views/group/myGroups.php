@@ -4,10 +4,12 @@ use common\models\group\Group;
 use frontend\assets\GroupAsset;
 use yii\bootstrap\Html;
 use yii\bootstrap\Modal;
+use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
 GroupAsset::register($this);
+Url::Remember();
 ?>
 <?= $this->render('../site/_userAreaHeader', ['active' => 'group']) ?>
 <div class="container">
@@ -34,7 +36,28 @@ GroupAsset::register($this);
             ]) ?>
         </div>
         <?php $form = ActiveForm::end(); ?>
+        <?php if ($dataProvider) {
+            echo '<div class="group-search-results">';
+            echo yii\widgets\ListView::widget([
+                    'dataProvider' => $dataProvider,
+                    'showOnEmpty' => false,
+                    'emptyText' => '<p>Your search did not return any results.</p>',
+                    'itemView' => '_searchResults',
+                    'viewParams' => ['aids' => $aids, 'pids' => $pids],
+                    'itemOptions' => ['class' => 'item-bordered'],
+                    'layout' => '<div class="summary-row hidden-print clearfix">{summary}</div>{items}{pager}',
+                ]);
+            echo '</div>';
+        } ?>
 
+        <?php if ($pendingGroups) { ?>
+            <h3>Pending Groups</h3>
+            <div class="group-list-container">
+                <?php foreach ($pendingGroups as $pendingGroup) { ?>
+                    <?= $this->render('_pendingGroup', ['group' => $pendingGroup]) ?>
+                <?php } ?>
+            </div>
+        <?php } ?>
         <?php if ($allJoinedGroups) { ?>
         	<h3>Joined Groups</h3>
             <div class="group-list-container">
@@ -57,7 +80,7 @@ GroupAsset::register($this);
 </div>
 
 <?php Modal::begin([
-    'header' => '<span class="glyphicons glyphicons-user-add"></span>',
+    'header' => '<h3><span class="glyphicons glyphicons-user-add"></span> Invite New Members</h3>',
     'id' => 'invite-modal',
     'size' => 'modal-md',
     'headerOptions' => ['class' => ''],

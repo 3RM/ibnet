@@ -9,10 +9,10 @@ namespace frontend\controllers;
 
 use common\models\User;
 use common\models\Utility;
-use common\models\SendMail;
 use common\models\profile\FormsCompleted;
 use common\models\profile\History;
 use common\models\profile\Profile;
+use common\models\profile\ProfileMail;
 use common\models\profile\Type;
 use common\models\profile\Staff;
 use common\models\profile\SubType;
@@ -275,22 +275,14 @@ class ProfileMgmtController extends ProfileController
     public function actionTransferInitiate($id, $email)
     {
         $profile = Profile::findProfile($id);
-
         if (Yii::$app->request->Post()) {
-            
             $newUser = User::findByEmail($email);
             $token = $profile->generateProfileTransferToken($newUser->id);
             $profile->updateAttributes(['transfer_token' => $token]);
 
             // Send transfer request email to new user
             $oldUser = User::findOne(Yii::$app->user->id);
-            $subject = 'IBNet Profile Transfer Request';
-            $title = 'IBNet Profile Transfer Request';
-            $msg = $oldUser->fullName . ' requests that you assume ownership of 
-                IBNet profile "' . $profile->profile_name . '".  Click the link below to complete the 
-                transfer and take ownership of this profile.  This link will remain valid for one week.';
-            SendMail::sendProfileTransfer($subject, $title, $msg, $profile, $email, true);
-
+            ProfileMail::sendProfileTransfer($profile, $newUser, $oldUser);
             return $this->redirect(['transfer-sent']);
         }
         return $this->render('transferInit', ['profile' => $profile, 'email' => $email]);
@@ -321,12 +313,8 @@ class ProfileMgmtController extends ProfileController
             $newUser = User::findOne($newUserId);
             $profile->updateAttributes(['user_id' => $newUserId, 'transfer_token' => NULL]);
 
-            // Send Email to "old" profile owner
-            $subject = 'IBNet Profile Transfer Complete';
-            $title = 'IBNet Profile Transfer Complete';
-            $msg = 'Your IBNet profile "' . $profile->profile_name . '" has been successfully transferred 
-                to ' . $newUser->fullName;
-            SendMail::sendProfileTransfer($subject, $title, $msg, $profile, $oldUser->email, false);
+            // Send Email to previous profile owner
+            ProfileMail::sendProfileTransfer($profile, $newUser, $oldUser, TRUE);
 
             return $this->render('transferComplete', ['profile' => $profile]);
         } else {

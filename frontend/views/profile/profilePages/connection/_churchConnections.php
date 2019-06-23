@@ -91,7 +91,7 @@ if ($memberArray) {
 			echo '<div class="connection">';
 				echo (empty($member['usr_image']) ? Html::img('@web/images/content/user.png'): Html::img($member['usr_image'])); 
 				echo '<div class="title">';
-					echo $member->screen_name;
+					echo $member->fullName;
 					echo Html::tag('span', '<br>Church member', ['class' => 'subTitle']);
 				echo '</div>';
 			echo '</div>';
@@ -111,7 +111,7 @@ if ($likeArray) {
 				} else {
 					echo (empty($like->usr_image) ? Html::img('@web/images/content/user.png') : Html::img($like->usr_image)); 
 					echo '<div class="title">';
-						echo $like->screen_name;
+						echo $like->fullName;
 						echo Html::tag('span', '<br>Friend of the ministry', ['class' => 'subTitle']);
 					echo '</div>';
 				}

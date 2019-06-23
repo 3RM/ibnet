@@ -139,7 +139,7 @@ $this->title = 'Group Features';
         </div>
         <div class="feature-text">
             <h3><i class="fa fa-archive"></i> Document Share</h3>
-            <p>Collaborate with your group.  Upload, author, link to, and store documents and files. (<span style="color:#ff8700;font-weight:bold;">Coming soon...</span>)</p>
+            <p>Collaborate with your group.  Upload, author, link to, and store documents and files. (<span style="color:#ff8700;">Gathering interest...</span>This feature will be released at a potential future date.)</p>
         </div>
     </div>
     <div class="feature-container">
@@ -157,7 +157,7 @@ $this->title = 'Group Features';
         </div>
         <div class="feature-text">
             <h3><i class="fas fa-hand-holding-usd"></i> Grace Gifts</h3>
-            <p>Members can send monetary gifts to other members using popular payment gateways such as PayPal. (<span style="color:#ff8700;font-weight:bold;">Coming soon...</span>)</p>
+            <p>Send monetary gifts to other members using popular payment gateways such as PayPal. (<span style="color:#ff8700;">Gathering interest...</span>This feature will be released at a potential future date.)</p>
         </div>
     </div>
 

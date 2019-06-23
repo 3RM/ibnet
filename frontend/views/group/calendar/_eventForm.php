@@ -18,7 +18,6 @@ if ($event->all_day) {$event->end -= 24*3600;}
     <?php $form = ActiveForm::begin(); ?>
     <div class="row">  
         <div class="col-md-9"> 
-            <label class="control-label">Date & Time Range</label> 
             <?= DateRangePicker::widget([
                 'name' => 'dateRange',
                 'value' => ($event->start && $event->end) ? 

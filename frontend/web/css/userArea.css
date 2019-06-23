@@ -115,30 +115,38 @@ ul.main-links li {
 .left-nav-linktext {
   margin-left: 4px;
 }
-.groups-links h3 {
+.group-nav-links h3 {
   background-color: lightgray;
   font-size: 1.3em;
   margin: 20px -10px 10px -10px;
   padding: 3px 10px;
 }
-.groups-links ul {
+.group-nav-links ul {
   margin-bottom: 15px;
 }
-.groups-links li {
+.group-nav-links li {
   margin-left: -35px;
   padding-left: 15px;
   list-style: none;
 }
-.groups-links p {
+.group-nav-links p {
   border-bottom: 1px dashed lightgray;
   color: #777;
 }
-.groups-links p:hover {
+.group-nav-links p:hover {
   cursor:pointer;
 }
-.groups-links li span,
-.groups-links li i {
+.group-nav-links li span,
+.group-nav-links li i {
   color: #bbb;
+}
+.active-page {
+  background-color: #365f89;
+  color: #fff;
+}
+.group-nav-links li.active-page span,
+.group-nav-links li.active-page i {
+  color: #fff;
 }
 .group-list {
   display: none;
@@ -199,6 +207,17 @@ ul.main-links li {
   background: url(../images/user-area/pwd.jpg) center left;
   background-repeat: no-repeat;
   display: inline-block;
+}
+.settings-lock {
+  margin: 40px 0;
+}
+.settings-lock p {
+  color: gray;
+  font-size: 1.2em;
+}
+.settings-lock span {
+  color: #ccc;
+  font-size: 1.8em;
 }
 
 /*
@@ -724,8 +743,13 @@ img.mc-icon {
     .acc-preview-header {
       background: url(../images/profile/profile-preview-header-mb.jpg);
     }
+    div#main-wrap.wrap > div.container {
+      display: flex;
+      flex-direction: column;
+    }
     .left-nav {
-      display: none;
+      width: 80%;
+      margin: 20px 10% 40px 10%;
     }
     #account0 {
       z-index: 10000;
@@ -735,6 +759,9 @@ img.mc-icon {
       float: none;
       width: 100%;
       padding: 40px 0;
+    }
+    .right-content .boxes {
+      margin: 0 15px;
     }
     .personal-settings {
       flex-direction: column;

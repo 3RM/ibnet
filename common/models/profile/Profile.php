@@ -20,7 +20,6 @@ use common\models\User;
 use common\models\Utility;
 use frontend\controllers\ProfileController;
 use frontend\controllers\ProfileFormController;
-use frontend\controllers\ProfileMailController;
 use frontend\models\GeoCoder;
 use sadovojav\cutter\behaviors\CutterBehavior;
 use yii;
@@ -1283,7 +1282,7 @@ class Profile extends yii\db\ActiveRecord
 
             $pastorProfileOwner = User::findOne($pastor->user_id);
             // Notify staff profile owner of unconfirmed status
-            ProfileMailController::initSendLink($this, $pastor, $pastorProfileOwner, 'SFSA', 'L');
+            ProfileMail::initSendLink($this, $pastor, $pastorProfileOwner, 'SFSA', 'L');
 
             return $this;
         }        
@@ -1319,7 +1318,8 @@ class Profile extends yii\db\ActiveRecord
         
         $pastor = $this->findProfile($staff->staff_id);
         $pastorProfileOwner = User::findOne($pastor->user_id);
-        ProfileMailController::initSendLink($this, $pastor, $pastorProfileOwner, 'SFSA', 'UL');     // Notify staff profile owner of unconfirmed status
+        // Notify staff profile owner of unconfirmed status
+        ProfileMail::initSendLink($this, $pastor, $pastorProfileOwner, 'SFSA', 'UL');
 
         return $this;
     }
@@ -1352,7 +1352,8 @@ class Profile extends yii\db\ActiveRecord
         $hcProfile = $this->homeChurch;
         $hcProfileOwner = $hcProfile->user;
         if ($oldHc === NULL) {
-            ProfileMailController::initSendLink($this, $hcProfile, $hcProfileOwner, 'PM', 'L');
+            ProfileMail::initSendLink($this, $hcProfile, $hcProfileOwner, 'PM', 'L');
+
 
         // Changed home church
         } elseif ($oldHc != $this->home_church) {
@@ -1366,8 +1367,10 @@ class Profile extends yii\db\ActiveRecord
             }
             $oldHcProfile = $this->findProfile($oldHc);
             $oldHcProfileOwner = $oldHcProfile->user;
-            ProfileMailController::initSendLink($this, $oldHcProfile, $oldHcProfileOwner, 'PM', 'UL');
-            ProfileMailController::initSendLink($this, $hcProfile, $hcProfileOwner, 'PM', 'L');
+            // Notify previous home church profile owner
+            ProfileMail::initSendLink($this, $oldHcProfile, $oldHcProfileOwner, 'PM', 'UL');
+            // Notify new home church profile owner
+            ProfileMail::initSendLink($this, $hcProfile, $hcProfileOwner, 'PM', 'L');
         }
 
         $this->updateMap(self::MAP_CHURCH);
@@ -1402,8 +1405,8 @@ class Profile extends yii\db\ActiveRecord
             // If individual, Update staff table regardless of new or existing connection
             if ($this->category == self::CATEGORY_IND) {
                 $this->aName = ($this->type == self::TYPE_STAFF) ? $this->title : $this->sub_type;
+                
                 // Add to staff table if not already there
-
                 if (!$staff = $this->staffPM) {
                     $staff = new Staff();
                     $staff->save();
@@ -1420,7 +1423,8 @@ class Profile extends yii\db\ActiveRecord
             $minProfile = $this->parentMinistry;
             $minProfileOwner = $minProfile->user;
             if ($oldMin == NULL) {
-                ProfileMailController::initSendLink($this, $minProfile, $minProfileOwner, 'PM', 'L');
+                ProfileMail::initSendLink($this, $minProfile, $minProfileOwner, 'PM', 'L');
+
             // Changed parent ministry
             } elseif ($oldMin != $this->ministry_of) {
                 if (($this->category == self::CATEGORY_IND)
@@ -1433,8 +1437,10 @@ class Profile extends yii\db\ActiveRecord
                 }
                 $oldMinProfile = $this->findProfile($oldMin);
                 $oldMinProfileOwner = $oldMinProfile->user;
-                ProfileMailController::initSendLink($this, $oldMinProfile, $oldMinProfileOwner, 'PM', 'UL');
-                ProfileMailController::initSendLink($this, $minProfile, $minProfileOwner, 'PM', 'L');
+                // Notify previous ministry profile owner
+                ProfileMail::initSendLink($this, $oldMinProfile, $oldMinProfileOwner, 'PM', 'UL');
+                // Notify new ministry profile owner
+                ProfileMail::initSendLink($this, $minProfile, $minProfileOwner, 'PM', 'L');
             }
         }
         $this->updateMap(self::MAP_MINISTRY);
@@ -1466,8 +1472,8 @@ class Profile extends yii\db\ActiveRecord
             // Send mail to notify ministry profile owner of new link
             if ($staff->ministry_id != $this->selectM) {
                 $ministryProfile = self::findProfile($this->selectM);
-                $ministryProfileOwner = User::findOne($ministryProfile->user_id);
-                ProfileMailController::initSendLink($this, $ministryProfile, $ministryProfileOwner, 'PM', 'L');   
+                $ministryProfileOwner = $ministryProfile->user;
+                ProfileMail::initSendLink($this, $ministryProfile, $ministryProfileOwner, 'PM', 'L');   
             }
                 
             $staff->updateAttributes([
@@ -1491,9 +1497,9 @@ class Profile extends yii\db\ActiveRecord
         if (isset($_POST['remove'])) {
             $pgProfile = Profile::findOne($_POST['remove']);
 
-            $pgProfileOwner = User::findOne($pgProfile->user_id);
             // Notify program profile owner of unlinked church
-            ProfileMailController::initSendLink($this, $pgProfile, $pgProfileOwner, 'PG', 'UL');
+            $pgProfileOwner = $pgProfile->user;
+            ProfileMail::initSendLink($this, $pgProfile, $pgProfileOwner, 'PG', 'UL');
 
             $this->unlink('programs', $pgProfile, $delete = true);
         
@@ -1512,11 +1518,9 @@ class Profile extends yii\db\ActiveRecord
             if (!$linked && $this->setUpdateDate()) {
                 $this->link('programs', $pgProfile);
             }
-
-            $pgProfileOwner = User::findOne($pgProfile->user_id);
             // Notify program profile owner of unlinked church
-            ProfileMailController::initSendLink($this, $pgProfile, $pgProfileOwner, 'PG', 'L');
-
+            $pgProfileOwner = $pgProfile->user;
+            ProfileMail::initSendLink($this, $pgProfile, $pgProfileOwner, 'PG', 'L');
         }
         return $this;
     }
@@ -1529,7 +1533,7 @@ class Profile extends yii\db\ActiveRecord
     public function handleFormSA()
     {
         if ($this->validate() && $this->setUpdateDate()) {
-            $oldSelect = arrayHelper::map($this->schoolsAttended, 'id', 'id');
+            $oldSelect = ArrayHelper::map($this->schoolsAttended, 'id', 'id');
             // handle case of new selection
             if (!$oldSelect && ($select = $this->select) != NULL) {
                 foreach ($select as $value) {
@@ -1540,7 +1544,7 @@ class Profile extends yii\db\ActiveRecord
                     $scProfile = $sc->linkedProfile;
                     if ($scProfile && ($scProfileOwner = $scProfile->user)) {
                         // notify school profile owner of link
-                        ProfileMailController::initSendLink($this, $scProfile, $scProfileOwner, 'SA', 'L');
+                        ProfileMail::initSendLink($this, $scProfile, $scProfileOwner, 'SA', 'L');
                     }
                 }
             }
@@ -1552,7 +1556,7 @@ class Profile extends yii\db\ActiveRecord
                     $scProfile = $sc->linkedProfile;
                     if ($scProfile && ($scProfileOwner = $scProfile->user)) {
                         // notify school profile owner of unlink
-                        ProfileMailController::initSendLink($this, $scProfile, $scProfileOwner, 'SA', 'UL');
+                        ProfileMail::initSendLink($this, $scProfile, $scProfileOwner, 'SA', 'UL');
                     }
 
                     // unlink all schools
@@ -1571,7 +1575,7 @@ class Profile extends yii\db\ActiveRecord
                         $scProfile = $sc->linkedProfile;
                         if ($scProfile && ($scProfileOwner = $scProfile->user)) {
                             // notify school profile owner of link
-                            ProfileMailController::initSendLink($this, $scProfile, $scProfileOwner, 'SA', 'L');
+                            ProfileMail::initSendLink($this, $scProfile, $scProfileOwner, 'SA', 'L');
                         }
 
                     }
@@ -1583,9 +1587,11 @@ class Profile extends yii\db\ActiveRecord
 
                         $scProfile = $sc->linkedProfile;
                         if ($scProfile && ($scProfileOwner = $scProfile->user)) {
-                            ProfileMailController::initSendLink($this, $scProfile, $scProfileOwner, 'SA', 'UL');  // Notify school profile owner of unlink
+                            // Notify school profile owner of unlink
+                            ProfileMail::initSendLink($this, $scProfile, $scProfileOwner, 'SA', 'UL');
                         }
 
+                        // unlink all schools
                         $this->unlink('schools', $sc, $delete = true);
                 
                     }
@@ -1604,7 +1610,7 @@ class Profile extends yii\db\ActiveRecord
     public function handleFormSL()
     {
         if ($this->validate() && $this->setUpdateDate()) {
-            $oldSelect = arrayHelper::map($this->schoolLevels, 'id', 'id');
+            $oldSelect = ArrayHelper::map($this->schoolLevels, 'id', 'id');
             // handle case of new selection
             if (empty($oldSelect) && ($select = $this->select) != NULL) {
                 foreach ($select as $value) {
@@ -1671,7 +1677,7 @@ class Profile extends yii\db\ActiveRecord
         }
 
     // **************************** Church *************************************
-        $oldSelect = arrayHelper::map($this->missionAgcys, 'id', 'id');
+        $oldSelect = ArrayHelper::map($this->missionAgcys, 'id', 'id');
         // handle case of new selection
         if (!$oldSelect && ($select = $this->select)) {
             foreach ($select as $value) {
@@ -1729,7 +1735,7 @@ class Profile extends yii\db\ActiveRecord
     // *************************** School **************************************
         if($this->type == 'School') {
 
-            $oldSelect = arrayHelper::map($this->accreditations, 'id', 'id');
+            $oldSelect = ArrayHelper::map($this->accreditations, 'id', 'id');
             // handle case of new selection
             if (!$oldSelect && ($select = $this->select) != NULL) {
                 foreach ($select as $value) {
@@ -1767,7 +1773,7 @@ class Profile extends yii\db\ActiveRecord
 
     // ************************** Fellowship ***********************************
         
-        $oldSelect = arrayHelper::map($this->fellowships, 'id', 'id');
+        $oldSelect = ArrayHelper::map($this->fellowships, 'id', 'id');
         // handle case of new selection
         if (!$oldSelect && ($select = $this->select) != NULL) {
             foreach ($select as $value) {
@@ -1776,8 +1782,8 @@ class Profile extends yii\db\ActiveRecord
 
                 // notify new fellowship profile owner of new link
                 if ($fProfile = $f->linkedProfile) {
-                    $fProfileOwner = User::findOne($fProfile->user_id);
-                    ProfileMailController::initSendLink($this, $fProfile, $fProfileOwner, 'AS', 'L');      
+                    $fProfileOwner = $fProfile->user;
+                    ProfileMail::initSendLink($this, $fProfile, $fProfileOwner, 'AS', 'L');
                 }
 
             }
@@ -1790,8 +1796,8 @@ class Profile extends yii\db\ActiveRecord
 
                 // notify old fellowship profile owner of unlink
                 if ($fProfile = $f->linkedProfile) {
-                    $fProfileOwner = User::findOne($fProfile->user_id);
-                    ProfileMailController::initSendLink($this, $fProfile, $fProfileOwner, 'AS', 'UL');      
+                    $fProfileOwner = $fProfile->user;
+                    ProfileMail::initSendLink($this, $fProfile, $fProfileOwner, 'AS', 'UL');
                 }
             }
         }
@@ -1805,8 +1811,8 @@ class Profile extends yii\db\ActiveRecord
 
                     // notify new fellowship profile owner of new link
                     if ($fProfile = $f->linkedProfile) {
-                        $fProfileOwner = User::findOne($fProfile->user_id);
-                        ProfileMailController::initSendLink($this, $fProfile, $fProfileOwner, 'AS', 'L');      
+                        $fProfileOwner = $fProfile->user;
+                        ProfileMail::initSendLink($this, $fProfile, $fProfileOwner, 'AS', 'L');
                     }
                 }
             }
@@ -1818,8 +1824,8 @@ class Profile extends yii\db\ActiveRecord
 
                     // notify old fellowship profile owner of unlink
                     if ($fProfile = $f->linkedProfile) {
-                        $fProfileOwner = User::findOne($fProfile->user_id);
-                        ProfileMailController::initSendLink($this, $fProfile, $fProfileOwner, 'AS', 'UL');      
+                        $fProfileOwner = $fProfile->user;
+                        ProfileMail::initSendLink($this, $fProfile, $fProfileOwner, 'AS', 'UL');      
                     }
                 }
             }
@@ -1841,7 +1847,7 @@ class Profile extends yii\db\ActiveRecord
         }
 
     // ************************* Association ***********************************
-        $oldSelectM = arrayHelper::map($this->associations, 'id', 'id');
+        $oldSelectM = ArrayHelper::map($this->associations, 'id', 'id');
         // handle case of new selection
         if (!$oldSelectM && ($selectM = $this->selectM) != NULL) {
             foreach ($selectM as $value) {
@@ -1850,8 +1856,8 @@ class Profile extends yii\db\ActiveRecord
 
                 // notify new association profile owner of new link
                 if ($aProfile = $a->linkedProfile) {
-                    $aProfileOwner = User::findOne($aProfile->user_id);
-                    ProfileMailController::initSendLink($this, $aProfile, $aProfileOwner, 'AS', 'L');      
+                    $aProfileOwner = $aProfile->user;
+                    ProfileMail::initSendLink($this, $aProfile, $aProfileOwner, 'AS', 'L');      
                 }
 
             }
@@ -1864,8 +1870,8 @@ class Profile extends yii\db\ActiveRecord
 
                 // notify old association profile owner of unlink
                 if ($aProfile = $a->linkedProfile) {
-                    $aProfileOwner = User::findOne($aProfile->user_id);
-                    ProfileMailController::initSendLink($this, $aProfile, $aProfileOwner, 'AS', 'UL');      
+                    $aProfileOwner = $aProfile->user_id;
+                    ProfileMail::initSendLink($this, $aProfile, $aProfileOwner, 'AS', 'UL');      
                 }
             }
         }
@@ -1879,8 +1885,8 @@ class Profile extends yii\db\ActiveRecord
                     
                     // notify new association profile owner of new link
                     if ($aProfile =$a->linkedProfile) {
-                        $aProfileOwner = User::findOne($aProfile->user_id);
-                        ProfileMailController::initSendLink($this, $aProfile, $aProfileOwner, 'AS', 'L');      
+                        $aProfileOwner = $aProfile->user;
+                        ProfileMail::initSendLink($this, $aProfile, $aProfileOwner, 'AS', 'L');      
                     }
                 }
             }
@@ -1892,8 +1898,8 @@ class Profile extends yii\db\ActiveRecord
 
                     // notify old association profile owner of unlink
                     if ($aProfile = $a->linkedProfile) {
-                        $aProfileOwner = User::findOne($aProfile->user_id);
-                        ProfileMailController::initSendLink($this, $aProfile, $aProfileOwner, 'AS', 'UL');      
+                        $aProfileOwner = $aProfile->user;
+                        ProfileMail::initSendLink($this, $aProfile, $aProfileOwner, 'AS', 'UL');      
                     }
                 }
             }
@@ -1929,7 +1935,7 @@ class Profile extends yii\db\ActiveRecord
     public function handleFormTA()
     {
 
-        $oldSelect = arrayHelper::map($this->tags, 'id', 'id');
+        $oldSelect = ArrayHelper::map($this->tags, 'id', 'id');
         // handle case of new selection
         if (empty($oldSelect) && !empty($select = $this->select)) {
             foreach ($select as $value) {
@@ -2034,7 +2040,7 @@ class Profile extends yii\db\ActiveRecord
         }
 
         // Send link notifications to profile owners
-        ProfileMailController::dbSendLink($this->id);
+        ProfileMail::dbSendLink($this->id);
         // Notify admin of activation
         if ($this->status == Self::STATUS_NEW) {
             ProfileMail::sendAdminActiveProfile($this->id);

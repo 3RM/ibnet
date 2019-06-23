@@ -32,7 +32,8 @@ GroupAsset::register($this);
     <div class="row">
         <div class="col-md-4">
             <?= $form->field($group, 'group_level')->widget(Select2::classname(), [
-                'data' => ['Local' => 'Local', 'Regional' => 'Regional', 'State/Province' => 'State/Province', 'National' => 'National', 'International' => 'International'],
+                'data' => [10 => 'Local', 20 => 'Regional', 30 => 'State/Province', 40 => 'National', 50 => 'International'],
+                'hideSearch' => true,
                 'options' => ['placeholder' => 'Select ...'],
                 'pluginOptions' => ['allowClear' => true],
             ]); ?>
@@ -93,7 +94,7 @@ GroupAsset::register($this);
     <!-- Keywords -->
     <p class="top-margin">
         <?= HTML::icon('info-sign') ?> Add one or more keywords to help identify what your group is about. 
-        Example: Minnesota pastors or school staff.
+        Example: state pastors or school staff.
     </p>
     <?php $form = ActiveForm::begin([
         'id' => $keyword->formName(), 

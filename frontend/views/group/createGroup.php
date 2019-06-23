@@ -21,7 +21,10 @@ $this->title = 'Create a Group';
 
 <div class="container-form">
 
-    <p>Information about groups here</p>
+    <p>
+    	Create a group and invite your friends and ministry partners to join. Groups have privately shared access to one or more features that
+    	are designed to aid you in ministry: Prayer list, Calendar, Discussion forum, Missionary updates, Email notifications, and more.
+    </p>
     
     <?= Html::a('Continue', ['group-information'], ['class' => 'btn btn-primary']) ?>
 

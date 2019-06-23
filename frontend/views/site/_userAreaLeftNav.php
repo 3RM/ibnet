@@ -1,13 +1,15 @@
 <?php
-use yii\bootstrap\Html; 
+use common\models\User;
+use yii\bootstrap\Html;
 $id = $_GET['id'] ?? NULL;
+$role = array_keys(Yii::$app->authManager->getRolesByUser(Yii::$app->user->identity->id))[0];
 ?>
     <div class="left-nav">
         <ul class="main-links">
             <?= Html::a('
             	<li class="settings ' . ($active == "settings" ? "active" : NULL) . '">
             		<span class="glyphicons glyphicons-settings"></span>
-            		<span class="left-nav-linktext">&nbsp;Account</span>
+            		<span class="left-nav-linktext">&nbsp;Settings</span>
             	</li>
             ', '/site/settings') ?>
             <?= Html::a('
@@ -16,12 +18,15 @@ $id = $_GET['id'] ?? NULL;
             		<span class="left-nav-linktext">&nbsp;Profiles</span>
             	</li>
             ', '/profile-mgmt/my-profiles') ?>
-            <?= Html::a('
-            	<li class="groups ' . ($active == "groups" ? "active" : NULL) . '">
-            		<span class="glyphicons glyphicons-cluster"></span>
-            		<span class="left-nav-linktext">&nbsp;Groups</span>
-            	</li>
-            ', '/group/my-groups') ?>
+            <?= (($role == User::ROLE_SAFEUSER) || ($role == User::ROLE_ADMIN)) ? 
+                Html::a('
+                	<li class="groups ' . ($active == "groups" ? "active" : NULL) . '">
+                		<span class="glyphicons glyphicons-cluster"></span>
+                		<span class="left-nav-linktext">&nbsp;Groups</span>
+                	</li>
+                ', '/group/my-groups') :
+                NULL
+            ?>
             <?= Yii::$app->user->identity->isMissionary ? Html::a('
             	<li class="updates ' . ($active == "updates" ? "active" : NULL) . '">
             		<span class="glyphicons glyphicons-direction"></span>
@@ -29,8 +34,8 @@ $id = $_GET['id'] ?? NULL;
             	</li>
             ', '/missionary/update-repository') : NULL ?>
         </ul>
-        <?php if (isset($joinedGroups)) { ?>
-            <div class="groups-links">
+        <?php if ((($role == User::ROLE_SAFEUSER) || ($role == User::ROLE_ADMIN)) && is_array($joinedGroups) && count($joinedGroups) > 0) { ?>
+            <div class="group-nav-links">
                 <h3>Groups</h3>
                 <?php foreach ($joinedGroups as $group) { ?>
                     <p <?= 'id="group-' . $group->id . '"' ?>><?= $group->name ?></p>

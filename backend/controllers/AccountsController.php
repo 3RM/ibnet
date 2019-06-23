@@ -175,10 +175,6 @@ class AccountsController extends Controller
             'display_name',
             'home_church',
             'primary_role',
-            'emailPrefLinks',
-            'emailPrefComments',
-            'emailPrefFeatures',
-            'emailPrefBlog',
             'reviewed',
         ];
         

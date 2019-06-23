@@ -13,13 +13,11 @@ class GroupAsset extends AssetBundle
     public $baseUrl = '@web';
     public $css = [
         'css/group.css',
-        'css/group-admin.css',
         'css/glyphicons.css',
         'css/glyphicons-social.css',
         'css/glyphicons-filetypes.css',
     ];
     public $js = [
-        //'js/prayer.js',
     ];
     public $depends = [
         'yii\web\YiiAsset',

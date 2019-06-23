@@ -4,7 +4,7 @@ namespace console\controllers;
 use common\models\blog\WpPosts;
 use common\models\Mail;
 use common\models\User;
-use fedemotta\cronjob\models\CronJob;
+use fedemotta\cronjob\models\CronJob; use common\models\Utility;
 use yii\console\Controller;
 use yii\helpers\ArrayHelper;
 
@@ -26,10 +26,9 @@ class BlogController extends Controller
         } else {
             foreach ($dates as $date) {
                 if ($posts = WpPosts::getWeeksPosts()) {
-                    $users = User::find()->where(['status' => User::STATUS_ACTIVE, 'emailPrefBlog' => 1])->andWhere('email IS NOT NULL')->all();
-                    
+                    $users = User::getAllSubscribedBlog();
+             
                     foreach ($users as $user) {
-                        $emailPrefLink = Html::a('click here', \Yii::$app->params['frontendUrl'] . '/site/login?url=' . \Yii::$app->params['frontendUrl'] . '/site/settings/#account-settings', ['target' => '_blank'])
                         Yii::$app
                             ->mailer
                             ->compose(
@@ -37,10 +36,9 @@ class BlogController extends Controller
                                 [
                                     'title' => 'This Week\'s Blog Posts', 
                                     'message' => 'Read the latest articles from the IBNet Blog: ', 
-                                    'posts' => $posts, 
-                                    'emailPrefLink' => $emailPrefLink
+                                    'posts' => $posts,
                                 ])
-                            ->setFrom([\Yii::$app->params['blogDigestEmail']])
+                            ->setFrom([\Yii::$app->params['email.blogDigest']])
                             ->setTo($user->email)
                             ->setSubject('IBNet Blog')
                             ->send();

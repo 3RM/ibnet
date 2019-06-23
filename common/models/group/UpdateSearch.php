@@ -55,7 +55,6 @@ class UpdateSearch extends MissionaryUpdate
         // load the search form data and validate
         if (!($this->load($params) && $this->validate())) {
             $query->joinWith(['user']);
-            $
             return $dataProvider;
         }
 

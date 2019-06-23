@@ -20,7 +20,6 @@ class AppAsset extends AssetBundle
         'css/glyphicons-social.css',
         'css/glyphicons-filetypes.css',
         'css/group.css',
-        'css/group-admin.css',
     ];
     public $js = [
         'js/site.js',

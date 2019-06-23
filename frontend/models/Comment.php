@@ -7,11 +7,13 @@
 
 namespace frontend\models;
 
+use common\models\User;
 use common\models\profile\Profile;
 use frontend\components\CommentSend;
 use rmrevin\yii\module\Comments;
+use Yii;
 use yii\behaviors\BlameableBehavior;
-use yii\behaviors\TimestampBehavior;
+use yii\behaviors\TimestampBehavior; use common\models\Utility;
 
 /**
  * Class Comment
@@ -100,8 +102,8 @@ class Comment extends \rmrevin\yii\module\Comments\models\Comment
      */
     public static function canCreate()
     {
-        $user = \Yii::$app->user->identity;
-        return isset($user->screen_name) && isset($user->home_church);
+        $role = array_keys(Yii::$app->authManager->getRolesByUser(Yii::$app->user->identity->id))[0];
+        return (($role == User::ROLE_SAFEUSER) || ($role == User::ROLE_ADMIN));
     }
 
     /**
@@ -109,10 +111,11 @@ class Comment extends \rmrevin\yii\module\Comments\models\Comment
      */
     public function canUpdate()
     {
-        $User = \Yii::$app->getUser();
-        return Comments\Module::instance()->useRbac === true
-            ? (\Yii::$app->getUser()->can(Comments\Permission::UPDATE) || \Yii::$app->getUser()->can(Comments\Permission::UPDATE_OWN, ['Comment' => $this]))
-            : ($User->isGuest ? false : ($this->created_by === $User->id));
+        $user = \Yii::$app->getUser();
+        return Comments\Module::instance()->useRbac === true ? 
+            (\Yii::$app->getUser()->can(Comments\Permission::UPDATE) 
+                || \Yii::$app->getUser()->can(Comments\Permission::UPDATE_OWN, ['Comment' => $this])) : 
+            ($user->isGuest ? false : ($this->created_by === $user->id));
     }
 
     /**
@@ -120,10 +123,13 @@ class Comment extends \rmrevin\yii\module\Comments\models\Comment
      */
     public function canDelete()
     {
-        $User = \Yii::$app->getUser();
-        return Comments\Module::instance()->useRbac === true
-            ? (\Yii::$app->getUser()->can(Comments\Permission::DELETE) || \Yii::$app->getUser()->can(Comments\Permission::DELETE_OWN, ['Comment' => $this]) || \Yii::$app->getUser()->can('updateProfile', ['profile' => $profile]))
-            : ($User->isGuest ? false : ($this->created_by === $User->id));
+        $user = \Yii::$app->getUser();
+        $profile = Profile::findOne($_GET['id']);
+        return Comments\Module::instance()->useRbac === true ? 
+            (\Yii::$app->getUser()->can(Comments\Permission::DELETE) 
+                || \Yii::$app->getUser()->can(Comments\Permission::DELETE_OWN, ['Comment' => $this]) 
+                || \Yii::$app->getUser()->can('updateProfile', ['profile' => $profile])) : 
+            ($user->isGuest ? false : ($this->created_by === $user->id));
     }
 
     /**

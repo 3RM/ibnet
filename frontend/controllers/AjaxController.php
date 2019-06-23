@@ -368,6 +368,7 @@ class AjaxController extends Controller
 
     /**
      * Delete a group place
+     * @param  $pid group place id
      * @return array
      */
     public function actionDeleteGroupPlace($pid)
@@ -407,6 +408,7 @@ class AjaxController extends Controller
 
     /**
      * Delete a group keyword
+     * @param  $kid keyword id
      * @return array
      */
     public function actionDeleteGroupKeyword($kid)
@@ -422,6 +424,7 @@ class AjaxController extends Controller
 
     /**
      * Delete tag on group prayer request tag form
+     * @param  $tid tag id
      * @return array
      */
     public function actionDeleteTag($tid)
@@ -429,7 +432,17 @@ class AjaxController extends Controller
         Yii::$app->response->format = Response::FORMAT_JSON;
 
         if ($tag = PrayerTag::findOne($tid)) {
+
+            // Unlink from all prayers where tag is currently used
+            if ($prayers = $tag->prayers) {
+                foreach ($prayers as $prayer) {
+                    $tag->unlink('prayers', $prayer, $delete = true);
+                }
+            }
+
+            // Delete tag
             $tag->delete();
+
             return ['tid' => $tid, 'success' => true];
         }
         return ['success' => false];
@@ -437,9 +450,10 @@ class AjaxController extends Controller
 
     /**
      * Return group prayer request on answer list back to prayer list
+     * @param  $id prayer id
      * @return array
      */
-    public function actionReturnRequest($id)
+    public function actionReturnPrayer($id)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
 
@@ -452,9 +466,10 @@ class AjaxController extends Controller
 
     /**
      * Delete group prayer request on prayer list
+     * @param  $id prayer id
      * @return array
      */
-    public function actionDeleteRequest($id)
+    public function actionDeletePrayer($id)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
 
@@ -532,12 +547,12 @@ class AjaxController extends Controller
     public function actionShowUpdates()
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        if (isset($_POST['mid']) && $member = GroupMember::findOne($_POST['mid'])) {
+        if (isset($_POST['mid']) && isset($_POST['gid']) && $member = GroupMember::findOne($_POST['mid'])) {
             $value = $member->show_updates == 1 ? 0 : 1;
             $member->updateAttributes(['show_updates' => $value]);
             $body = $member->show_updates ? 
-                Html::button('<i class="far fa-times-circle"></i> Stop sharing updates', ['id' => 'show-updates', 'class' => 'link-btn']) :
-                Html::button('<i class="far fa-check-circle"></i> Start sharing updates', ['id' => 'show-updates', 'class' => 'link-btn']);
+                Html::button('<i class="far fa-times-circle"></i> Stop sharing updates', ['id' => 'show-updates-' . $_POST['gid'], 'class' => 'link-btn']) :
+                Html::button('<i class="far fa-check-circle"></i> Start sharing updates', ['id' => 'show-updates-' . $_POST['gid'], 'class' => 'link-btn']);
             return ['body' => $body, 'success' => true];
         } 
         return ['success' => false];

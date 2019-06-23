@@ -826,7 +826,7 @@ button.link-btn:hover {
   color: #23527c;
 }
 .btn-link {           /* style link to look like button */
-  padding: 10px 40px;
+  padding: 10px 30px;
   color: #fff;
   background-color: #dc9f27;
   -webkit-transition: all 0.7s ease;

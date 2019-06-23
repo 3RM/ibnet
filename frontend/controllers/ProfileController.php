@@ -1549,23 +1549,18 @@ class ProfileController extends Controller
             $profile = Profile::findProfile($id);
             if ($profile->inappropriate < 1) {
                 $profile->updateAttributes(['inappropriate' => 1]);                
-                $user = Yii::$app->user->isGuest ? NULL : Yii::$app->user->identity->id;                
+                $user = Yii::$app->user->isGuest ? NULL : Yii::$app->user->identity;                
                 $url = Url::base('http') . Url::toRoute(['/profile/view-profile', 'id' => $id, 'urlLoc' => $profile->url_loc, 'urlName' => $profile->url_name]);
                 
-                Yii::$app
-                    ->mailer
-                    ->compose(
-                        ['html' => 'profile/flag-profile-html', 'text' => 'profile/flag-profile-text'], 
-                        ['url' => $url, 'user' => $user]
-                    )
-                    ->setFrom([\yii::$app->params['email.no-reply']])
-                    ->setTo([\yii::$app->params['email.admin']])
-                    ->setSubject('Inappropriate Profile Flag')
-                    ->send();
+                // Notify admin
+                $mail = Subscription::getSubscriptionByEmail(Yii::$app->params['email.admin']);
+                $mail->to = Yii::$app->params['email.admin'];
+                $mail->subject = 'Flagged Profile';
+                $mail->title = 'Flagged Profile';
+                $mail->message = Html::a(Html::encode($url), $url) . '. Flagged by ' . (isset($user) ? $user->fullName . ' (id ' . $user->id . ').' : 'a guest user.');
+                $mail->sendNotification();
             }
-            Yii::$app->session->setFlash('success', 
-                'Notification of inappropriate content received. This profile is now under review. 
-                Thank you for bringing this to our attention.');
+            Yii::$app->session->setFlash('success', 'This profile is now under review. Thank you for bringing this to our attention.');
         }
         
         return $this->redirect(['view-profile', 'id' => $id, 'urlLoc' => $profile->url_loc, 'urlName' => $profile->url_name]);

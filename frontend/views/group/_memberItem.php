@@ -40,7 +40,7 @@ $new = $model->created_at > $group->last_visit;
                 Html::button('<i class="fas fa-user-slash"></i>', [
                     'id' => 'ban-' . $model->id, 
                     'class' => 'btn btn-member-action', 
-                    'title' => 'Contact'
+                    'title' => 'Ban'
                 ]) : NULL
             ?>
         <?php } ?>

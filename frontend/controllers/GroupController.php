@@ -7,30 +7,29 @@
 
 namespace frontend\controllers;
 
-use common\models\profile\Profile;
+use common\models\Subscription;
 use common\models\User;
-use common\models\missionary\MissionaryUpdate; use common\models\Utility;
+use common\models\missionary\MissionaryUpdate;
 use common\models\group\IcalenderEvent;
 use common\models\group\Group;
 use common\models\group\GroupIcalendarUrl;
 use common\models\group\GroupCalendarEvent;
+use common\models\group\GroupInvite;
 use common\models\group\GroupMember;
 use common\models\group\GroupKeyword;
 use common\models\group\GroupPlace;
 use common\models\group\GroupSearch;
 use common\models\group\MemberSearch;
-use common\rbac\PermissionGroup;
 use common\models\group\Prayer;
+use common\models\group\PrayerAlertQueue;
 use common\models\group\PrayerTag;
 use common\models\group\AnswerSearch;
 use common\models\group\PrayerSearch;
 use common\models\group\PrayerUpdate;
 use common\models\group\UpdateSearch;
-// use Dompdf\Dompdf;
-// use kartik\grid\GridView;
+use common\rbac\PermissionGroup;
 use Yii;
 use yii\bootstrap\Html;
-// use yii\bootstrap\Modal;
 use yii\data\ActiveDataProvider;
 use yii\db\Expression;
 use yii\filters\AccessControl;
@@ -55,7 +54,7 @@ class GroupController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'except' => [],
+                'except' => ['invite-join'],
                 'rules' => [
                     [
                         'allow' => false,
@@ -63,7 +62,7 @@ class GroupController extends Controller
                     ],
                     [
                         'allow' => true,
-                        'roles' => ['safeUser', 'Admin'],
+                        'roles' => ['SafeUser', 'Admin'],
                     ],
                 ],
             ],
@@ -85,20 +84,50 @@ class GroupController extends Controller
             $group = Group::findOne($_POST['trash']);
             $group->trash();
             Yii::$app->session->setFlash('success', 'Your group ' . $group->name . ' has been deleted.');
+        } elseif (isset($_POST['join'])) {
+            $group = Group::findOne($_POST['join']);
+            GroupMember::joinGroup($_POST['join']);
+            $group->private ?
+                Yii::$app->session->setFlash('success', 'Your request to join ' . $group->name . ' has been submitted.') :
+                Yii::$app->session->setFlash('success', 'You are now a member of ' . $group->name . '.');
+        } elseif (isset($_POST['leave'])) {
+            $group = Group::findOne($_POST['leave']);
+            GroupMember::leaveGroup($_POST['leave']);
+            Yii::$app->session->setFlash('success', 'You have left ' . $group->name . '.');
+        }
+
+        // Solr group search
+        $groupSearch = new GroupSearch();
+        $dataProvider = NULL;
+        if ($groupSearch->load(Yii::$app->request->Post())) {
+            $dataProvider = $groupSearch->query($groupSearch->term);
         }
 
         $user = Yii::$app->user->identity;
+        // Owned groups
         $ownGroups = $user->ownGroups;
         $ids = ArrayHelper::getColumn($ownGroups, 'id');
+        // Joined groups (any status)
         $allJoinedGroups = $user->getJoinedGroups($ids)->all();
+        // Joined groups (active status)
         $joinedGroups = $user->activeJoinedGroups;
-        $groupSearch = new GroupSearch();
+        // Owned and joined group ids
+        $jids = ArrayHelper::getColumn($allJoinedGroups, 'id');
+        $aids = array_merge($ids, $jids);
+        // Groups with join requests pending for current user, exclude owned and joined groups
+        $pendingGroups = $user->getPendingGroups($aids)->all();
+        // Pending group ids
+        $pids = ArrayHelper::getColumn($pendingGroups, 'id');
 
         return $this->render('myGroups', [
             'ownGroups' => $ownGroups,
             'allJoinedGroups' => $allJoinedGroups,
             'joinedGroups' => $joinedGroups,
+            'pendingGroups' => $pendingGroups,
+            'aids' => $aids,
+            'pids' => $pids,
             'groupSearch' => $groupSearch,
+            'dataProvider' => $dataProvider,
         ]);
     }
 
@@ -240,11 +269,23 @@ class GroupController extends Controller
                 return $this->redirect(['group-features', 'id' => $group->id]);
 
             } elseif ($group->validate()) {
-                if (Group::STATUS_ACTIVE != $group->status) {
+
+                // Set status
+                if ($group->status != Group::STATUS_ACTIVE) {
                     $group->status = Group::STATUS_ACTIVE;
                     Yii::$app->session->setFlash('success', 'Your group "' . $group->name . '" is now active.');
                 }
+
+                // Create Discourse Group
+                if ($group->feature_forum != $group->getOldAttribute('feature_forum')) {
+                    $group->feature_forum == 1 ?
+                        $group->createForumGroup() :
+                        $group->removeForumGroup();
+                }
+
+                // Save
                 $group->save();
+
                 return $this->redirect(['my-groups']);
             }
         }
@@ -257,7 +298,7 @@ class GroupController extends Controller
      *
      * @return mixed
      */
-    public function actionGroupMembers($id)
+    public function actionManageMembers($id)
     {
         $group = Group::findOne($id);
         if (!$group->canUpdateOwn()) {
@@ -268,7 +309,7 @@ class GroupController extends Controller
             list($gid, $uid) = explode('-', $_POST['approve']); 
             if ($member = GroupMember::find()->where(['group_id' => $gid, 'user_id' => $uid])->one()) {
                 $member->approveMember();
-                return $this->redirect(['group-members', 'id' => $gid]);
+                return $this->redirect(['manage-members', 'id' => $gid]);
             }
             throw new HttpException(500);
         }
@@ -288,6 +329,71 @@ class GroupController extends Controller
     }
 
     /**
+     * Manage group forum
+     *
+     * @return mixed
+     */
+    public function actionManageForum($id)
+    {
+        $group = Group::findOne($id);
+        $group->scenario = 'category-edit';
+        if (!$group->canUpdateOwn() || ($group->feature_forum == NULL)) {
+            throw new NotFoundHttpException;
+        }
+
+        $parentCategory = $group->parentCategory;
+        $categories = $group->childCategories;
+        
+        return $this->render('forum\forum', [
+            'group' => $group,
+            'parentCategory' => $parentCategory,
+            'categories' => $categories,
+        ]);
+    }
+
+    /**
+     * Manage group forum
+     *
+     * @return mixed
+     */
+    public function actionCategoryEdit($id=NULL, $cid=NULL)
+    {
+        $group = $id ? Group::findOne($id) : New Group;
+        $group->scenario = 'category-edit';
+
+        if (isset($_POST['save']) && $group->load(Yii::$app->request->Post())) {
+            $group->categoryBannerColor = $_POST['categoryBannerColor'];
+            $group->categoryTitleColor = $_POST['categoryTitleColor'];
+            $group->updateCategory();
+            return $this->redirect(['manage-forum', 'id' => $id]);
+
+        } elseif (isset($_POST['trash']) && $group->load(Yii::$app->request->Post())) {
+            $group->removeCategory(); 
+            return $this->redirect(['manage-forum', 'id' => $id]);
+        
+        } elseif (isset($_POST['new']) && $group->load(Yii::$app->request->Post())) {
+            $group->categoryBannerColor = $_POST['categoryBannerColor'];
+            $group->categoryTitleColor = $_POST['categoryTitleColor'];
+            $group->addChildCategory();
+            return $this->redirect(['manage-forum', 'id' => $id]);
+        }
+
+        // Category exists, prepopulate values
+        if (isset($cid)) {
+            $category = $cid == $group->discourse_category_id ? 
+                $group->parentCategory :
+                $group->getChildCategory($cid);
+            $group->cid = $category->id;
+            $group->categoryName = $category->name;
+            $group->categoryBannerColor = $category->color;
+            $group->categoryTitleColor = $category->text_color;
+            $group->_categoryDescription = $group->getCategoryDescription($category->topic_url);
+        }
+
+        return $this->renderAjax('forum\_categoryEdit', ['group' => $group]);
+    }
+
+    /**
      * Decline user request to join group
      *
      * @return mixed
@@ -304,7 +410,7 @@ class GroupController extends Controller
             if ($member = GroupMember::find()->where(['group_id' => $group->id, 'user_id' => $_POST['decline']])->one()) {
                 if ($member->declineMember($group->message)) {
                     Yii::$app->session->setFlash('success', 'The request was declined and the user has been notified.');
-                    return $this->redirect(['group-members', 'id' => $group->id]);
+                    return $this->redirect(['manage-members', 'id' => $group->id]);
                 }
             }
             throw new HttpException(500);
@@ -331,11 +437,11 @@ class GroupController extends Controller
             throw new NotFoundHttpException;
         }
 
-        if (isset($_POST['remove']) && $group->load(Yii::$app->request->Post())) {
+        if (isset($_POST['remove']) && $group->load(Yii::$app->request->Post())) { 
             if ($member = GroupMember::find()->where(['group_id' => $group->id, 'user_id' => $_POST['remove']])->one()) {
                 if ($member->removeMember($group->message)) {
                     Yii::$app->session->setFlash('success', 'The member was removed and a notification was sent.');
-                    return $this->redirect(['group-members', 'id' => $group->id]);
+                    return $this->redirect(['manage-members', 'id' => $group->id]);
                 }
             }
             throw new HttpException(500);
@@ -366,7 +472,7 @@ class GroupController extends Controller
             if ($member = GroupMember::find()->where(['group_id' => $group->id, 'user_id' => $_POST['ban']])->one()) {
                 if ($member->banMember($group->message)) {
                     Yii::$app->session->setFlash('success', 'The member was banned and a notification was sent.');
-                    return $this->redirect(['group-members', 'id' => $group->id]);
+                    return $this->redirect(['manage-members', 'id' => $group->id]);
                 }
             }
             throw new HttpException(500);
@@ -397,7 +503,7 @@ class GroupController extends Controller
             if ($member = GroupMember::find()->where(['group_id' => $group->id, 'user_id' => $_POST['restore']])->one()) {
                 if ($member->restore($group->message)) {
                     Yii::$app->session->setFlash('success', 'The ban has been removed and a notification was sent.');
-                    return $this->redirect(['group-members', 'id' => $group->id]);
+                    return $this->redirect(['manage-members', 'id' => $group->id]);
                 }
             }
             throw new HttpException(500);
@@ -418,7 +524,7 @@ class GroupController extends Controller
      */
     public function actionContactMember($id=NULL, $uid=NULL)
     {
-        $group = $id ? Group::findOne($id) : new Group;
+        $group = $id ? Group::findOne($id) : new Group();
         $group->scenario = 'contact-member';
         if ($id && !$group->canUpdateOwn()) {
             throw new NotFoundHttpException;
@@ -429,22 +535,22 @@ class GroupController extends Controller
             && $group->validate()
             && $user = User::findOne($_POST['contact'])) {
 
-            $owner = User::findOne($group->user_id);
-            Yii::$app
-                ->mailer
-                ->compose(
-                    ['html' => 'site/notification-html', 'text' => 'site/notification-text'], 
-                    ['title' => 'Message from IBNet group ' . $group->name, 'message' => $group->message]
-                )
-                ->setFrom($owner->email)
-                ->setCc($owner->email)
-                ->setTo($user->email)
-                ->setSubject($group->subject)
-                ->send();
+            $owner = $group->owner;
+            $mail = $owner->subscription ?? new Subscription();
+            $mail->headerColor = Subscription::COLOR_GROUP;
+            $mail->headerImage = Subscription::IMAGE_GROUP;
+            $mail->headerText = 'Group Message';
+            $mail->from = $owner->email;
+            $mail->to = $user->email;
+            $mail->cc = $owner->email;
+            $mail->title = 'Message from IBNet group ' . $group->name;
+            $mail->subject = $group->subject;
+            $mail->message = $group->message;
+            $mail->sendNotification(); 
 
             Yii::$app->session->setFlash('success', 'You\'re message has been sent.');
 
-            return $this->redirect(['group-members', 'id' => $group->id]);
+            return $this->redirect(['manage-members', 'id' => $group->id]);
         }
 
         $user = User::findOne($uid);
@@ -465,11 +571,82 @@ class GroupController extends Controller
     public function actionInvite($id)
     {
         $group = Group::findOne($id);
+        $group->scenario = 'invite-member';
         if (!$group->canUpdateOwn()) {
             throw new NotFoundHttpException;
         }
 
-        return $this->renderAjax('_invite', []);
+        if (isset($_POST['invite'])
+            && $group->load(Yii::$app->request->Post()) 
+            && $group->validate()) {
+
+            // Check for failed email addresses
+            $return = $group->sendInvites();
+            if (is_array($return)) {
+                $msg = count($return) > 1 ?
+                    'The following address(es) are either invalid or unsubscribed: ' :
+                    'The following address is either invalid or unsubscribed: ';
+                foreach ($return as $failed) {
+                    $msg .= $failed . ', ';
+                }
+                $msg = rtrim($msg,', ');
+                Yii::$app->session->setFlash('warning', $msg);
+            } else {
+                Yii::$app->session->setFlash('success', 'You\'re invitation has been sent.');
+            }
+
+            return $this->redirect(['my-groups', 'id' => $group->id]);
+        }
+
+        return $this->renderAjax('_invite', ['group' => $group]);
+    }
+
+    /**
+     * Invite new group members
+     *
+     * @return mixed
+     */
+    public function actionInviteJoin($token)
+    {
+        if (isset($_POST['join'])) {
+            $invite = GroupInvite::findOne($_POST['join']);
+            GroupMember::joinGroup($invite->group_id, true);
+            $invite->delete();
+            return $this->redirect(['group/my-groups']);
+
+        } elseif (isset($_POST['decline'])) {
+            $invite = GroupInvite::findOne($_POST['decline']);
+            $invite->decline();
+            return $this->goHome();
+        } 
+        
+        if (!$invite = GroupInvite::find()->where(['token' => $token])->one()) {
+            throw new NotFoundHttpException;
+        }        
+            
+        $group = $invite->group;
+        $status = 'authorized';
+        if (!Yii::$app->user->isGuest) {
+            $user = Yii::$app->user->identity;
+            $role = array_keys(Yii::$app->authManager->getRolesByUser($user->id))[0];
+            $members = ArrayHelper::getColumn($group->memberUsers, 'id');
+        }
+
+        if (Yii::$app->user->isGuest) {
+            $status = 'guest';
+        } elseif (in_array($user->id, $members)) {
+            $status = 'member';
+        } elseif (($invite->created_at + Yii::$app->params['tokenExpire.groupInviteJoin']) < time()) {
+            $status = 'expired';
+        } elseif (($role != User::ROLE_ADMIN) && ($role != User::ROLE_SAFEUSER)) {
+            $status = 'not authorized';
+        }
+
+        return $this->render('inviteJoin', [
+            'group' => $group,
+            'invite' => $invite,
+            'status' => $status,
+        ]);
     }
 
     /**
@@ -490,22 +667,19 @@ class GroupController extends Controller
                 && ($newUser = User::findByEmail($group->newUserEmail))
                 && $group->generateGroupTransferToken($newUser->id)) {
 
+                // Check if user supplied own address
                 if ($oldUser->id == $newUser->id) {
-                    Yii::$app->session->setFlash('warning', 'You cannot transfer the group to yourself.');
+                    Yii::$app->session->setFlash('warning', 'You already own this group.');
                     return $this->redirect(['transfer', 'id' => $id]);
                 }
 
                 // Send transfer request email to new user
-                Yii::$app->mailer->compose(
-                        ['html' => 'group/transfer-html', 'text' => 'group/transfer-text'], 
-                        ['group' => $group, 'oldUser' => $oldUser]
-                    )
-                    ->setFrom([\yii::$app->params['email.admin']])
-                    ->setTo([$newUser->email])
-                    ->setSubject('IBNet Group Transfer Request')
-                    ->send();
+                if (!$group->sendGroupTransfer($group, $newUser, $oldUser)) {
+                    Yii::$app->session->setFlash('warning', 'The message could not be sent to the address supplied.');
+                    return $this->redirect(['transfer', 'id' => $id]); 
+                }
             }
-            Yii::$app->session->setFlash('success', 'Your request was sent provided the email is registered with IBNet.  You will receive an email when the transfer is complete.');
+            Yii::$app->session->setFlash('success', 'Your request was sent and will remain valid for one week.  You will receive an email when the transfer is complete.');
         }
         return $this->render('transfer', ['group' => $group]);                              
     }
@@ -543,15 +717,13 @@ class GroupController extends Controller
                 $groupMember->save();
             }
 
-            // Send Email to old profile owner           
-            Yii::$app->mailer->compose(
-                    ['html' => 'group/transferComplete-html', 'text' => 'group/transferComplete-text'], 
-                    ['group' => $group, 'newUser' => $newUser]
-                )
-                ->setFrom([\yii::$app->params['email.admin']])
-                ->setTo([$oldUser->email])
-                ->setSubject('IBNet Profile Transfer Complete')
-                ->send();
+            $sub = $newUser->subscription;
+            if ($sub->token && $sub->unsubscribe) {
+                return $this->render('transferComplete', ['group' => $group]);
+            }
+
+            // Send Email to old group owner
+            $group->sendGroupTransfer($group, $newUser, $oldUser, TRUE);           
 
             return $this->render('transferComplete', ['group' => $group]);
 
@@ -562,12 +734,15 @@ class GroupController extends Controller
 
     /**
      * Prayer List feature
-     *
+     * @param $id integer group id
+     * @param $dspy boolean preserve new prayer request on tag save page reload (1)
+     * @param $f boolean ignore pagination and show full list of results (1)
+     * @param $l boolean whether to show prayer (0) or answer (1) list
      * @return mixed
      */
-    public function actionPrayer($id, $pdf=NULL, $dspy=NULL, $f=NULL, $l=0)     // $dspy=1 preserve new tag text on page reload
-    {                                                                           // $f=1 ignore pagination and return the full list
-        $group = Group::findOne($id);                                           // $l=0 show prayer list; $l=1 show answer list
+    public function actionPrayer($id, $dspy=NULL, $f=NULL, $l=0)
+    {
+        $group = Group::findOne($id); 
         if (!$group->canAccess()) {
             throw new NotFoundHttpException;
         }
@@ -577,7 +752,6 @@ class GroupController extends Controller
         $member = $group->groupMember;
         $prayer = new Prayer();
         $prayer->scenario = 'prayer';
-        $tag = new PrayerTag();
         $tagList = $group->prayerTagList;
         $update = new PrayerUpdate();
         $answer = new Prayer();
@@ -607,15 +781,14 @@ class GroupController extends Controller
             if ($prayer->select) {
                 $prayer->handleTags();
             }
+            // Save to alert queue
+            $prayer->addToAlertQueue(PrayerAlertQueue::STATUS_NEW);
+
             return $this->redirect(['prayer', 'id' => $id, 'dspy' => NULL]);  
 
-        } elseif ($tag->load(Yii::$app->request->post()) && $tag->validate()) {
-            $tag->group_id = $id;
-            $tag->tag = strtolower($tag->tag);
-            $tag->save();
-            return $this->redirect(['prayer', 'id' => $id, 'dspy' => 1]);         
         }
 
+        $prayer->duration = 30; // Initialize to "short-term"
         $searchModel = new PrayerSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->get(), $id, $f, $l);       
 
@@ -624,7 +797,6 @@ class GroupController extends Controller
             'joinedGroups' => $joinedGroups,
             'member' => $member,
             'prayer' => $prayer,
-            'tag' => $tag,
             'tagList' => $tagList,
             'update' => $update,
             'answer' => $answer,
@@ -638,18 +810,19 @@ class GroupController extends Controller
     }
 
     /**
-     * Render content for update prayer request modal
-     *
+     * Render content for update prayer modal
+     * @param $id integer group id
+     * @param  $pid integer prayer id
      * @return mixed
      */
-    public function actionUpdateRequest($id, $rid)
-    {
+    public function actionUpdatePrayer($id, $pid)
+    { 
         $group = Group::findOne($id);
         if (!$group->canAccess()) {
             throw new NotFoundHttpException;
         }
 
-        $prayer = Prayer::findOne($rid);
+        $prayer = Prayer::findOne($pid);
         $prayer->scenario = 'update';
         $update = new PrayerUpdate();
         $update->select = $prayer->prayerTags;
@@ -666,16 +839,20 @@ class GroupController extends Controller
                 $prayer->handleTags();
             }
             // Handle update
-            if (isset($udpate->update)) {
-                $update->prayer_id = $rid;
+            if (isset($update->update)) {
+                $update->prayer_id = $pid;
                 $update->save();
+
+                // Save to alert queue
+                $prayer->addToAlertQueue(PrayerAlertQueue::STATUS_UPDATE);
             }
             // Always save prayer in order to update updated_at
             $prayer->save();
+
             return $this->redirect(['prayer', 'id' => $id, 'dspy' => NULL]); 
         
         } else {
-            return $this->renderAjax('prayer/_updateRequest', ['update' => $update, 'tagList' => $tagList]);
+            return $this->renderAjax('prayer/_updatePrayer', ['update' => $update, 'tagList' => $tagList]);
         }
     }
 
@@ -684,28 +861,57 @@ class GroupController extends Controller
      *
      * @return mixed
      */
-    public function actionAnswerRequest($id, $rid)
+    public function actionAnswerPrayer($id, $pid)
     {
         $group = Group::findOne($id);
         if (!$group->canAccess()) {
             throw new NotFoundHttpException;
         }
 
-        $request = Prayer::findOne($rid);
-        $request->scenario = 'prayer';
+        $prayer = Prayer::findOne($pid);
+        $prayer->scenario = 'prayer';
         $answer = new Prayer();
         $answer->scenario = 'answer';
         if ($answer->load(Yii::$app->request->post()) && $answer->validate()) {
-            $request->answer_description = $answer->answer_description;
-            $request->answer_date = time();
-            $request->answered = 1;
-            $request->save();
+            $prayer->answer_description = $answer->answer_description;
+            $prayer->answer_date = time();
+            $prayer->answered = 1;
+            $prayer->save();
+
+            // Save to alert queue
+            $prayer->addToAlertQueue(PrayerAlertQueue::STATUS_ANSWER);
+
             return $this->redirect(['prayer', 'id' => $id, 'dspy' => NULL]); 
         
         }
         // Retain answer description if previously answered, then moved back to list
-        $answer->answer_description = $request->answer_description;
-        return $this->renderAjax('prayer/_answerRequest', ['answer' => $answer]);
+        $answer->answer_description = $prayer->answer_description;
+        return $this->renderAjax('prayer/_answerPrayer', ['answer' => $answer]);
+    }
+
+    /**
+     * Render content for update prayer modal
+     * @param $id integer group id
+     * @return mixed
+     */
+    public function actionNewTag($id=NULL)
+    {
+        $tag = new PrayerTag();
+
+        if ($tag->load(Yii::$app->request->post()) && $tag->validate()) {
+            $tag->tag = strtolower($tag->tag);
+            $tag->save();
+            return $this->redirect(['prayer', 'id' => $tag->group_id, 'dspy' => 1]);
+        }
+
+        $group = Group::findOne($id);
+        $tagList = $group->prayerTagList;
+        $tag->group_id = $id;
+
+        return $this->renderAjax('prayer/_newTag', [
+            'tag' => $tag, 
+            'tagList' => $tagList
+        ]);
     }
 
     /**
@@ -763,7 +969,7 @@ class GroupController extends Controller
         $q = $sso->buildLoginString($userparams);
         
         // Redirect back
-        header('Location: ' . Yii::getAlias('@discourse') . '/session/sso_login?' . $q);
+        $this->redirect(Yii::getAlias('@discourse') . '/session/sso_login?' . $q);
     }
 
     /**
@@ -773,10 +979,7 @@ class GroupController extends Controller
      */
     public function actionForumReturn()
     {
-        if (Url::previous() != NULL) {
-            return $this->redirect(Url::previous());
-        }
-        return $this->goHome();
+        return Url::previous() != NULL ? $this->redirect(Url::previous()) : $this->goHome();
     }
 
     /**
@@ -998,12 +1201,25 @@ class GroupController extends Controller
      */
     public function actionNotification($id)
     {
-        $this->group = Group::findOne($id);
+        $group = Group::findOne($id);
+        $group->scenario = 'send-notice';
         if (!$group->canAccess()) {
             throw new NotFoundHttpException;
         }
+
+        if ($group->load(Yii::$app->request->Post()) && $group->validate()) {
+            $group->sendNotification();
+            Yii::$app->session->setFlash('success', 'Your notification has been sent.');
+            return $this->redirect(['notification', 'id' => $group->id]);
+        }
+
+        $user = Yii::$app->user->identity;
+        $joinedGroups = $user->joinedGroups;
         
-        return $this->render('notification', ['group' => $this->group]);
+        return $this->render('notification/notification', [
+            'group' => $group,
+            'joinedGroups' => $joinedGroups,
+        ]);
     }
 
     /**

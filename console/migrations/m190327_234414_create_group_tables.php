@@ -38,6 +38,9 @@ class m190327_234414_create_group_tables extends Migration
             'not_searchable' => $this->smallInteger(6),
             'group_level' => $this->smallInteger(6),
             'ministry_id' => $this->integer(),
+            'discourse_group_name' => $this->string(),
+            'discourse_group_id' => $this->integer(),
+            'discourse_category_id' => $this->integer(),
             'feature_prayer' => $this->tinyInteger(1),
             'feature_calendar' => $this->tinyInteger(1),
             'feature_notification' => $this->tinyInteger(1),
@@ -204,6 +207,45 @@ class m190327_234414_create_group_tables extends Migration
             'group_member',
             'missionary_id',
             'missionary',
+            'id',
+            'NO ACTION',
+            'NO ACTION'
+        );
+
+        $this->createIndex(
+            'idx-group_member-group_id',
+            'group_member',
+            'group_id'
+        );
+
+        $this->createIndex(
+            'idx-group_member-user_id',
+            'group_member',
+            'user_id'
+        );
+
+        /**
+         * Table group_invite
+         **/
+        $this->createTable('{{%group_invite}}', [
+            'id' => $this->primaryKey(),
+            'email' => $this->string(60)->notNULL(),
+            'created_at' => $this->integer()->notNULL(),
+            'group_id' => $this->integer()->notNULL(),
+            'token' => $this->string()->notNULL(),
+        ], $tableOptions);
+
+        $this->addCommentOnColumn(
+            'group_invite',
+            'group_id',
+            'FOREIGN KEY (group_id) REFERENCES group (id) ON DELETE NO ACTION ON UPDATE NO ACTION'
+        );
+
+        $this->addForeignKey(
+            'fk-group_invite-group_id',
+            'group_invite',
+            'group_id',
+            'group',
             'id',
             'NO ACTION',
             'NO ACTION'
@@ -449,17 +491,106 @@ class m190327_234414_create_group_tables extends Migration
             'NO ACTION'
         );
 
+        // $this->addForeignKey(
+        //     'fk-group_icalendar_url-ical_id',
+        //     'group_icalendar_url',
+        //     'ical_id',
+        //     'icalender_main',
+        //     'id',
+        //     'NO ACTION',
+        //     'NO ACTION'
+        // );
+
+
+
+        /**
+         * Table group_notification
+         **/
+        $this->createTable('{{%group_notification}}', [
+            'id' => $this->primaryKey(),
+            'group_id' => $this->integer(),
+            'user_id' => $this->integer(),
+            'created_at' => $this->integer(),
+            'reply_to' => $this->integer(),
+            'subject' => $this->string(),
+            'message' => $this->text(),
+        ], $tableOptions);
+
+        $this->addCommentOnColumn(
+            'group_notification',
+            'group_id',
+            'FOREIGN KEY (group_id) REFERENCES group (id) ON DELETE NO ACTION ON UPDATE NO ACTION'
+        );
+
+        $this->addCommentOnColumn(
+            'group_notification',
+            'user_id',
+            'FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE NO ACTION ON UPDATE NO ACTION'
+        );
+
+        $this->addCommentOnColumn(
+            'group_notification',
+            'reply_to',
+            'FOREIGN KEY (reply_to) REFERENCES group_notification (id) ON DELETE NO ACTION ON UPDATE NO ACTION'
+        );
+
         $this->addForeignKey(
-            'fk-group_icalendar_url-ical_id',
-            'group_icalendar_url',
-            'ical_id',
-            'icalender_main',
+            'fk-group_notification-group_id',
+            'group_notification',
+            'group_id',
+            'group',
             'id',
             'NO ACTION',
             'NO ACTION'
         );
 
+        $this->addForeignKey(
+            'fk-group_notification-user_id',
+            'group_notification',
+            'user_id',
+            'user',
+            'id',
+            'NO ACTION',
+            'NO ACTION'
+        );
+
+        $this->addForeignKey(
+            'fk-group_notification-reply_to',
+            'group_notification',
+            'reply_to',
+            'group_notification',
+            'id',
+            'NO ACTION',
+            'NO ACTION'
+        );
+
+
+
+        /**
+         * Table group_notification_message_id
+         **/
+        $this->createTable('{{%group_notification_message_id}}', [
+            'message_id' => $this->primaryKey(),
+            'notification_id' => $this->integer(),
+        ], $tableOptions);
+
+        $this->addCommentOnColumn(
+            'group_notification_message_id',
+            'notification_id',
+            'FOREIGN KEY (notification_id) REFERENCES group_notification (id) ON DELETE NO ACTION ON UPDATE NO ACTION'
+        );
+
+        $this->addForeignKey(
+            'fk-group_notification_message_id-notification_id',
+            'group_notification_message_id',
+            'notification_id',
+            'group_notification',
+            'id',
+            'NO ACTION',
+            'NO ACTION'
+        );
     }
+
 
     /**
      * {@inheritdoc}

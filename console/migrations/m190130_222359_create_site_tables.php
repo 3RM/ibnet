@@ -34,16 +34,13 @@ class m190130_222359_create_site_tables extends Migration
             'created_at' => $this->integer()->notNull(),
             'updated_at' => $this->integer()->notNull(),
             'last_login' => $this->integer()->notNull(),
+            'ip' => $this->string(),
+            'timezone' => $this->string()->defaultValue('UTC'),
             'status' => $this->smallInteger()->notNull()->defaultValue(10),
             'usr_image' => $this->string(),
             'display_name' => $this->string(60),
             'home_church' => $this->integer(),
             'primary_role' => $this->string(20),
-            'emailPrefProfile' => $this->tinyInteger(1)->notNull()->defaultValue(1),
-            'emailPrefLinks' => $this->tinyInteger(1)->notNull()->defaultValue(1),
-            'emailPrefComments' => $this->tinyInteger(1)->notNull()->defaultValue(1),
-            'emailPrefFeatures' => $this->tinyInteger(1)->notNull()->defaultValue(1),
-            'emailPrefBlog' => $this->tinyInteger(1)->notNull()->defaultValue(1),
             'reviewed' => $this->tinyInteger(1),   
         ], $tableOptions);
 
@@ -64,7 +61,23 @@ class m190130_222359_create_site_tables extends Migration
             'id' => $this->primaryKey(),
             'role' => $this->string(60)->notNull(),
             'type' => $this->string(40)->notNull(),
-        ], $tableOptions);     
+        ], $tableOptions);
+
+
+        /**
+         * Table mail_preferences
+         **/
+        $this->createTable('{{%mail_preferences}}', [
+            'id' => $this->primaryKey(),
+            'email' => $this->string(60)->notNull(),
+            'token' => $this->string(32),
+            'unsubscribe' => $this->tinyInteger(1)->defaultValue(0),
+            'profile' => $this->tinyInteger(1)->defaultValue(0),
+            'links' => $this->tinyInteger(1)->defaultValue(0),
+            'comments' => $this->tinyInteger(1)->defaultValue(0),
+            'features' => $this->tinyInteger(1)->defaultValue(0),
+            'blog' => $this->tinyInteger(1)->defaultValue(0),
+        ], $tableOptions);  
     }
 
     /**

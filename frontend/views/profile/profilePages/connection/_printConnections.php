@@ -55,7 +55,7 @@ if ($likeArray) {
 				} else {
 					echo (empty($like->usr_image) ? Html::img('@web/images/content/user.png') : Html::img($like->usr_image)); 
 					echo '<div class="title">';
-						echo $like->screen_name;
+						echo $like->fullName;
 						echo Html::tag('span', '<br>Friend of the ministry', ['class' => 'subTitle']);
 					echo '</div>';
 				}

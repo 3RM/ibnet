@@ -3,6 +3,7 @@ namespace frontend\models;
 
 use Yii;
 use yii\base\Model;
+use common\models\Subscription;
 use common\models\User;
 
 /**
@@ -55,15 +56,11 @@ class PasswordResetRequestForm extends Model
             }
         }
 
-        return Yii::$app
-            ->mailer
-            ->compose(
-                ['html' => 'passwordResetToken-html', 'text' => 'passwordResetToken-text'],
-                ['user' => $user]
-            )
-            ->setFrom([Yii::$app->params['no-replyEmail'] => Yii::$app->params['no-replyEmail']])
-            ->setTo($this->email)
-            ->setSubject('Password reset for IBNet.org')
-            ->send();
+        $mail = $user->subscription ?? new Subscription();
+        $mail->to = $user->email;
+        $mail->subject = 'Password Reset for IBNet.org';
+        $mail->message = 'Follow the link below to reset your password:';
+        $mail->link = Yii::$app->urlManager->createAbsoluteUrl(['site/reset-password', 'token' => $user->password_reset_token]);
+        return $mail->sendNotification(NULL, TRUE);
     }
 }

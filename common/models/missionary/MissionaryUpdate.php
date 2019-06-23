@@ -199,6 +199,10 @@ class MissionaryUpdate extends \yii\db\ActiveRecord
      *
      * Default is return embed code | false
      *
+     * Disable throwing guzzle http protocol errors: 
+     * $res = $client->request('GET', '/status/500', ['http_errors' => false]);
+     * http://docs.guzzlephp.org/en/stable/request-options.html
+     * 
      * @return mixed
      */
     public function getVideo($errorImage=false, $thumb=false)

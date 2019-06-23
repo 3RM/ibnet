@@ -1,6 +1,5 @@
 <?php
 return [
-    'adminEmail' => 'admin@ibnet.org',
-    'blogDigestEmail' => 'blogdigest@ibnet.org',
-    'frontendUrl' => 'https://ibnet.org',
+    'email.admin' => 'admin@ibnet.org',
+    'email.blogDigest' => 'blogdigest@ibnet.org',
 ];

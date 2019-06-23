@@ -5,21 +5,25 @@ namespace frontend\assets;
 use yii\web\AssetBundle;
 
 /**
- * Group plugins asset bundle.
+ * Fullcalendar asset bundle.
  */
 class AdminLtePluginAsset extends AssetBundle
 {
-    // public $sourcePath = '@vendor/almasaeed2010/adminlte/plugins';
+    // public $sourcePath = '@vendor/almasaeed2010/adminlte/bower_components/fullcalendar/dist';
     // public $js = [
-    //     // 'fullcalendar/fullcalendar.min.js',
-    //     '../../../js/calendar.js',
+    //     'fullcalendar.js',
+    //     'fullcalendar.min.js',
+    //     'locale-all.js',
+    //     '../../../../../../js/calendar.js',
+        
     // ];
     // public $css = [
-    //     // 'fullcalendar/fullcalendar.min.css',
+    //     'fullcalendar.min.css',
+    //     'fullcalendar.print.css',
     // ];
     // public $depends = [
-    //     // 'omnilight\assets\MomentAsset',
-    //     // 'yii\jui\JuiAsset',
-    //     'dmstr\web\AdminLteAsset',
+    //     'omnilight\assets\MomentAsset',
+    //     'yii\jui\JuiAsset',
+    //     // 'dmstr\web\AdminLteAsset',
     // ];
 }

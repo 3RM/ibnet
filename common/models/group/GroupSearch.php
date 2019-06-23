@@ -14,9 +14,11 @@ use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use yii\db\Query;
 
-
 class GroupSearch extends Group
 {
+    /**
+     * @param string $term User entered search string
+     */
     public $term;
    
     /**
@@ -25,12 +27,13 @@ class GroupSearch extends Group
     public function rules()
     {
         return [
-            ['term', 'string', 'max' => 20],
+            ['term', 'string', 'max' => 100],
             ['term', 'filter', 'filter' => 'strip_tags'],
         ];
     }
 
     /**
+     * Bypass scenarios() - implementation in the parent class
      * @inheritdoc
      */
     public function scenarios()
@@ -39,13 +42,15 @@ class GroupSearch extends Group
     }
 
     /**
-     * Returns groups based on user search string
+     * Returns Profile rows based on user search string
      */
     public function query($term)
     {
-        $query = Yii::$app->solr->createSelect();
+        $solr = Yii::$app->solr;
+        $solr->setDefaultEndpoint('group');
+        $query = $solr->createSelect();
         $EDisMax = $query->getEDisMax();
-        $EDisMax->setBoostQuery('name^2');
+        // $EDisMax->setBoostQuery('org_name^2 ind_last_name^2');
         $query->setQuery($term);
         //$this->result = Yii::$app->solr->select($query);
 

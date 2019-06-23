@@ -5,6 +5,8 @@ use common\rbac\PermissionProfile;
 use common\rbac\MyGroupRule;
 use common\rbac\MemberGroupRule;
 use common\rbac\PermissionGroup;
+use \rmrevin\yii\module\Comments\Permission;
+use \rmrevin\yii\module\Comments\rbac\ItsMyComment;
 use yii\db\Migration;
 
 /**
@@ -36,6 +38,36 @@ class m190311_181235_populate_rbac extends Migration
 
         $auth->addChild($admin, $safeUser);
         $auth->addChild($safeUser, $user);
+
+
+        /*********************************
+         * Comment Permissions
+         *********************************/
+        $ItsMyCommentRule = new ItsMyComment();
+        $auth->add($ItsMyCommentRule);
+        
+        $auth->add(new \yii\rbac\Permission([
+            'name' => Permission::CREATE,
+            'description' => 'Can create own comments',
+        ]));
+        $auth->add(new \yii\rbac\Permission([
+            'name' => Permission::UPDATE,
+            'description' => 'Can update all comments',
+        ]));
+        $auth->add(new \yii\rbac\Permission([
+            'name' => Permission::UPDATE_OWN,
+            'ruleName' => $ItsMyCommentRule->name,
+            'description' => 'Can update own comments',
+        ]));
+        $auth->add(new \yii\rbac\Permission([
+            'name' => Permission::DELETE,
+            'description' => 'Can delete all comments',
+        ]));
+        $auth->add(new \yii\rbac\Permission([
+            'name' => Permission::DELETE_OWN,
+            'ruleName' => $ItsMyCommentRule->name,
+            'description' => 'Can delete own comments',
+        ]));
 
 
         /*********************************

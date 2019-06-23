@@ -1,6 +1,6 @@
 <?php
 
-use frontend\assets\AdminLtePluginAsset;
+// use frontend\assets\AdminLtePluginAsset;
 use kartik\date\DatePicker;
 use kartik\daterange\DateRangePicker;
 use kartik\form\ActiveForm;
@@ -11,7 +11,7 @@ use yii\web\JsExpression;
 
 /* @var $this yii\web\View */   
 
-AdminLtePluginAsset::register($this);
+// AdminLtePluginAsset::register($this);
 Url::Remember();
 $this->title = 'Calendar';
 ?>
@@ -173,3 +173,9 @@ Modal::end(); ?>
         $('#import-modal').modal('show').find('#import-content').html(data);
     });
 })", \yii\web\View::POS_READY); ?>
+
+<div style="display:none">
+<?= DateRangePicker::widget([
+    'name' => 'dateRange',  
+]) ?>
+</div>

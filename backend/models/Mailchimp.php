@@ -21,19 +21,19 @@ class Mailchimp extends \yii\base\Model
     public function buildFeatureList()
     {
         $client = new \sammaye\mailchimp\Chimp();
-        $client->apikey = Yii::$app->params['mc_token'];
+        $client->apikey = Yii::$app->params['token.mailchimp'];
 
         // Delete old list
         $lists = $client->get('/lists');
         foreach ($lists->lists as $list) {
-            if ($list->name == Yii::$app->params['mcFeatureListName']) {
+            if ($list->name == Yii::$app->params['name.mailchimpFeatureList']) {
                 $deleteRes = $client->delete('/lists/' . $list->id);
             }
         }
 
         // Create new list
         $create = $client->post('/lists', [
-            'name' => Yii::$app->params['mcFeatureListName'], 
+            'name' => Yii::$app->params['name.mailchimpFeatureList'], 
             'permission_reminder' => 'You are receiving this email because you are registered with IBNet and have elected to recieve new feature updates.  Log into your IBNet account to change your email preferences.', 
             'email_type_option' => true, 
             'contact' => [
@@ -54,13 +54,13 @@ class Mailchimp extends \yii\base\Model
         ]);
         $lists = $client->get('/lists');
         foreach ($lists->lists as $list) {
-            if ($list->name == Yii::$app->params['mcFeatureListName']) {
+            if ($list->name == Yii::$app->params['name.mailchimpFeatureList']) {
                 $listId = $list->id;
             }
         }
 
         // Populate list
-        $users = User::find()->where('email != ""')->andWhere(['status' => User::STATUS_ACTIVE, 'emailPrefFeatures' => 1])->all();
+        $users = User::getAllSubscribedFeature();
         foreach ($users as $user) {
             $res = $client->post('/lists/' . $listId . '/members', [
                 'email_address' => $user->email,

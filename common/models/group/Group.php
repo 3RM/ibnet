@@ -11,15 +11,22 @@ namespace common\models\group;
 use common\models\profile\Profile;
 use common\models\group\GroupCalendarEvent;
 use common\models\group\GroupMember;
+use common\models\group\GroupNotification;
 use common\models\group\GroupKeyword;
 use common\models\group\GroupPlace;
+use common\models\group\PrayerAlertQueue;
 use common\models\missionary\MissionaryUpdate;
+use common\models\Subscription;
+use common\models\Utility;
+use common\models\User;
 use common\rbac\PermissionGroup;
 use common\models\group\PrayerTag;
+use GuzzleHttp\Client;
 use sadovojav\cutter\behaviors\CutterBehavior;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Inflector;
 
 /**
@@ -66,6 +73,11 @@ class Group extends ActiveRecord
     public $newUserEmail;
 
     /**
+     * @var string $emails list of emails on invite modal
+     */
+    public $emails;
+
+    /**
      * @var string $subject subject line of contact member form
      */
     public $subject;
@@ -74,6 +86,31 @@ class Group extends ActiveRecord
      * @var string $message message line of contact member form
      */
     public $message;
+
+    /**
+     * @var string $categoryName Discourse forum category name
+     */
+    public $categoryName;
+
+    /**
+     * @var string $categoryName Discourse forum category name
+     */
+    public $_categoryDescription;
+
+    /**
+     * @var string $categoryBannerColor Discourse forum category banner color
+     */
+    public $categoryBannerColor;
+
+    /**
+     * @var string $categoryTextColor Discourse forum category text color
+     */
+    public $categoryTitleColor;
+
+    /**
+     * @var string $cid Discourse forum category id
+     */
+    public $cid;
 
     /**
      * @const int $STATUS_* The status of the group.
@@ -126,7 +163,10 @@ class Group extends ActiveRecord
             'features' => ['feature_prayer', 'feature_calendar', 'feature_document', 'feature_chat', 'feature_forum', 'feature_notification', 'feature_update', 'feature_donation'],
             'transfer' => ['newUserEmail'],
             'group-member-action' => ['id', 'message'],
+            'invite-member' => ['emails', 'message'],
             'contact-member' => ['id', 'user_id', 'name', 'subject', 'message'],
+            'category-edit' => ['cid', 'categoryName', '_categoryDescription', 'categoryBannerColor', 'categoryTitleColor'],
+            'send-notice' => ['subject', 'message'],
         ];
     }
 
@@ -168,9 +208,21 @@ class Group extends ActiveRecord
             [['id'], 'safe', 'on' => 'group-member-action'],
             [['message'], 'string', 'on' => 'group-member-action'],
 
+            [['emails'], 'required', 'on' => 'invite-member'],
+            [['emails', 'message'], 'string', 'on' => 'invite-member'],
+
             [['subject', 'message'], 'required', 'on' => 'contact-member'],
             [['subject', 'message'], 'string', 'on' => 'contact-member'],
-            [['id', 'user_id', 'name'], 'safe', 'on' => 'contact-member']
+            [['id', 'user_id', 'name'], 'safe', 'on' => 'contact-member'],
+
+            [['categoryName', '_categoryDescription'], 'required', 'on' => 'category-edit'],
+            [['_categoryDescription'], 'string', 'length' => [20, 200], 'on' => 'category-edit'],
+            [['_categoryName'], 'string', 'max' => 60, 'on' => 'category-edit'],
+            [['categoryName', 'categoryBannerColor', 'categoryTitleColor'], 'string', 'on' => 'category-edit'],
+            [['cid'], 'safe', 'on' => 'category-edit'],
+
+            [['subject', 'message'], 'required', 'on' => 'send-notice'],
+            [['subject', 'message'], 'string', 'on' => 'send-notice'],
         ];
     }
 
@@ -189,7 +241,7 @@ class Group extends ActiveRecord
             'permit_user' => 'Allow users without public profiles (i.e. non-ministry individuals)',
             'private' => 'Private (Require approval for new members)',
             'hide_on_profiles' => 'Do not show group membership on public profiles',
-            'not_searchable' => 'Exclude from search (leave unchecked to allow users to find this group in the search; search results will display group name and description.)',
+            'not_searchable' => 'Exclude from search (Users join by invitation only)',
             'feature_prayer' => '',
             'feature_calendar' => '',
             'feature_notification' => '',
@@ -199,6 +251,8 @@ class Group extends ActiveRecord
             'feature_update' => '', 
             'feature_donation' => '',
             'newUserEmail' => '',
+            'categoryName' => 'Category Name (one or two words)',
+            '_categoryDescription' => 'Description'
         ];
     }
 
@@ -221,7 +275,6 @@ class Group extends ActiveRecord
 
     /**
      * Process new group information
-     *
      * @return mixed;
      */
     public function handleFormInformation()
@@ -234,7 +287,7 @@ class Group extends ActiveRecord
             // Create a new group member for group owner
             $user = Yii::$app->user->identity;
             $groupMember = new GroupMember();
-            $groupMember->group_id = $group->id;
+            $groupMember->group_id = $this->id;
             $groupMember->user_id = $user->id;
             if ($profile = $user->indActiveProfile) {
                 $groupMember->profile_id = $profile->id;
@@ -250,6 +303,538 @@ class Group extends ActiveRecord
             return $this;
         }
         return false;
+    }
+
+    /**
+     * Send new user notice of profile transfer request
+     * @return boolean
+     */
+    public static function sendGroupTransfer($group, $newUser, $oldUser, $complete=false)
+    {   
+        $mail = Subscription::getSubscriptionByEmail($newUser->email) ?? new Subscription();
+        $mail->headerColor = Subscription::COLOR_GROUP;
+        $mail->headerImage = Subscription::IMAGE_GROUP;
+        $mail->headerText = $complete ? 'Transfer Complete' : 'Transfer Request';
+        $mail->to = $complete ? $oldUser->email : $newUser->email;
+        $mail->subject = $complete ? 'IBNet Group Transfer Complete' : 'IBNet Group Transfer Request';
+        $mail->title = $complete ? 'Goodbye old friend...' : 'Take Ownership of '. $group->name;
+        $mail->message = $complete ? 
+            'Your IBNet group ' . $group->name . ' has been successfully transferred to ' . $newUser->fullName . '.' :
+            $oldUser->fullName . ' requests that you assume ownership of IBNet group "' . $group->name . '".  Click the link 
+            below to complete the transfer and take ownership of this group. This link will remain valid for one week.';
+        $resetLink = $complete ? NULL : Yii::$app->urlManager->createAbsoluteUrl(['group/transfer-complete', 'id' => $group->id, 'token' => $group->transfer_token]);
+        $mail->link = $complete ? NULL : Html::a(Html::encode($resetLink), $resetLink);
+        $mail->sendNotification();
+
+        return true;
+    }
+
+    /**
+     * Create a new group in the Discourse forum
+     * @return boolean;
+     */
+    public function createForumGroup()
+    {
+        $client = new Client(['base_uri' => Yii::getAlias('@discourse')]);
+        $headers = [
+            'Api-Key' => Yii::$app->params['apiKey.discourse'],
+            'Api-Username' => Yii::$app->params['apiKey.discourse-username'],
+        ];
+
+        // Generate unique group name
+        $this->discourse_group_name = Utility::generateUniqueRandomString($this, 'discourse_group_name', 20, true);
+
+        // Create group
+        $response = $client->post('/admin/groups', [
+            'headers' => $headers,
+            'form_params' => [
+                'group[name]' => $this->discourse_group_name,
+                'group[full_name]' => $this->name,
+            ]
+        ]); 
+
+        // Save group id
+        $response = $client->get('/groups/' . $this->discourse_group_name . '.json', ['headers' => $headers]); 
+        $json = $response->getBody()->getContents();
+        $decoded = json_decode($json);
+        $this->discourse_group_id = $decoded->group->id;
+
+        // Set interaction levels 
+        $response = $client->put('/groups/' . $this->discourse_group_id, [
+            'headers' => $headers,
+            'form_params' => [
+                'group[visibility_level]' => 1,
+                'group[grant_trust_level]' => 1,
+                // 'group[flair_url]' => Yii::$app->params['url.frontend'] . $this->image ?? '',  
+                'group[bio_raw]' => $this->description ?? '',
+            ]
+        ]);
+
+        // Check if default category exists; if not, add new
+        $response = $client->get('/categories.json', ['headers' => $headers]); 
+        $json = $response->getBody()->getContents();
+        $decoded = json_decode($json);
+        $categories = ArrayHelper::getColumn($decoded->category_list->categories, 'name');
+        if (!in_array($this->name, $categories)) {
+            // Add default group category
+            $response = $client->post('/categories.json', [
+                'headers' => $headers,
+                'form_params' => [
+                    'name' => $this->name,
+                    'color' => 'green',
+                    'text_color' => 'black'
+                ]
+            ]); 
+
+            // Save default category id
+            $response = $client->get('/categories.json', ['headers' => $headers]); 
+            $json = $response->getBody()->getContents();
+            $decoded = json_decode($json);
+            $cids = ArrayHelper::getColumn($decoded->category_list->categories, 'id');
+            $this->discourse_category_id = end($cids);
+        }
+
+        // Set default category permissions (assign to group)
+        $response = $client->put('/categories/' . $this->discourse_category_id, [
+            'headers' => $headers,
+            'form_params' => [
+                'name' => $this->name,
+                'color' => 'green',
+                'text_color' => 'black',
+                'permissions[' . $this->discourse_group_name . ']' => 1,
+            ]
+        ]);
+
+        // Create and/or add users to group
+        $members = $this->getGroupMembers()->with('user')->all();
+        // Get all discourse users
+        $response = $client->get('/admin/users/list/active.json', ['headers' => $headers]);
+        $json = $response->getBody()->getContents();
+        $decoded = json_decode($json); 
+        $discourseUsers = ArrayHelper::getColumn($decoded, 'username');
+        // Separate group members into new and current discourse users
+        $new = $current = [];
+        foreach ($members as $member) {
+            in_array($member->user->username, $discourseUsers) ?
+                $current[] = $member->user->username :
+                $new[] = $member->user;
+        }
+        // Add existing users to group
+        if ($current) {
+            $current = implode(',', $current);
+            $response = $client->put('/groups/' . $this->discourse_group_id . '/members.json', [
+                'headers' => $headers,
+                'form_params' => ['usernames' => $current]
+            ]);
+        }
+        // Create new users and add to group
+        if ($new) {
+            foreach ($new as $n) {
+                $ssoParams = [
+                    'external_id' => $n->id,
+                    'email' => $n->email,
+                    'username' => $n->username,
+                    'add_groups' => $this->discourse_group_name
+                ];
+                $ssoPayload = base64_encode(http_build_query($ssoParams));
+                $sig = hash_hmac('sha256', $ssoPayload, Yii::$app->params['apiKey.discourse-secret']);
+                $response = $client->post('/admin/users/sync_sso', [
+                    'headers' => $headers,
+                    'form_params' => [
+                        'sso' => $ssoPayload,
+                        'sig' => $sig,
+                        'api_key' => Yii::$app->params['apiKey.discourse'],
+                        'api_username' => Yii::$app->params['apiKey.discourse-username'],
+                    ]
+                ]); 
+            }
+        }
+        
+        return $this;
+    }
+
+    /**
+     * Remove a group in the Discourse forum
+     * @return boolean;
+     */
+    public function removeForumGroup()
+    {   
+        $client = new Client(['base_uri' => Yii::getAlias('@discourse')]);
+        // Check if group exists; if so, remove it
+        $response = $client->get('/groups.json', [
+            'headers' => [
+                'Api-Key' => Yii::$app->params['apiKey.discourse'],
+                'Api-Username' => Yii::$app->params['apiKey.discourse-username'],
+            ]
+        ]);
+        $json = $response->getBody()->getContents();
+        $decoded = json_decode($json);
+        $ids = ArrayHelper::getColumn($decoded->groups, 'id');
+        if (in_array($this->discourse_group_id, $ids)) {
+            $response = $client->delete('/admin/groups/' . $this->discourse_group_id . '.json', ['headers' => $headers]);
+        }
+    }
+
+    /**
+     * Get a group parent category in the Discourse forum
+     * @return boolean;
+     */
+    public function getParentCategory()
+    {   
+        $client = new Client(['base_uri' => Yii::getAlias('@discourse')]);
+        $response = $client->get('/categories.json', [
+            'headers' => [
+                'Api-Key' => Yii::$app->params['apiKey.discourse'],
+                'Api-Username' => Yii::$app->params['apiKey.discourse-username'],
+            ]
+        ]);
+        $json = $response->getBody()->getContents();
+        $decoded = json_decode($json);
+        foreach ($decoded->category_list->categories as $cat) {
+            if ($cat->id == $this->discourse_category_id) {
+                return $cat;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Get all group categories in the Discourse forum
+     * @return boolean;
+     */
+    public function getChildCategories()
+    {   
+        $client = new Client(['base_uri' => Yii::getAlias('@discourse')]);
+        $response = $client->get('/site.json', [
+            'headers' => [
+                'Api-Key' => Yii::$app->params['apiKey.discourse'],
+                'Api-Username' => Yii::$app->params['apiKey.discourse-username'],
+            ]
+        ]);
+        $json = $response->getBody()->getContents();
+        $decoded = json_decode($json);
+        $childCategories = [];
+        foreach ($decoded->categories as $cat) {
+            if (isset($cat->parent_category_id) && ($cat->parent_category_id == $this->discourse_category_id)) {
+                $childCategories[] = $cat;
+            }
+        }
+
+        return $childCategories;
+    }
+
+    /**
+     * Get a single group child category in the Discourse forum
+     * @return boolean;
+     */
+    public function getChildCategory($cid)
+    {
+        $categories = $this->childCategories;
+        foreach ($categories as $cat) {
+            if ($cat->id == $cid) {
+                return $cat;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Update a group category in the Discourse forum
+     * @return boolean;
+     */
+    public function updateCategory()
+    {
+        // Update banner and text colors
+        $client = new Client(['base_uri' => Yii::getAlias('@discourse')]);
+        $headers = [
+            'Api-Key' => Yii::$app->params['apiKey.discourse'],
+            'Api-Username' => Yii::$app->params['apiKey.discourse-username'],
+        ];
+        $response = $client->put('/categories/' . $this->cid, [
+            'headers' => $headers,
+            'form_params' => [
+                'name' => $this->categoryName,
+                'color' => Utility::colorFilter($this->categoryBannerColor, ''),
+                'text_color' => Utility::colorFilter($this->categoryTitleColor, ''),
+            ],
+        ]);
+        // Update description
+        //      get topic id
+        $json = $response->getBody()->getContents();
+        $decoded = json_decode($json);
+        $topicUrl = $decoded->category->topic_url;
+        list(,,, $tid) = explode('/', $topicUrl);
+        $response = $client->get('/t/-/' . $tid . '.json', ['headers' => $headers]);
+        //      get first post id in topic
+        $json = $response->getBody()->getContents();
+        $decoded = json_decode($json);
+        $pid = $decoded->post_stream->posts[0]->id; 
+        $response = $client->put('/posts/' . $pid . '.json', [
+            'headers' => $headers,
+            'form_params' => ['post[raw]' => $this->_categoryDescription]
+        ]);
+        return true;
+    }
+
+    /**
+     * Return a group category description in the Discourse forum
+     * @return boolean;
+     */
+    public function getCategoryDescription($categoryUrl)
+    {
+
+        $client = new Client(['base_uri' => Yii::getAlias('@discourse')]);
+        $headers = [
+            'Api-Key' => Yii::$app->params['apiKey.discourse'],
+            'Api-Username' => Yii::$app->params['apiKey.discourse-username'],
+        ];
+        // Get topic
+        list(,,, $tid) = explode('/', $categoryUrl);
+        $response = $client->get('/t/-/' . $tid . '.json', ['headers' => $headers]);
+        // Get first post id in topic
+        $json = $response->getBody()->getContents();
+        $decoded = json_decode($json);
+        $pid = $decoded->post_stream->posts[0]->id;
+        // Get post description
+        $response = $client->get('/posts/' . $pid . '.json', ['headers' => $headers]);
+        $json = $response->getBody()->getContents();
+        $decoded = json_decode($json); 
+        return $decoded->raw;
+
+    }
+
+    /**
+     * Add a group category in the Discourse forum
+     * @return boolean;
+     */
+    public function addChildCategory()
+    {   
+        $client = new Client(['base_uri' => Yii::getAlias('@discourse')]);
+        $headers = [
+            'Api-Key' => Yii::$app->params['apiKey.discourse'],
+            'Api-Username' => Yii::$app->params['apiKey.discourse-username'],
+        ];
+
+        // Check if category exists; if not, add new
+        $response = $client->get('/categories.json', ['headers' => $headers]); 
+        $json = $response->getBody()->getContents();
+        $decoded = json_decode($json);
+        $categories = ArrayHelper::getColumn($decoded->category_list->categories, 'name');
+        if (!in_array($this->categoryName, $categories)) {
+            // Add group category
+            $this->categoryBannerColor = $this->categoryBannerColor ?? 'blue';
+            $this->categoryTitleColor = $this->categoryTitleColor ?? 'white';
+            $response = $client->post('/categories', [
+                'headers' => $headers,
+                'form_params' => [
+                    'name' => $this->categoryName,
+                    'color' => Utility::colorFilter($this->categoryBannerColor, ''),
+                    'text_color' => Utility::colorFilter($this->categoryTitleColor, ''),
+                    'permissions[' . $this->discourse_group_name . ']' => 1,
+                    'parent_category_id' => $this->discourse_category_id,
+                ]
+            ]);
+
+            // Add category description to default topic
+            //      get topic id
+            $json = $response->getBody()->getContents();
+            $decoded = json_decode($json);
+            $topicUrl = $decoded->category->topic_url;
+            list(,,, $tid) = explode('/', $topicUrl);
+            $response = $client->get('/t/-/' . $tid . '.json', ['headers' => $headers]);
+            //      get first post id in topic
+            $json = $response->getBody()->getContents();
+            $decoded = json_decode($json);
+            $pid = $decoded->post_stream->posts[0]->id; 
+            $response = $client->put('/posts/' . $pid . '.json', [
+                'headers' => $headers,
+                'form_params' => ['post[raw]' => $this->_categoryDescription]
+            ]);
+        } 
+    }
+
+    /**
+     * Remove a group category in the Discourse forum
+     * @return boolean;
+     */
+    public function removeCategory()
+    {   
+        $client = new Client(['base_uri' => Yii::getAlias('@discourse')]);
+        $response = $client->delete('/categories/' . $this->cid, [
+            'headers' => [
+                'Api-Key' => Yii::$app->params['apiKey.discourse'],
+                'Api-Username' => Yii::$app->params['apiKey.discourse-username'],
+            ],
+        ]); 
+        return true;
+    }
+
+    /**
+     * Add a new user to the discourse group
+     * @return boolean;
+     */
+    public function addDiscourseUser($uid)
+    {
+        $user = User::findOne($uid);
+
+        $client = new Client(['base_uri' => Yii::getAlias('@discourse')]);
+        $headers = [
+            'Api-Key' => Yii::$app->params['apiKey.discourse'],
+            'Api-Username' => Yii::$app->params['apiKey.discourse-username'],
+        ];
+
+        // Get all discourse users
+        $response = $client->get('/admin/users/list/active.json', ['headers' => $headers]);
+        $json = $response->getBody()->getContents();
+        $decoded = json_decode($json); 
+        $discourseUsers = ArrayHelper::getColumn($decoded, 'username');
+        
+        // Add user to group
+        if (in_array($user->username, $discourseUsers)) {
+            $response = $client->put('/groups/' . $this->discourse_group_id . '/members.json', [
+                'headers' => $headers,
+                'form_params' => ['usernames' => $user->username]
+            ]);
+
+        // Create new discourse user and add to group
+        } else {
+            $ssoParams = [
+                'external_id' => $user->id,
+                'email' => $user->email,
+                'username' => $user->username,
+                'add_groups' => $this->discourse_group_name
+            ];
+            $ssoPayload = base64_encode(http_build_query($ssoParams));
+            $sig = hash_hmac('sha256', $ssoPayload, Yii::$app->params['apiKey.discourse-secret']);
+            $response = $client->post('/admin/users/sync_sso', [
+                'headers' => $headers,
+                'form_params' => [
+                    'sso' => $ssoPayload,
+                    'sig' => $sig,
+                    'api_key' => Yii::$app->params['apiKey.discourse'],
+                    'api_username' => Yii::$app->params['apiKey.discourse-username'],
+                ]
+            ]); 
+        }
+    }
+
+    /**
+     * Remove a user from the discourse group
+     * @return boolean;
+     */
+    public function removeDiscourseUser($uid)
+    {
+        $user = User::findOne($uid);
+
+        $client = new Client(['base_uri' => Yii::getAlias('@discourse')]);
+        $headers = [
+            'Api-Key' => Yii::$app->params['apiKey.discourse'],
+            'Api-Username' => Yii::$app->params['apiKey.discourse-username'],
+        ];
+
+        // Get all discourse users
+        $response = $client->get('/admin/users/list/active.json', ['headers' => $headers]);
+        $json = $response->getBody()->getContents();
+        $decoded = json_decode($json); 
+        $discourseUsers = ArrayHelper::getColumn($decoded, 'username');
+        
+        // Remove from group if current discourse user
+        if (in_array($user->username, $discourseUsers)) {
+            $response = $client->delete('/groups/' . $this->discourse_group_id . '/members.json', [
+                'headers' => $headers,
+                'form_params' => ['username' => $user->username]
+            ]);
+        }
+    }
+
+    /**
+     * Send group invitation emails
+     * @return \yii\db\ActiveQuery
+     */
+    public function sendInvites()
+    {
+        $user = Yii::$app->user->identity;
+        $emails = explode(',', $this->emails);
+        $subscriptions = Subscription::find()->all();
+        $subscriptions = ArrayHelper::getColumn($subscriptions, 'email');
+        $unsubscribed = Subscription::getAllUnsubscribed();
+        $validator = new yii\validators\EmailValidator();
+        foreach ($emails as $i => $email) {
+            $email = trim($email);
+            
+            // Add to subscriptions
+            if (!in_array($email, $subscriptions)) {
+                $sub = new Subscription();
+                $sub->add($email);
+            }
+            
+            // Add to invite list
+            if ($validator->validate($email) && !in_array($email, $unsubscribed)) { 
+                $invite = new GroupInvite;
+                $invite->add($email, $this->id);
+                $mails[$i][0] = $email;
+                $mails[$i][1] = $invite->token;
+                $mails[$i][2] = Subscription::getToken($email);
+
+            // Not a valid email or unsubscribed
+            } else {
+                $failed[] = $email;
+            }
+        }
+
+        // Send emails
+        $messages = [];
+        foreach ($mails as $mail) {
+            $messages[] = 
+                Yii::$app->mailer->compose(
+                    ['html' => 'group/invite-html', 'text' => 'group/invite-text'], 
+                    [
+                        'group' => $this, 
+                        'user' => $user, 
+                        'token' => $mail[1], 
+                        'extMessage' => $this->message ?? NULL,
+                        'email' => $mail[0],
+                        'unsubTok' => $mail[2],
+                    ],
+                )
+                ->setFrom([Yii::$app->params['email.noReply'] => $this->name])
+                ->setTo([$mail[0] => $user->fullName])
+                ->setSubject('Invitation to join IBNet Group "' . $this->name . '"');
+        }
+        Yii::$app->mailer->sendMultiple($messages);
+
+        return $failed ?? true;
+            
+    }
+
+    /**
+     * Notification feature: Send a notification email to all group members
+     * @return \yii\db\ActiveQuery
+     */
+    public function sendNotification()
+    {
+        // Save notification
+        $notification = new GroupNotification();
+        $notification->group_id = $this->id;
+        $notification->user_id = Yii::$app->user->identity->id;
+        $notification->subject = $this->subject;
+        $notification->message = $this->message;
+        $notification->save();      
+
+        // Assemble messages
+        $members = $this->memberUsers;
+        $messages = [];
+        foreach ($members as $member) {
+            $notification->toEmail = $member->email;
+            $notification->toName = $member->fullName;
+            if ($return = $notification->prepareNotification()) {
+                $messages[] = $return;
+            }
+        }
+        // Send
+        Yii::$app->mailer->sendMultiple($messages);      
+
+        return true;
     }
 
     /**
@@ -330,6 +915,22 @@ class Group extends ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
+    public function getActivePrayerGroups()
+    {
+        return static::find()->where(['status' => self::STATUS_ACTIVE])->andWhere(['feature_prayer' => 1])->all();
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getActiveNotificationGroups()
+    {
+        return static::find()->where(['status' => self::STATUS_ACTIVE])->andWhere(['feature_notification' => 1])->all();
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
     public function getPlaces()
     {
         return $this->hasMany(GroupPlace::className(), ['group_id' => 'id']);
@@ -357,7 +958,16 @@ class Group extends ActiveRecord
      */
     public function getGroupMember()
     {
-        return GroupMember::find()->where(['group_id' => $this->id, 'user_id' => Yii::$app->user->identity->id, 'status' => GroupMember::STATUS_ACTIVE])->one();
+        return $this->hasOne(GroupMember::className(), ['group_id' => 'id'])->where(['user_id' => Yii::$app->user->identity->id]);
+    }
+
+    /**
+     * Group pending member of current user
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPendingGroupMember()
+    {
+        return $this->hasOne(GroupMember::className(), ['group_id' => 'id'])->where(['user_id' => Yii::$app->user->identity->id])->andWhere(['group_member.status' => GroupMember::STATUS_PENDING]);
     }
 
     /**
@@ -366,14 +976,50 @@ class Group extends ActiveRecord
      */
     public function getGroupMembers()
     {
-        return $this->hasMany(GroupMember::className(), ['group_id' => 'id'])->where(['status' => GroupMember::STATUS_ACTIVE]);
+        return $this->hasMany(GroupMember::className(), ['group_id' => 'id'])->where(['group_member.status' => GroupMember::STATUS_ACTIVE]);
+    }
+
+    /**
+     * User models for all current group members
+     * @return \yii\db\ActiveQuery
+     */
+    public function getMemberUsers()
+    {
+        return $this->hasMany(User::className(), ['id' => 'user_id'])->where(['user.status' => User::STATUS_ACTIVE])
+            ->via('groupMembers');
+    }
+
+    /**
+     * User model of group owner
+     * @return \yii\db\ActiveQuery
+     */
+    public function getOwner()
+    {
+        return $this->hasOne(User::className(), ['id' => 'user_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getGroupMemberId()
+    {
+        return GroupMember::find()->where(['group_id' => $this->id, 'user_id' => Yii::$app->user->identity->id])->one()->id;
+    }
+
+    /**
+     * All current group members with updates active
+     * @return \yii\db\ActiveQuery
+     */
+    public function getMembersUpdatesActive()
+    {
+        return $this->hasMany(GroupMember::className(), ['group_id' => 'id'])->where(['group_member.status' => GroupMember::STATUS_ACTIVE])->andWhere(['show_updates' => 1]);
     }
 
     /**
      * Pending member approvals
      * @return \yii\db\ActiveQuery
      */
-    public function getPending()
+    public function getPendingMembers()
     {
         return GroupMember::find()
             ->where(['group_id' => $this->id])
@@ -412,15 +1058,7 @@ class Group extends ActiveRecord
     public function getUpdates()
     {
         return $this->hasMany(MissionaryUpdate::className(), ['missionary_id' => 'missionary_id'])
-            ->via('groupMembers');
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getGroupMemberId()
-    {
-        return GroupMember::find()->where(['group_id' => $this->id, 'user_id' => Yii::$app->user->identity->id])->one()->id;
+            ->via('membersUpdatesActive');
     }
 
     /**
@@ -442,6 +1080,46 @@ class Group extends ActiveRecord
             array_push($nameList, $prayer->fullName);
         }
         return array_unique($nameList);
+    }
+
+    /**
+     * All current group members receiving immediate prayer alerts
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPrayerAlertMembers()
+    {
+        return $this->hasMany(GroupMember::className(), ['group_id' => 'id'])
+            ->joinWith('user')
+            ->where(['group_member.status' => GroupMember::STATUS_ACTIVE])
+            ->andWhere(['group_member.email_prayer_alert' => 1]);
+    }
+
+    /**
+     * New prayers that haven't been alerted
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPrayerImmediateAlertQueue()
+    {
+        return $this->hasMany(PrayerAlertQueue::className(), ['group_id' => 'id'])->where(['alerted' => 0]);
+    }
+
+    /**
+     * Prayers that haven't been alerted on the weekly list
+     * Only pull requests that have been alerted to avoid sending out and deleting brand new alerts
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPrayerWeeklyAlertQueue()
+    {
+        return $this->hasMany(PrayerAlertQueue::className(), ['group_id' => 'id'])->where(['<>', 'alerted', 0])
+            ->with('prayerWithUpdates');
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCategories()
+    {
+        // return $this->hasMany(GroupCalendarEvent::className(), ['group_id' => 'id']);
     }
 
     /**
@@ -499,6 +1177,4 @@ class Group extends ActiveRecord
         }
         return $icalList;
     }
-
-    
 }

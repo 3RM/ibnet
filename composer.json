@@ -47,7 +47,12 @@
         "philippfrenzel/yii2fullcalendar":"*",
         "kartik-v/yii2-date-range": "*",
         "kartik-v/yii2-widget-colorinput": "*",
-        "sammaye/yii2-discourse-sso": "dev-master"
+        "sammaye/yii2-discourse-sso": "dev-master",
+        "ssilence/php-imap-client": "dev-master",
+        "willdurand/email-reply-parser": "^2.8@dev",
+        "yii-dream-team/yii2-timezone-picker": "dev-master",
+        "yii2mod/yii2-timezone": "*",
+        "omnilight/yii2-momentjs": "dev-master"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",
@@ -57,7 +62,7 @@
         "phpunit/phpunit": "~6.5.5",
         "codeception/verify": "~1.0.0"
     },
-     "config": {
+    "config": {
         "process-timeout": 1800,
         "fxp-asset": {
             "installer-paths": {
