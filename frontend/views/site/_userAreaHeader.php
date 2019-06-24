@@ -3,15 +3,17 @@
 use common\widgets\Alert;
 use yii\bootstrap\Html;
 use yii\bootstrap\Nav;
-use yii\bootstrap\NavBar;
+use yii\bootstrap\NavBar; use common\models\Utility; //Utility::pp(Yii::$app->user->identity->isMissionary);
 
 $this->title = 'My Account';
 $menuItems = [
     ['label' => '<span class="glyphicons glyphicons-settings"></span> Settings', 'url' => ['/site/settings']],
     ['label' => '<span class="glyphicons glyphicons-vcard"></span> Profiles', 'url' => ['/profile-mgmt/my-profiles']],
-    ['label' => '<span class="glyphicons glyphicons-cluster"></span> Networks', 'url' => ['/network/my-networks']],
-    ['label' => '<span class="glyphicons glyphicons-direction"></span> Updates', 'url' => ['/missionary/update-repository'], ['visible' => Yii::$app->user->identity->isMissionary]],
+    ['label' => '<span class="glyphicons glyphicons-cluster"></span> Groups', 'url' => ['/network/my-groups']],
 ];
+if (Yii::$app->user->identity->isMissionary) {
+    $menuItems[] = ['label' => '<span class="glyphicons glyphicons-direction"></span> Updates', 'url' => ['/missionary/update-repository']];
+}
 ?>
 <div class="account-header-container">
     <div class=<?='"account-header acc-' . $active . '-header"'?>>

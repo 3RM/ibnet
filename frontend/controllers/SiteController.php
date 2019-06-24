@@ -7,9 +7,8 @@
 
 namespace frontend\controllers;
 
-use common\models\AccountSettings;
 use common\models\LoginForm;
-use common\models\Mail;
+use common\models\Subscription;
 use common\models\blog\WpPosts;
 use common\models\profile\Profile;
 use common\models\profile\ProfileBrowse;
@@ -18,7 +17,6 @@ use common\models\profile\ProfileSearch;
 use common\models\profile\ProfileGuestSearch;
 use common\models\PrimaryRole;
 use common\models\User;
-use common\models\Utility;
 use frontend\controllers\ProfileController;
 use frontend\models\Box3Content;
 use frontend\models\ContactForm;
@@ -35,10 +33,7 @@ use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
-use xj\sitemap\models\Url;
-use xj\sitemap\models\BaiduUrl;
-use xj\sitemap\actions\SitemapUrlsetAction;
-use xj\sitemap\actions\SitemapIndexAction;
+use yii\web\NotFoundHttpException;
 
 /**
  * Site controller
@@ -95,122 +90,8 @@ class SiteController extends Controller
             'page' => [
                 'class' => 'yii\web\ViewAction',
             ],
-             //Google Sitemap By ActiveRecord
-            'sitemap-google-index' => [
-                'class' => SitemapIndexAction::className(),
-                'route' => ['sitemap-google-urlset'],
-                'dataProvider' => new ActiveDataProvider([
-                    'query' => Profile::find()->where(['status' => Profile::STATUS_ACTIVE])->all(),
-                    'pagination' => [
-                        'pageParam' => 'p',
-                        'pageSize' => 1, //per page 1 record
-                    ]]),
-            ],
-            'sitemap-google-urlset' => [
-                'class' => SitemapUrlsetAction::className(),
-                'gzip' => YII_DEBUG ? false : true,
-                'dataProvider' => new ActiveDataProvider([
-                    'query' => Profile::find()->where(['status' => Profile::STATUS_ACTIVE]),
-                    'pagination' => [
-                        'pageParam' => 'p',
-                        'pageSize' => 1,
-                    ]]),
-                'remap' => function ($model) {
-                        /* @var $model Profile */
-                        $url = Url::create([
-                            'loc' => \yii\helpers\Url::to(['profile/view-profile', 'id' => $model->id], true),
-                            'lastmod' => date(DATE_W3C, $model->last_modified),
-                            'changefreq' => Url::CHANGEFREQ_MONTHLY,
-                            'priority' => '0.5',
-                        ]);                        
-                        return $url;
-                },
-            ],
-
-            //Baidu Mobile Sitemap By ActiveRecord
-            'sitemap-baidumobile-index' => [
-                'class' => SitemapIndexAction::className(),
-                'route' => ['sitemap-baidumobile-urlset'],
-                'dataProvider' => new ActiveDataProvider([
-                    'query' => Profile::find()->where(['status' => Profile::STATUS_ACTIVE]),
-                    'pagination' => [
-                        'pageParam' => 'p',
-                        'pageSize' => 1, //per page 1 record
-                    ]]),
-            ],
-            'sitemap-baidumobile-urlset' => [
-                'class' => SitemapUrlsetAction::className(),
-                'urlClass' => BaiduUrl::className(), //for Baidu
-                'gzip' => YII_DEBUG ? false : true,
-                'dataProvider' => new ActiveDataProvider([
-                    'query' => Profile::find()->where(['status' => Profile::STATUS_ACTIVE]),
-                    'pagination' => [
-                        'pageParam' => 'p',
-                        'pageSize' => 1,
-                    ]]),
-                'remap' => function ($model) {
-                    /* @var $model Profile */
-                    //return Array will auto using $urlClass::create()
-                    return [
-                        'loc' => \yii\helpers\Url::to(['user/view', 'username' => $model->username], true),
-                        'lastmod' => date(DATE_W3C, $model->updated_at),
-                        'changefreq' => Url::CHANGEFREQ_MONTHLY,
-                        'priority' => '0.5',
-                        'baiduType' => BaiduUrl::BAIDU_TYPE_MOBILE, // BaiduUrl::BAIDU_TYPE_ADAP | BaiduUrl::BAIDU_TYPE_HTMLADAP
-                    ];
-                },
-            ],
-
-            //FOR DIRECT DATA
-            'sitemap-direct-index' => [
-                'class' => SitemapIndexAction::className(),
-                'route' => ['sitemap-direct'],
-                'dataProvider' => new ArrayDataProvider([
-                    'allModels' => [
-                        1, 1, 1, 1 //only need number// p=1 | p=2 | p=3 | p=4
-                    ],
-                    'pagination' => [
-                        'pageParam' => 'p',
-                        'pageSize' => 1,
-                    ]
-                ]),
-            ],
-            'sitemap-direct-urlset' => [
-                'class' => SitemapUrlsetAction::className(),
-                'gzip' => YII_DEBUG ? false : true,
-                'dataProvider' => new ArrayDataProvider([
-                    'allModels' => [
-                        [
-                            'loc' => 'http://url-a',
-                            'lastmod' => date(DATE_W3C),
-                            'changefreq' => Url::CHANGEFREQ_ALWAYS,
-                        ],
-                        [
-                            'loc' => 'http://url-b',
-                            'lastmod' => date(DATE_W3C),
-                            'changefreq' => Url::CHANGEFREQ_DAILY,
-                        ],
-                        [
-                            'loc' => 'http://error-model',
-                            'lastmod' => date(DATE_W3C),
-                            'changefreq' => Url::CHANGEFREQ_HOURLY,
-                            'priority' => 'errorPriority',
-                        ],
-                        [
-                            'loc' => 'http://url-c',
-                            'lastmod' => date(DATE_W3C),
-                            'changefreq' => Url::CHANGEFREQ_HOURLY,
-                        ],
-                    ],
-                    'pagination' => [
-                        'pageParam' => 'p',
-                        'pageSize' => 4,
-                    ]
-                ]),
-                'remap' => function ($model) {
-                    /* @var $model array */
-                    return Url::create()->setAttributes($model);
-                },
+            'timezone' => [
+                'class' => 'yii2mod\timezone\TimezoneAction',
             ],
         ];
     }
@@ -293,6 +174,15 @@ class SiteController extends Controller
 
         // =============== login successful =======================
                 if ($user->email != NULL && $model->login()) {
+
+                    // Redirect to Discourse if SSO login
+                    if ($sso = Yii::$app->getSession()->get('sso')) {
+                        return $this->redirect(['discourse-sso', 
+                            'sso' => $sso['sso'], 
+                            'sig' => $sso['sig']
+                        ]);
+                    }
+
                     return $url == NULL ?
                         $this->goHome() :
                         $this->redirect($url);
@@ -366,6 +256,51 @@ class SiteController extends Controller
     }
 
     /**
+     * Unsubscribe an email address from all communications
+     *
+     * @return mixed
+     */
+    public function actionUnsubscribe($email, $token)
+    {
+        if (isset($email) && isset($token)) {
+            if (!$sub = Subscription::find()->where(['email' => $email])->andWhere(['token' => $token])->one()) {
+                throw new NotFoundHttpException;
+            }
+        } else {
+            $sub = new MailPreferences();
+        }
+        $sub->scenario = 'unsubscribe';
+
+        if ($sub->load(Yii::$app->request->post())) {
+            $sub->unsubscribe();
+            return $this->redirect(['unsubscribed', 'email' => $sub->email, 'token' => $sub->token]);
+        }
+
+        $registered = User::find()->where(['email' => $email])->exists();
+
+        return $this->render('unsubscribe', [
+            'sub' => $sub, 
+            'registered' => $registered
+        ]);
+    }
+
+    /**
+     * Unsubscribe successful
+     *
+     * @return mixed
+     */
+    public function actionUnsubscribed($email, $token)
+    {
+        if (!$sub = Subscription::find()->where(['email' => $email])->andWhere(['token' => $token])->one()) {
+            throw new NotFoundHttpException;
+        }
+
+        return $this->render('unsubscribed', [
+            'sub' => $sub,
+        ]);
+    }
+
+    /**
      * Displays about page.
      *
      * @return mixed
@@ -393,31 +328,20 @@ class SiteController extends Controller
                 $user->generateNewEmailToken();
                 $link = Yii::$app->urlManager->createAbsoluteUrl(['site/registration-complete', 
                     'token' => $user->new_email_token]);
-                Yii::$app->mailer
-                    ->compose(
-                        ['html' => 'site/notification-html', 'text' => 'site/notification-text'],
-                        [
-                            'title' => 'Complete your registration with IBNet.org', 
-                            'message' => 'Follow this link to complete your registration: ' . $link,
-                        ])
-                    ->setFrom(Yii::$app->params['email.admin'])
-                    ->setTo($user->new_email)
-                    ->setSubject(Yii::$app->params['email.systemSubject'])
-                    ->send();
+                $mail = $user->subscription ?? new Subscription();
+                $mail->to = $user->new_email;
+                $mail->title = 'Complete your registration with IBNet.org';
+                $mail->subject = Yii::$app->params['email.systemSubject'];
+                $mail->message = 'Follow this link to complete your registration: ' . $link;
+                $mail->sendNotification(NULL, TRUE);
 
                 // Notify admin of new user
-                Yii::$app
-                    ->mailer
-                    ->compose(
-                        ['html' => 'site/notification-html', 'text' => 'notification-text'], 
-                        [
-                            'title' => 'New User Registration', 
-                            'message' => 'A new user has registered at IBNet: ' . $user->fullName
-                        ])
-                    ->setFrom([\yii::$app->params['email.admin']])
-                    ->setTo([\yii::$app->params['email.admin']])
-                    ->setSubject(Yii::$app->params['email.systemSubject'])
-                    ->send();
+                $mail = Subscription::getSubscriptionByEmail(Yii::$app->params['email.admin']) ?? new Subscription();
+                $mail->to = Yii::$app->params['email.admin'];
+                $mail->title = 'New User Registration';
+                $mail->subject = Yii::$app->params['email.systemSubject'];
+                $mail->message = 'A new user has registered at IBNet: ' . $user->fullName;
+                $mail->sendNotification(NULL, TRUE);
                     
                 return $this->render('completeRegistration');
             }
@@ -444,9 +368,21 @@ class SiteController extends Controller
      */
     public function actionResendVerificationEmail($username)
     {
-        if (Mail::sendVerificationEmail($username)) {
-            Yii::$app->session->setFlash('success', 'A new email was sent with a link to verify your 
-                email address.');
+        $user = User::findByUsername($username);
+        $user->generateNewEmailToken();
+        $link = Yii::$app->urlManager->createAbsoluteUrl([
+            'site/registration-complete', 
+            'token' => $user->new_email_token]);
+       
+        $mail = Subscription::getSubscriptionByEmail($user->new_email) ?? new Subscription();
+        $mail->to = $user->new_email;
+        $mail->title = 'Complete your registration with IBNet.org';
+        $mail->subject = Yii::$app->params['email.systemSubject'];
+        $mail->message = 'Follow this link to complete your registration: ' . $link;
+        if ($mail->sendNotification(NULL, TRUE)) {
+            Yii::$app->session->setFlash('success', 'A new email was sent with a link to verify your email address.');
+        } else {
+            Yii::$app->session->setFlash('danger', 'There was an error processing your request. Please contact admin@ibnet.org if the problem persists.');
         }
         return $this->redirect('login');
     }
@@ -460,12 +396,15 @@ class SiteController extends Controller
     {
         if (!empty($token) && $user = User::findByNewEmailToken($token)) {
             if ($user->isNewEmailTokenValid($token)) {
+                // Save user params
                 $user->updateAttributes([
                     'new_email_token' => NULL,
                     'email' => $user->new_email,
-                    'new_email' => NULL]);
+                    'new_email' => NULL,
+                    'timezone' => Yii::$app->timezone->name, // Very rough guess at user timezone using JSTZ
+                ]);
                 Yii::$app->getUser()->login($user);
-                $user->scenario = 'emailPref';
+                $user->scenario = 'sub';
                 return $this->render('registrationComplete', ['user' => $user]);
             }
         } elseif ($user = Yii::$app->user->identity) {
@@ -506,7 +445,7 @@ class SiteController extends Controller
      */
     public function actionBeliefs()
     {
-        return $this->render('beliefs');
+       return $this->render('beliefs');
     }
 
     /**
@@ -520,16 +459,12 @@ class SiteController extends Controller
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
             if ($model->sendEmail()) {
                 Yii::$app->session->setFlash('success', 'Check your email for further instructions to reset your password.');
-
                 return $this->redirect('login');
             } else {
                 Yii::$app->session->setFlash('error', 'Sorry, we are unable to reset your password for the email provided.');
             }
         }
-
-        return $this->render('requestPasswordResetToken', [
-            'model' => $model,
-        ]);
+        return $this->render('requestPasswordResetToken', ['model' => $model]);
     }
 
     /**
@@ -549,10 +484,8 @@ class SiteController extends Controller
 
         if ($model->load(Yii::$app->request->post()) && $model->validate() && $model->resetPassword()) {
             Yii::$app->session->setFlash('success', 'New password was saved.');
-
             return $this->redirect('login');
         }
-
         return $this->render('resetPassword', ['model' => $model]);
     }
 
@@ -590,6 +523,8 @@ class SiteController extends Controller
         $userA = Yii::$app->user->identity;
         $userA->scenario = 'account';
 
+        $joinedGroups = $userP->activeJoinedGroups;
+
         // Set default role
         if ($userP->primary_role == NULL) {
             $userP->primary_role = 'Church Member';
@@ -601,11 +536,22 @@ class SiteController extends Controller
         }
         $list = ArrayHelper::map(PrimaryRole::find()->all(), 'role', 'role', 'type');
 
+        // Set subscriptions
+        if (!$sub = $userA->subscription) {
+            throw new NotFoundHttpException;
+        }
+        $userA->subscriptionProfile = $sub->profile;
+        $userA->subscriptionLinks = $sub->links;
+        $userA->subscriptionComments = $sub->comments;
+        $userA->subscriptionFeatures = $sub->features;
+        $userA->subscriptionBlog = $sub->blog;
+
         return $this->render('settings', [
             'userP' => $userP,
             'userA' => $userA,
             'list' => $list,
             'home_church' => $home_church,
+            'joinedGroups' => $joinedGroups,
         ]);
     }
 
@@ -628,7 +574,7 @@ class SiteController extends Controller
             // Update roles
             $role = array_keys(Yii::$app->authManager->getRolesByUser($user->id))[0];            
             if ($user->home_church && ($role == User::ROLE_USER)) {  
-                // Revoke current SafeUser role
+                // Revoke current User role
                 $auth = Yii::$app->authManager;
                 $item = $auth->getRole(User::ROLE_USER);
                 $auth->revoke($item, $user->id);  
@@ -654,22 +600,26 @@ class SiteController extends Controller
             if ($user->home_church && $user->home_church != $oldChurch) {
                 $church = Profile::findActiveProfile($user->home_church);
                 $churchProfOwner = User::findOne($church->user_id);
-                if ($churchProfOwner && $churchProfOwner->emailPrefLinks == 1) {
+                if ($churchProfOwner && $churchProfOwner->subscription->links == 1) {
                     ProfileMail::sendLink($user, $church, $churchProfOwner, 'PSHC', 'L');
                 }
                 if ($oldChurch) {
                     $oldChurch = Profile::findActiveProfile($oldChurch);
                     $oldChurchProfOwner = User::findOne($oldChurch->user_id);
-                    if ($oldChurchProfOwner && $oldChurchProfOwner->emailPrefLinks == 1) {
+                    if ($oldChurchProfOwner && $oldChurchProfOwner->subscription->links == 1) {
                         ProfileMail::sendLink($user, $oldChurch, $oldChurchProfOwner, 'PSHC', 'UL');
                     }
                 }
             }
         }
-        return $this->redirect(['settings']);
+        return $this->redirect('settings');
 
     }
 
+    /**
+     * Account settings form submit redirects here
+     * @return mixed
+     */
     public function actionAccountSettings()
     {
         // Personal user settings
@@ -681,6 +631,6 @@ class SiteController extends Controller
             $user->validate(); 
             $user->save();
         }
-        return $this->redirect(['settings']);
+        return $this->redirect('settings');
     }
 }

@@ -112,7 +112,8 @@ $this->title = 'Browse';
                                         # =============================== City ===============================
                     echo '<div class="left-block">';
                                                 echo '<h4>City</h4>';
-                                                foreach ($statePivot->getPivot() as $k=>$cityPivot) {
+                                                foreach ($statePivot->getPivot() as $cityPivot) {
+                                                    $k++;
                                                     if ($k > 3 && $more['city'] == 1) {continue;}
                                                     if (($cityCount = $cityPivot->getCount()) > 0) {
                                                         $city = $cityPivot->getValue();

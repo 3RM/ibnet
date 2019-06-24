@@ -2,9 +2,11 @@
 
 use common\rbac\MyProfileRule;
 use common\rbac\PermissionProfile;
-use common\rbac\MyNetworkRule;
-use common\rbac\MemberNetworkRule;
-use common\rbac\PermissionNetwork;
+use common\rbac\MyGroupRule;
+use common\rbac\MemberGroupRule;
+use common\rbac\PermissionGroup;
+use \rmrevin\yii\module\Comments\Permission;
+use \rmrevin\yii\module\Comments\rbac\ItsMyComment;
 use yii\db\Migration;
 
 /**
@@ -36,6 +38,36 @@ class m190311_181235_populate_rbac extends Migration
 
         $auth->addChild($admin, $safeUser);
         $auth->addChild($safeUser, $user);
+
+
+        /*********************************
+         * Comment Permissions
+         *********************************/
+        $ItsMyCommentRule = new ItsMyComment();
+        $auth->add($ItsMyCommentRule);
+        
+        $auth->add(new \yii\rbac\Permission([
+            'name' => Permission::CREATE,
+            'description' => 'Can create own comments',
+        ]));
+        $auth->add(new \yii\rbac\Permission([
+            'name' => Permission::UPDATE,
+            'description' => 'Can update all comments',
+        ]));
+        $auth->add(new \yii\rbac\Permission([
+            'name' => Permission::UPDATE_OWN,
+            'ruleName' => $ItsMyCommentRule->name,
+            'description' => 'Can update own comments',
+        ]));
+        $auth->add(new \yii\rbac\Permission([
+            'name' => Permission::DELETE,
+            'description' => 'Can delete all comments',
+        ]));
+        $auth->add(new \yii\rbac\Permission([
+            'name' => Permission::DELETE_OWN,
+            'ruleName' => $ItsMyCommentRule->name,
+            'description' => 'Can delete own comments',
+        ]));
 
 
         /*********************************
@@ -79,52 +111,52 @@ class m190311_181235_populate_rbac extends Migration
 
 
         /*********************************
-         * Network Permissions
+         * Group Permissions
          *********************************/
-        $myNetworkRule = new MyNetworkRule();
-        $auth->add($myNetworkRule);
+        $myGroupRule = new MyGroupRule();
+        $auth->add($myGroupRule);
 
-        $memberNetworkRule = new MemberNetworkRule();
-        $auth->add($memberNetworkRule);
+        $memberGroupRule = new MemberGroupRule();
+        $auth->add($memberGroupRule);
 
-        $createNetwork = $auth->createPermission(PermissionNetwork::CREATE);
-        $createNetwork->description = 'Can create own networks';
-        $auth->add($createNetwork);
+        $createGroup = $auth->createPermission(PermissionGroup::CREATE);
+        $createGroup->description = 'Can create own groups';
+        $auth->add($createGroup);
 
-        $updateNetwork = $auth->createPermission(PermissionNetwork::UPDATE);
-        $updateNetwork->description = 'Can update networks';
-        $auth->add($updateNetwork);
+        $updateGroup = $auth->createPermission(PermissionGroup::UPDATE);
+        $updateGroup->description = 'Can update groups';
+        $auth->add($updateGroup);
 
-        $updateOwnNetwork = $auth->createPermission(PermissionNetwork::UPDATE_OWN);
-        $updateOwnNetwork->description = 'Can update own networks';
-        $updateOwnNetwork->ruleName = $myNetworkRule->name;
-        $auth->add($updateOwnNetwork);
+        $updateOwnGroup = $auth->createPermission(PermissionGroup::UPDATE_OWN);
+        $updateOwnGroup->description = 'Can update own groups';
+        $updateOwnGroup->ruleName = $myGroupRule->name;
+        $auth->add($updateOwnGroup);
 
-        $deleteNetwork = $auth->createPermission(PermissionNetwork::DELETE);
-        $deleteNetwork->description = 'Can delete networks';
-        $auth->add($deleteNetwork);
+        $deleteGroup = $auth->createPermission(PermissionGroup::DELETE);
+        $deleteGroup->description = 'Can delete groups';
+        $auth->add($deleteGroup);
 
-        $deleteOwnNetwork = $auth->createPermission(PermissionNetwork::DELETE_OWN);
-        $deleteOwnNetwork->description = 'Can delete own networks';
-        $deleteOwnNetwork->ruleName = $myNetworkRule->name;
-        $auth->add($deleteOwnNetwork);
+        $deleteOwnGroup = $auth->createPermission(PermissionGroup::DELETE_OWN);
+        $deleteOwnGroup->description = 'Can delete own groups';
+        $deleteOwnGroup->ruleName = $myGroupRule->name;
+        $auth->add($deleteOwnGroup);
 
-        $accessNetwork = $auth->createPermission(PermissionNetwork::ACCESS);
-        $accessNetwork->description = 'Can access networks';
-        $accessNetwork->ruleName = $memberNetworkRule->name;
-        $auth->add($accessNetwork);
+        $accessGroup = $auth->createPermission(PermissionGroup::ACCESS);
+        $accessGroup->description = 'Can access groups';
+        $accessGroup->ruleName = $memberGroupRule->name;
+        $auth->add($accessGroup);
 
         // Assign roles
-        $auth->addChild($admin, $updateNetwork);
-        $auth->addChild($admin, $deleteNetwork);
+        $auth->addChild($admin, $updateGroup);
+        $auth->addChild($admin, $deleteGroup);
 
-        $auth->addChild($updateOwnNetwork, $updateNetwork);
-        $auth->addChild($deleteOwnNetwork, $deleteNetwork);
+        $auth->addChild($updateOwnGroup, $updateGroup);
+        $auth->addChild($deleteOwnGroup, $deleteGroup);
 
-        $auth->addChild($safeUser, $createNetwork);
-        $auth->addChild($safeUser, $updateOwnNetwork);
-        $auth->addChild($safeUser, $deleteOwnNetwork);
-        $auth->addChild($safeUser, $accessNetwork);
+        $auth->addChild($safeUser, $createGroup);
+        $auth->addChild($safeUser, $updateOwnGroup);
+        $auth->addChild($safeUser, $deleteOwnGroup);
+        $auth->addChild($safeUser, $accessGroup);
     }
 
     /**

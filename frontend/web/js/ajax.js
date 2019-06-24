@@ -56,7 +56,7 @@ function handleAjaxLink(e) {
         formId = $link.data('formId'),
         onDone = $link.data('onDone');
 
-    //$("#show_msg").html("Loading.... please wait...");
+    // $("#show-result").html('<div class="loader"></div>');
  
     ajaxRequest = $.ajax({
         type: "post",
@@ -124,7 +124,7 @@ var ajaxCallbacks = {
         document.getElementById('tag-'+response.tid).style.display = 'none';
         // can also try .empty() https://api.jquery.com/empty/
     },
-    'requestDone': function (response) {
+    'prayerDone': function (response) {
         $('#item-'+response.requestId).parent().toggle();
     },
     'updateDone': function (response) {

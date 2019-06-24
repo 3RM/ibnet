@@ -8,7 +8,7 @@
 namespace common\models\profile;
 
 use common\models\profile\Profile;
-use sammaye\solr\SolrDataProvider; use common\models\Utility;
+use sammaye\solr\SolrDataProvider;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;

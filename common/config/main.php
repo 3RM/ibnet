@@ -29,24 +29,11 @@ return [
             'apikey' => '',
         ],  
         'formatter' => [
+            'class' => 'yii\i18n\Formatter',
             'dateFormat' => 'MM-dd-yyyy',
         ],
-        'solr' => [
-            'class' => 'sammaye\solr\Client',
-            'options' => [
-                'endpoint' => [
-                    'profile' => [
-                        'host' => 'localhost',
-                        'port' => '8983',
-                        'path' => '/solr/profile',
-                    ],
-                    'profile-guest' => [
-                        'host' => 'localhost',
-                        'port' => '8983',
-                        'path' => '/solr/profile-guest',
-                    ],
-                ],
-            ],
+        'timezone' => [
+            'class' => 'yii2mod\timezone\Timezone',
         ],
         'view' => [
             'theme' => [

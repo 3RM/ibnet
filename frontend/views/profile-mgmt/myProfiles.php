@@ -4,14 +4,17 @@ use common\models\profile\Profile;
 use frontend\controllers\ProfileController;
 use frontend\controllers\ProfileFormController;
 use yii\bootstrap\Html;
+use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $dataProvider yii\data\ActiveDataProvider */
+Url::Remember();
 ?>
+
 <?= $this->render('../site/_userAreaHeader', ['active' => 'profiles']) ?>
 <div class="container">
-    <?= $this->render('../site/_userAreaLeftNav', ['active' => 'profiles']) ?>
+    <?= $this->render('../site/_userAreaLeftNav', ['active' => 'profiles', 'joinedGroups' => $joinedGroups]) ?>
 
     <div class="right-content">
         <h2>My Profiles</h2>

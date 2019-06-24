@@ -89,7 +89,7 @@ class LoginForm extends Model
         if ($this->validate()) {
             return Yii::$app->user->login($this->user, $this->rememberMe ? Yii::$app->params['user.rememberMeDuration'] : 0);
         }
-        
+
         return false;
     }
 

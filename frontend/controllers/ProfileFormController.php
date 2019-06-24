@@ -25,7 +25,6 @@ use common\models\profile\Type;
 use common\models\User;
 use common\models\Utility;
 use common\rbac\PermissionProfile;
-use frontend\controllers\ProfileMailController;
 use kartik\markdown\MarkdownEditor;
 use Yii;
 use yii\filters\AccessControl;
@@ -224,10 +223,10 @@ class ProfileFormController extends ProfileController
         if (isset($_POST['exit'])) {
             return $this->redirect(['/profile-mgmt/my-profiles']); 
         }
-        if ($profile->load(Yii::$app->request->Post()) && 
-            $profile->handleFormND() && 
-            $profile->setUpdateDate() && 
-            $profile->setProgress($fmNum)) {
+        if ($profile->load(Yii::$app->request->Post()) 
+            && $profile->handleFormND() 
+            && $profile->setUpdateDate() 
+            && $profile->setProgress($fmNum)) {
 
             return isset($_POST['save']) ?
                 $this->redirect(['/preview/view-preview', 'id' => $id]) :
@@ -471,9 +470,7 @@ class ProfileFormController extends ProfileController
         }
         if (Yii::$app->request->Post()) {
             $profile->deleteOldImg('image1');
-            if ($profile->save() && 
-            $profile->setUpdateDate() && 
-            $profile->setProgress($fmNum)) {
+            if ($profile->save() && $profile->setUpdateDate() && $profile->setProgress($fmNum)) {
             return isset($_POST['save']) ?
                 $this->redirect(['/preview/view-preview', 'id' => $id]) :
                 $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);  
@@ -526,9 +523,9 @@ class ProfileFormController extends ProfileController
         }
         if (Yii::$app->request->Post()) {
             $profile->deleteOldImg('image2');
-            if ($profile->save() && 
-            $profile->setUpdateDate() && 
-            $profile->setProgress($fmNum)) {
+            if ($profile->save() 
+                && $profile->setUpdateDate() 
+                && $profile->setProgress($fmNum)) {
             return isset($_POST['save']) ?
                 $this->redirect(['/preview/view-preview', 'id' => $id]) :
                 $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);  
@@ -581,9 +578,9 @@ class ProfileFormController extends ProfileController
         if (isset($_POST['exit'])) {
             return $this->redirect(['/profile-mgmt/my-profiles']); 
         }
-        if ($profile->load(Yii::$app->request->Post()) && 
-            $profile->handleFormLO() &&
-            $profile->setProgress($fmNum)) {
+        if ($profile->load(Yii::$app->request->Post()) 
+            && $profile->handleFormLO() 
+            && $profile->setProgress($fmNum)) {
             if ($dup = $profile->duplicate) {
                 return $this->redirect(['duplicate-profile', 'id' => $profile->id, 'dupId' => $dup->id]);
             }
@@ -712,7 +709,7 @@ class ProfileFormController extends ProfileController
                 $staffProfile = Profile::findProfile($staff->staff_id);
                 $staffProfileOwner = User::findOne($staffProfile->user_id);
                 // Notify staff profile owner of unconfirmed status
-                ProfileMailController::initSendLink($profile, $staffProfile, $staffProfileOwner, 'SF', 'L');
+                ProfileMail::initSendLink($profile, $staffProfile, $staffProfileOwner, 'SF', 'L');
             
             }
             return $this->redirect(['form' . $fmNum, 'id' => $profile->id]);
@@ -725,7 +722,7 @@ class ProfileFormController extends ProfileController
                 $staffProfile = Profile::findProfile($staff->staff_id);
                 $staffProfileOwner = User::findOne($staffProfile->user_id);
                 // Notify staff profile owner of unconfirmed status
-                ProfileMailController::initSendLink($profile, $staffProfile, $staffProfileOwner, 'SF', 'UL');
+                ProfileMail::initSendLink($profile, $staffProfile, $staffProfileOwner, 'SF', 'UL');
 
             }
             return $this->redirect(['form' . $fmNum, 'id' => $profile->id]);
@@ -753,8 +750,11 @@ class ProfileFormController extends ProfileController
         } elseif (isset($_POST['exit'])) {
             return $this->redirect(['/profile-mgmt/my-profiles']); 
     
-        } elseif ($profile->load(Yii::$app->request->Post()) && $profile->validate() && 
-            $profile->save() && $profile->setUpdateDate() && $profile->setProgress($fmNum)) {
+        } elseif ($profile->load(Yii::$app->request->Post()) 
+            && $profile->validate() 
+            && $profile->save() 
+            && $profile->setUpdateDate() 
+            && $profile->setProgress($fmNum)) {
             return isset($_POST['save']) ?
                 $this->redirect(['/preview/view-preview', 'id' => $id]) :
                 $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);      
@@ -1010,9 +1010,9 @@ class ProfileFormController extends ProfileController
         } elseif (isset($_POST['exit'])) {
             return $this->redirect(['/profile-mgmt/my-profiles']); 
 
-        } elseif ($missionary->load(Yii::$app->request->Post()) &&
-            $missionary->handleFormCP($profile) && 
-            $profile->setProgress($fmNum)) {
+        } elseif ($missionary->load(Yii::$app->request->Post()) 
+            && $missionary->handleFormCP($profile) 
+            && $profile->setProgress($fmNum)) {
             return isset($_POST['save']) ?
                 $this->redirect(['/preview/view-preview', 'id' => $id]) :
                 $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
@@ -1090,18 +1090,19 @@ class ProfileFormController extends ProfileController
         if (isset($_POST['more'])) {
             $more = true;
 
-        } elseif (isset($_POST['removeM']) && $staff = Staff::findOne($_POST['removeM'])) {
+        } elseif (isset($_POST['removeM']) 
+            && $staff = Staff::findOne($_POST['removeM']) 
+            && $parentMinistry = $profile->parentMinistry) {
             
             // Notify ministry profile owner of unlink
-            $ministry = $staff->ministry;
-            $ministryOwner = $ministry->user;
-            ProfileMailController::initSendLink($profile, $ministry, $ministryOwner, 'PM', 'UL');
+            $parentMinistryOwner = $parentMinistry->user;
+            ProfileMail::initSendLink($profile, $parentMinistry, $parentMinistryOwner, 'PM', 'UL');
             $staff->delete();
             return $this->redirect(['form' . $fmNum, 'id' => $profile->id]);
 
-        } elseif (isset($_POST['submit-more']) &&
-            $profile->load(Yii::$app->request->Post()) &&
-            $profile->handleFormPMM()) {
+        } elseif (isset($_POST['submit-more']) 
+            && $profile->load(Yii::$app->request->Post()) 
+            && $profile->handleFormPMM()) {
             return $this->redirect(['form' . $fmNum, 'id' => $profile->id]);
 
         } elseif (isset($_POST['cancel'])) {
@@ -1110,10 +1111,10 @@ class ProfileFormController extends ProfileController
         } elseif (isset($_POST['exit'])) {
             return $this->redirect(['/profile-mgmt/my-profiles']); 
 
-        } elseif ($profile->load(Yii::$app->request->Post()) &&
-            $profile->setProgress($fmNum) &&
-            $profile->handleFormPM() &&
-            $profile->handleFormPMM()) {
+        } elseif ($profile->load(Yii::$app->request->Post()) 
+            && $profile->setProgress($fmNum) 
+            && $profile->handleFormPM() 
+            && $profile->handleFormPMM()) {
             return isset($_POST['save']) ?
                 $this->redirect(['/preview/view-preview', 'id' => $id]) :
                 $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
@@ -1209,9 +1210,9 @@ class ProfileFormController extends ProfileController
         } elseif (isset($_POST['exit'])) {
             return $this->redirect(['/profile-mgmt/my-profiles']); 
 
-        } elseif ($profile->load(Yii::$app->request->Post()) && 
-            $profile->handleFormSA() && 
-            $profile->setProgress($fmNum)) {
+        } elseif ($profile->load(Yii::$app->request->Post()) 
+            && $profile->handleFormSA() 
+            && $profile->setProgress($fmNum)) {
             return isset($_POST['save']) ?
                 $this->redirect(['/preview/view-preview', 'id' => $id]) :
                 $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]); 
@@ -1266,9 +1267,9 @@ class ProfileFormController extends ProfileController
         } elseif (isset($_POST['exit'])) {
             return $this->redirect(['/profile-mgmt/my-profiles']); 
 
-        } elseif ($profile->load(Yii::$app->request->Post()) && 
-            $profile->handleFormSL() && 
-            $profile->setProgress($fmNum)) {
+        } elseif ($profile->load(Yii::$app->request->Post()) 
+            && $profile->handleFormSL() 
+            && $profile->setProgress($fmNum)) {
             return isset($_POST['save']) ?
                 $this->redirect(['/preview/view-preview', 'id' => $id]) :
                 $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]); 
@@ -1309,10 +1310,10 @@ class ProfileFormController extends ProfileController
         } elseif (isset($_POST['exit'])) {
             return $this->redirect(['/profile-mgmt/my-profiles']); 
 
-        } elseif ($profile->load(Yii::$app->request->Post()) && 
-            $profile->save() && 
-            $profile->setUpdateDate() && 
-            $profile->setProgress($fmNum)) {
+        } elseif ($profile->load(Yii::$app->request->Post()) 
+            && $profile->save() 
+            && $profile->setUpdateDate() 
+            && $profile->setProgress($fmNum)) {
             return isset($_POST['save']) ?
                 $this->redirect(['/preview/view-preview', 'id' => $id]) :
                 $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);  
@@ -1369,10 +1370,10 @@ class ProfileFormController extends ProfileController
             return $this->redirect(['/profile-mgmt/my-profiles']); 
 
     // **************************** Church POST *********************************
-        } elseif ($profile->type == Profile::TYPE_CHURCH && 
-            $profile->load(Yii::$app->request->Post()) && 
-            $profile->handleFormMA() && 
-            $profile->setProgress($fmNum)) {
+        } elseif ($profile->type == Profile::TYPE_CHURCH 
+            && $profile->load(Yii::$app->request->Post()) 
+            && $profile->handleFormMA() 
+            && $profile->setProgress($fmNum)) {
 
             if ($_POST['Profile']['housingSelect'] == 'Y') {
                 return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
@@ -1386,10 +1387,10 @@ class ProfileFormController extends ProfileController
             } 
 
     // ************************** Missionary POST *******************************    
-        } elseif (($profile->type == Profile::TYPE_MISSIONARY || $profile->type == Profile::TYPE_CHAPLAIN) && 
-            $missionary->load(Yii::$app->request->Post()) && 
-            $missionary->handleFormMA($profile) && 
-            $profile->setProgress($fmNum)) { 
+        } elseif (($profile->type == Profile::TYPE_MISSIONARY || $profile->type == Profile::TYPE_CHAPLAIN) 
+            && $missionary->load(Yii::$app->request->Post()) 
+            && $missionary->handleFormMA($profile) 
+            && $profile->setProgress($fmNum)) { 
             // Skip Missionary Housing if checkbox is not checked
             return isset($_POST['save']) ?
                 $this->redirect(['/preview/view-preview', 'id' => $id]) :
@@ -1452,10 +1453,10 @@ class ProfileFormController extends ProfileController
         } elseif (isset($_POST['exit'])) {
             return $this->redirect(['/profile-mgmt/my-profiles']); 
 
-        } elseif ($missHousing->load(Yii::$app->request->Post()) && 
-            $missHousing->handleFormMH($profile) &&
-            $profile->setUpdateDate() && 
-            $profile->setProgress($fmNum)) {
+        } elseif ($missHousing->load(Yii::$app->request->Post()) 
+            && $missHousing->handleFormMH($profile) 
+            && $profile->setUpdateDate() 
+            && $profile->setProgress($fmNum)) {
             return isset($_POST['save']) ?
                 $this->redirect(['/preview/view-preview', 'id' => $id]) :
                 $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]); 

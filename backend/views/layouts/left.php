@@ -12,7 +12,7 @@ use yii\helpers\Html;
             <div class="pull-left image">
                 <?= empty($user->usr_image) ? 
                     Html::img('@web/images/user.png', ['class' => 'img-circle', 'alt' => 'User image']) :
-                    Html::img(\Yii::$app->params['frontendUrl'] . $user->usr_image, ['class' => 'img-circle', 'alt' => 'User image']) ?>
+                    Html::img(\Yii::$app->params['url.frontend'] . $user->usr_image, ['class' => 'img-circle', 'alt' => 'User image']) ?>
             </div>
             <div class="pull-left info">
                 <p><?= $user->first_name . ' ' . $user->last_name ?></p>

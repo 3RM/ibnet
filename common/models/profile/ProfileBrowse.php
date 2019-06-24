@@ -109,7 +109,7 @@ class ProfileBrowse extends Profile
      */
     public function resultSet($query)
     {
-        return $resultSet = Yii::$app->solr->select($query);
+        return Yii::$app->solr->select($query);
     }
 
 

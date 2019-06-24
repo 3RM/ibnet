@@ -154,7 +154,7 @@ class m190311_132910_create_profile_tables extends Migration
          **/
         $this->createTable('{{%profile_tracking}}', [
             'id' => $this->primaryKey(),
-            'date' => $this->timeStamp()->notNull(),
+            'date' => $this->integer()->notNull(),
             'users' => $this->integer(),
             'type_array' => $this->string(),
             'sub_type_array' => $this->string(),

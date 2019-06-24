@@ -90,7 +90,12 @@ class StaffSearch extends \common\models\profile\Staff
         $query->andFilterWhere(['like', 'staff_id', $this->staff_id])
               ->andFilterWhere(['like', 'ministry_id', $this->ministry_id])
               ->andFilterWhere(['like', 'staff_type', $this->staff_type])
-              ->andFilterWhere(['like', 'staff_title', $this->staff_title]);
+              ->andFilterWhere(['like', 'staff_title', $this->staff_title])
+              ->andFilterWhere(['like', 'home_church', $this->home_church])
+              ->andFilterWhere(['like', 'church_pastor', $this->church_pastor])
+              ->andFilterWhere(['like', 'ministry_of', $this->ministry_of])
+              ->andFilterWhere(['like', 'sr_pastor', $this->sr_pastor])
+              ->andFilterWhere(['confirmed' => $this->confirmed]);
 
         return $dataProvider;
     }

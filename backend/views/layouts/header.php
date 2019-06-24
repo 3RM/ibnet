@@ -162,17 +162,16 @@ use yii\helpers\Html;
                 <li class="dropdown user user-menu">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                         <?= empty($user->usr_image) ? 
-                            Html::img('@images/user.png', ['class' => 'user-image img-circle', 'alt' => 'User image']) :
-                            Html::img(\Yii::$app->params['frontendUrl'] . $user->usr_image, ['class' => 'user-image img-circle', 'alt' => 'User image']) ?>
+                            Html::img('@web/images/user.png', ['class' => 'user-image img-circle', 'alt' => 'User image']) :
+                            Html::img(\Yii::$app->params['url.frontend'] . $user->usr_image, ['class' => 'user-image img-circle', 'alt' => 'User image']) ?>
                         <span class="hidden-xs"><?= $user->first_name . ' ' . $user->last_name ?></span>
                     </a>
                     <ul class="dropdown-menu">
                         <!-- User image -->
                         <li class="user-header">
                             <?= empty($user->usr_image) ? 
-                                Html::img('@images/user.png', ['class' => 'img-circle', 'alt' => 'User image']) :
-                                Html::img(\Yii::$app->params['frontendUrl'] . $user->usr_image, ['class' => 'img-circle', 'alt' => 'User image']) ?>
-
+                                Html::img('@web/images/user.png', ['class' => 'img-circle', 'alt' => 'User image']) :
+                                Html::img(\Yii::$app->params['url.frontend'] . $user->usr_image, ['class' => 'img-circle', 'alt' => 'User image']) ?>
                             <p>
                                 <?php $assignment = $user->assignment ?>
                                 <?= $user->first_name . ' ' . $user->last_name . ' - ' . $assignment->item_name ?>

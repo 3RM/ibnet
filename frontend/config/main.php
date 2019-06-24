@@ -34,6 +34,10 @@ return [
             'enableAutoLogin' => true,
             'identityCookie' => ['name' => '_identity-frontend', 'httpOnly' => true],
         ],
+        'discourseSso' => [
+            'class' => 'sammaye\discourse\Sso',
+            'secret' => 'Bu!^#uI$gy2Q&n16Xo338arO',
+        ],
         'session' => [
             // this is the name of the session cookie used for login on the frontend
             'name' => 'advanced-frontend',

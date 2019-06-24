@@ -11,13 +11,14 @@ use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $dataProvider yii\data\ActiveDataProvider */
+Url::Remember();
 ?>
 <?= $this->render('_userAreaHeader', ['active' => 'settings']) ?>
 <div class="container">
-    <?= $this->render('../site/_userAreaLeftNav', ['active' => 'settings']) ?>
+    <?= $this->render('../site/_userAreaLeftNav', ['active' => 'settings', 'joinedGroups' => $joinedGroups]) ?>
 
     <div class="right-content">
-        <h2>Profile Settings</h2>
+        <h2>Personal Profile Settings</h2>
         <div class="personal-settings">
             <?= empty($userP->usr_image) ?
                 Html::img('@img.site/user.png', ['class' => 'img-circle']) :
@@ -107,7 +108,15 @@ use yii\widgets\ActiveForm;
             </div>
         </div>
         <?php $form = ActiveForm::end(); ?>
-        <div class="top-margin">&nbsp;</div>
+
+        <div class="settings-lock">
+            <?= $userP->isSafeUser ? 
+                NULL : '<p>' . Html::icon('lock') . ' Identify your home church from the directory to unlock additional features!</p>'
+            ?>
+            <?= ($userP->isPrimaryRoleMissionary && !$userP->isMissionary) ?
+                '<p>' . Html::icon('lock') . ' Create a missionary profile to unlock additional missionary features!</p>' : NULL
+            ?>
+        </div>
 
         <hr>
 
@@ -117,17 +126,18 @@ use yii\widgets\ActiveForm;
             <h4><b>Username:</b> <?= $userA->username ?></h4>
             <h4><b>Email:</b> <?= $userA->email ?></h4>
             <h4><b>Password:</b> <span class="pwd"></span></h4>
+            <h4><b>Timezone:</b> <?= $userA->timezone ?></h4>
             <h4><b>Email Preferences:</b> 
                 <span class="fa fa-check-square-o"></span>
-                <?= $userA->emailPrefProfile ? 
+                <?= $userA->subscriptionProfile ? 
                     '<span class="fa fa-check-square-o"></span>' : '<span class="fa fa-square-o"></span>' ?>
-                <?= $userA->emailPrefLinks ?
+                <?= $userA->subscriptionLinks ?
                     '<span class="fa fa-check-square-o"></span>' : '<span class="fa fa-square-o"></span>' ?>
-                <?= $userA->emailPrefComments ?
+                <?= $userA->subscriptionComments ?
                     '<span class="fa fa-check-square-o"></span>' : '<span class="fa fa-square-o"></span>' ?>
-                <?= $userA->emailPrefFeatures ?
+                <?= $userA->subscriptionFeatures ?
                     '<span class="fa fa-check-square-o"></span>' : '<span class="fa fa-square-o"></span>' ?>
-                <?= $userA->emailPrefBlog ?
+                <?= $userA->subscriptionBlog ?
                     '<span class="fa fa-check-square-o"></span>' : '<span class="fa fa-square-o"></span>' ?>
             </h4>
      
@@ -153,6 +163,9 @@ use yii\widgets\ActiveForm;
                 <?= $form->field($userA, 'currentPassword', ['options' => ['class' => "no-label"]])->passwordInput(['maxlength' => true, 'placeholder' => 'Current password']) ?>
                 <?= $form->field($userA, 'newPassword', ['options' => ['class' => "no-label"]])->passwordInput(['maxlength' => true, 'placeholder' => 'New password']) ?>
 
+                <h3 class="top-margin-28">Timezone</h3>
+                <?= $form->field($userA, 'timezone')->widget(\yiidreamteam\widgets\timezone\Picker::className(), ['options' => ['class' => 'input form-control no-label']]) ?>
+
                 <h3 class="top-margin-28">Email Preferences</h3>
                 <?= $form->field($userA, 'emailMaintenance', ['options' => ['class' => 'top-margin-10']])->widget(CheckboxX::classname(), [
                     'initInputType' => CheckboxX::INPUT_CHECKBOX,
@@ -164,7 +177,7 @@ use yii\widgets\ActiveForm;
                         'threeState'=>false, 
                     ]
                 ])->label(false) ?>
-                <?= $form->field($userA, 'emailPrefProfile')->widget(CheckboxX::classname(), [
+                <?= $form->field($userA, 'subscriptionProfile')->widget(CheckboxX::classname(), [
                     'initInputType' => CheckboxX::INPUT_CHECKBOX,
                     'autoLabel' => true,
                     'pluginOptions'=>[
@@ -174,7 +187,7 @@ use yii\widgets\ActiveForm;
                         'threeState'=>false, 
                     ]
                 ])->label(false) ?>
-                <?= $form->field($userA, 'emailPrefLinks')->widget(CheckboxX::classname(), [
+                <?= $form->field($userA, 'subscriptionLinks')->widget(CheckboxX::classname(), [
                     'initInputType' => CheckboxX::INPUT_CHECKBOX,
                     'autoLabel' => true,
                     'pluginOptions'=>[
@@ -183,7 +196,7 @@ use yii\widgets\ActiveForm;
                         'threeState'=>false, 
                     ]
                 ])->label(false) ?>
-                <?= $form->field($userA, 'emailPrefComments')->widget(CheckboxX::classname(), [
+                <?= $form->field($userA, 'subscriptionComments')->widget(CheckboxX::classname(), [
                     'initInputType' => CheckboxX::INPUT_CHECKBOX,
                     'autoLabel' => true,
                     'pluginOptions'=>[
@@ -192,7 +205,7 @@ use yii\widgets\ActiveForm;
                         'threeState'=>false, 
                     ]
                 ])->label(false) ?>
-                <?= $form->field($userA, 'emailPrefFeatures')->widget(CheckboxX::classname(), [
+                <?= $form->field($userA, 'subscriptionFeatures')->widget(CheckboxX::classname(), [
                     'initInputType' => CheckboxX::INPUT_CHECKBOX,
                     'autoLabel' => true,
                     'pluginOptions'=>[
@@ -201,7 +214,7 @@ use yii\widgets\ActiveForm;
                         'threeState'=>false, 
                     ]
                 ])->label(false) ?>
-                <?= $form->field($userA, 'emailPrefBlog')->widget(CheckboxX::classname(), [
+                <?= $form->field($userA, 'subscriptionBlog')->widget(CheckboxX::classname(), [
                     'initInputType' => CheckboxX::INPUT_CHECKBOX,
                     'autoLabel' => true,
                     'pluginOptions'=>[

@@ -5,15 +5,16 @@
  *
  ************/
 
+
 /*
- * Account
+ * Header
 --------------------------------- */
 .account-header-container {
   height: 280px;
 }
 .account-header {
 }
-.acc-settings-header, .acc-profiles-header, .acc-network-header, .acc-update-header, .acc-forms-header, .acc-preview-header {
+.acc-settings-header, .acc-profiles-header, .acc-group-header, .acc-update-header, .acc-forms-header, .acc-preview-header {
   height: 100%;
   margin-top: -165px;
   /* Stretch image outside of containing div */
@@ -24,7 +25,6 @@
   margin-left: -50vw;
   margin-right: -50vw;
 }
-
 .acc-settings-header {
   background: url(../images/user-area/settings-header.jpg);
   border-bottom: 1px solid #bbb;
@@ -33,8 +33,8 @@
   background: url(../images/user-area/profiles-header.jpg);
   border-bottom: 1px solid #bbb;
 }
-.acc-network-header {
-  background: url(../images/user-area/network-header.jpg);
+.acc-group-header {
+  background: url(../images/user-area/group-header.jpg);
   border-bottom: 1px solid #bbb;
 }
 .acc-update-header {
@@ -79,64 +79,93 @@
   -webkit-transition: all 0.4s ease;
   transition: all 0.4s ease;
 }
+
+
+/*
+ * Left Nav
+--------------------------------- */
 .left-nav {
   float: left;
   width: 160px;
-  margin-left: -15px;
-  padding:40px 0;
+  margin: 40px 10px 10px -15px;
+  padding: 10px;
+  border-right: 1px solid #e6e6e6;
+  border-bottom: 1px solid #bbb;
+  border-radius: 4px;
+  background-color: #f7f7f7;
 }
-.left-nav ul {
+.left-nav p {
+  font-size: 0.9em;
+}
+ul.main-links {
   padding: 0;
   margin: 0;
 }
-.left-nav li {
-  width: 50px;
-  height: 50px;
+ul.main-links li {
   display: flex;
-  justify-content: left;
-  align-items: center;
-  padding: 10px;
-  list-style: none;
-  background-color: #f7f7f7;
-  border-right: 5px solid #f7f7f7;
-  border-bottom: 1px solid #bbb;
-  border-radius: 6px;
-  color: #808080;
-  overflow: hidden;
-  white-space: nowrap;
-}
-.left-nav li:hover {
-  width: 150px;
-  background-color: #365f89;
-  border-right: 5px solid #365f89;
-  color: #fff;
-  -webkit-transition: width 0.5s; /* Safari */
-  transition: width 0.5s;
-  justify-content: center;
 }
 .left-nav a {
   text-decoration: none;
+  font-size: 0.95em;
 }
 .left-nav li.active {
-  background-color: #365f89;
-  border-right: 5px solid #365f89;
   color: #fff;
+  background-color: #365f89;
 }
 .left-nav-linktext {
   margin-left: 4px;
 }
-li.active .underline {
-  border-bottom: 5px solid #dc9f27;
-  padding-bottom: 6px;
+.group-nav-links h3 {
+  background-color: lightgray;
+  font-size: 1.3em;
+  margin: 20px -10px 10px -10px;
+  padding: 3px 10px;
 }
+.group-nav-links ul {
+  margin-bottom: 15px;
+}
+.group-nav-links li {
+  margin-left: -35px;
+  padding-left: 15px;
+  list-style: none;
+}
+.group-nav-links p {
+  border-bottom: 1px dashed lightgray;
+  color: #777;
+}
+.group-nav-links p:hover {
+  cursor:pointer;
+}
+.group-nav-links li span,
+.group-nav-links li i {
+  color: #bbb;
+}
+.active-page {
+  background-color: #365f89;
+  color: #fff;
+}
+.group-nav-links li.active-page span,
+.group-nav-links li.active-page i {
+  color: #fff;
+}
+.group-list {
+  display: none;
+}
+
+
+/*
+ * Right Content
+--------------------------------- */
 .right-content {
   float: right;
   width: 80%;
   padding: 40px 0;
 }
 .right-content h2 {
+  margin-top: 0;
   margin-bottom: 40px;
 }
+
 
 /*
  * Account - Settings
@@ -178,6 +207,17 @@ li.active .underline {
   background: url(../images/user-area/pwd.jpg) center left;
   background-repeat: no-repeat;
   display: inline-block;
+}
+.settings-lock {
+  margin: 40px 0;
+}
+.settings-lock p {
+  color: gray;
+  font-size: 1.2em;
+}
+.settings-lock span {
+  color: #ccc;
+  font-size: 1.8em;
 }
 
 /*
@@ -395,7 +435,10 @@ li.active .underline {
 --------------------------------- */
 .repo-url {
   width: 50%;
-  padding: 2% 0;
+  border: 6px solid #eee;
+  border-radius: 20px;
+  padding: 10px 10px 30px 10px;
+  color: #7b7b7b;
 }
 #repository_link {
   background-color: inherit;
@@ -403,8 +446,9 @@ li.active .underline {
 .repo-links {
   font-size: 0.9em;
   width: 50%;
-  margin: -20px 0 0;
   padding: 0 5%;
+  position: relative;
+  top: -34px;
 }
 .repo-links a {
   float: right;
@@ -435,6 +479,7 @@ button.repo-url-refresh:focus {
   margin-top: 15px;
   width: 35%;
   float: right;
+  /*cursor: help;*/
 }
 .repo-form h2 {
   display: inline-block;
@@ -628,8 +673,8 @@ img.mc-icon {
     .acc-profiles-header {
       background: url(../images/user-area/profiles-header-uw.jpg);
     }
-    .acc-network-header {
-      background: url(../images/user-area/network-header-uw.jpg);
+    .acc-group-header {
+      background: url(../images/user-area/group-header-uw.jpg);
     } 
     .acc-update-header {
       background: url(../images/user-area/update-header-uw.jpg);
@@ -701,7 +746,7 @@ img.mc-icon {
       background: url(../images/user-area/profiles-header-mb.jpg);
     }
     .acc-update-header {
-      background: url(../images/user-area/network-header-mb.jpg);
+      background: url(../images/user-area/group-header-mb.jpg);
     }
     .acc-update-header {
       background: url(../images/user-area/update-header-mb.jpg);
@@ -712,8 +757,13 @@ img.mc-icon {
     .acc-preview-header {
       background: url(../images/profile/profile-preview-header-mb.jpg);
     }
+    div#main-wrap.wrap > div.container {
+      display: flex;
+      flex-direction: column;
+    }
     .left-nav {
-      display: none;
+      width: 80%;
+      margin: 20px 10% 40px 10%;
     }
     #account0 {
       z-index: 10000;
@@ -723,6 +773,9 @@ img.mc-icon {
       float: none;
       width: 100%;
       padding: 40px 0;
+    }
+    .right-content .boxes {
+      margin: 0 15px;
     }
     .personal-settings {
       flex-direction: column;
@@ -780,10 +833,14 @@ img.mc-icon {
       margin: 0;
       padding: 0;
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
+      justify-content: space-evenly;
     }
     .repo-links a {
       float: none;
+    }
+    .repo-url-refresh {
+      width: 20px;
     }
     .repo-form {
       width: 100%;
@@ -816,6 +873,9 @@ img.mc-icon {
     }
     .timeline-form {
       width: 75%;
+    }
+    .mb-hide {
+      display: none;
     }
 }
 
