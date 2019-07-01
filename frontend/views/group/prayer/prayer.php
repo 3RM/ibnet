@@ -83,62 +83,68 @@ $this->title = 'Prayer List';
             <div class="box-body">
                     
                 <!-- Requested By -->
-                <?= Select2::widget([
-                    'id' => 'name-id',
-                    'name' => 'nameSelect',
-                    'data' => $prayerNameList,
-                    'disabled' => $f,
-                    'options' => ['class' => 'filter-select', 'placeholder' => 'Requested By'],
-                ]); ?>
-                <?php $this->registerJs(
-                "$('#name-id').change(function() {
-                    GET = location.search.substr(1).split('&').reduce((o,i)=>(u=decodeURIComponent,[k,v]=i.split('='),o[u(k)]=v&&u(v),o),{});
-                    if (GET.f) {
-                        nameVal = NULL;
-                    } else {
-                        nameVal = '&PrayerSearch%5Bname%5D\=' + $('#name-id option:selected').text();
-                    }
-                    window.location.replace('" . Url::to(['group/prayer', 'id' => $group->id, 'f' => $f, 'l' => $l]) . "' + nameVal);
-                });", \yii\web\View::POS_READY); ?>
+                <div class="box-filter-select">
+                    <?= Select2::widget([
+                        'id' => 'name-id',
+                        'name' => 'nameSelect',
+                        'data' => $prayerNameList,
+                        'disabled' => $f,
+                        'options' => ['class' => 'filter-select', 'placeholder' => 'Requested By'],
+                    ]); ?>
+                    <?php $this->registerJs(
+                    "$('#name-id').change(function() {
+                        GET = location.search.substr(1).split('&').reduce((o,i)=>(u=decodeURIComponent,[k,v]=i.split('='),o[u(k)]=v&&u(v),o),{});
+                        if (GET.f) {
+                            nameVal = NULL;
+                        } else {
+                            nameVal = '&PrayerSearch%5Bname%5D\=' + $('#name-id option:selected').text();
+                        }
+                        window.location.replace('" . Url::to(['group/prayer', 'id' => $group->id, 'f' => $f, 'l' => $l]) . "' + nameVal);
+                    });", \yii\web\View::POS_READY); ?>
+                </div>
                     
                 <!-- Duration -->
-                <?= Select2::widget([
-                    'id' => 'duration-id',
-                    'name' => 'durationSelect',
-                    'data' => Prayer::DURATIONLIST,
-                    'hideSearch' => true,
-                    'disabled' => $f,
-                    'options' => ['class' => 'filter-select', 'placeholder' => 'Duration'],
-                ]); ?>
-                <?php $this->registerJs(
-                "$('#duration-id').change(function() {
-                    GET = location.search.substr(1).split('&').reduce((o,i)=>(u=decodeURIComponent,[k,v]=i.split('='),o[u(k)]=v&&u(v),o),{});
-                    if (GET.f) {
-                        durVal = NULL;
-                    } else {
-                        durVal = '&PrayerSearch%5Bduration%5D\=' + $('#duration-id').val();
-                    }
-                    window.location.replace('" . Url::to(['group/prayer', 'id' => $group->id, 'f' => $f, 'l' => $l]) . "' + durVal);
-                });", \yii\web\View::POS_READY); ?>
-                    
+                <div class="box-filter-select">
+                    <?= Select2::widget([
+                        'id' => 'duration-id',
+                        'name' => 'durationSelect',
+                        'data' => Prayer::DURATIONLIST,
+                        'hideSearch' => true,
+                        'disabled' => $f,
+                        'options' => ['class' => 'filter-select', 'placeholder' => 'Duration'],
+                    ]); ?>
+                    <?php $this->registerJs(
+                    "$('#duration-id').change(function() {
+                        GET = location.search.substr(1).split('&').reduce((o,i)=>(u=decodeURIComponent,[k,v]=i.split('='),o[u(k)]=v&&u(v),o),{});
+                        if (GET.f) {
+                            durVal = NULL;
+                        } else {
+                            durVal = '&PrayerSearch%5Bduration%5D\=' + $('#duration-id').val();
+                        }
+                        window.location.replace('" . Url::to(['group/prayer', 'id' => $group->id, 'f' => $f, 'l' => $l]) . "' + durVal);
+                    });", \yii\web\View::POS_READY); ?>
+                </div>
+
                 <!-- Tag -->
-                <?= Select2::widget([
-                    'id' => 'tag-id',
-                    'name' => 'tagSelect',
-                    'data' => ArrayHelper::map($tagList, 'id', 'tag'),
-                    'disabled' => $f,
-                    'options' => ['class' => 'filter-select', 'placeholder' => 'Tag'],
-                ]); ?>
-                <?php $this->registerJs(
-                "$('#tag-id').change(function() {
-                    GET = location.search.substr(1).split('&').reduce((o,i)=>(u=decodeURIComponent,[k,v]=i.split('='),o[u(k)]=v&&u(v),o),{});
-                    if (GET.f) {
-                        tagVal = NULL;
-                    } else {
-                        tagVal = '&PrayerSearch%5Btag%5D\=' + $('#tag-id option:selected').text();
-                    }
-                    window.location.replace('" . Url::to(['group/prayer', 'id' => $group->id, 'f' => $f, 'l' => $l]) . "' + tagVal);
-                });", \yii\web\View::POS_READY); ?>
+                <div class="box-filter-select">
+                    <?= Select2::widget([
+                        'id' => 'tag-id',
+                        'name' => 'tagSelect',
+                        'data' => ArrayHelper::map($tagList, 'id', 'tag'),
+                        'disabled' => $f,
+                        'options' => ['class' => 'filter-select', 'placeholder' => 'Tag'],
+                    ]); ?>
+                    <?php $this->registerJs(
+                    "$('#tag-id').change(function() {
+                        GET = location.search.substr(1).split('&').reduce((o,i)=>(u=decodeURIComponent,[k,v]=i.split('='),o[u(k)]=v&&u(v),o),{});
+                        if (GET.f) {
+                            tagVal = NULL;
+                        } else {
+                            tagVal = '&PrayerSearch%5Btag%5D\=' + $('#tag-id option:selected').text();
+                        }
+                        window.location.replace('" . Url::to(['group/prayer', 'id' => $group->id, 'f' => $f, 'l' => $l]) . "' + tagVal);
+                    });", \yii\web\View::POS_READY); ?>
+                </div>
                 <div class="reset">
                     <?= Html::a('<span class="glyphicons glyphicons-repeat"></span>', Url::to(['group/prayer', 'id' => $group->id, 'l' => $l]), ['data-toggle' => 'tooltip', 'data-placement' => 'top', 'title' => 'Reset List']) ?>
                     <?= Html::a('<span class="glyphicons glyphicons-resize-full"></span>', Url::to(['group/prayer', 'id' => $group->id, 'f' => 1, 'l' => $l]), ['data-toggle' => 'tooltip', 'data-placement' => 'top', 'title' => 'Show Entire List']) ?>

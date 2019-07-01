@@ -1,6 +1,7 @@
 <?php
-use common\models\group\PrayerAlertQueue;
+use common\models\group\GroupAlertQueue;
 use yii\helpers\Html;
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $prayer common\models\group\Prayer */
@@ -19,18 +20,18 @@ use yii\helpers\Html;
 	<tr>
 		<td colspan="2">
 			<p style="color:gray; margin:20px;">Requested by <?= Html::a($prayer->fullName, 'mailto:' . $prayer->email, ['style' => 'color:gray; text-decoration:underline; text-decoration-style:dashed;']) ?></p>
-			<?php if ($status == PrayerAlertQueue::STATUS_NEW) { ?>
+			<?php if ($status == GroupAlertQueue::PRAYER_STATUS_NEW) { ?>
 				<p style="margin:20px; font-size:1.6em;">New: <?= $prayer->request ?></p>
-			<?php } elseif ($status == PrayerAlertQueue::STATUS_UPDATE) { ?>
+			<?php } elseif ($status == GroupAlertQueue::PRAYER_STATUS_UPDATE) { ?>
 				<p style="margin:20px; font-size:1.6em;">Update: <?= $prayer->request ?></p>
-			<?php } elseif ($status == PrayerAlertQueue::STATUS_ANSWER) { ?>
+			<?php } elseif ($status == GroupAlertQueue::PRAYER_STATUS_ANSWER) { ?>
 				<p style="margin:20px; font-size:1.6em;">Answered: <?= $prayer->request ?></p>
 			<?php } ?>
 		</td>
 	</tr>
 	<tr>
 		<td colspan="2">
-			<?php if($status == PrayerAlertQueue::STATUS_ANSWER) { ?>
+			<?php if($status == GroupAlertQueue::PRAYER_STATUS_ANSWER) { ?>
 				<p style="margin:0 20px 10px 20px;"><?= $prayer->answer_description ?></p>
 				<p style="margin:40px 20px 20px 20px; color:gray; font-size:1.2em"><em>Original Request:</em></p>
 			<?php } ?>
@@ -50,7 +51,7 @@ use yii\helpers\Html;
 				</table>
 			<?php } ?>
 			<p style="margin:0 20px 10px 20px;">
-				Visit the <?= Html::a('prayer list here', Yii::$app->params['url.loginFirst'] . 'group/prayer/'  . $prayer->group->id) ?>.
+				Visit the <?= Html::a('prayer list here', Yii::$app->params['url.loginFirst'] . urlencode(Url::to(['group/prayer', 'id' => $group->prayer->id]))) ?>.
 			</p>
 		</td>
 	</tr>

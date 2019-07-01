@@ -26,7 +26,7 @@ class GroupWeeklyPrayerController extends Controller
                 
                 $groups = Group::getActivePrayerGroups();
                 foreach ($groups as $group) {
-                    GroupMail::WeeklyPrayerSummary($group);
+                    GroupMail::sendWeeklyPrayerSummary($group);
                 }
             }
             $command->finish();

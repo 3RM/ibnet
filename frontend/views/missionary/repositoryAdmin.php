@@ -1,11 +1,12 @@
 <?php
 
+use common\models\missionary\MissionaryUpdate;
 use frontend\assets\AjaxAsset;
 use kartik\select2\Select2;
 use yii\bootstrap\Html;
 use yii\bootstrap\Modal;
 use yii\helpers\Url;
-use yii\widgets\ActiveForm;
+use yii\widgets\ActiveForm; //use common\models\Utility; Utility::pp($updates[0]->alert_status == 0);
 
 /* @var $this yii\web\View */
 /* @var $profilemodel app\models\Profile */
@@ -184,6 +185,35 @@ Url::Remember();
                                 </td>                        
                             </tr>   
                         <?php } else { ?>
+                            <?php if (($update->alert_status == MissionaryUpdate::ALERT_ENABLED) || ($update->alert_status == MissionaryUpdate::ALERT_PAUSED)) { ?>
+                            <tr>
+                                <td colspan="3" id="alert-timer-container-<?= $update->id ?>">
+                                    <?php if ($update->alert_status == MissionaryUpdate::ALERT_PAUSED) { ?>
+                                        <div id="update-alert-timer-<?= $update->id ?>">
+                                            <?= Html::icon('send') . Html::a(' Send alert', ['ajax/send-alert', 'id' => $update->id], ['id' => 'alert-send', 'data-on-done' => 'alertSendDone']) ?>
+                                            <?= Html::a('<i class="fas fa-times"></i>', ['ajax/cancel-alert', 'id' => $update->id], ['id' => 'alert-cancel', 'data-on-done' => 'alertCancelDone']) ?>
+                                            <?php $this->registerJs("$('#update-alert-timer-" . $update->id . "').on('click', '#alert-send', handleAjaxLink);", \yii\web\View::POS_READY); ?>
+                                            <?php $this->registerJs("$('#update-alert-timer-" . $update->id . "').on('click', '#alert-cancel', handleAjaxSpanLink);", \yii\web\View::POS_READY); ?>
+                                        </div>
+                                    <?php } elseif ($update->alert_status == MissionaryUpdate::ALERT_ENABLED) { ?>
+                                        <div id="update-alert-timer-<?= $update->id ?>">
+                                            <?= Html::a('<i class="fas fa-times"></i>', ['ajax/cancel-alert', 'id' => $update->id], [
+                                                'id' => 'alert-cancel', 
+                                                'style' => 'visibility:hidden', 
+                                                'data-on-done' => 'alertCancelDone'
+                                            ]) ?>
+                                            <div id="alert-timer-text">
+                                                Sending group alert in <span id="timer"></span>
+                                                <?= Html::a('<i class="far fa-stop-circle"></i>', ['ajax/pause-alert', 'id' => $update->id], ['id' => 'alert-pause', 'data-on-done' => 'alertPauseDone']) ?>
+                                            </div>
+                                            <?php $this->registerJs("$('#update-alert-timer-" . $update->id . "').on('click', '#alert-send', handleAjaxLink);", \yii\web\View::POS_READY); ?>
+                                            <?php $this->registerJs("$('#update-alert-timer-" . $update->id . "').on('click', '#alert-pause', handleAjaxSpanLink);", \yii\web\View::POS_READY); ?>
+                                            <?php $this->registerJs("$('#update-alert-timer-" . $update->id . "').on('click', '#alert-cancel', handleAjaxSpanLink);", \yii\web\View::POS_READY); ?>
+                                        </div>
+                                    <?php } ?>
+                                </td>
+                            </tr>
+                            <?php } ?>
                             <tr id=<?= '"' . $update->id . '"' ?>>
                                 <td>
                                     <?php if ($update->mailchimp_url) {
@@ -274,5 +304,43 @@ Url::Remember();
         $("#videoModal").on('show.bs.modal', function(){
             $("#video").attr('src', url);
         });
-    });
+    }); 
+</script>
+
+<script type="text/javascript">
+// Initialize counter
+window.onload = timer;
+
+function initialize() {
+    if (parseInt(<?= isset($updates[0]) ? $updates[0]->alert_status : 0 ?>) == parseInt(<?= MissionaryUpdate::ALERT_ENABLED ?>)) {
+        timer;
+    }
+}
+
+// Intitialize variables
+var createDate = parseInt(<?= isset($updates[0]) ? $updates[0]->created_at : 0 ?>) * 1000;
+var delay = parseInt(<?= Yii::$app->params['delay.missionaryUpdate'] ?>) * 1000;
+var countDownTime = createDate + delay;
+var setTimer;
+var setAlertSent;
+
+// Timer function
+function timer() {
+    setTimer = setInterval(calcTime, 500);
+
+    function calcTime() {
+        var now = new Date().getTime();
+        var delta = countDownTime - now;
+        var min = Math.floor((delta % (1000 * 60 * 60)) / (1000 * 60));
+        var sec = Math.floor((delta % (1000 * 60)) / 1000);
+        
+        document.getElementById("timer").innerHTML = min + ":" + ("0" + sec).slice(-2);
+          
+        if (delta < 0) {
+            clearInterval(setTimer);
+            document.getElementById("update-alert-timer-<?= isset($updates[0]) ? $updates[0]->id : NULL ?>").innerHTML = "Group alert in queue...";
+        }
+    }
+}
+
 </script>

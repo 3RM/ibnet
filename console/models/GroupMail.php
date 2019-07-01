@@ -8,9 +8,10 @@ use common\models\group\GroupMember;
 use common\models\group\GroupNotification;
 use common\models\group\GroupNotificationMessageId; use common\models\Utility;
 use common\models\group\Prayer;
-use common\models\group\PrayerAlertQueue;
+use common\models\group\GroupAlertQueue;
 use common\models\group\PrayerTag;
 use common\models\group\PrayerUpdate;
+use common\models\missionary\MissionaryUpdate;
 use SSilence\ImapClient\ImapClientException;
 use SSilence\ImapClient\ImapConnect;
 use SSilence\ImapClient\ImapClient as Imap;
@@ -25,11 +26,12 @@ class GroupMail extends Model
     const SIG_REGEX = '/(?:^\s*--|^\s*__|^-\w|^-- $)|(?:^Sent (from|via) (my|the )?(?:\s*\w+){1,4}$)|(?:^={30,}$)$/s';
 
     /**
-     * Retrieve mail and process new prayer requests, updates, and answers
+     * Retrieve mail and process new prayer requests, updates, and answers; send alerts
      * @param object $group
      * @return Boolean
      */
-    public function ProcessPrayer(Group $group) {
+    public function processPrayer(Group $group) 
+    {
     	
         if ($group->prayer_email == NULL || $group->prayer_email_pwd == NULL) {
             return false;
@@ -51,11 +53,11 @@ class GroupMail extends Model
                             $messages[] = $return;
                         }
                     }
-                Yii::$app->mailer->sendMultiple($messages);
-                unset($messages);
+                    Yii::$app->mailer->sendMultiple($messages);
+                    unset($messages);
                 }
+                $alert->updateAttributes(['alerted' => 1]);
             }
-            PrayerAlertQueue::updateAllCounters(['alerted' => 1]);
         }
       
         // Process email requests and send alerts
@@ -150,7 +152,7 @@ class GroupMail extends Model
                     $prayer->toEmail = $member->user->email;
                     $prayer->toName = $member->user->fullName;
                     // Check for unsubscribed members (returns false if unsubscribed)
-                    if ($return = $prayer->prepareAlert(PrayerAlertQueue::STATUS_NEW)) {
+                    if ($return = $prayer->prepareAlert(GroupAlertQueue::PRAYER_STATUS_NEW)) {
                         $messages[] = $return;
                     }
                     Yii::$app->mailer->sendMultiple($messages);
@@ -187,7 +189,7 @@ class GroupMail extends Model
                             $prayer->toEmail = $member->user->email;
                             $prayer->toName = $member->user->fullName;
                             // Check for unsubscribed members (returns false if unsubscribed)
-                            if ($return = $prayer->prepareAlert(PrayerAlertQueue::STATUS_ANSWER)) {
+                            if ($return = $prayer->prepareAlert(GroupAlertQueue::PRAYER_STATUS_ANSWER)) {
                                 $messages[] = $return;
                             }
                             Yii::$app->mailer->sendMultiple($messages);
@@ -230,7 +232,7 @@ class GroupMail extends Model
                             $prayer->toName = $member->user->fullName;
                             Yii::$app->formatter->timeZone = $member->user->timezone;
                             // Check for unsubscribed members (returns false if unsubscribed)
-                            if ($return = $prayer->prepareAlert(PrayerAlertQueue::STATUS_UPDATE)) {
+                            if ($return = $prayer->prepareAlert(GroupAlertQueue::PRAYER_STATUS_UPDATE)) {
                                 $messages[] = $return;
                             }
                             Yii::$app->mailer->sendMultiple($messages);
@@ -250,7 +252,8 @@ class GroupMail extends Model
      * @param object $group
      * @return Boolean
      */
-    public function WeeklyPrayerSummary(Group $group) {
+    public function sendWeeklyPrayerSummary(Group $group) 
+    {
         
         if ($group->prayer_email == NULL || $group->prayer_email_pwd == NULL) {
             return false;
@@ -271,7 +274,7 @@ class GroupMail extends Model
 
                 // Assemble message;
                 $messages[] = Yii::$app->mailer->compose(
-                        ['html' => 'group/prayerWeeklySummary-html'], 
+                        ['html' => 'group/prayerWeeklySummary-html', 'text' => 'group/prayerWeeklySummary-text'], 
                         [
                             'prayers' => $prayers, 
                             'gid' => $group->id, 
@@ -285,8 +288,75 @@ class GroupMail extends Model
             }
             // Send messages
             Yii::$app->mailer->sendMultiple($messages);
-            // Clear the queue
-            PrayerAlertQueue::ClearQueue();
+        }
+    }
+
+    /**
+     * Send new missionary update alerts
+     * @param object $group
+     * @return Boolean
+     */
+    public function sendUpdateAlerts() 
+    {
+        if ($alerts = GroupAlertQueue::getUpdateQueue()) {
+            foreach($alerts as $alert) { 
+
+                $update = $alert->missionaryUpdate;
+
+                // Get missionary group memberships where showing updates
+                $memberships = $update->user->groupMembersWithUpdates;
+                foreach ($memberships as $membership) {
+                    $alertMembers[] = $membership->group->updateAlertMembers;
+                }
+
+                // Get unique members (don't send multiple alerts to same user)
+                $uniqueMembers = [];
+                $uids = []; 
+                $i = 0;
+                foreach($alertMembers as $val1) {
+                    foreach ($val1 as $val2) {
+                        if (!in_array($val2['user_id'], $uids)) {
+                            $uids[$i] = $val2['user_id'];
+                            $uniqueMembers[$i] = $val2;
+                        }
+                        $i++;
+                    }
+                } 
+
+                foreach ($uniqueMembers as $member) {
+
+                    // Check subscriptions
+                    $sub = $member->user->subscription;
+                    if ($sub->token && $sub->unsubscribe) {
+                        continue;
+                    }
+
+                    // Set member timezone
+                    Yii::$app->formatter->timeZone = $member->user->timezone;
+
+                    // Assemble message;
+                    $group = $member->group;
+                    $messages[] = Yii::$app->mailer->compose(
+                            ['html' => 'group/updateAlert-html', 'text' => 'group/updateAlert-text'], 
+                            [
+                                'update' => $update, 
+                                'gid' => $group->id, 
+                                'to' => $member->user->email, 
+                                'token' => $sub->token
+                            ]
+                        )
+                        ->setFrom([Yii::$app->params['email.noReply'] => $group->name])
+                        ->setTo([$member->user->email => $member->user->fullName])
+                        ->setSubject('Missionary Update Alert');
+                }
+                Yii::$app->mailer->sendMultiple($messages);
+                unset($messages);
+                $alert->updateAttributes(['alerted' => 1]);
+                $update->updateAttributes(['alert_status' => MissionaryUpdate::ALERT_SENT]);
+            }
+
+            // Clear the queue (prayer and update alerts)
+            GroupAlertQueue::clearQueue();
         }
     }
 
@@ -295,7 +365,8 @@ class GroupMail extends Model
      * @param object $group
      * @return Boolean
      */
-    public function ProcessNotice(Group $group) {
+    public function processNotice(Group $group) 
+    {
         if ($group->notice_email == NULL || $group->notice_email_pwd == NULL) {
             return false;
         }

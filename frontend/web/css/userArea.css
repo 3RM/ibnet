@@ -541,6 +541,36 @@ div[id^="visible-result-"] {
 a.update-visible {
   color: #00b100;
 }
+td[id^="alert-timer-container-"] {
+  border-bottom: 1px solid white;
+}
+div[id^="update-alert-timer-"] {
+  color: gray;
+  text-align: center;
+  background-color: #fbff63;
+  border: 1px solid #e7e7e7;
+  padding: 8px;
+}
+div[id^="update-alert-timer-"] a {
+  font-size: 1.1em;
+  top: 1px;
+  position: relative;
+  color: #6c8296;
+  margin: 0 4px;
+}
+div[id^="update-alert-timer-"] span.glyphicon {
+  margin: 0 5px;
+}
+div[id^="update-alert-timer-"] a:hover {
+  color: #31708f;
+}
+div[id^="update-alert-timer-"] a#alert-cancel {
+  float: right;
+  top: -5px;
+  position: relative;
+  font-size: 0.8em;
+  color: #bcbcbc;
+}
 img.repo-thumb {
   width: 100%;
   margin-bottom: 15px;
@@ -563,6 +593,24 @@ table.table .edit-buttons button {
 }
 img.mc-icon {
   margin: 10px;
+}
+.watch-title-container {
+  display: flex;
+  margin: 60px 0 20px 0;
+}
+.watch-name-title h2 {
+  margin: 0;
+}
+.watch-name-title h4 {
+  margin: 0 2px;
+}
+.watch-name-title a.wprofile {
+  margin: 0 4px;
+}
+.watch-flag img {
+  position: relative;
+  top: -5px;
+  width: 85px;
 }
 
 
@@ -657,6 +705,9 @@ img.mc-icon {
 }
 .feature-video-container i:hover {
   color: #e91e42;
+}
+.hide {
+  visibility: hidden;
 }
 
 

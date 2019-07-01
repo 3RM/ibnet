@@ -162,4 +162,4 @@ GroupAsset::register($this);
     }
 
 </script>
-<script src="https://maps.googleapis.com/maps/api/js?key=<?= Yii::$app->params['apiKey.Google-no-restrictions'] ?>&libraries=places&callback=init" async defer></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=<?= Yii::$app->params['apiKey.google-no-restrictions'] ?>&libraries=places&callback=init" async defer></script>

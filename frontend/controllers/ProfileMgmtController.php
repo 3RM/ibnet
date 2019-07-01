@@ -150,32 +150,32 @@ class ProfileMgmtController extends ProfileController
         //     return $this->redirect(['preview/view-preview', 'id' => $profile->id]);
         // }
 
-        // Check if all required forms for this profile type have been completed
-        if (!$progress = FormsCompleted::findOne($id)) {
-            $progress = $profile->createProgress($id);
-        }        
-        $completeArray = unserialize($progress->form_array);
-        $typeArray = ProfileFormController::$formArray[$profile->type];
-        // any $fmNum => 1 pairs that are missing from $completeArray  
-        $missingArray = array_diff_assoc($completeArray, $typeArray);
-        if (!$progress || !empty($missingArray)) {
-            if ($profile->type == Profile::TYPE_CHURCH) {   
-                // Ignore skipped form (church profile missions housing)                                                    
-                if (!((count($missingArray) == 1) &&
-                    isset($missingArray[ProfileFormController::$form['mh']]))) {
+        // // Check if all required forms for this profile type have been completed
+        // if (!$progress = FormsCompleted::findOne($id)) {
+        //     $progress = $profile->createProgress($id);
+        // }        
+        // $completeArray = unserialize($progress->form_array);
+        // $typeArray = ProfileFormController::$formArray[$profile->type];
+        // // any $fmNum => 1 pairs that are missing from $completeArray  
+        // $missingArray = array_diff_assoc($completeArray, $typeArray);
+        // if (!$progress || !empty($missingArray)) {
+        //     if ($profile->type == Profile::TYPE_CHURCH) {   
+        //         // Ignore skipped form (church profile missions housing)                                                    
+        //         if (!((count($missingArray) == 1) &&
+        //             isset($missingArray[ProfileFormController::$form['mh']]))) {
                     
-                    $missing = json_encode($missingArray);
-                    return $this->redirect(['profile-form/missing-forms', 'id' => $profile->id, 'missing' => $missing]);
-                }
+        //             $missing = json_encode($missingArray);
+        //             return $this->redirect(['profile-form/missing-forms', 'id' => $profile->id, 'missing' => $missing]);
+        //         }
             
-            } else {
-                $missing = json_encode($missingArray);
-                return $this->redirect(['profile-form/missing-forms', 
-                    'id' => $profile->id, 
-                    'missing' => $missing,
-                ]);
-            }
-        }
+        //     } else {
+        //         $missing = json_encode($missingArray);
+        //         return $this->redirect(['profile-form/missing-forms', 
+        //             'id' => $profile->id, 
+        //             'missing' => $missing,
+        //         ]);
+        //     }
+        // }
 
         // Check for duplicates
         if ($dup = $profile->duplicate) {
@@ -183,7 +183,8 @@ class ProfileMgmtController extends ProfileController
         }
 
         // Activate
-        if ($progress->delete() && $profile->activate()) {
+        // if ($progress->delete() && $profile->activate()) {
+        if ($profile->activate()) {
             return $this->render('activationComplete', ['profile' => $profile]);
 
         // Some other errror

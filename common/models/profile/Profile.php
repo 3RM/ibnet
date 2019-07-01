@@ -1216,7 +1216,7 @@ class Profile extends yii\db\ActiveRecord
                     $address .= $this->ind_city . ',+';
                     $address .= $this->ind_st_prov_reg . ',+';
                     $address .= $this->ind_country;
-                    $this->ind_loc = GeoCoder::getCoordinates($address, Yii::$app->params['apiKey.Google-server']);
+                    $this->ind_loc = GeoCoder::getCoordinates($address, Yii::$app->params['apiKey.google-server']);
 
                 }
                 // Convert US states to abbreviations
@@ -1262,7 +1262,7 @@ class Profile extends yii\db\ActiveRecord
                     $address .= $this->org_city . ',+';
                     $address .= $this->org_st_prov_reg . ',+';
                     $address .= $this->org_country;
-                    $this->org_loc = GeoCoder::getCoordinates($address, Yii::$app->params['apiKey.Google-server']);
+                    $this->org_loc = GeoCoder::getCoordinates($address, Yii::$app->params['apiKey.google-server']);
                 }
                 // Convert US states to abbreviations
                 if ($this->org_country == 'United States') {
@@ -2087,6 +2087,7 @@ class Profile extends yii\db\ActiveRecord
             $urlLoc = ($this->type == self::TYPE_MISSIONARY) ?
                 Inflector::slug($this->missionary->field) :
                 Inflector::slug($this->ind_city);
+            $this->addToGroupMembers();
 
         } else {
             $name = Inflector::slug($this->org_name);
@@ -2103,6 +2104,7 @@ class Profile extends yii\db\ActiveRecord
         if ($this->type == self::TYPE_MISSIONARY) {
             $missionary = $this->missionary;
             $missionary->generateRepositoryKey();
+            $missionary->addToGroupMembers();
             // Set to active any mailchimp updates that were generated while the profile was inactive
             $missionary->setUpdatesActive();
         }
@@ -2348,6 +2350,24 @@ class Profile extends yii\db\ActiveRecord
 
         // Delete Record
         return $this->delete() ? true : false;
+    }
+
+    /**
+     * Add profile id to all group members
+     *
+     * @return boolean
+     */
+    public function addToGroupMembers()
+    {
+        $user = $this->user;
+        if ($members = $user->groupMembers) {
+            foreach ($members as $member) {
+                if (!$member->profile_id) {
+                    $member->updateAttributes(['profile_id' => $this->id]);
+                }
+            }
+        }
+        return $this;
     }
 
     /**
@@ -3130,7 +3150,7 @@ class Profile extends yii\db\ActiveRecord
                 $this->ind_country) {
                 return $this->$attribute;
             } else {
-                $message = 'Please enter a complete address.';
+                $message = 'Enter a complete address including city, state, and country.';
                 $this->addError('ind_address1', $message);
             }
 
@@ -3139,7 +3159,7 @@ class Profile extends yii\db\ActiveRecord
             $this->org_country) {
             return $this->$attribute;
         } else {
-            $message = 'Please enter a complete address.';
+            $message = 'Enter a complete address including city, state, and country.';
             $this->addError('org_address1', $message);
         }
     }
@@ -3158,7 +3178,7 @@ class Profile extends yii\db\ActiveRecord
                 $this->ind_po_country) {
                 return $this->$attribute;
             } else {
-                $message = 'Please enter a complete address.';
+                $message = 'Enter a complete address including city, state, and country.';
                 $this->ind_po_address1 ? 
                     $this->addError('ind_po_address1', $message) :
                     $this->addError('ind_po_box', $message);
@@ -3168,7 +3188,7 @@ class Profile extends yii\db\ActiveRecord
             $this->org_po_country) {
             return $this->$attribute;
         } else {
-            $message = 'Please enter a complete address.';
+            $message = 'Enter a complete address including city, state, and country.';
             $this->org_po_address1 ? 
                 $this->addError('org_po_address1', $message) :
                 $this->addError('org_po_box', $message);

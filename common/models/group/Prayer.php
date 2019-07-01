@@ -6,7 +6,7 @@ use common\models\Subscription;
 use common\models\User;
 use common\models\group\GroupMember;
 use common\models\group\PrayerTag;
-use common\models\group\PrayerAlertQueue;
+use common\models\group\GroupAlertQueue;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
@@ -234,12 +234,12 @@ class Prayer extends \yii\db\ActiveRecord
      * @param  $status string prayer status (new|update|answer)
      * @return \yii\db\ActiveQuery
      */
-    public function addToAlertQueue($status=PrayerAlertQueue::STATUS_NEW)
+    public function addToAlertQueue($status=GroupAlertQueue::PRAYER_STATUS_NEW)
     {
-        $queue = PrayerAlertQueue::findOne(['prayer_id' => $this->id]) ?? new PrayerAlertQueue();
+        $queue = GroupAlertQueue::findOne(['prayer_id' => $this->id]) ?? new GroupAlertQueue();
         $queue->group_id = $this->group_id;
         $queue->prayer_id = $this->id;
-        $queue->status = $status;
+        $queue->prayer_status = $status;
         $queue->save();
     }
 
@@ -248,7 +248,7 @@ class Prayer extends \yii\db\ActiveRecord
      * @param  $status string prayer status (new|update|answer)
      * @return \yii\db\ActiveQuery
      */
-    public function prepareAlert($status=PrayerAlertQueue::STATUS_NEW)
+    public function prepareAlert($status=GroupAlertQueue::PRAYER_STATUS_NEW)
     {
         // Check subscriptions
         $sub = Subscription::getSubscriptionByEmail($this->toEmail);

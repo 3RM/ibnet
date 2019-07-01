@@ -155,8 +155,7 @@ class SiteController extends Controller
 
     /**
      * Logs in a user.
-     * $url passes through a redirect url following login
-     *
+     * @param $url string Redirect url following login
      * @return mixed
      */
     public function actionLogin($url=NULL)
@@ -164,7 +163,7 @@ class SiteController extends Controller
         if (!Yii::$app->user->isGuest) {
             return empty($url) ?
                 $this->goHome() :
-                $this->redirect($url);
+                $this->redirect(urldecode($url));
         }
 
         $model = new LoginForm();

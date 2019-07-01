@@ -28,14 +28,7 @@ class PrayerSearch extends Prayer
     }
 
     public function search($params, $nid, $f=NULL, $l=NULL)
-    { //var_dump($l); die;
-        // if (null === $f) {
-        //     $f = ;
-        // }
-    
-        // if (null === $l) {
-        //     $l = 0;
-        // }
+    { 
         $query = Prayer::find()->distinct()->where(['prayer.group_id' => $nid, 'prayer.answered' => $l, 'prayer.deleted' => 0]);
         $pageSize = $f ? -1 : 10;
         $dataProvider = new ActiveDataProvider([

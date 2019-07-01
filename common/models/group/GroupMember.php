@@ -60,9 +60,7 @@ class GroupMember extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['group_id'], 'required'],
-            [['group_id', 'user_id', 'profile_id'], 'integer'],
-            [['created_at'], 'safe'],
+            [['created_at', 'group_id', 'user_id', 'profile_id', 'missionary_id', 'status'], 'safe'],
         ];
     }
 
@@ -96,7 +94,7 @@ class GroupMember extends \yii\db\ActiveRecord
         $member = $group->groupMember ?? New GroupMember();
         $member->group_id = $_POST['join'];
         $member->user_id = $user->id;
-        $member->profile_id = $user->indActiveProfile ?? NULL;
+        $member->profile_id = $user->indActiveProfile ? $user->indActiveProfile->id : NULL;
         $member->missionary_id = $user->isMissionary ? $user->missionary->id : NULL;
         if ($invite) {
             $member->status = GroupMember::STATUS_ACTIVE;
@@ -112,7 +110,7 @@ class GroupMember extends \yii\db\ActiveRecord
         $mail->headerText = 'Group Membership';
         $mail->to = $group->owner->email;
         $mail->subject = 'Notice from ' . $group->name;
-        $link = Html::a('Click here ', Yii::$app->params['url.loginFirst'] . 'group/group-members?id=' . $group->id);
+        $link = Html::a('Click here ', Yii::$app->params['url.loginFirst'] . urlencode(Url::to(['group/group-members', 'id' => $group->id])));
         $verb = $group->private == 1 ? ' requested to join ' : ' joined ';
         $mail->message = $user->fullName . ' has just ' . $verb . ' your group ' . $group->name . '. ' . $link . ' to manage your group members.';
         $mail->sendNotification(); 
@@ -143,11 +141,11 @@ class GroupMember extends \yii\db\ActiveRecord
         $mail->headerText = 'Group Membership';
         $mail->to = $owner->email;
         $mail->subject = 'Notice from ' . $group->name;
-        $mail->message = Yii::$app->user->identity->fullName . ' has left your group ' . $group->name . '.';
+        $mail->message = Yii::$app->user->identity->realName . ' has left your group ' . $group->name . '.';
         $mail->sendNotification();
 
         // Remove from forum group
-        $group->removeDiscourseUser($user->id);
+        $group->removeDiscourseUser(Yii::$app->user->identity->id);
 
         return true;
     }
@@ -294,6 +292,14 @@ class GroupMember extends \yii\db\ActiveRecord
      * @return \yii\db\ActiveQuery
      */
     public function getGroup()
+    {
+        return $this->hasOne(Group::className(), ['id' => 'group_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getGroupsWithUpdates()
     {
         return $this->hasOne(Group::className(), ['id' => 'group_id']);
     }

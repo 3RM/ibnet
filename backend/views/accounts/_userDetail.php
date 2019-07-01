@@ -6,14 +6,14 @@ use common\models\Utility;
 use frontend\controllers\ProfileController;
 use yii\bootstrap\Html;
 use yii\widgets\ActiveForm;
-use yii\widgets\ActiveField;
+use yii\widgets\ActiveField; //Utility::pp($user->subscription);
 ?>
 
 
 
 <div class="detail-head">
 	<div class="picture">
-		<?= $user->usr_image ? Html::img(Yii::$app->params['frontendUrl'] . $user->usr_image) : Html::img('@images/user.png') ?>
+		<?= $user->usr_image ? Html::img(Yii::$app->params['url.frontend'] . $user->usr_image) : Html::img('@images/user.png') ?>
 	</div>
 	<div class="name">
 		<h2><?= $user->fullName ?></h2>
@@ -56,9 +56,9 @@ use yii\widgets\ActiveField;
 	<p>Email: <?= $user->email ?? '--' ?></p>
 	<?= $user->new_email ? '<p>New Email: ' . $user->new_email . '</p>' : NULL ?>
 	<?= $user->new_email_token ? '<p>New Email Token: ' . $user->new_email_token . '</p>' : NULL ?>
-	<p>Email Preferences: <?= $user->emailMaintenance . $user->emailPrefProfile . $user->emailPrefLinks . $user->emailPrefComments . $user->emailPrefFeatures . $user->emailPrefBlog ?></p>
-	<p>Created: <?= Yii::$app->formatter->asDate($user->created_at, 'php:Y-m-d') ?> <span class="ago">(<?= Utility::time_elapsed_string(Yii::$app->formatter->asDate($user->created_at, 'php:Y-m-d'))?>)</span></p>
-	<p>Last login: <?= $user->last_login ?> <span class="ago">(<?= Utility::time_elapsed_string($user->last_login)?>)</span></p>
+	<p>Email Preferences: <?= empty($user->subscription) ? NULL : $user->subscription->profile . $user->subscription->links . $user->subscription->comments . $user->subscription->features . $user->subscription->blog ?></p>
+	<p>Created: <?= Yii::$app->formatter->asDate($user->created_at, 'php:Y-m-d') ?> <span class="ago">(<?= Yii::$app->formatter->asRelativeTime($user->created_at, time())?>)</span></p>
+	<p>Last login: <?= $user->last_login ?> <span class="ago">(<?= Yii::$app->formatter->asRelativeTime($user->last_login, time())?>)</span></p>
 	<p>IP Address: <?= $user->ip ?? '--' ?></p>
 	<p>Location: </p>
 	<?= $user->password_reset_token ? '<p>Password Reset Token: ' . $user->password_reset_token . '</p>' : NULL ?>
@@ -79,7 +79,7 @@ use yii\widgets\ActiveField;
             	$status = 'Banned';
             } ?>	
 			<p class=<?= '"indent ' . $status . '"' ?>>
-				<?= $profile->image2 ? Html::img(Yii::$app->params['frontendUrl'] . $profile->image2 . ' ') : NULL ?>
+				<?= $profile->image2 ? Html::img(Yii::$app->params['url.frontend'] . $profile->image2 . ' ') : NULL ?>
 				<?= $profile->status == Profile::STATUS_ACTIVE ?
 					Html::a(($profile->category == Profile::CATEGORY_ORG ? $profile->org_name : $profile->formatName), 
 							'https://ibnet.org/' . ProfileController::$profilePageArray[$profile->type] . '/' . $profile->url_loc . '/' . $profile->url_name . '/' . $profile->id, ['target' => '_blank']) :

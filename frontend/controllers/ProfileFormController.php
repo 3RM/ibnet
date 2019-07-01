@@ -45,7 +45,7 @@ class ProfileFormController extends ProfileController
 
     // Determine sequence of forms
     public static $formArray = [     
-        // Form #                       0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18 
+                            // Form #   0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18 
         Profile::TYPE_PASTOR        => [1,  1,  1,  1,  1,  0,  0,  0,  1,  0,  1,  0,  1,  0,  1,  0,  0,  1,  0],  
         Profile::TYPE_EVANGELIST    => [1,  1,  1,  1,  1,  0,  0,  0,  1,  0,  1,  0,  1,  0,  1,  0,  0,  1,  0],
         Profile::TYPE_MISSIONARY    => [1,  1,  1,  1,  1,  0,  0,  1,  1,  1,  1,  0,  1,  0,  1,  1,  0,  0,  0],
@@ -660,9 +660,9 @@ class ProfileFormController extends ProfileController
                 $preferred[] = Country::find()
                     ->select('iso')
                     ->where(['printable_name' => $profile->org_country])
-                    ->scalar();
-            if ($preferred == NULL) {
-                $preferred[] = 'US';
+                    ->scalar(); //Utility::pp($preferred);
+            if (is_array($preferred) && empty($preferred[0])) {
+                $preferred[0] = 'US';
             }
 
             $profile->category == Profile::CATEGORY_IND ?
@@ -882,7 +882,10 @@ class ProfileFormController extends ProfileController
         $fm = 'forms/form' . $fmNum;
         $profile = Profile::findProfile($id);
 
-        $missionary = $profile->missionary ? $profile->missionary : new Missionary();
+        if (!$missionary = $profile->missionary) {
+            $missionary = new Missionary();
+            $missionary->user_id = Yii::$app->user->identity->id;
+        }
         $missionary->scenario = 'fi';
 
         if (!\Yii::$app->user->can(PermissionProfile::UPDATE, ['profile' => $profile]) || !$profile->validType()) {
@@ -906,8 +909,8 @@ class ProfileFormController extends ProfileController
                 // Link new missionary record to profile
                 $profile->link('missionary', $missionary);
             }
-            // Set url_loc to missionary field
             $profile->updateAttributes(['url_loc' =>  $missionary->field]);
+
             return isset($_POST['save']) ?
                 $this->redirect(['/preview/view-preview', 'id' => $id]) :
                 $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);     
@@ -991,7 +994,7 @@ class ProfileFormController extends ProfileController
         $fmNum = Self::$form['cp'];
         $fm = 'forms/form' . $fmNum;
         $profile = Profile::findProfile($id);
-        $missionary = $profile->missionary ? $profile->missionary : New Missionary();
+        $missionary = $profile->missionary ?? new Missionary();
         $missionary->scenario = 'cp';
 
         if (!\Yii::$app->user->can(PermissionProfile::UPDATE, ['profile' => $profile]) || !$profile->validType()) {
@@ -1001,7 +1004,9 @@ class ProfileFormController extends ProfileController
             return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
         }
         if ($profile->sub_type != Profile::SUBTYPE_MISSIONARY_CP) {
-             return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
+            // Mark form as "reviewed"
+            $profile->setProgress($fmNum);
+            return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
         }
 
         if (isset($_POST['cancel'])) {
@@ -1350,7 +1355,7 @@ class ProfileFormController extends ProfileController
         }
 
         if ($profile->type == Profile::TYPE_MISSIONARY || $profile->type == Profile::TYPE_CHAPLAIN) {
-            $missionary = $profile->missionary ? $profile->missionary : new Missionary();
+            $missionary = $profile->missionary ?? new Missionary();
             $profile->type == Profile::TYPE_MISSIONARY ?
                 $missionary->scenario = 'ma-missionary' :
                 $missionary->scenario = 'ma-chaplain';

@@ -25,7 +25,7 @@ $this->title = 'My Account';
         })
     });", \yii\web\View::POS_READY); ?>
 
-    <div class="category-item" style="margin-top:40px; border-left:10px solid <?= Utility::colorFilter($parentCategory->color) ?>">
+    <div class="category-item" style="margin-top:40px; border-left:10px solid <?= Utility::colorToHex($parentCategory->color) ?>">
         <h4><?= $parentCategory->name ?> <span>(<i>top level category</i>)</span> <?= Html::button('<i class="fas fa-pen"></i>', ['id' => 'parent', 'class' => 'link-btn']) ?></h4>
         <p><i class="fas fa-caret-right"></i> Topics: <?= $parentCategory->topic_count ?></p>
         <p><i class="fas fa-caret-right"></i> Posts: <?= $parentCategory->post_count ?></p>
@@ -33,7 +33,7 @@ $this->title = 'My Account';
         <?php if ($categories) { ?>
         <div class="category-child">
         <?php foreach ($categories as $category) { ?>
-            <div class="category-item" style="border-left:10px solid <?= Utility::colorFilter($category->color) ?>">
+            <div class="category-item" style="border-left:10px solid <?= Utility::colorToHex($category->color) ?>">
                 <h4><?= $category->name ?> <?= Html::button('<i class="fas fa-pen"></i>', ['id' => 'category-' . $category->id, 'class' => 'link-btn']) ?></h4>
                 <p><i class="fas fa-caret-right"></i> Topics: <?= $category->topic_count ?></p>
                 <p><i class="fas fa-caret-right"></i> Posts: <?= $category->post_count ?></p>

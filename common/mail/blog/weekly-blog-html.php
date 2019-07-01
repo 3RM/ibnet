@@ -1,5 +1,6 @@
 <?php
 use yii\helpers\Html;
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $user common\models\User */
@@ -23,7 +24,7 @@ use yii\helpers\Html;
 
     <div id="footer">
         <hr>
-        <p>To change your email subscriptions, visit your <?= Html::a('Account Settings', Yii::$app->params['url.loginFirst']) . 'settings/#account-settings' ?>.</p>
+        <p>To change your email subscriptions, visit your <?= Html::a('Account Settings', Yii::$app->params['url.loginFirst']) . urlencode(Url::to(['site/#account-settings'])) ?>.</p>
 
         <p><?= Html::a('Unsubscribe', Yii::$app->params['url.unsubscribe'] . $email . '&token' . $unsubTok) ?>.</p>
 

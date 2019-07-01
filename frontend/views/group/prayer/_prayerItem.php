@@ -42,7 +42,7 @@ use yii\widgets\ActiveField;
             }
         });", \yii\web\View::POS_READY); ?>
     </p>
-    <p class="name-date"> <?= $model->fullName . ', ' . Yii::$app->formatter->asDate($model->created_at) ?></p> 
+    <p class="name-date"> <?= Html::a($model->fullName, 'mailto:' . $model->email) . ', ' . Yii::$app->formatter->asDate($model->created_at) ?></p> 
     <div class="duration"
         <?php switch ($model->duration) {
             case '10': echo 'style="background-color:#ff3c3c"'; break;

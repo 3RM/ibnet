@@ -14,7 +14,7 @@ use common\models\group\GroupMember;
 use common\models\group\GroupNotification;
 use common\models\group\GroupKeyword;
 use common\models\group\GroupPlace;
-use common\models\group\PrayerAlertQueue;
+use common\models\group\GroupAlertQueue;
 use common\models\missionary\MissionaryUpdate;
 use common\models\Subscription;
 use common\models\Utility;
@@ -291,7 +291,7 @@ class Group extends ActiveRecord
             $groupMember->user_id = $user->id;
             if ($profile = $user->indActiveProfile) {
                 $groupMember->profile_id = $profile->id;
-                if ('Missionary' == $profile->type) {
+                if ($profile->type == Profile::TYPE_MISSIONARY) {
                     $groupMember->missionary_id = $profile->missionary->id;
                 }
             }
@@ -554,8 +554,8 @@ class Group extends ActiveRecord
             'headers' => $headers,
             'form_params' => [
                 'name' => $this->categoryName,
-                'color' => Utility::colorFilter($this->categoryBannerColor, ''),
-                'text_color' => Utility::colorFilter($this->categoryTitleColor, ''),
+                'color' => Utility::colorToHex($this->categoryBannerColor, ''),
+                'text_color' => Utility::colorToHex($this->categoryTitleColor, ''),
             ],
         ]);
         // Update description
@@ -628,8 +628,8 @@ class Group extends ActiveRecord
                 'headers' => $headers,
                 'form_params' => [
                     'name' => $this->categoryName,
-                    'color' => Utility::colorFilter($this->categoryBannerColor, ''),
-                    'text_color' => Utility::colorFilter($this->categoryTitleColor, ''),
+                    'color' => Utility::colorToHex($this->categoryBannerColor, ''),
+                    'text_color' => Utility::colorToHex($this->categoryTitleColor, ''),
                     'permissions[' . $this->discourse_group_name . ']' => 1,
                     'parent_category_id' => $this->discourse_category_id,
                 ]
@@ -923,6 +923,14 @@ class Group extends ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
+    public function getActiveUpdateGroups()
+    {
+        return static::find()->where(['status' => self::STATUS_ACTIVE])->andWhere(['feature_update' => 1])->all();
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
     public function getActiveNotificationGroups()
     {
         return static::find()->where(['status' => self::STATUS_ACTIVE])->andWhere(['feature_notification' => 1])->all();
@@ -1011,8 +1019,8 @@ class Group extends ActiveRecord
      * @return \yii\db\ActiveQuery
      */
     public function getMembersUpdatesActive()
-    {
-        return $this->hasMany(GroupMember::className(), ['group_id' => 'id'])->where(['group_member.status' => GroupMember::STATUS_ACTIVE])->andWhere(['show_updates' => 1]);
+    { 
+        return $this->hasMany(GroupMember::className(), ['group_id' => 'id'])->where(['and', ['group_member.status' => GroupMember::STATUS_ACTIVE], ['show_updates' => 1]]);
     }
 
     /**
@@ -1074,7 +1082,7 @@ class Group extends ActiveRecord
      */
     public function getPrayerListNames()
     {
-        $prayerList = Prayer::find()->with(['groupUser'])->where(['prayer.group_id' => $this->id, 'prayer.answered' => NULL, 'prayer.deleted' => 0])->all();
+        $prayerList = Prayer::find()->with(['groupUser'])->where(['prayer.group_id' => $this->id, 'prayer.answered' => 0, 'prayer.deleted' => 0])->all();
         $nameList = [];
         foreach ($prayerList as $prayer) {
             array_push($nameList, $prayer->fullName);
@@ -1095,12 +1103,24 @@ class Group extends ActiveRecord
     }
 
     /**
+     * All current group members receiving immediate missionary update alerts
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUpdateAlertMembers()
+    {
+        return $this->hasMany(GroupMember::className(), ['group_id' => 'id'])
+            ->joinWith('user')
+            ->where(['group_member.status' => GroupMember::STATUS_ACTIVE])
+            ->andWhere(['group_member.email_update_alert' => 1]);
+    }
+
+    /**
      * New prayers that haven't been alerted
      * @return \yii\db\ActiveQuery
      */
     public function getPrayerImmediateAlertQueue()
     {
-        return $this->hasMany(PrayerAlertQueue::className(), ['group_id' => 'id'])->where(['alerted' => 0]);
+        return $this->hasMany(GroupAlertQueue::className(), ['group_id' => 'id'])->where(['<>', 'prayer_id', 0])->andWhere(['alerted' => 0]);
     }
 
     /**
@@ -1110,16 +1130,8 @@ class Group extends ActiveRecord
      */
     public function getPrayerWeeklyAlertQueue()
     {
-        return $this->hasMany(PrayerAlertQueue::className(), ['group_id' => 'id'])->where(['<>', 'alerted', 0])
+        return $this->hasMany(GroupAlertQueue::className(), ['group_id' => 'id'])->where(['<>', 'prayer_id', 0])->andWhere(['<>', 'alerted', 0])
             ->with('prayerWithUpdates');
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getCategories()
-    {
-        // return $this->hasMany(GroupCalendarEvent::className(), ['group_id' => 'id']);
     }
 
     /**
@@ -1130,7 +1142,7 @@ class Group extends ActiveRecord
         $updateList = MissionaryUpdate::find()->joinWith('groupMember')->where(['group_id' => $this->id])->all();
         $nameList = [];
         foreach ($updateList as $update) {
-            array_push($nameList, $update->fullName);
+            array_push($nameList, $update->realName);
         }
         return array_unique($nameList);
     }

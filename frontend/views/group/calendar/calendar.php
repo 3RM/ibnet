@@ -7,11 +7,10 @@ use kartik\form\ActiveForm;
 use yii\bootstrap\Html;
 use yii\bootstrap\Modal;
 use yii\helpers\Url;
-use yii\web\JsExpression;
+use yii\web\JsExpression; use common\models\Utility;
 
 /* @var $this yii\web\View */   
 
-// AdminLtePluginAsset::register($this);
 Url::Remember();
 $this->title = 'Calendar';
 ?>
@@ -102,6 +101,7 @@ $this->title = 'Calendar';
                         'themeSystem' => 'jquery-ui',
                         'selectable' => true,
                         'eventLimit' => true,
+                        'defaultDate' => $date ?? NULL,
                         'select' => new JSExpression("function(date, allDay, jsEvent, view) {
                             if (view.name == 'day') return;
                                 view.calendar.gotoDate(date);

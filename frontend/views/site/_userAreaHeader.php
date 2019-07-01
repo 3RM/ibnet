@@ -3,7 +3,7 @@
 use common\widgets\Alert;
 use yii\bootstrap\Html;
 use yii\bootstrap\Nav;
-use yii\bootstrap\NavBar; use common\models\Utility; //Utility::pp(Yii::$app->user->identity->isMissionary);
+use yii\bootstrap\NavBar;
 
 $this->title = 'My Account';
 $menuItems = [

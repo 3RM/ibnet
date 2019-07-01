@@ -667,7 +667,7 @@ class User extends ActiveRecord implements
      */
     public function getIsMissionary()
     {
-        return Profile::find()->where(['user_id' => $this->id, 'type' => Profile::TYPE_MISSIONARY])->exists();
+        return Profile::find()->where(['user_id' => $this->id, 'type' => Profile::TYPE_MISSIONARY])->andWhere(['!=', 'status', Profile::STATUS_NEW])->exists();
     }
 
     /**
@@ -736,6 +736,14 @@ class User extends ActiveRecord implements
     /**
      * @return string
      */
+    public function getRealName()
+    {
+        return $this->first_name . ' ' . $this->last_name;
+    }
+
+    /**
+     * @return string
+     */
     public function getFullName()
     {
         return $this->display_name ? $this->display_name : $this->first_name . ' ' . $this->last_name;
@@ -796,6 +804,14 @@ class User extends ActiveRecord implements
     public function getPendingGroupMembers()
     {
         return $this->hasMany(GroupMember::className(), ['user_id' => 'id'])->where(['status' => GroupMember::STATUS_PENDING]);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getGroupMembersWithUpdates()
+    {
+        return $this->hasMany(GroupMember::className(), ['user_id' => 'id'])->where(['status' => GroupMember::STATUS_ACTIVE])->andWhere(['show_updates' => 1]);
     } 
 
     /**

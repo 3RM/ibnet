@@ -17,7 +17,7 @@ use yii\widgets\ActiveField;
         <?= Html::a(Html::img($model->user->avatar, ['class' => 'avatar']), ['/profile/missionary', 'id' => $model->groupMemberProfile->id, 'urlLoc' => $model->groupMemberProfile->url_loc, 'urlName' => $model->groupMemberProfile->url_name], ['target' => '_blank', 'rel' => 'noopener noreferrer']) ?>
         <div class="name-date">
             <p class="name"><?= Html::a($model->user->fullName . ' - ' . $model->missionary->field, ['/profile/missionary', 'id' => $model->groupMemberProfile->id, 'urlLoc' => $model->groupMemberProfile->url_loc, 'urlName' => $model->groupMemberProfile->url_name], ['target' => '_blank', 'rel' => 'noopener noreferrer']) ?></p>
-            <p><?= Yii::$app->formatter->asDate($model->from_date, 'php:F j, Y'); ?></p>
+            <p><?= Yii::$app->formatter->asDate($model->from_date, 'php:F j, Y') ?></p>
         </div>
     </div>
     

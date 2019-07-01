@@ -177,7 +177,7 @@ class GroupCalendarEvent extends ActiveRecord
         $dates = Yii::$app->formatter->asDate($start, 'php:F j');
         $dates .= $allDay ?
             NULL :
-            '<span class="time">' . Yii::$app->formatter->asDate($start, 'php: g' . $startMins . 'a') . '</span>';
+            '<span class="time">' . Yii::$app->formatter->asDate($start, 'php: g' . $startMins) . '</span>';
         if ($startYear == $thisYear) {
             if ($end) {                   
                 if ($endYear == $thisYear) {

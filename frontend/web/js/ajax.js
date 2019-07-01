@@ -115,7 +115,7 @@ var ajaxCallbacks = {
         }
     },
     'visibleDone': function (response) {
-        $('#visible-result-'+response.updateId).html(response.body);
+        $('#visible-result-'+response.updateId).html(response.link);
     },
     'viewedDone': function (response) {
         document.getElementById('video-container').style.display = 'none';
@@ -140,7 +140,7 @@ var ajaxCallbacks = {
             } else {
                 $('#placeList').append('<div id="place-'+pid+'" class="item-row place-row">'+place+'<a id="placeitem-'+pid+'" href="/ajax/delete-network-place?pid='+pid+'" data-on-done="placeDeleteDone"><span class="glyphicon glyphicon-remove"></span></a><br></div>');
             }
-            $(document).on("click",'#placeitem-'+pid, handleAjaxSpanLink);
+            $(document).on('click','#placeitem-'+pid, handleAjaxSpanLink);
         }
     },
     'placeDeleteDone': function (response) {
@@ -159,7 +159,7 @@ var ajaxCallbacks = {
             } else {
                 $('#keywordList').append('<div id="keyword-'+kid+'" class="item-row keyword-row">'+kw+'<a id="keyworditem-'+kid+'" href="/ajax/delete-network-keyword?kid='+kid+'" data-on-done="keywordDeleteDone"><span class="glyphicon glyphicon-remove"></span></a><br></div>');
             }
-            $(document).on("click",'#keyworditem-'+kid, handleAjaxSpanLink);
+            $(document).on('click','#keyworditem-'+kid, handleAjaxSpanLink);
         }    
     },
     'keywordDeleteDone': function (response) {
@@ -168,4 +168,15 @@ var ajaxCallbacks = {
             document.getElementById('keywordList').remove();
         }
     },
+    'alertPauseDone': function (response) {
+        clearInterval(setTimer);
+        document.getElementById('alert-timer-text').innerHTML = response.html;
+        document.getElementById('alert-cancel').style.visibility = 'visible';
+    },
+    'alertSendDone': function (response) {
+        document.getElementById('update-alert-timer-'+response.uid).innerHTML = 'Group alert in queue...';
+    },
+    'alertCancelDone': function (response) {
+        document.getElementById('alert-timer-container-'+response.uid).remove();
+    }
 }

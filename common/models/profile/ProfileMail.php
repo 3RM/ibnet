@@ -79,7 +79,7 @@ class ProfileMail extends \yii\db\ActiveRecord
         $mail->title = 'New Missionary Update';
         $updateUrl = Url::toRoute(['missionary/update', 'repository_key' => $repoKey, 'id' => $id], 'https');
         $mail->message = 'Your recent Mailchimp campaign has been synced to your IBNet Missionary Updates page.  Visit your Updates admin page ' . 
-            Html::a('here', Yii::$app->params['url.loginFirst'] . 'missionary/update-repository') . ' or your Updates page ' . Html::a('here', $updateUrl);
+            Html::a('here', Yii::$app->params['url.loginFirst'] . urlencode(Url::to(['missionary/update-repository']))) . ' or your Updates page ' . Html::a('here', $updateUrl);
         $mail->sendNotification();
 
         return true;

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a3519c9c8b2a87c537fd245d82869760",
+    "content-hash": "2c3e88a5b93bdafecfccd0cd2b4f04b4",
     "packages": [
         {
             "name": "almasaeed2010/adminlte",
@@ -361,50 +361,6 @@
                 "MIT"
             ],
             "time": "2016-09-16T05:47:55+00:00"
-        },
-        {
-            "name": "bower-asset/moment",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/moment/moment.git",
-                "reference": "96d0d6791ab495859d09a868803d31a55c917de1"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/moment/moment/zipball/96d0d6791ab495859d09a868803d31a55c917de1",
-                "reference": "96d0d6791ab495859d09a868803d31a55c917de1",
-                "shasum": ""
-            },
-            "type": "bower-asset-library",
-            "extra": {
-                "bower-asset-main": "moment.js",
-                "bower-asset-ignore": [
-                    "**/.*",
-                    "benchmarks",
-                    "bower_components",
-                    "meteor",
-                    "node_modules",
-                    "scripts",
-                    "tasks",
-                    "test",
-                    "component.json",
-                    "composer.json",
-                    "CONTRIBUTING.md",
-                    "ender.js",
-                    "Gruntfile.js",
-                    "Moment.js.nuspec",
-                    "package.js",
-                    "package.json",
-                    "ISSUE_TEMPLATE.md",
-                    "typing-tests",
-                    "min/tests.js"
-                ]
-            },
-            "license": [
-                "MIT"
-            ],
-            "time": "2019-01-21T20:59:53+00:00"
         },
         {
             "name": "bower-asset/punycode",
@@ -2275,46 +2231,6 @@
             "time": "2018-12-12T02:46:03+00:00"
         },
         {
-            "name": "omnilight/yii2-momentjs",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/omnilight/yii2-momentjs.git",
-                "reference": "270e8eecc4f2c09ebb199836b081d417a331baac"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/omnilight/yii2-momentjs/zipball/270e8eecc4f2c09ebb199836b081d417a331baac",
-                "reference": "270e8eecc4f2c09ebb199836b081d417a331baac",
-                "shasum": ""
-            },
-            "require": {
-                "bower-asset/moment": "*",
-                "php": ">=5.4.0",
-                "yiisoft/yii2": "*"
-            },
-            "type": "yii2-extension",
-            "autoload": {
-                "psr-4": {
-                    "omnilight\\assets\\": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "authors": [
-                {
-                    "name": "Pavel Agalecky",
-                    "email": "pavel.agalecky@gmail.com"
-                }
-            ],
-            "description": "Moment.js asset for Yii2 framework",
-            "keywords": [
-                "moment",
-                "momentjs",
-                "yii2"
-            ],
-            "time": "2016-12-15T09:54:43+00:00"
-        },
-        {
             "name": "oyejorge/less.php",
             "version": "v1.7.0.14",
             "source": {
@@ -4136,6 +4052,47 @@
             "time": "2015-10-07T06:24:15+00:00"
         },
         {
+            "name": "uguranyum/yii2-icalender",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/uguranyum/yii2-icalender.git",
+                "reference": "6b539566dfb4e984d4b827a3bdd2f2d5b9954421"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/uguranyum/yii2-icalender/zipball/6b539566dfb4e984d4b827a3bdd2f2d5b9954421",
+                "reference": "6b539566dfb4e984d4b827a3bdd2f2d5b9954421",
+                "shasum": ""
+            },
+            "require": {
+                "yiisoft/yii2": "*"
+            },
+            "type": "extension",
+            "autoload": {
+                "psr-4": {
+                    "uguranyum\\icalender\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ugur",
+                    "email": "uguranyum@yandex.com"
+                }
+            ],
+            "description": "iCalender for the Yii framework!",
+            "keywords": [
+                "currency",
+                "numbers",
+                "spell"
+            ],
+            "time": "2016-07-14T11:19:31+00:00"
+        },
+        {
             "name": "willdurand/email-reply-parser",
             "version": "dev-master",
             "source": {
@@ -4887,6 +4844,47 @@
             "description": "Compass for scssphp",
             "homepage": "http://leafo.net/scssphp/",
             "time": "2015-12-14T10:54:53+00:00"
+        },
+        {
+            "name": "zhuravljov/yii2-logreader",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/zhuravljov/yii2-logreader.git",
+                "reference": "ff25fe4f92ccbf5214a567cf0850059ba3a85e1f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/zhuravljov/yii2-logreader/zipball/ff25fe4f92ccbf5214a567cf0850059ba3a85e1f",
+                "reference": "ff25fe4f92ccbf5214a567cf0850059ba3a85e1f",
+                "shasum": ""
+            },
+            "require": {
+                "yiisoft/yii2": "~2.0.13"
+            },
+            "type": "yii2-extension",
+            "autoload": {
+                "psr-4": {
+                    "zhuravljov\\yii\\logreader\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Roman Zhuravlev",
+                    "email": "zhuravljov@gmail.com"
+                }
+            ],
+            "description": "Yii2 Log Reader",
+            "keywords": [
+                "log",
+                "module",
+                "yii2"
+            ],
+            "time": "2017-11-12T01:58:43+00:00"
         }
     ],
     "packages-dev": [
@@ -4948,6 +4946,50 @@
                 "parser"
             ],
             "time": "2019-01-16T14:22:17+00:00"
+        },
+        {
+            "name": "bower-asset/moment",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/moment/moment.git",
+                "reference": "96d0d6791ab495859d09a868803d31a55c917de1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/moment/moment/zipball/96d0d6791ab495859d09a868803d31a55c917de1",
+                "reference": "96d0d6791ab495859d09a868803d31a55c917de1",
+                "shasum": ""
+            },
+            "type": "bower-asset-library",
+            "extra": {
+                "bower-asset-main": "moment.js",
+                "bower-asset-ignore": [
+                    "**/.*",
+                    "benchmarks",
+                    "bower_components",
+                    "meteor",
+                    "node_modules",
+                    "scripts",
+                    "tasks",
+                    "test",
+                    "component.json",
+                    "composer.json",
+                    "CONTRIBUTING.md",
+                    "ender.js",
+                    "Gruntfile.js",
+                    "Moment.js.nuspec",
+                    "package.js",
+                    "package.json",
+                    "ISSUE_TEMPLATE.md",
+                    "typing-tests",
+                    "min/tests.js"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "time": "2019-01-21T20:59:53+00:00"
         },
         {
             "name": "codeception/base",
@@ -5308,6 +5350,46 @@
                 "object graph"
             ],
             "time": "2019-04-07T13:18:21+00:00"
+        },
+        {
+            "name": "omnilight/yii2-momentjs",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/omnilight/yii2-momentjs.git",
+                "reference": "270e8eecc4f2c09ebb199836b081d417a331baac"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/omnilight/yii2-momentjs/zipball/270e8eecc4f2c09ebb199836b081d417a331baac",
+                "reference": "270e8eecc4f2c09ebb199836b081d417a331baac",
+                "shasum": ""
+            },
+            "require": {
+                "bower-asset/moment": "*",
+                "php": ">=5.4.0",
+                "yiisoft/yii2": "*"
+            },
+            "type": "yii2-extension",
+            "autoload": {
+                "psr-4": {
+                    "omnilight\\assets\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "authors": [
+                {
+                    "name": "Pavel Agalecky",
+                    "email": "pavel.agalecky@gmail.com"
+                }
+            ],
+            "description": "Moment.js asset for Yii2 framework",
+            "keywords": [
+                "moment",
+                "momentjs",
+                "yii2"
+            ],
+            "time": "2016-12-15T09:54:43+00:00"
         },
         {
             "name": "phar-io/manifest",
@@ -7466,7 +7548,7 @@
         "ssilence/php-imap-client": 20,
         "willdurand/email-reply-parser": 20,
         "yii-dream-team/yii2-timezone-picker": 20,
-        "omnilight/yii2-momentjs": 20
+        "uguranyum/yii2-icalender": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,

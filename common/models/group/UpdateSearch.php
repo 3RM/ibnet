@@ -2,7 +2,7 @@
 
 namespace common\models\group;
 
-use common\models\missionary\MissionaryUpdate;
+use common\models\missionary\MissionaryUpdate; use common\models\Utility;
 use Yii;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;
@@ -30,7 +30,7 @@ class UpdateSearch extends MissionaryUpdate
     {
         $query = $group->getUpdates()
             ->where([
-                'missionary_update.deleted' => 0, 
+                'missionary_update.deleted' => 0,
                 'missionary_update.profile_inactive' => 0,
                 'missionary_update.vid_not_accessible' => 0])
             ->andWhere('missionary_update.to_date >= NOW()');

@@ -142,7 +142,7 @@ class m190327_234414_create_group_tables extends Migration
             'status' => $this->smallInteger(6)->defaultValue(0),
             'approval_date' => $this->integer(),
             'inactivate_date' => $this->integer(),
-            'show_updates' => $this->tinyInteger(1),
+            'show_updates' => $this->tinyInteger(1)->defaultValue(0),
             'email_prayer_alert' => $this->tinyInteger(1),
             'email_prayer_summary' => $this->tinyInteger(1),
             'email_update_alert' => $this->tinyInteger(1),
@@ -491,15 +491,15 @@ class m190327_234414_create_group_tables extends Migration
             'NO ACTION'
         );
 
-        // $this->addForeignKey(
-        //     'fk-group_icalendar_url-ical_id',
-        //     'group_icalendar_url',
-        //     'ical_id',
-        //     'icalender_main',
-        //     'id',
-        //     'NO ACTION',
-        //     'NO ACTION'
-        // );
+        $this->addForeignKey(
+            'fk-group_icalendar_url-ical_id',
+            'group_icalendar_url',
+            'ical_id',
+            'icalender_main',
+            'id',
+            'NO ACTION',
+            'NO ACTION'
+        );
 
 
 
@@ -585,6 +585,69 @@ class m190327_234414_create_group_tables extends Migration
             'group_notification_message_id',
             'notification_id',
             'group_notification',
+            'id',
+            'NO ACTION',
+            'NO ACTION'
+        );
+
+
+
+        /**
+         * Table group_alert_queue
+         **/
+        $this->createTable('{{%group_alert_queue}}', [
+            'id' => $this->primaryKey(),
+            'created_at' => $this->integer(),
+            'group_id' => $this->integer(),
+            'prayer_id' => $this->integer()->defaultValue(0),
+            'update_id' => $this->integer()->defaultValue(0),
+            'prayer_status' => $this->smallInteger(6),
+            'alerted' => $this->tinyInteger(1),
+        ], $tableOptions);
+
+        $this->addCommentOnColumn(
+            'group_alert_queue',
+            'group_id',
+            'FOREIGN KEY (group_id) REFERENCES group (id) ON DELETE NO ACTION ON UPDATE NO ACTION'
+        );
+
+        $this->addCommentOnColumn(
+            'group_alert_queue',
+            'prayer_id',
+            'FOREIGN KEY (prayer_id) REFERENCES prayer (id) ON DELETE NO ACTION ON UPDATE NO ACTION'
+        );
+
+        $this->addCommentOnColumn(
+            'group_alert_queue',
+            'update_id',
+            'FOREIGN KEY (update_id) REFERENCES missionary_update (id) ON DELETE NO ACTION ON UPDATE NO ACTION'
+        );
+
+        $this->addForeignKey(
+            'fk-group_alert_queue-group_id',
+            'group_alert_queue',
+            'group_id',
+            'group',
+            'id',
+            'NO ACTION',
+            'NO ACTION'
+        );
+
+        $this->addForeignKey(
+            'fk-group_alert_queue-prayer_id',
+            'group_alert_queue',
+            'prayer_id',
+            'prayer',
+            'id',
+            'NO ACTION',
+            'NO ACTION'
+        );
+
+        $this->addForeignKey(
+            'fk-group_alert_queue-update_id',
+            'group_alert_queue',
+            'update_id',
+            'missionary_update',
             'id',
             'NO ACTION',
             'NO ACTION'

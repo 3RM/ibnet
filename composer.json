@@ -43,7 +43,7 @@
         "geocoder-php/google-maps-provider": "^4.0@dev",
         "php-http/guzzle6-adapter": "^2.0@dev",
         "php-http/message": "^1.6@dev",
-        "zhuravljov/yii2-logreader": "*"
+        "zhuravljov/yii2-logreader": "*",
         "dompdf/dompdf": "dev-master",
         "philippfrenzel/yii2fullcalendar":"*",
         "kartik-v/yii2-date-range": "*",
@@ -53,6 +53,7 @@
         "willdurand/email-reply-parser": "^2.8@dev",
         "yii-dream-team/yii2-timezone-picker": "dev-master",
         "yii2mod/yii2-timezone": "*",
+        "uguranyum/yii2-icalender": "dev-master"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",

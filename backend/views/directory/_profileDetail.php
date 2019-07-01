@@ -57,21 +57,21 @@ use yii\widgets\ActiveField;
     <p>Profile Name: <?= $profile->profile_name ?></p>
     <p>
         Created: <?= Yii::$app->formatter->asDate($profile->created_at, 'php:Y-m-d') ?> 
-        <span class="ago">(<?= Utility::time_elapsed_string(Yii::$app->formatter->asDate($profile->created_at, 'php:Y-m-d'))?>)</span>
+        <span class="ago">(<?= Yii::$app->formatter->asRelativeTime($profile->created_at, time())?>)</span>
     </p>
     <p>
         Updated: <?= Yii::$app->formatter->asDate($profile->updated_at, 'php:Y-m-d') ?> 
-        <span class="ago">(<?= Utility::time_elapsed_string(Yii::$app->formatter->asDate($profile->updated_at, 'php:Y-m-d'))?>)</span>
+        <span class="ago">(<?= Yii::$app->formatter->asRelativeTime($profile->updated_at, time())?>)</span>
     </p>
     <p>
         Last User Update: <?= $profile->last_update ?> 
-        <span class="ago">(<?= Utility::time_elapsed_string($profile->last_update)?>)</span>
+        <span class="ago">(<?= Yii::$app->formatter->asRelativeTime($profile->last_update, time())?>)</span>
     </p>
     <p>
         Renewal: <?= $profile->renewal_date ?> 
-        <span class="ago">(<?= Utility::time_elapsed_string($profile->renewal_date)?>)</span>
+        <span class="ago">(<?= Yii::$app->formatter->asRelativeTime($profile->renewal_date, time())?>)</span>
     </p>
-    <?= $profile->inactivation_date ? '<p>Inactivated: ' . $profile->inactivation_date . ' (' . Utility::time_elapsed_string($profile->inactivation_date) . ')</p>' : NULL; ?>
+    <?= $profile->inactivation_date ? '<p>Inactivated: ' . $profile->inactivation_date . ' (' . Yii::$app->formatter->asRelativeTime($profile->inactivation_date, time()) . ')</p>' : NULL; ?>
     <p>Has been inactivated: <?= $profile->has_been_inactivated ? ' Yes' : ' No' ?></p>
     <p>In edit mode (not new): <?= $profile->edit ? ' Yes' : ' No' ?></p>
     <?= $profile->title ? '<p>Staff Title: ' . $profile->title . '</p>' : NULL; ?>

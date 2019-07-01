@@ -9,8 +9,10 @@ namespace common\models\missionary;
 
 use common\models\User;
 use common\models\Utility;
+use common\models\group\GroupAlertQueue;
 use common\models\group\GroupMember;
 use common\models\profile\Profile;
+use GuzzleHttp\Client;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
@@ -59,6 +61,15 @@ class MissionaryUpdate extends \yii\db\ActiveRecord
      * @var string $videoHtml Stores video embed html
      */
     public $videoHtml;
+
+    /**
+     * @const int ALERT_* The alert status of the update.
+     */
+    const ALERT_ENABLED = 10;
+    const ALERT_PAUSED = 20;
+    const ALERT_USER_SENT = 30; // User sent to send queue
+    const ALERT_SENT = 40;
+    const ALERT_CANCELED = 50;
 
     /**
      * @inheritdoc
@@ -123,7 +134,7 @@ class MissionaryUpdate extends \yii\db\ActiveRecord
         if ($this->validate()) {
 
     		$this->from_date = new Expression('CURDATE()');
-    		if (NULL != $this->editActive) {
+    		if ($this->editActive != NULL) {
     			$this->active = $this->editActive;
     		}
 
@@ -153,7 +164,7 @@ class MissionaryUpdate extends \yii\db\ActiveRecord
     	// ************************* Validate Video Url *****************************
         	if ($this->vimeo_url || $this->youtube_url) {
                 if (!$this->thumbnail = $this->getVideo(false, true)) {
-                    Yii::$app->session->setFlash('danger', 'The Url you supplied does not appear to be a valid Vimeo Url. Ensure your video privacy settings allow embedding. Please contact us if you think this is in error.');
+                    Yii::$app->session->setFlash('danger', 'The Url you supplied does not appear to be a valid Video Url. Ensure your video privacy settings allow embedding. Please contact us if you think this is in error.');
                     return $this;
                 }
 
@@ -186,18 +197,42 @@ class MissionaryUpdate extends \yii\db\ActiveRecord
         	    $this->pdf = $this->getOldAttribute('pdf');
         	}
 
-            if ((NULL == $this->edit) 
-                && (NULL == $this->pdf) 
-                && (NULL == $this->vimeo_url) 
-                && (NULL == $this->youtube_url)
-                && (NULL == $this->drive_url)) {
+            if (($this->edit == NULL) 
+                && ($this->pdf == NULL) 
+                && ($this->vimeo_url == NULL) 
+                && ($this->youtube_url == NULL)
+                && ($this->drive_url == NULL)) {
                 Yii::$app->session->setFlash('info', 'Your update was not saved.  Be sure to upload a pdf or video link.');
                 return $this;
             }
             
             $this->save(false);
+
+            // Add to group alert queue
+            if ($members = Yii::$app->user->identity->groupMembers) {
+                // If sharing updates with at least one group, add to queue
+                foreach ($members as $member) {
+                    if ($member->show_updates == 1) {
+                        $this->addToAlertQueue();
+                        $this->updateAttributes(['alert_status' => self::ALERT_ENABLED]);
+                        break;
+                    }
+                }
+            }
+
     		return $this;
     	}
+    }
+
+    /**
+     * Add update to alert queue
+     * @return \yii\db\ActiveQuery
+     */
+    public function addToAlertQueue()
+    {
+        $queue = GroupAlertQueue::findOne(['update_id' => $this->id]) ?? new GroupAlertQueue();
+        $queue->update_id = $this->id;
+        $queue->save();
     }
 
     /**
@@ -208,14 +243,12 @@ class MissionaryUpdate extends \yii\db\ActiveRecord
      *    Return embed coded if $thumbnail = false
      *    Return thumbnail url if $thumbnal = true
      * If video is not retrievable:
-     *    Set vid_not_accessible if clear
+     *    Set vid_not_accessible if not set
      *    Return false if $errorImage=false
      *    Return error image html if $errorImage=true
      *
      * Default is return embed code | false
      *
-     * Disable throwing guzzle http protocol errors: 
-     * $res = $client->request('GET', '/status/500', ['http_errors' => false]);
      * http://docs.guzzlephp.org/en/stable/request-options.html
      * 
      * @return mixed
@@ -223,25 +256,26 @@ class MissionaryUpdate extends \yii\db\ActiveRecord
     public function getVideo($errorImage=false, $thumb=false)
     {
         if ($this->vimeo_url) {
-            $url = 'https://vimeo.com/api/oembed.json?url=' . $this->vimeo_url;
+            $url = Yii::$app->params['url.vimeoOembed'] . $this->vimeo_url;
         } elseif ($this->youtube_url) {
-            $url = 'http://www.youtube.com/oembed?format=json&url=' . $this->youtube_url;
+            $url = Yii::$app->params['url.youtubeOembed'] . $this->youtube_url;
         }
-        $res = Utility::get($url);
-        if (('404 Not Found' == $res) || ('Not Found' == $res)) {
-            if (0 == $this->vid_not_accessible) {
+        $client = new Client();
+        $response = $client->request('GET', $url, ['http_errors' => false]);
+        if ($response->getStatusCode() !== 200) {
+            if ($this->vid_not_accessible == 0) {
                 $this->updateAttributes(['vid_not_accessible' => 1]);
             }
             return $errorImage ? Html::img('@img.group/broken-vid.jpg', ['style' => 'width:100%']) : false;
         } else {
-            if (1 == $this->vid_not_accessible) {
+            $json = $response->getBody()->getContents();
+            $decoded = json_decode($json);
+            if ($this->vid_not_accessible == 1) {
                 $this->updateAttributes(['vid_not_accessible' => 0]);
             }
-            return $thumb ? json_decode($res)->thumbnail_url : json_decode($res)->html;
+            return $thumb ? $decoded->thumbnail_url : $decoded->html;
         }
     }
-
-
 
     /*
      * @return \yii\db\ActiveQuery
@@ -278,10 +312,26 @@ class MissionaryUpdate extends \yii\db\ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return string
+     */
+    public function getRealName()
+    {
+        return $this->user->realName;
+    }
+
+    /**
+     * @return string
      */
     public function getFullName()
     {
         return $this->user->fullName;
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getGroupAlert()
+    {
+        return $this->hasOne(GroupAlertQueue::className(), ['update_id' => 'id']);
     }
 }

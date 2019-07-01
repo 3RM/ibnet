@@ -112,17 +112,17 @@ class ServerController extends Controller
     {
 
         if (isset($_POST['backendClear'])) {
-            $sizeBefore = Utility::getTotalSize(Yii::$app->cache->cachePath);
+            $sizeBefore = $this->getDirectorySize(Yii::$app->cache->cachePath);
             Yii::$app->cache->flush();
-            $sizeAfter = Utility::getTotalSize(Yii::$app->cache->cachePath);
+            $sizeAfter =  $this->getDirectorySize(Yii::$app->cache->cachePath);
             
             Yii::$app->session->setFlash('success', 
                 'Yii backend cache flushed successfully. Size before: ' . $sizeBefore . 'B. Size after: ' . $sizeAfter . 'B.');
         
         } elseif (isset($_POST['frontendClear'])) {
-            $sizeBefore = Utility::getTotalSize(Yii::$app->cacheFrontend->cachePath);
+            $sizeBefore =  $this->getDirectorySize(Yii::$app->cacheFrontend->cachePath);
             Yii::$app->cacheFrontend->flush();
-            $sizeAfter = Utility::getTotalSize(Yii::$app->cacheFrontend->cachePath);
+            $sizeAfter =  $this->getDirectorySize(Yii::$app->cacheFrontend->cachePath);
             
             Yii::$app->session->setFlash('success', 
                 'Yii frontend cache flushed successfully. Size before: ' . $sizeBefore . 'B. Size after: ' . $sizeAfter . 'B.');
@@ -130,6 +130,49 @@ class ServerController extends Controller
         }
 
         return $this->render('cache');
+    }
+
+    /**
+     * Get size of a server directory
+     * 
+     * @param mixed $dir
+     * @return boolean TRUE if it is a valid string. FALSE if it isn't.
+     */
+    public static function getDirectorySize($dir)
+    {
+        $dir = rtrim(str_replace('\\', '/', $dir), '/');
+    
+        if (is_dir($dir) === true) {
+            $totalSize = 0;
+            $os        = strtoupper(substr(PHP_OS, 0, 3));
+            // If on a Unix Host (Linux, Mac OS)
+            if ($os !== 'WIN') {
+                $io = popen('/usr/bin/du -sb ' . $dir, 'r');
+                if ($io !== false) {
+                    $totalSize = intval(fgets($io, 80));
+                    pclose($io);
+                    return $totalSize;
+                }
+            }
+            // If on a Windows Host (WIN32, WINNT, Windows)
+            if ($os === 'WIN' && extension_loaded('com_dotnet')) {
+                $obj = new \COM('scripting.filesystemobject');
+                if (is_object($obj)) {
+                    $ref       = $obj->getfolder($dir);
+                    $totalSize = $ref->size;
+                    $obj       = null;
+                    return $totalSize;
+                }
+            }
+            // If System calls did't work, use slower PHP 5
+            $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir));
+            foreach ($files as $file) {
+                $totalSize += $file->getSize();
+            }
+            return $totalSize;
+        } else if (is_file($dir) === true) {
+            return filesize($dir);
+        }
     }
 
 }

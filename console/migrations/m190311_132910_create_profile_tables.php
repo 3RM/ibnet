@@ -599,6 +599,7 @@ class m190311_132910_create_profile_tables extends Migration
             'missionary_id' => $this->integer()->notNull(),
             'created_at' => $this->integer()->notNull(),
             'updated_at' => $this->integer()->notNull(),
+            'alert_status' => $this->smallInteger(6)->defaultValue(0),
             'title' => $this->string(60)->notNull(),
             'mailchimp_url' => $this->string(),
             'pdf' => $this->string(),

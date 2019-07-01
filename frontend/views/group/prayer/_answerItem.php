@@ -46,7 +46,7 @@ use yii\widgets\ActiveField;
     </p>
     <p><?= $model->answer_description ?></p>
 	<p class="request"><?= $model->request ?></p>
-    <p class="name-date"> <?= $model->fullName . ', ' . Yii::$app->formatter->asDate($model->created_at) ?></p>
+    <p class="name-date"> <?= Html::a($model->fullName, 'mailto:' . $model->email) . ', ' . Yii::$app->formatter->asDate($model->created_at) ?></p>
 	<?= $model->description ? '<p class="prayer-description">' . $model->description . '</p>' : NULL; ?>
     <?php foreach ($model->prayerUpdates as $update) {
         echo '<div class="update">';

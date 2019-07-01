@@ -8,6 +8,7 @@
 namespace frontend\controllers;
 
 use common\models\Utility;
+use common\models\group\Group;
 use common\models\missionary\MailchimpList;
 use common\models\missionary\Missionary;
 use common\models\missionary\MissionaryUpdate;
@@ -74,12 +75,16 @@ class MissionaryController extends Controller
             $this->redirect('/site/settings');
         }
 
-        $profile = Profile::find()
-            ->where(['user_id' => $user->id])
-            ->andWhere(['type' => 'Missionary'])
-            ->andWhere('`status` != ' . Profile::STATUS_TRASH)
-            ->andWhere('`status` != ' . Profile::STATUS_NEW)
-            ->one();
+        if (!$profile = Profile::find()
+            ->where(['and', 
+                ['user_id' => $user->id],
+                ['type' => Profile::TYPE_MISSIONARY],
+                ['!=', 'status', Profile::STATUS_TRASH],
+                ['!=', 'status', Profile::STATUS_NEW]
+            ])->one()) 
+        {
+            throw new NotFoundHttpException;
+        }
         $profileActive = $profile->status == Profile::STATUS_ACTIVE ? true : false;
         $missionary = $profile->missionary;
         $updates = $missionary->updatesAll;
@@ -91,11 +96,16 @@ class MissionaryController extends Controller
             return ActiveForm::validate($newUpdate);
         }
 
+        // Remove an udpate
         if (isset($_POST['remove'])) {
             $update = MissionaryUpdate::findOne($_POST['remove']);
             $update->updateAttributes(['deleted' => 1]);
+            if ($alert = $update->groupAlert) {
+                $alert->delete();
+            }
             $updates = $missionary->updates;
 
+        // Show update edit form
         } elseif (isset($_POST['edit'])) {
             foreach ($updates as $i=>$update) {
                 if ($update->id == $_POST['edit']) {
@@ -106,6 +116,7 @@ class MissionaryController extends Controller
                 $i++;
             }
 
+        // Save an edit
         } elseif (isset($_POST['edit-save'])) {
             $update = MissionaryUpdate::findOne($_POST['edit-save']);
             if ($update->load(Yii::$app->request->Post())) {
@@ -117,12 +128,14 @@ class MissionaryController extends Controller
                     Try making your edit again.');
             }
 
+        // Generate a new repository url
         } elseif (isset($_POST['new_url'])) {
             $missionary->generateRepositoryKey();
             Yii::$app->session->setFlash('success', 'A new Url has been created.  
                     You can rest assured that your updates are secure.');
             $a = NULL;
 
+        // New update
         } elseif ($newUpdate->load(Yii::$app->request->Post())) {
             $newUpdate->missionary_id = $missionary->id;
             $newUpdate->handleForm();
@@ -179,6 +192,30 @@ class MissionaryController extends Controller
         } else {
             throw new NotFoundHttpException();
         }
+    }
+
+    /**
+     * Watch a video update linked from alart email
+     * @param  $gid integer Group id
+     * @param  $uid integer Update id
+     * @return mixed
+     */
+    public function actionWatch($gid, $uid)
+    {
+        $group = Group::findOne($gid);
+        if (!$group->canAccess()) {
+            throw new NotFoundHttpException;
+        }
+
+        $update = MissionaryUpdate::findOne($uid);
+        $missionary = $update->missionary;
+        $profile = $missionary->profile;
+        
+        return $this->render('watch', [
+            'profile' => $profile,
+            'missionary' => $missionary,
+            'update' => $update,
+        ]);
     }
 
     /**

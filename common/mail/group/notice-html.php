@@ -43,6 +43,9 @@ use yii\helpers\Html;
 					to ask a question, leave feedback, or make new feature requests.
 				</p>
 				<p>
+					This is a notification from the <?= $notification->group->name ?> group. You are receiving this message because you are a member of the group. 
+				</p>
+				<p>
 					<?= Html::a('Unsubscribe', Yii::$app->params['url.unsubscribe'] . $notification->toEmail . '&token=' . $unsubTok) ?> 
 					if you no longer wish to receive emails from IBNet. 
 				</p>

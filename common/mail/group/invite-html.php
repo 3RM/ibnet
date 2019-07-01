@@ -1,6 +1,7 @@
 <?php
 
 use yii\helpers\Html;
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $nid network id */
@@ -29,11 +30,11 @@ use yii\helpers\Html;
 				<?= $user->fullName ?> cordially invites you to join the IBNet group <?= $group->name ?>.  Joining a group gives you access 
 				to many ministry tools that are shared among group members.  If you are not registered with IBNet, 
 				<?= Html::a('click here', Yii::$app->params['url.register']) ?> to register.  Also, be sure to identify your home church 
-				from the IBNet directory on your <?= Html::a('account settings', Yii::$app->params['url.loginFirst'] . 'settings') ?> page in order to 
-				unlock the group feature along with other great features.
+				from the IBNet directory on your <?= Html::a('account settings', Yii::$app->params['url.loginFirst'] . urlencode(Url::to(['site/settings']))) ?> 
+				page in order to unlock the group feature along with other great features.
 			</p>
 			<?= isset($extMessage) ? '<p style="margin-left:20px;">' . $extMessage . '</p>' : NULL ?>
-			<h3 style="margin-left:20px;"><?= Html::a('Click Here to Join!', Yii::$app->params['url.loginFirst'] . 'group/invite-join?token=' . $token) ?></h3>
+			<h3 style="margin-left:20px;"><?= Html::a('Click Here to Join!', Yii::$app->params['url.loginFirst'] . urlencode(Url::to(['group/invite-join', 'token' => $token]))) ?></h3>
 		</td>
 	</tr>
 	<tr>

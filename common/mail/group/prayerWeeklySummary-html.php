@@ -1,6 +1,7 @@
 <?php
-use common\models\group\PrayerAlertQueue;
+use common\models\group\GroupAlertQueue;
 use yii\helpers\Html;
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $prayer common\models\group\Prayer */
@@ -20,11 +21,11 @@ use yii\helpers\Html;
 		<tr>
 			<td colspan="2">
 				<p style="margin:20px 20px 0 20px; font-size:1.2em;">
-					<?php if ($p->status == PrayerAlertQueue::STATUS_NEW) { ?>
+					<?php if ($p->status == GroupAlertQueue::PRAYER_STATUS_NEW) { ?>
 						<b>New: <?= $p->prayer->request ?></b>
-					<?php } elseif ($p->status == PrayerAlertQueue::STATUS_UPDATE) { ?>
+					<?php } elseif ($p->status == GroupAlertQueue::PRAYER_STATUS_UPDATE) { ?>
 						<b>Update: <?= $p->prayer->request ?></b>
-					<?php } elseif ($p->status == PrayerAlertQueue::STATUS_ANSWER) { ?>
+					<?php } elseif ($p->status == GroupAlertQueue::PRAYER_STATUS_ANSWER) { ?>
 						<b>Answered: <?= $p->prayer->request ?></b>
 					<?php } ?>
 				</p>
@@ -36,7 +37,7 @@ use yii\helpers\Html;
 		</tr>
 		<tr>
 			<td colspan="2">
-				<?php if($p->status == PrayerAlertQueue::STATUS_ANSWER) { ?>
+				<?php if($p->status == GroupAlertQueue::PRAYER_STATUS_ANSWER) { ?>
 					<p style="margin:0 20px 10px 20px;"><?= $p->prayer->answer_description ?></p>
 					<p style="margin:40px 20px 20px 20px; color:gray; font-size:1.2em"><em>Original Request:</em></p>
 				<?php } ?>
@@ -64,7 +65,7 @@ use yii\helpers\Html;
 	<?php } ?>
 	<tr>
 		<p style="margin:0 20px 10px 20px;">
-			Visit the <?= Html::a('prayer list here', Yii::$app->params['url.loginFirst'] . 'group/prayer/'  . $gid) ?>.
+			Visit the <?= Html::a('prayer list here', Yii::$app->params['url.loginFirst'] . urlencode(Url::to(['group/prayer', 'id' => $gid]))) ?>.
 		</p>
 	</tr>
 	<tr>
@@ -78,6 +79,10 @@ use yii\helpers\Html;
 				<p>
 					For assistance, contact <?= Yii::$app->params['email.admin'] ?>.  
 					Visit the <?= Html::a('forum', Yii::$app->params['url.forum']) ?> to ask a question, leave feedback, or make new feature requests.
+				</p>
+				<p>
+					You are subscribed to receive weekly prayer list summaries.  Visit the group 
+					<?= Html::a('prayer list', Yii::$app->params['url.loginFirst'] . urlencode(Url::to(['group/prayer', 'id' => $gid]))) ?> to change your subscription. 
 				</p>
 				<p>
 					<?= Html::a('Unsubscribe', Yii::$app->params['url.unsubscribe'] . $to . '&token=' . $token) ?> 

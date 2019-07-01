@@ -312,6 +312,24 @@ class Missionary extends \yii\db\ActiveRecord
         return true;
     }
 
+    /**
+     * Add missionary id to all group members
+     *
+     * @return boolean
+     */
+    public function addToGroupMembers()
+    {
+        $user = $this->user;
+        if ($members = $user->groupMembers) {
+            foreach ($members as $member) {
+                if (!$member->missionary_id) {
+                    $member->updateAttributes(['missionary_id' => $this->id]);
+                }
+            }
+        }
+        return $this;
+    }
+
      /**
      * Unsync Mailchimp from missionary account
      *
@@ -322,6 +340,14 @@ class Missionary extends \yii\db\ActiveRecord
         $this->deleteAllMCWebhooks();
         $this->updateAttributes(['mc_token' => NULL, 'mc_key' => NULL]);
         return true;
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUser()
+    {
+        return $this->hasOne(User::className(), ['id' => 'user_id']);
     }
 
     /**

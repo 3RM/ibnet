@@ -21,7 +21,7 @@ use common\models\group\GroupPlace;
 use common\models\group\GroupSearch;
 use common\models\group\MemberSearch;
 use common\models\group\Prayer;
-use common\models\group\PrayerAlertQueue;
+use common\models\group\GroupAlertQueue;
 use common\models\group\PrayerTag;
 use common\models\group\AnswerSearch;
 use common\models\group\PrayerSearch;
@@ -709,7 +709,7 @@ class GroupController extends Controller
                 $groupMember->user_id = $newUser->id;
                 if ($profile = $newUser->indActiveProfile) {
                     $groupMember->profile_id = $profile->id;
-                    if ('Missionary' == $profile->type) {
+                    if ($profile->type == Profile::TYPE_MISSIONARY) {
                         $groupMember->missionary_id = $profile->missionary->id;
                     }
                 }
@@ -782,7 +782,7 @@ class GroupController extends Controller
                 $prayer->handleTags();
             }
             // Save to alert queue
-            $prayer->addToAlertQueue(PrayerAlertQueue::STATUS_NEW);
+            $prayer->addToAlertQueue(GroupAlertQueue::PRAYER_STATUS_NEW);
 
             return $this->redirect(['prayer', 'id' => $id, 'dspy' => NULL]);  
 
@@ -844,7 +844,7 @@ class GroupController extends Controller
                 $update->save();
 
                 // Save to alert queue
-                $prayer->addToAlertQueue(PrayerAlertQueue::STATUS_UPDATE);
+                $prayer->addToAlertQueue(GroupAlertQueue::PRAYER_STATUS_UPDATE);
             }
             // Always save prayer in order to update updated_at
             $prayer->save();
@@ -879,7 +879,7 @@ class GroupController extends Controller
             $prayer->save();
 
             // Save to alert queue
-            $prayer->addToAlertQueue(PrayerAlertQueue::STATUS_ANSWER);
+            $prayer->addToAlertQueue(GroupAlertQueue::PRAYER_STATUS_ANSWER);
 
             return $this->redirect(['prayer', 'id' => $id, 'dspy' => NULL]); 
         
@@ -984,10 +984,11 @@ class GroupController extends Controller
 
     /**
      * Calendar feature
-     *
+     * $id integer Group id
+     * $date string Start date of last edited event to use on page reload
      * @return mixed
      */
-    public function actionCalendar($id)
+    public function actionCalendar($id, $date=NULL)
     {
         $group = Group::findOne($id);
         if (!$group->canAccess()) {
@@ -1006,6 +1007,7 @@ class GroupController extends Controller
             'upcomingList' => $upcomingList,
             'urls' => empty($icalList) ? false : true,
             'joinedGroups' => $joinedGroups,
+            'date' => $date,
         ]);
     }
 
@@ -1029,13 +1031,13 @@ class GroupController extends Controller
             $event->group_member_id = $nmid;
             $range = explode(' - ', $_POST['dateRange']);
             $event->start = strtotime($range[0]);
-            $event->end = strtotime($range[1]);
-            $item->end = $event->all_day ?
+            $event->end = $event->all_day ?
                 strtotime($range[1]) + (24*3600) :
                 strtotime($range[1]);
             $event->color = $_POST['color'];
             $event->save();
-            return $this->redirect(['calendar', 'id' => $id]);
+            $date = Yii::$app->formatter->asDate($event->start, 'php:Y-m');
+            return $this->redirect(['calendar', 'id' => $id, 'date' => $date]);
         } else {
             return $this->renderAjax('calendar/_eventForm', ['event' => $event]);
         }
@@ -1117,7 +1119,8 @@ class GroupController extends Controller
                 strtotime($range[1]);
             $event->color = $_POST['color'];
             $event->save();
-            return $this->redirect(['calendar', 'id' => $id]);
+            $date = Yii::$app->formatter->asDate($event->start, 'php:Y-m');
+            return $this->redirect(['calendar', 'id' => $id, 'date' => $date]);
         } else {
             return $this->renderAjax('calendar/_eventForm', ['event' => $event]);
         }
@@ -1140,13 +1143,14 @@ class GroupController extends Controller
         if ($ical->load(Yii::$app->request->post()) && $ical->validate()) {
             if (!empty($ical->url)) {
                 // Check if url is already saved
+                $duplicate = false;
                 if (is_array($urlList)) {
                     foreach ($urlList as $url) {
-                        $comp = strcmp($url->url, $ical->url);
-                        $dup = $comp == 0 ? true : $dup;
+                        $compare = strcmp($url->url, $ical->url);
+                        $duplicate = $compare == 0 ? true : $duplicate;
                     }
                 }
-                if (isset($dup)) {
+                if (!empty($duplicate)) {
                     Yii::$app->session->setFlash('info', 
                         'The calendar has already been imported.');
                 } else {

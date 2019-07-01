@@ -18,12 +18,19 @@ return [
     'tokenExpire.groupTransfer' => 604800,
     'tokenExpire.groupInviteJoin' => 2419200,   // 4 * 7 * 24 * 60 * 60 (4 weeks)
 
+    // Missionary update group alert delay before send
+    'delay.missionaryUpdate' => 900,            // 15 * 60 (15 mins)
+
     // API Keys
-    'apiKey.Google-client' => 'AIzaSyBtE_w8tdgpSwEse8qTsEZoR-Vw776xg6I',
-    'apiKey.Google-server' => 'AIzaSyDylFZ5rIu9zpubJ5TKV2WsmkEybS4t3HA',
-    'apiKey.Google-no-restrictions' => 'AIzaSyDvsfbC0RbT8TLJFYFxBiCYzWgUd51xDg8',
+    'apiKey.google-client' => 'AIzaSyBtE_w8tdgpSwEse8qTsEZoR-Vw776xg6I',
+    'apiKey.google-server' => 'AIzaSyDylFZ5rIu9zpubJ5TKV2WsmkEybS4t3HA',
+    'apiKey.google-no-restrictions' => 'AIzaSyDvsfbC0RbT8TLJFYFxBiCYzWgUd51xDg8',
     'apiKey.discourse' => '17038c2fc01d59596673221ab17ec6a728ff6a0fb01e9e0b7e73082873f7847f',
     'apiKey.discourse-secret' => 'Bu!^#uI$gy2Q&n16Xo338arO',
     'apiKey.discourse-username' => 'ibnets',
     'apiKey.ipstack' => 'b0680d3fde00ea007164f24a19ca2608',
+
+    // URLs
+    'url.vimeoOembed' => 'https://vimeo.com/api/oembed.json?url=',
+    'url.youtubeOembed' => 'http://www.youtube.com/oembed?format=json&url=',
 ];

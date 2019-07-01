@@ -21,7 +21,7 @@ $this->title = '';
             <?= $form->field($searchModel, 'term')->textInput([
                 'maxlength' => true, 
                   'class' => 'form-control',
-                'placeholder' => 'Find churches, organizations and individuals ...',
+                'placeholder' => Yii::$app->user->isGuest ? 'Find churches and organizations ...' : 'Find churches, organizations and individuals ...',
                 'autocomplete' => 'off',
             ])->label('') ?>
             <?= Html::submitButton('', [

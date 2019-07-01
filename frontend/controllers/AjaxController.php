@@ -313,12 +313,11 @@ class AjaxController extends Controller
 
         $body = '';
         if ($update = MissionaryUpdate::findOne($id)) {
-            if ($update->visible) {
-                $update->updateAttributes(['visible' => 0]);
-            } else {
+            $update->visible ?
+                $update->updateAttributes(['visible' => 0]) :
                 $update->updateAttributes(['visible' => 1]);
-            }
-            $body = $update->visible ? 
+            
+            $link = $update->visible ? 
                 Html::a(Html::icon('eye-open'), ['ajax/update-visible', 'id' => $update->id], [
                     'id' => 'visible-' . $update->id, 
                     'data-on-done' => 'visibleDone', 
@@ -329,13 +328,71 @@ class AjaxController extends Controller
                     'data-on-done' => 'visibleDone', 
                 ]);
             return [
-                'body' => $body,
+                'link' => $link,
                 'updateId' => $update->id,
                 'success' => true,
             ];
         }
         return ['success' => false];
     }
+
+    /**
+     * Pause update alert in send queue
+     * @return array
+     */
+    public function actionPauseAlert($id)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        if ($update = MissionaryUpdate::findOne($id)) {
+            $update->updateAttributes(['alert_status' => MissionaryUpdate::ALERT_PAUSED]);         
+            $html = Html::icon('send') . Html::a(' Send alert', ['ajax/send-alert', 'id' => $update->id], [
+                'id' => 'alert-send', 
+                'data-on-done' => 'alertSendDone']);
+            return [
+                'html' => $html,
+                'success' => true
+            ];
+        }
+        return ['success' => false];
+    }
+
+    /**
+     * Unpause update alert in send queue
+     * @return array
+     */
+    public function actionSendAlert($id)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        if ($update = MissionaryUpdate::findOne($id)) {
+            $update->updateAttributes(['alert_status' => MissionaryUpdate::ALERT_USER_SENT]);         
+            return [
+                'uid' => $update->id,
+                'success' => true
+            ];
+        }
+        return ['success' => false];
+    }
+
+    /**
+     * Cancel update alert
+     * @return array
+     */
+    public function actionCancelAlert($id)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        if ($update = MissionaryUpdate::findOne($id)) {
+            $update->updateAttributes(['alert_status' => MissionaryUpdate::ALERT_CANCELED]);
+            return [
+                'uid' => $update->id,
+                'success' => true
+            ];
+        }
+        return ['success' => false];
+    }
+
 
 
 

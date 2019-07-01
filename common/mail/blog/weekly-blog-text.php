@@ -1,5 +1,6 @@
 <?php
 use yii\helpers\Html;
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $user common\models\User */
@@ -16,7 +17,7 @@ use yii\helpers\Html;
     }
 ?>
 
-To change your email subscriptions, visit your account settings at <?= Yii::$app->params['url.loginFirst']) . 'settings/#account-settings' ?>.
+To change your email subscriptions, visit your account settings at <?= Yii::$app->params['url.loginFirst']) . urlencode(Url::to(['site/#account-settings'])) ?>.
 
 Unsubscribe at <?= Yii::$app->params['url.unsubscribe'] . $email . '&token' . $unsubTok) ?>.
 

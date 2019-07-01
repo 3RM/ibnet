@@ -14,13 +14,15 @@ use yii\widgets\ActiveField;
 
 <div>
     <p>
-        Import any calendar in the iCal format.
+        Import any calendar in the iCal format.  Calendars sync daily.
     </p>
-    <p>
+    <p class="shaded">
         To import a Google calendar, go to your Google calendar settings and scroll down to "Integrate Calendar."  Copy the "Secret address in iCal format" url and paste it here.
     </p>
-    <p>
-        To add holidays for any country, for example, use a url from here: <?= Html::a('https://www.officeholidays.com/ics/', 'https://www.officeholidays.com/ics/', ['target' => '_blank', 'rel' => 'noopener noreferrer']) ?>
+    <p class="shaded">
+        To add holidays for your country, for example, visit 
+            <?= Html::a('https://www.officeholidays.com/subscribe', 'https://www.officeholidays.com/subscribe', ['target' => '_blank', 'rel' => 'noopener noreferrer']) ?>.
+            Select your country. Then copy one of the two links provided and paste it here.
     </p>
 
     <?php $form = ActiveForm::begin(['action' => '/group/remove-ical']); ?>
