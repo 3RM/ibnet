@@ -795,7 +795,7 @@ class Group extends ActiveRecord
                         'extMessage' => $this->message ?? NULL,
                         'email' => $mail[0],
                         'unsubTok' => $mail[2],
-                    ],
+                    ]
                 )
                 ->setFrom([Yii::$app->params['email.noReply'] => $this->name])
                 ->setTo([$mail[0] => $user->fullName])
