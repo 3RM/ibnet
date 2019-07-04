@@ -9,7 +9,7 @@ namespace frontend\controllers;
 
 use common\models\Subscription;
 use common\models\User;
-use common\models\missionary\MissionaryUpdate;
+use common\models\missionary\MissionaryUpdate; use common\models\Utility;
 use common\models\group\IcalenderEvent;
 use common\models\group\Group;
 use common\models\group\GroupIcalendarUrl;
@@ -62,7 +62,7 @@ class GroupController extends Controller
                     ],
                     [
                         'allow' => true,
-                        'roles' => ['SafeUser', 'Admin'],
+                        'roles' => [User::ROLE_SAFEUSER, User::ROLE_ADMIN],
                     ],
                 ],
             ],
@@ -138,10 +138,6 @@ class GroupController extends Controller
      */
     public function actionCreate()
     {
-        if (!\Yii::$app->user->can(PermissionGroup::CREATE)) {
-            throw new NotFoundHttpException;
-        }
-
         return $this->render('createGroup');
     }
 
@@ -150,7 +146,7 @@ class GroupController extends Controller
      *
      * @return mixed
      */
-    public function actionGroupInformation($id = NULL)
+    public function actionGroupInformation($id=NULL)
     {
         if ($id) {
             $group = Group::findOne($id);
@@ -159,12 +155,10 @@ class GroupController extends Controller
                 throw new NotFoundHttpException;
             }
 
-        } elseif (\Yii::$app->user->can(PermissionGroup::CREATE)) {
+        } else {
             $group = New Group();        
             $group->scenario = 'information';
             
-        } else {
-            throw new NotFoundHttpException;
         }
 
         // Ajax validation for unique group name
@@ -970,16 +964,6 @@ class GroupController extends Controller
         
         // Redirect back
         $this->redirect(Yii::getAlias('@discourse') . '/session/sso_login?' . $q);
-    }
-
-    /**
-     * Return from Discourse forum
-     *
-     * @return redirect
-     */
-    public function actionForumReturn()
-    {
-        return Url::previous() != NULL ? $this->redirect(Url::previous()) : $this->goHome();
     }
 
     /**

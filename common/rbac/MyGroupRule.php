@@ -19,6 +19,6 @@ class MyGroupRule extends Rule
      */
     public function execute($user, $item, $params)
     {
-        return true; // isset($params['Group']) ? $params['Group']->user_id === $user : false;
+        return isset($params['Group']) ? $params['Group']->user_id === $user : false;
     }
 }

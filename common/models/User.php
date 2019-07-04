@@ -175,7 +175,7 @@ class User extends ActiveRecord implements
             'personal' => ['display_name', 'home_church', 'primary_role', 'usr_image'],
             'account' => ['newUsername', 'newEmail', 'newPassword', 'timezone', 'subscriptionProfile', 'subscriptionLinks', 'subscriptionComments',   'subscriptionFeatures', 'subscriptionBlog'],
             'sub' => ['subscriptionProfile', 'subscriptionLinks', 'subscriptionComments',   'subscriptionFeatures', 'subscriptionBlog'],
-            'backend' => ['first_name', 'last_name', 'email', 'new_email', 'new_email_token', 'username', 'auth_key', 'password_hash', 'password_reset_token', 'created_at', 'updated_at', 'last_login', 'status', 'display_name', 'home_church', 'primary_role', 'email_pref_links', 'subscriptionComments', 'subscriptionFeatures', 'subscriptionBlog', 'reviewed'],
+            'backend' => ['first_name', 'last_name', 'email', 'new_email', 'new_email_token', 'username', 'auth_key', 'password_hash', 'password_reset_token', 'created_at', 'updated_at', 'last_login', 'status', 'display_name', 'home_church', 'primary_role', 'subscriptionProfile', 'subscriptionLinks', 'subscriptionComments', 'subscriptionFeatures', 'subscriptionBlog', 'reviewed'],
         ];
     }
 

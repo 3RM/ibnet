@@ -73,7 +73,7 @@ $this->title = 'Group Information';
                         'errorLoading' => new JsExpression("function () { return 'Waiting for results...'; }"),
                     ],
                     'ajax' => [
-                        'url' => Url::to(['ajax/find-ministry']),
+                        'url' => Url::to(['ajax/search']),
                         'dataType' => 'json',
                         'data' => new JsExpression('function(params) { return {q:params.term}; }')
                     ],

@@ -6,7 +6,7 @@ use common\models\Utility;
 use frontend\controllers\ProfileController;
 use yii\bootstrap\Html;
 use yii\widgets\ActiveForm;
-use yii\widgets\ActiveField; //Utility::pp($user->subscription);
+use yii\widgets\ActiveField;
 ?>
 
 

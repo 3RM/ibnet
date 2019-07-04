@@ -42,7 +42,7 @@ class GroupSearch extends Group
     }
 
     /**
-     * Returns Profile rows based on user search string
+     * Returns Groups based on user search string
      */
     public function query($term)
     {

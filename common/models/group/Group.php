@@ -279,10 +279,13 @@ class Group extends ActiveRecord
      */
     public function handleFormInformation()
     {
-        if (NULL == $this->status) {
+        if ($this->status == NULL) {
             $this->user_id = Yii::$app->user->identity->id;
             $this->url_name = Inflector::slug($this->name);
             $this->status = self::STATUS_NEW;
+        }
+
+        if ($this->save()) {
 
             // Create a new group member for group owner
             $user = Yii::$app->user->identity;
@@ -298,11 +301,7 @@ class Group extends ActiveRecord
             $groupMember->validate();
             $groupMember->save();
         }
-
-        if ($this->validate() && $this->save()) {
-            return $this;
-        }
-        return false;
+        return $this;
     }
 
     /**

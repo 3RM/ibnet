@@ -24,6 +24,6 @@ class MemberGroupRule extends Rule
         $userModel = Yii::$app->user->identity;
         $joinedGroups = $userModel->joinedGroups;
 
-        return 1; //(isset($params['Group']) && isset($joinedGroups)) ? in_array($params['Group']->id, ArrayHelper::getColumn($joinedGroups, 'id')) : false;
+        return (isset($params['Group']) && isset($joinedGroups)) ? in_array($params['Group']->id, ArrayHelper::getColumn($joinedGroups, 'id')) : false;
     }
 }

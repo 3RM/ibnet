@@ -67,16 +67,16 @@ class m190130_222359_create_site_tables extends Migration
         /**
          * Table mail_preferences
          **/
-        $this->createTable('{{%mail_preferences}}', [
+        $this->createTable('{{%subscription}}', [
             'id' => $this->primaryKey(),
             'email' => $this->string(60)->notNull(),
             'token' => $this->string(32),
             'unsubscribe' => $this->tinyInteger(1)->defaultValue(0),
-            'profile' => $this->tinyInteger(1)->defaultValue(0),
-            'links' => $this->tinyInteger(1)->defaultValue(0),
-            'comments' => $this->tinyInteger(1)->defaultValue(0),
-            'features' => $this->tinyInteger(1)->defaultValue(0),
-            'blog' => $this->tinyInteger(1)->defaultValue(0),
+            'profile' => $this->tinyInteger(1)->defaultValue(1),
+            'links' => $this->tinyInteger(1)->defaultValue(1),
+            'comments' => $this->tinyInteger(1)->defaultValue(1),
+            'features' => $this->tinyInteger(1)->defaultValue(1),
+            'blog' => $this->tinyInteger(1)->defaultValue(1),
         ], $tableOptions);  
     }
 

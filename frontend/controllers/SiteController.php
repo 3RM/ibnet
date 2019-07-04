@@ -232,6 +232,16 @@ class SiteController extends Controller
     }
 
     /**
+     * Return from Discourse forum
+     *
+     * @return redirect
+     */
+    public function actionForumReturn()
+    {
+        return Url::previous() != NULL ? $this->redirect(Url::previous()) : $this->goHome();
+    }
+
+    /**
      * Displays contact page.
      *
      * @return mixed
@@ -537,7 +547,8 @@ class SiteController extends Controller
 
         // Set subscriptions
         if (!$sub = $userA->subscription) {
-            throw new NotFoundHttpException;
+            $sub = New Subscription();
+            $sub->add($userA->email);
         }
         $userA->subscriptionProfile = $sub->profile;
         $userA->subscriptionLinks = $sub->links;
