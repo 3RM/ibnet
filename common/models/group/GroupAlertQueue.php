@@ -2,7 +2,7 @@
 
 namespace common\models\group;
 
-use common\models\missionary\missionaryUpdate;
+use common\models\missionary\MissionaryUpdate;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;

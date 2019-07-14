@@ -14,7 +14,7 @@ class ProfileTrackingController extends Controller
     
     /**
      * Check profile expirations
-     * Cron job can be found at ~/crontab -e
+     * Cron job can be found at crontab -e
      * @param string $from
      * @param string $to
      * @return int exit code

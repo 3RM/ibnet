@@ -6,8 +6,8 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 
 $this->title = 'About';
-Url::remember();
 ?>
+
 <div class="site-about">
     <div class="row">
         <div class="col-md-8">

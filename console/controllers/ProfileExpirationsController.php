@@ -15,7 +15,7 @@ class ProfileExpirationsController extends Controller
     
     /**
      * Run ProfileExpirations::RunCheck for a period of time
-     * Cron job can be found at ~/crontab -e
+     * Cron job can be found at crontab -e
      * @param string $from
      * @param string $to
      * @return int exit code

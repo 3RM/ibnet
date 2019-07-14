@@ -73,6 +73,7 @@ class DirectoryController extends Controller
         $searchModel = new ProfileSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->get());
 
+        Url::remember();
         return $this->render('profiles', [
             'searchModel' => $searchModel, 
             'dataProvider' => $dataProvider,

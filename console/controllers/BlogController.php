@@ -4,7 +4,7 @@ namespace console\controllers;
 use common\models\blog\WpPosts;
 use common\models\Mail;
 use common\models\User;
-use fedemotta\cronjob\models\CronJob; use common\models\Utility;
+use fedemotta\cronjob\models\CronJob;
 use yii\console\Controller;
 use yii\helpers\ArrayHelper;
 
@@ -13,7 +13,7 @@ class BlogController extends Controller
     
     /**
      * Send out weekly blog notice
-     * Cron job can be found at ~/crontab -e
+     * Cron job can be found at crontab -e
      * @param string $from
      * @param string $to
      * @return int exit code

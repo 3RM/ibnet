@@ -480,6 +480,132 @@ class AjaxController extends Controller
     }
 
     /**
+     * Close or open a category topic
+     * @param  integer $gid Group id
+     * @param  integer $tid Topic id
+     * @return array
+     */
+    public function actionCloseTopic($gid, $tid)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        if ($group = Group::findOne($gid)) {
+            if ($topic = $group->getTopic($tid)) {
+                $enabled = $topic->closed ? 'false' : 'true';
+                $group->closeTopic($tid, $enabled);
+
+                $html = 
+                    ($topic->pinned ? '<i class="fas fa-thumbtack topic-status"></i>' : NULL) .
+                    (!$topic->closed ? '<i class="fas fa-lock topic-status"></i>' : NULL) . 
+                    $topic->fancy_title . ' (' . ($topic->posts_count + 1) . ' post' . ($topic->posts_count > 1 ? 's' : NULL) . ')' .
+                    Html::a(!$topic->closed ? '<i class="fas fa-unlock"></i>' : '<i class="fas fa-lock"></i>', ['ajax/close-topic','gid' => $gid, 'tid' => $tid],
+                        [
+                            'id' => 'close-topic-' . $tid,
+                            'data-on-done' => 'topicStatusDone',
+                            'data-toggle' => 'tooltip',
+                            'data-placement' => 'top',
+                            'title' => !$topic->closed ? 'Open Topic' : 'Close Topic',
+                        ]) .
+                    Html::a('<i class="fas fa-thumbtack ' . ($topic->pinned ? 'fa-rotate-180' : NULL) . '"></i>', ['ajax/pin-topic', 'gid' => $gid, 'tid' => $tid],
+                        [
+                            'id' => 'pin-topic-' . $tid,
+                            'data-on-done' => 'topicStatusDone',
+                            'data-toggle' => 'tooltip',
+                            'data-placement' => 'top',
+                            'title' => $topic->pinned ? 'Unpin Topic' : 'Pin Topic',
+                        ]) .
+                    Html::a('<i class="far fa-trash-alt"></i>', ['ajax/remove-topic', 'gid' => $group->id, 'tid' => $tid],
+                        [
+                            'id' => 'remove-topic-' . $tid,
+                            'data-on-done' => 'removeTopicDone',
+                            'data-toggle' => 'tooltip',
+                            'data-placement' => 'top',
+                            'title' => 'Remove Topic',
+                        ]);
+
+                return [
+                    'tid' => $tid,
+                    'html' => $html,
+                    'success' => true
+                ];
+            }
+        }
+        return ['success' => false];
+    }
+
+    /**
+     * Pin or unpin a category topic
+     * @param  integer $gid Group id
+     * @param  integer $tid Topic id
+     * @return array
+     */
+    public function actionPinTopic($gid, $tid)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        if ($group = Group::findOne($gid)) {
+            if ($topic = $group->getTopic($tid)) {
+                $enabled = $topic->pinned ? 'false' : 'true';
+                $group->pinTopic($tid, $enabled);
+
+                $html = (!$topic->pinned ? '<i class="fas fa-thumbtack topic-status"></i>' : NULL) .
+                    ($topic->closed ? '<i class="fas fa-lock topic-status"></i>' : NULL) . 
+                    $topic->fancy_title . ' (' . ($topic->posts_count + 1) . ' post' . ($topic->posts_count > 1 ? 's' : NULL) . ')' .
+                    Html::a($topic->closed ? '<i class="fas fa-unlock"></i>' : '<i class="fas fa-lock"></i>', ['ajax/close-topic', 'gid' => $group->id, 'tid' => $topic->id],
+                        [
+                            'id' => 'close-topic-' . $topic->id,
+                            'data-on-done' => 'topicStatusDone',
+                            'data-toggle' => 'tooltip',
+                            'data-placement' => 'top',
+                            'title' => $topic->closed ? 'Open Topic' : 'Close Topic',
+                        ]) .
+                    Html::a('<i class="fas fa-thumbtack ' . (!$topic->pinned ? 'fa-rotate-180' : NULL) . '"></i>', ['ajax/pin-topic', 'gid' => $group->id, 'tid' => $topic->id],
+                        [
+                            'id' => 'pin-topic-' . $topic->id,
+                            'data-on-done' => 'topicStatusDone',
+                            'data-toggle' => 'tooltip',
+                            'data-placement' => 'top',
+                            'title' => !$topic->pinned ? 'Unpin Topic' : 'Pin Topic',
+                        ]) .
+                    Html::a('<i class="far fa-trash-alt"></i>', ['ajax/remove-topic', 'gid' => $group->id, 'tid' => $topic->id],
+                        [
+                            'id' => 'remove-topic-' . $topic->id,
+                            'data-on-done' => 'removeTopicDone',
+                            'data-toggle' => 'tooltip',
+                            'data-placement' => 'top',
+                            'title' => 'Remove Topic',
+                        ]);
+
+                return [
+                    'tid' => $tid,
+                    'html' => $html,
+                    'pinned' => !$topic->pinned,
+                    'enabled' => $enabled,
+                    'success' => true
+                ];
+            }
+        }
+        return ['success' => false];
+    }
+
+    /**
+     * Remove a category topic
+     * @param  integer $gid Group id
+     * @param  integer $tid Topic id
+     * @return array
+     */
+    public function actionRemoveTopic($gid, $tid)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        if ($group = Group::findOne($gid)) {
+            $group->removeTopic($tid);
+            return ['tid' => $tid, 'success' => true];
+        }
+        return ['success' => false];
+    }
+
+    /**
      * Delete tag on group prayer request tag form
      * @param  $tid tag id
      * @return array
@@ -515,7 +641,7 @@ class AjaxController extends Controller
         Yii::$app->response->format = Response::FORMAT_JSON;
 
         if ($prayer = Prayer::findOne($id)) {
-            $prayer->updateAttributes(['answered' => NULL, 'answer_date' => NULL]);
+            $prayer->updateAttributes(['answered' => 0, 'answer_date' => NULL]);
             return ['requestId' => $prayer->id, 'success' => true];
         }
         return ['success' => false, 'requestId' => $id];

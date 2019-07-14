@@ -215,13 +215,13 @@ div.box-body.center {
   top: 0;
   right: 0;
   position: absolute;
+  font-size: 0.8em;
 }
 .group-links p {
   margin: 5px;
-  font-size: 0.8em;
 }
 .group-links button.link-btn {
-  font-size: 0.8em;
+  text-align: left;
 }
 .group-links .label-danger {
   border-radius: 50%;
@@ -411,7 +411,6 @@ a.invite-join {
  * Manage Categories
 --------------------------------- */
 .category-item {
-  width: 60%;
   margin: 20px 0;
   border: 1px solid gray;
   padding: 15px;
@@ -455,6 +454,31 @@ button.red,
 button.red:hover {
   background-color: #dc2727;
 }
+.pointer {
+  cursor: pointer;
+}
+p[id^="category-topic"] i {
+  width: 8px;
+}
+div[id^="topics-container-"] {
+  margin-left: 40px;
+  display: none;
+}
+div[id^="list-item-"] {
+  background-color: #f6f6f6;
+  border-left: 5px solid gray;
+  border-radius: 5px;
+  padding: 10px;
+  margin: 10px 0;
+}
+div[id^="list-item-"] a {
+  margin-left: 10px;
+}
+.topic-status {
+  color: #aaa;
+  font-size: 0.9em;
+  margin-right: 5px;
+}
 
 
 /*
@@ -495,6 +519,29 @@ button.red:hover {
 .forum {
   background: url(../images/group/forum.jpg) no-repeat;
   height: 125px;
+}
+.forum-tips {
+  padding: 10px;
+}
+button#forum-tips-id {
+  float: right;
+  font-size: 2em;
+  color: #588eb0;
+  top: 20px;
+  position: relative;
+}
+.forum-tips .tip {
+  display: flex;
+  margin-bottom: 10px;
+}
+.forum-tips i {
+  margin-right: 10px;
+  color: blue;
+}
+.forum-tips .hint {
+  background-color: #f0f0f0;
+  margin-top: 30px;
+  padding: 10px;
 }
 .update-feature {
   background: url(../images/group/update.jpg) no-repeat;
@@ -929,7 +976,7 @@ p.name a:hover {
 }
 .update-item {
   width: 80%;     /* 640px/800px */
-  margin-bottom: 20px;
+  margin-bottom: 30px;
   padding: 20px 2.777778% 0;  /* 20px/720px */
   display: inline-block;  /* prevents margin collapsing */
   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
@@ -1056,14 +1103,10 @@ img.avatar {
     height: 200px;
     font-size: 0.9em;
   }
-  .group-info p {
+  .group-info {
     font-size: 0.9em;
-  }
-  .group-links p {
-    font-size: 0.9em;
-  }
-  .group-links .link-btn {
-    font-size: 0.9em;
+    min-height: unset;
+    text-align: center;
   }
 }
 
@@ -1086,10 +1129,7 @@ img.avatar {
   .group-info p {
     font-size: 0.7em;
   }
-  .group-links p {
-    font-size: 0.7em;
-  }
-  .group-links .link-btn {
+  .group-links {
     font-size: 0.7em;
   }
 

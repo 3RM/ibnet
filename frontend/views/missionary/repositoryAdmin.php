@@ -6,17 +6,17 @@ use kartik\select2\Select2;
 use yii\bootstrap\Html;
 use yii\bootstrap\Modal;
 use yii\helpers\Url;
-use yii\widgets\ActiveForm; //use common\models\Utility; Utility::pp($updates[0]->alert_status == 0);
+use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $profilemodel app\models\Profile */
 AjaxAsset::register($this);
 \Eddmash\Clipboard\ClipboardAsset::register($this);
-Url::Remember();
 ?>
+
 <?= $this->render('../site/_userAreaHeader', ['active' => 'update']) ?>
 <div class="container">
-    <?= $this->render('../site/_userAreaLeftNav', ['active' => 'updates', 'joinedGroups' => $joinedGroups]) ?>
+    <?= $this->render('../site/_userAreaLeftNav', ['active' => 'updates', 'gid' => NULL, 'role' => $role, 'joinedGroups' => $joinedGroups]) ?>
 
     <div class="right-content">
         <div id="video-container" class="feature-video-container" <?= $displayNone ?>>

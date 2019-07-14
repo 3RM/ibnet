@@ -31,6 +31,7 @@ use yii\data\ArrayDataProvider;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Url;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -213,6 +214,49 @@ class SiteController extends Controller
         }
     }
 
+    /**
+     * Discourse SSO login
+     *
+     * @return mixed
+     */
+    public function actionDiscourseSso()
+    {
+        $request = Yii::$app->getRequest();
+        $sso = Yii::$app->discourseSso;
+        
+        $payload = $request->get('sso');
+        $sig = $request->get('sig');
+    
+        if(!($sso->validate($payload, $sig))){
+            throw new ForbiddenHttpException('Bad SSO request');
+        }
+        
+        $nonce = $sso->getNonce($payload);
+        
+        if (Yii::$app->getUser()->isGuest) {
+            Yii::$app->getSession()->set('sso', ['sso' => $payload, 'sig' => $sig]);
+            return $this->redirect(['site/login']);
+        } else {
+            $user = Yii::$app->getuser()->getIdentity();
+        }
+        
+        Yii::$app->getSession()->remove('sso');
+        
+        // Send the data
+        $userparams = [
+            "nonce" => $nonce,
+            "external_id" => (String)$user->id,
+            "email" => $user->email,
+            "username" => $user->username,
+            "name" => $user->fullName,
+            'avatar_url' => isset($user->usr_image) ? Url::to([$user->usr_image], 'http') : NULL,
+        ];
+        $q = $sso->buildLoginString($userparams);
+        
+        // Redirect back
+        $this->redirect(Yii::getAlias('@discourse') . '/session/sso_login?' . $q);
+    }
+
     public function actionTestVerification()
     {
 
@@ -238,7 +282,7 @@ class SiteController extends Controller
      */
     public function actionForumReturn()
     {
-        return Url::previous() != NULL ? $this->redirect(Url::previous()) : $this->goHome();
+        return $this->redirect(Url::previous());
     }
 
     /**
@@ -316,6 +360,7 @@ class SiteController extends Controller
      */
     public function actionAbout()
     {
+        Url::remember();
         return $this->render('about');
     }
 
@@ -434,6 +479,7 @@ class SiteController extends Controller
      */
     public function actionPrivacy()
     {
+        Url::remember();
         return $this->render('privacy');
     }
 
@@ -444,6 +490,7 @@ class SiteController extends Controller
      */
     public function actionTerms()
     {
+        Url::remember();
         return $this->render('terms');
     }
 
@@ -454,7 +501,8 @@ class SiteController extends Controller
      */
     public function actionBeliefs()
     {
-       return $this->render('beliefs');
+        Url::remember();
+        return $this->render('beliefs');
     }
 
     /**
@@ -532,6 +580,7 @@ class SiteController extends Controller
         $userA = Yii::$app->user->identity;
         $userA->scenario = 'account';
 
+        $role = array_keys(Yii::$app->authManager->getRolesByUser(Yii::$app->user->identity->id))[0];
         $joinedGroups = $userP->activeJoinedGroups;
 
         // Set default role
@@ -556,11 +605,13 @@ class SiteController extends Controller
         $userA->subscriptionFeatures = $sub->features;
         $userA->subscriptionBlog = $sub->blog;
 
+        Url::remember();
         return $this->render('settings', [
             'userP' => $userP,
             'userA' => $userA,
             'list' => $list,
             'home_church' => $home_church,
+            'role' => $role,
             'joinedGroups' => $joinedGroups,
         ]);
     }

@@ -21,6 +21,7 @@ use Yii;
 use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
@@ -63,6 +64,7 @@ class ProfileMgmtController extends ProfileController
         }
 
         $user = Yii::$app->user->identity;
+        $role = array_keys(Yii::$app->authManager->getRolesByUser(Yii::$app->user->identity->id))[0];
         $profiles = $user->profiles;
         foreach ($profiles as $profile) {
             if ($profile->category == Profile::CATEGORY_ORG) {
@@ -74,10 +76,12 @@ class ProfileMgmtController extends ProfileController
 
         $joinedGroups = $user->joinedGroups;
 
+        Url::remember();
         return $this->render('myProfiles', [
             'profiles' => $profiles, 
             'isMissionary' => $isMissionary, 
-            'joinedGroups' => $joinedGroups
+            'joinedGroups' => $joinedGroups,
+            'role' => $role,
         ]);
     }
 

@@ -11,7 +11,7 @@ class GroupMailController extends Controller
     
     /**
      * Process group alerts and retrieve and process group emails
-     * Cron job can be found at ~/crontab -e
+     * Cron job can be found at crontab -e
      * @param string $from
      * @param string $to
      * @return int exit code

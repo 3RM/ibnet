@@ -7,7 +7,7 @@
 
 namespace frontend\controllers;
 
-use common\models\profile\Association; use common\models\Utility;
+use common\models\profile\Association;
 use common\models\profile\Fellowship;
 use common\models\profile\Profile;
 use common\models\profile\Staff;

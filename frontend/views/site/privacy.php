@@ -6,8 +6,8 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 
 $this->title = 'Privacy Policy';
-Url::remember();
 ?>
+
 <div class="site-about">
     <h1><?= $this->title ?></h1>
     

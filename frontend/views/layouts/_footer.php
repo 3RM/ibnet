@@ -14,6 +14,7 @@ use yii\helpers\Html;
             <?= Html::a('About', ['/site/about']) ?>
             <?= HTML::a('Contact', ['/site/contact']); ?>
             <?= Yii::$app->user->isGuest ? HTML::a('Register', ['/site/register']) : NULL; ?>
+            <?= Yii::$app->user->isGuest ? NULL : HTML::a('Forum', Yii::$app->params['url.forum']); ?>
         </div>
         <div>
             Designed by <a href="http://ifbdesign.com" target="_blank">IFBDesign</a> & <a href="https://ibnet.org" target="_blank">IBNet</a>

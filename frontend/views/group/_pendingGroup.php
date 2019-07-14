@@ -1,7 +1,7 @@
 <?php
 
 use common\models\group\Group;
-use frontend\assets\AjaxAsset; use common\models\Utility;
+use frontend\assets\AjaxAsset;
 use yii\bootstrap\Html;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;

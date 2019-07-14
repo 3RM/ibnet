@@ -768,6 +768,9 @@ img.mc-icon {
 /* iPads (portrait) ----------- */
 
 @media only screen and (max-width: 768px) {
+    .account-header-container {
+      margin-bottom: -120px;
+    }
     .acc-settings-header {
       background: url(../images/user-area/settings-header-mb.jpg);
     }

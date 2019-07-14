@@ -15,11 +15,10 @@ use yii\widgets\ListView;
 /* @var $profilemodel app\models\Profile */
 
 GroupAsset::register($this);
-Url::Remember();
 $this->title = 'Missionary Updates';
 ?>
 
-<?= $this->render('../../site/_userAreaLeftNav', ['active' => 'update', 'joinedGroups' => $joinedGroups]) ?>
+<?= $this->render('../../site/_userAreaLeftNav', ['active' => 'update', 'gid' => $group->id, 'role' => $role, 'joinedGroups' => $joinedGroups]) ?>
 
 <div class="right-content">
 

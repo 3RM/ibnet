@@ -1,23 +1,24 @@
 <?php
 
 // use frontend\assets\AdminLtePluginAsset;
+use common\widgets\Alert;
 use kartik\date\DatePicker;
 use kartik\daterange\DateRangePicker;
 use kartik\form\ActiveForm;
 use yii\bootstrap\Html;
 use yii\bootstrap\Modal;
 use yii\helpers\Url;
-use yii\web\JsExpression; use common\models\Utility;
+use yii\web\JsExpression;
 
 /* @var $this yii\web\View */   
 
-Url::Remember();
 $this->title = 'Calendar';
 ?>
 
-<?= $this->render('../../site/_userAreaLeftNav', ['active' => 'calendar', 'joinedGroups' => $joinedGroups]) ?>
+<?= $this->render('../../site/_userAreaLeftNav', ['active' => 'calendar', 'gid' => $group->id, 'role' => $role, 'joinedGroups' => $joinedGroups]) ?>
 
 <div class="right-content">
+    <?= Alert::widget() ?>
 
     <!-- boxes -->
     <div class="col-md-3 boxes">

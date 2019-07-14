@@ -8,7 +8,6 @@ use yii\bootstrap\Modal;
 use yii\helpers\Url;
 
 $this->title = 'User Accounts';
-Url::remember();
 ?>
 
 <div class="site-index">

@@ -22,7 +22,6 @@ use yii\widgets\ListView;
 
 GroupAsset::register($this);
 AjaxAsset::register($this);
-Url::Remember();
 
 if (isset($_SESSION['html'])) {
     $pdf = new Dompdf();
@@ -42,7 +41,7 @@ if (isset($_SESSION['html'])) {
 $this->title = 'Prayer List';
 ?>
 
-<?= $this->render('../../site/_userAreaLeftNav', ['active' => 'prayer', 'joinedGroups' => $joinedGroups]) ?>
+<?= $this->render('../../site/_userAreaLeftNav', ['active' => 'prayer', 'gid' => $group->id, 'role' => $role, 'joinedGroups' => $joinedGroups]) ?>
 
 <div class="right-content">
 

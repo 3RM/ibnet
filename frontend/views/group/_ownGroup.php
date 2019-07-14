@@ -48,13 +48,13 @@ AjaxAsset::register($this);
                     });", \yii\web\View::POS_READY); ?>
             <?php } ?>
             <?php ActiveForm::begin(); ?>
-            <?= $group->feature_forum ? '<p>' . Html::a('<i class="fa fa-comments"></i>' . ' Manage Forum ', ['group/manage-forum', 'id' => $group->id]) . '</p>' : NULL; ?>
+            <?= $group->feature_forum ? '<p>' . Html::a('<i class="fa fa-comments"></i>' . ' Manage Forum ', ['group/manage-forum', 'id' => $group->id]) . '</p>' : NULL ?>
             <p><?= Html::a(Html::icon('check') . ' Manage Members ', ['group/manage-members', 'id' => $group->id]); ?>
                 <?= $pending ? '<span class="badge" style="background-color:#da0017">' . $pending . '</span></p>' : NULL ?>
                 <?= $newMembers ? '<span class="badge" style="background-color:#05aa36">' . $newMembers . '</span></p>' : NULL ?>
             </p>
-            <?= Html::button(Html::icon('user') . ' Invite New Members', ['id' => 'invite-' . $group->id, 'class' => 'link-btn']); ?>
-            <p><?= group::STATUS_ACTIVE == $group->status ?
+            <?= $group->status == Group::STATUS_ACTIVE ? Html::button(Html::icon('user') . ' Invite New Members', ['id' => 'invite-' . $group->id, 'class' => 'link-btn']) : NULL ?>
+            <p><?= $group->status == Group::STATUS_ACTIVE ?
                  Html::a(Html::icon('edit') . ' Group Settings', ['group/group-information', 'id' => $group->id]) :
                  Html::a(Html::icon('edit') . ' Activate', ['group/group-information', 'id' => $group->id]) ?>
              </p>

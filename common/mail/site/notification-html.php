@@ -27,7 +27,7 @@ use yii\helpers\Html;
 		<td colspan="2">
 			<?= $notification->title ? 
 				'<p style="margin:0 20px 10px 20px;">' . $notification->message . '</p>' :
-				'<p style="margin:20px 20px 10px 20px;">' . $notification->message . '</p>';
+				'<p style="margin:20px 20px 10px 20px;">' . $notification->message . '</p>'; ?>
 			<?= $notification->extMessage ? '<p style="margin:0 20px 10px 20px;">' . $notification->extMessage . '</p>' : NULL ?>
 			<?= $notification->link ? '<p style="margin:0 20px 10px 20px;">' . $notification->link . '</p>' : NULL ?>
 		</td>

@@ -8,7 +8,7 @@ use common\models\group\Prayer;
 use common\models\profile\Profile;
 use common\models\User;
 use Yii;
-use yii\behaviors\TimestampBehavior; use common\models\Utility;
+use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\helpers\Html;
 use yii\helpers\Url;
@@ -99,7 +99,7 @@ class GroupMember extends \yii\db\ActiveRecord
         if ($invite) {
             $member->status = GroupMember::STATUS_ACTIVE;
         } else {
-            $member->status = $group->private == 1 ? GroupMember::STATUS_PENDING : GroupMember::STATUS_ACTIVE;
+            $member->status = $group->private == 1 ? self::STATUS_PENDING : self::STATUS_ACTIVE;
         }
         $member->save();
 
@@ -110,7 +110,7 @@ class GroupMember extends \yii\db\ActiveRecord
         $mail->headerText = 'Group Membership';
         $mail->to = $group->owner->email;
         $mail->subject = 'Notice from ' . $group->name;
-        $link = Html::a('Click here ', Yii::$app->params['url.loginFirst'] . urlencode(Url::to(['group/group-members', 'id' => $group->id])));
+        $link = Html::a('Click here ', Yii::$app->params['url.loginFirst'] . urlencode(Url::to(['group/manage-members', 'id' => $group->id])));
         $verb = $group->private == 1 ? ' requested to join ' : ' joined ';
         $mail->message = $user->fullName . ' has just ' . $verb . ' your group ' . $group->name . '. ' . $link . ' to manage your group members.';
         $mail->sendNotification(); 
@@ -131,7 +131,7 @@ class GroupMember extends \yii\db\ActiveRecord
     {
         $group = Group::findOne($gid);
         $member = $group->groupMember;
-        $member->delete();
+        $member->updateAttributes(['status' => self::STATUS_LEFT, 'inactivate_date' => time()]);
 
         // Notify group owner
         $owner = $group->owner;

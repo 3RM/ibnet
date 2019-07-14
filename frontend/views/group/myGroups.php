@@ -9,11 +9,11 @@ use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
 GroupAsset::register($this);
-Url::Remember();
 ?>
+
 <?= $this->render('../site/_userAreaHeader', ['active' => 'group']) ?>
 <div class="container">
-    <?= $this->render('../site/_userAreaLeftNav', ['active' => 'groups', 'joinedGroups' => $joinedGroups]) ?>
+    <?= $this->render('../site/_userAreaLeftNav', ['active' => 'groups', 'gid' => NULL, 'role' => $role, 'joinedGroups' => $joinedGroups]) ?>
 
     <div class="right-content">
         <h2>Groups</h2>

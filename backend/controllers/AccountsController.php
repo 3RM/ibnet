@@ -60,6 +60,7 @@ class AccountsController extends Controller
         $searchModel = new UserSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->get());
 
+        Url::remember();
         return $this->render('users', [
             'searchModel' => $searchModel, 
             'dataProvider' => $dataProvider,
@@ -98,6 +99,7 @@ class AccountsController extends Controller
     public function actionViewEdit($id)
     {
         $user = User::findOne($id);
+        $user->scenario = 'backend';
         return $this->renderAjax('_userEdit', ['user' => $user]);
     }
 
@@ -144,7 +146,7 @@ class AccountsController extends Controller
      */
     public function actionUpdate()
     {
-        $user = NULL; 
+        $user = NULL;
 
         // Ban user
         if (isset($_POST['ban']) && $user = User::findOne($_POST['ban'])) {

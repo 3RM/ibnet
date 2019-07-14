@@ -14,16 +14,16 @@ use yii\widgets\ActiveField;
     <p class="answer-date">Answered <?= Yii::$app->formatter->asDate($model->answer_date) ?>
         <?php if ($model->group_member_id == $nmid) {
             echo '&nbsp;';
-            echo Html::a('<span class="glyphicons glyphicons-unshare"></span>', ['ajax/return-request', 'id' => $model->id], [
+            echo Html::a('<span class="glyphicons glyphicons-unshare"></span>', ['ajax/return-prayer', 'id' => $model->id], [
                     'id' => 'request-return-link-' . $model->id,
-                    'data-on-done' => 'requestDone',
+                    'data-on-done' => 'prayerDone',
                     'data-toggle' => 'tooltip',
                     'data-placement' => 'top',
                     'title' => 'Send back to prayer list',
                 ]);
-            echo Html::a(Html::icon('remove'), ['ajax/delete-request', 'id' => $model->id], [
+            echo Html::a(Html::icon('remove'), ['ajax/delete-prayer', 'id' => $model->id], [
                     'id' => 'request-rm-link-' . $model->id,
-                    'data-on-done' => 'requestDone',
+                    'data-on-done' => 'prayerDone',
                     'data-toggle' => 'tooltip',
                     'data-placement' => 'top',
                     'title' => 'Remove',

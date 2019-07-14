@@ -11,11 +11,10 @@ use yii\widgets\ActiveField;
 /* @var $profilemodel app\models\Profile */
 
 GroupAsset::register($this);
-Url::Remember();
 $this->title = 'Notification';
 ?>
 
-<?= $this->render('../../site/_userAreaLeftNav', ['active' => 'notification', 'joinedGroups' => $joinedGroups]) ?>
+<?= $this->render('../../site/_userAreaLeftNav', ['active' => 'notification', 'gid' => $group->id, 'role' => $role, 'joinedGroups' => $joinedGroups]) ?>
 
 <div class="right-content">
     
@@ -24,8 +23,9 @@ $this->title = 'Notification';
         
         <p>
             <i class="fas fa-info-circle"></i> Use this form to send an email notification to every group member.  You can also send an email to 
-            <span style="color:blue;"><?= $group->notice_email ? $group->prayer_email : '<i>Group Email Pending</i>' ?></span>. Any replies will also be forwarded to the entire group. This feature 
-            is not intended to be a mailing list.  Sustained discussions are better handled in the group forum.
+            <span style="color:blue;"><?= $group->notice_email ? $group->notice_email : '<i>Group Email Pending</i>' ?></span>. Any replies will 
+            also be forwarded to the entire group. This feature is not intended to be a mailing list.  Sustained discussions are better handled 
+            in the group forum.
         </p>
         
         <p class="top-margin-40"></p>

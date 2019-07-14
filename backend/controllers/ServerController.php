@@ -127,6 +127,11 @@ class ServerController extends Controller
             Yii::$app->session->setFlash('success', 
                 'Yii frontend cache flushed successfully. Size before: ' . $sizeBefore . 'B. Size after: ' . $sizeAfter . 'B.');
         
+        } elseif (isset($_POST['authClear'])) {
+            $manager = Yii::$app->authManager;
+            $manager->invalidateCache();
+
+            Yii::$app->session->setFlash('success', 'Yii auth manager cache cleared successfully.');
         }
 
         return $this->render('cache');

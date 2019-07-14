@@ -259,7 +259,10 @@ class MissionaryUpdate extends \yii\db\ActiveRecord
             $url = Yii::$app->params['url.vimeoOembed'] . $this->vimeo_url;
         } elseif ($this->youtube_url) {
             $url = Yii::$app->params['url.youtubeOembed'] . $this->youtube_url;
+        } else {
+            return true;
         }
+        
         $client = new Client();
         $response = $client->request('GET', $url, ['http_errors' => false]);
         if ($response->getStatusCode() !== 200) {
@@ -300,6 +303,15 @@ class MissionaryUpdate extends \yii\db\ActiveRecord
     public function getGroupMember()
     {
         return $this->hasOne(GroupMember::className(), ['missionary_id' => 'missionary_id']);
+    }
+
+    /**
+     * Group member of current user if sharing missionary updates
+     * @return \yii\db\ActiveQuery
+     */
+    public function getGroupMemberSharingUpdates()
+    {
+        return $this->hasOne(GroupMember::className(), ['missionary_id' => 'missionary_id'])->where(['show_updates' => 1]);
     }
 
     /**

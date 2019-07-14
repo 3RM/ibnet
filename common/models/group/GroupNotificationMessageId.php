@@ -11,7 +11,7 @@ use Yii;
  * @property int $notification_id
  * @property string $message_id
  */
-class GroupNotificationMessageId extends \yii\db\ActiveRecord
+class GroupNotificationMessageID extends \yii\db\ActiveRecord
 {
     /**
      * {@inheritdoc}

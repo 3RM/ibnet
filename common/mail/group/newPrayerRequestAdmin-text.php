@@ -15,7 +15,7 @@ or to mark it as answered.  Add your update or answer description in your reply.
 
 Follow the link below to visit the prayer list:
 
-<?= Yii::$app->params['url.loginFirst'] . urlencode(Url::to(['group/prayer', 'id' => $grouop->prayer->id])) ?>
+<?= Yii::$app->params['url.loginFirst'] . urlencode(Url::to(['group/prayer', 'id' => $prayer->group->id])) ?>
 
 For assistance, contact <?= Yii::$app->params['email.admin'] ?> or visit the forum (<?= Yii::$app->params['url.forum'] ?>) 
 to ask a question, leave feedback, or make new feature requests.

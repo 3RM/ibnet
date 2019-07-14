@@ -29,7 +29,7 @@ use yii\helpers\Url;
 				in your reply (required).
 			</p>
 			<p style="margin:0 20px 10px 20px;">
-				Visit the <?= Html::a('prayer list here', Yii::$app->params['url.loginFirst'] . urlencode(Url::to(['group/prayer', 'id' => $group->prayer->id]))) ?>.
+				Visit the <?= Html::a('prayer list here', Yii::$app->params['url.loginFirst'] . urlencode(Url::to(['group/prayer', 'id' => $prayer->group->id]))) ?>.
 			</p>
 		</td>
 	</tr>

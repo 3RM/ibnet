@@ -13,7 +13,7 @@ use frontend\components\CommentSend;
 use rmrevin\yii\module\Comments;
 use Yii;
 use yii\behaviors\BlameableBehavior;
-use yii\behaviors\TimestampBehavior; use common\models\Utility;
+use yii\behaviors\TimestampBehavior;
 
 /**
  * Class Comment

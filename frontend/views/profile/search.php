@@ -5,7 +5,6 @@ use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-Url::remember();
 $this->title = 'IBNet Search';
 ?>
 

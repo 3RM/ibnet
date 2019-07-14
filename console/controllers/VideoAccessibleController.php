@@ -11,7 +11,7 @@ class VideoAccessibleController extends Controller
     
     /**
      * Send request to video APIs to check if videos are accessible and mark them in db
-     * Cron job can be found at ~/crontab -e
+     * Cron job can be found at crontab -e
      * @param string $from
      * @param string $to
      * @return int exit code

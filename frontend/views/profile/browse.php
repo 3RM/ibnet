@@ -10,7 +10,6 @@ use yii\jui\SliderInput;
 use yii\web\JsExpression;
 
 /* @var $this yii\web\View */
-Url::remember();
 $stateSelected = NULL;
 $citySelected = NULL;
 $this->title = 'Browse';
@@ -112,6 +111,7 @@ $this->title = 'Browse';
                                         # =============================== City ===============================
                     echo '<div class="left-block">';
                                                 echo '<h4>City</h4>';
+                                                $k = 0;
                                                 foreach ($statePivot->getPivot() as $cityPivot) {
                                                     $k++;
                                                     if ($k > 3 && $more['city'] == 1) {continue;}

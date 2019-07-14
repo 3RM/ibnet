@@ -14,7 +14,7 @@ $this->title = 'Clear Yii Cache';
 	<?php $form = ActiveForm::begin(); ?>
         <div class="row top-margin">
             <div class="col-md-8">
-                <?= Html::submitButton('Flush /backend Cache', [
+                <?= Html::submitButton('Clear /backend Cache', [
                     'method' => 'POST',
                     'class' => 'btn btn-main',
                     'name' => 'backendClear'
@@ -23,10 +23,19 @@ $this->title = 'Clear Yii Cache';
         </div>
         <div class="row top-margin">
             <div class="col-md-8">
-            	<?= Html::submitButton('Flush /frontend Cache', [
+            	<?= Html::submitButton('Clear /frontend Cache', [
                     'method' => 'POST',
                     'class' => 'btn btn-main',
                     'name' => 'frontendClear'
+                ]) ?>
+            </div>
+        </div>
+        <div class="row top-margin">
+            <div class="col-md-8">
+                <?= Html::submitButton('Clear Auth Manager Cache', [
+                    'method' => 'POST',
+                    'class' => 'btn btn-main',
+                    'name' => 'authClear'
                 ]) ?>
             </div>
         </div>

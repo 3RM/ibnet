@@ -44,11 +44,13 @@ use yii\widgets\ActiveForm;
                     Html::a(Html::img('@img.site/user.png'), '#', ['id' => 'navLogin', 'class' => 'dropdown-toggle navbar-user', 'data-toggle' => 'dropdown'])) .
                '<div id="dropdown-menu-user" class="dropdown-menu">
                     <h4>' . Yii::$app->user->identity->fullName . '</h4>' .
-                    Html::a('My Account', '/site/settings', ['class' => 'btn btn-primary']) .
-                    Html::a('My Profiles', '/profile-mgmt/my-profiles', ['class' => 'btn btn-primary']) .'
+                    Html::a('Account', '/site/settings', ['class' => 'btn btn-primary']) . '<br>' .
+                    Html::a('Profiles', '/profile-mgmt/my-profiles', ['class' => 'btn btn-primary']) . '<br>' .
+                    (Yii::$app->user->identity->isMissionary ? Html::a('Updates', '/missionary/update-repository', ['class' => 'btn btn-primary']) . '<br>' : NULL) . 
+                    (Yii::$app->user->identity->isSafeUser ? Html::a('Groups', '/group/my-groups', ['class' => 'btn btn-primary']) . '<br>' : NULL) . '
                     <hr> '.
                     Html::beginForm('/site/logout', 'post') .
-                        Html::submitButton('Sign Out', ['class' => 'btn btn-primary btn-small']) .
+                        Html::submitButton('Sign Out', ['class' => 'btn btn-primary']) .
                     Html::endForm() .'
                 </div>
             </li>';

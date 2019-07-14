@@ -14,7 +14,7 @@ use yii\widgets\ActiveForm;
 /* @var $model app\models\Profile */
 /* @var $form yii\widgets\ActiveForm */
 
-$this->title = 'Name and Description'; //Utility::pp($profile->select);
+$this->title = 'Name and Description';
 ?>
 
 <?= $this->render('_profileFormHeader', ['profile' => $profile, 'pp' => $pp]) ?>

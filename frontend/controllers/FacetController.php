@@ -8,7 +8,7 @@
 namespace frontend\controllers;
 
 use common\models\profile\Profile;
-use common\models\profile\ProfileBrowse; use common\models\Utility;
+use common\models\profile\ProfileBrowse;
 use common\models\profile\ProfileGuestBrowse;
 use frontend\models\GeoCoder;
 use Yii;

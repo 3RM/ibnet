@@ -96,6 +96,8 @@ class ProfileController extends Controller
         } else {                                                                                   
             $searchModel->term = $term;
             $dataProvider = $searchModel->query($term);
+
+            Url::remember();
             return $this->render('search', [
                 'searchModel' => $searchModel, 
                 'dataProvider' => $dataProvider
@@ -188,6 +190,7 @@ class ProfileController extends Controller
             $markers[] = NULL;
             $browseModel->distance = 60;
 
+            Url::remember();
             return $this->render('browse', [
                 'fqs' => $fqs,
                 'browseModel' => $browseModel,
@@ -600,7 +603,7 @@ class ProfileController extends Controller
                 }
                 
                 // $churchMembers Church member
-                if ($churchMembers = $profile->churchMembers) { //Utility::pp($churchMembers);
+                if ($churchMembers = $profile->churchMembers) {
                     $churchMembers = $profile->filterUsers($churchMembers, $uids);
                     $uids = $profile->filterUserIds($churchMembers, $uids);
                 }

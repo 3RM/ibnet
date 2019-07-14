@@ -9,12 +9,11 @@ use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $dataProvider yii\data\ActiveDataProvider */
-Url::Remember();
 ?>
 
 <?= $this->render('../site/_userAreaHeader', ['active' => 'profiles']) ?>
 <div class="container">
-    <?= $this->render('../site/_userAreaLeftNav', ['active' => 'profiles', 'joinedGroups' => $joinedGroups]) ?>
+    <?= $this->render('../site/_userAreaLeftNav', ['active' => 'profiles', 'gid' => NULL, 'role' => $role, 'joinedGroups' => $joinedGroups]) ?>
 
     <div class="right-content">
         <h2>My Profiles</h2>

@@ -25,10 +25,6 @@ return [
     'apiKey.google-client' => 'AIzaSyBtE_w8tdgpSwEse8qTsEZoR-Vw776xg6I',
     'apiKey.google-server' => 'AIzaSyDylFZ5rIu9zpubJ5TKV2WsmkEybS4t3HA',
     'apiKey.google-no-restrictions' => 'AIzaSyDvsfbC0RbT8TLJFYFxBiCYzWgUd51xDg8',
-    'apiKey.discourse' => '17038c2fc01d59596673221ab17ec6a728ff6a0fb01e9e0b7e73082873f7847f',
-    'apiKey.discourse-secret' => 'Bu!^#uI$gy2Q&n16Xo338arO',
-    'apiKey.discourse-username' => 'ibnets',
-    'apiKey.ipstack' => 'b0680d3fde00ea007164f24a19ca2608',
 
     // URLs
     'url.vimeoOembed' => 'https://vimeo.com/api/oembed.json?url=',

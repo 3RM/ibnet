@@ -15,7 +15,7 @@ $this->title = 'Complete Registration';
 	<div class="container registration-complete">
 	    <h2>Almost There! We sent a registration link to your email. <br><span class="small" style="color:white; font-size:.6em;">Look for an email from "<?= Yii::$app->params['email.admin'] ?>" with the subject line "<?= Yii::$app->params['email.systemSubject'] ?>".  <br>Be sure to check your spam folder.</span></h2>
 
-	    <?= HTML::a('Got it!', 'index', ['class' => 'btn-link']) ?>
+	    <?= HTML::a('Got it!', 'site/login', ['class' => 'btn-link']) ?>
 	</div>
 
 </div>

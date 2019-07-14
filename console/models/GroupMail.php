@@ -6,7 +6,7 @@ use common\models\Subscription;
 use common\models\group\Group;
 use common\models\group\GroupMember;
 use common\models\group\GroupNotification;
-use common\models\group\GroupNotificationMessageId; use common\models\Utility;
+use common\models\group\GroupNotificationMessageId;
 use common\models\group\Prayer;
 use common\models\group\GroupAlertQueue;
 use common\models\group\PrayerTag;
@@ -146,7 +146,7 @@ class GroupMail extends Model
                 // Send alerts
                 foreach ($members as $member) {
                     // Don't send alerts to requestor
-                    if ($prayer->user_id == $member->user_id) {
+                    if ($prayer->group_member_id == $member->id) {
                         continue;
                     }
                     $prayer->toEmail = $member->user->email;

@@ -4,7 +4,7 @@ namespace common\models\group;
 
 use common\models\Subscription;
 use common\models\User;
-use common\models\group\GroupNotificationMessageID; use common\models\Utility;
+use common\models\group\GroupNotificationMessageID;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
@@ -108,7 +108,7 @@ class GroupNotification extends \yii\db\ActiveRecord
             ->setSubject($subject);
 
         // Save message id for matching up reply emails
-        $messageId = new GroupNotificationMessageID();
+        $messageId = New GroupNotificationMessageID();
         $messageId->attributes = ['message_id' => $mailer->getSwiftMessage()->getId(), 'notification_id' => $this->id];
         $messageId->save();
 

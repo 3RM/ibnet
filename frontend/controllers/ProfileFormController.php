@@ -660,7 +660,7 @@ class ProfileFormController extends ProfileController
                 $preferred[] = Country::find()
                     ->select('iso')
                     ->where(['printable_name' => $profile->org_country])
-                    ->scalar(); //Utility::pp($preferred);
+                    ->scalar();
             if (is_array($preferred) && empty($preferred[0])) {
                 $preferred[0] = 'US';
             }

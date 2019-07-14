@@ -79,7 +79,7 @@ function handleAjaxSpanLink(e) {
         callUrl = $link[0].parentNode.href,
         formId = $link.data('formId'),
         onDone = $link[0].parentNode.dataset.onDone;
-
+        
     ajaxRequest = $.ajax({
         type: "post",
         dataType: 'json',
@@ -178,5 +178,11 @@ var ajaxCallbacks = {
     },
     'alertCancelDone': function (response) {
         document.getElementById('alert-timer-container-'+response.uid).remove();
+    },
+    'topicStatusDone': function (response) {
+        $('#list-item-'+response.tid).html(response.html);
+    },
+    'removeTopicDone': function (response) {
+        document.getElementById('list-item-'+response.tid).remove();
     }
 }

@@ -13,7 +13,7 @@ class CalendarController extends Controller
     
     /**
      * Clean iCalendar tables and do a fresh import for all icalendar urls
-     * Cron job can be found at ~/crontab -e
+     * Cron job can be found at crontab -e
      * @param string $from
      * @param string $to
      * @return int exit code

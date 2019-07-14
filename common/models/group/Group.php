@@ -27,6 +27,7 @@ use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 use yii\helpers\Inflector;
 
 /**
@@ -91,6 +92,11 @@ class Group extends ActiveRecord
      * @var string $categoryName Discourse forum category name
      */
     public $categoryName;
+
+    /**
+     * @var string $oldCategoryName Discourse forum old category name
+     */
+    public $oldCategoryName;
 
     /**
      * @var string $categoryName Discourse forum category name
@@ -165,7 +171,8 @@ class Group extends ActiveRecord
             'group-member-action' => ['id', 'message'],
             'invite-member' => ['emails', 'message'],
             'contact-member' => ['id', 'user_id', 'name', 'subject', 'message'],
-            'category-edit' => ['cid', 'categoryName', '_categoryDescription', 'categoryBannerColor', 'categoryTitleColor'],
+            'category-new' => ['categoryName', '_categoryDescription', 'categoryBannerColor', 'categoryTitleColor'],
+            'category-edit' => ['cid', 'categoryName', 'oldCategoryName', '_categoryDescription', 'categoryBannerColor', 'categoryTitleColor'],
             'send-notice' => ['subject', 'message'],
         ];
     }
@@ -215,11 +222,18 @@ class Group extends ActiveRecord
             [['subject', 'message'], 'string', 'on' => 'contact-member'],
             [['id', 'user_id', 'name'], 'safe', 'on' => 'contact-member'],
 
+            [['categoryName', '_categoryDescription'], 'required', 'on' => 'category-new'],
+            [['_categoryDescription'], 'string', 'length' => [20, 200], 'on' => 'category-new'],
+            [['categoryName'], 'string', 'max' => 60, 'on' => 'category-new'],
+            [['categoryBannerColor', 'categoryTitleColor'], 'string', 'on' => 'category-new'],
+            [['categoryName'], 'validateUniqueCategoryName', 'on' => 'category-new'],
+
             [['categoryName', '_categoryDescription'], 'required', 'on' => 'category-edit'],
             [['_categoryDescription'], 'string', 'length' => [20, 200], 'on' => 'category-edit'],
-            [['_categoryName'], 'string', 'max' => 60, 'on' => 'category-edit'],
-            [['categoryName', 'categoryBannerColor', 'categoryTitleColor'], 'string', 'on' => 'category-edit'],
-            [['cid'], 'safe', 'on' => 'category-edit'],
+            [['categoryName'], 'string', 'max' => 60, 'on' => 'category-edit'],
+            [['categoryBannerColor', 'categoryTitleColor'], 'string', 'on' => 'category-edit'],
+            [['categoryName'], 'validateUniqueCategoryName', 'on' => 'category-edit'],
+            [['cid', 'oldCategoryName'], 'safe', 'on' => 'category-edit'],
 
             [['subject', 'message'], 'required', 'on' => 'send-notice'],
             [['subject', 'message'], 'string', 'on' => 'send-notice'],
@@ -251,7 +265,7 @@ class Group extends ActiveRecord
             'feature_update' => '', 
             'feature_donation' => '',
             'newUserEmail' => '',
-            'categoryName' => 'Category Name (one or two words)',
+            'categoryName' => 'Category Name',
             '_categoryDescription' => 'Description'
         ];
     }
@@ -285,22 +299,35 @@ class Group extends ActiveRecord
             $this->status = self::STATUS_NEW;
         }
 
-        if ($this->save()) {
+        // Notify admin
+        if ($this->isNewRecord) {
+            $mail = Subscription::getSubscriptionByEmail(Yii::$app->params['email.admin']);
+            $mail->to = Yii::$app->params['email.admin'];
+            $mail->subject = 'New Group';
+            $mail->title = 'New Group';
+            $mail->message = 'Group ' . $group->name . ' was just created by ' . $group->owner->fullName;
+            $mail->sendNotification();
+        }
 
-            // Create a new group member for group owner
+        $this->save();
+
+        // Create a new group member for group owner
+        if (!$this->owner) {
             $user = Yii::$app->user->identity;
             $groupMember = new GroupMember();
             $groupMember->group_id = $this->id;
             $groupMember->user_id = $user->id;
+            $groupMember->group_owner = 1;
+            $groupMember->status = GroupMember::STATUS_ACTIVE;
             if ($profile = $user->indActiveProfile) {
                 $groupMember->profile_id = $profile->id;
                 if ($profile->type == Profile::TYPE_MISSIONARY) {
                     $groupMember->missionary_id = $profile->missionary->id;
                 }
-            }
-            $groupMember->validate();
+            } 
             $groupMember->save();
         }
+
         return $this;
     }
 
@@ -335,17 +362,13 @@ class Group extends ActiveRecord
     public function createForumGroup()
     {
         $client = new Client(['base_uri' => Yii::getAlias('@discourse')]);
-        $headers = [
-            'Api-Key' => Yii::$app->params['apiKey.discourse'],
-            'Api-Username' => Yii::$app->params['apiKey.discourse-username'],
-        ];
 
         // Generate unique group name
         $this->discourse_group_name = Utility::generateUniqueRandomString($this, 'discourse_group_name', 20, true);
 
         // Create group
         $response = $client->post('/admin/groups', [
-            'headers' => $headers,
+            'headers' => $this->headers,
             'form_params' => [
                 'group[name]' => $this->discourse_group_name,
                 'group[full_name]' => $this->name,
@@ -353,14 +376,14 @@ class Group extends ActiveRecord
         ]); 
 
         // Save group id
-        $response = $client->get('/groups/' . $this->discourse_group_name . '.json', ['headers' => $headers]); 
+        $response = $client->get('/groups/' . $this->discourse_group_name . '.json', ['headers' => $this->headers]); 
         $json = $response->getBody()->getContents();
         $decoded = json_decode($json);
         $this->discourse_group_id = $decoded->group->id;
 
         // Set interaction levels 
         $response = $client->put('/groups/' . $this->discourse_group_id, [
-            'headers' => $headers,
+            'headers' => $this->headers,
             'form_params' => [
                 'group[visibility_level]' => 1,
                 'group[grant_trust_level]' => 1,
@@ -370,14 +393,14 @@ class Group extends ActiveRecord
         ]);
 
         // Check if default category exists; if not, add new
-        $response = $client->get('/categories.json', ['headers' => $headers]); 
+        $response = $client->get('/categories.json', ['headers' => $this->headers]); 
         $json = $response->getBody()->getContents();
         $decoded = json_decode($json);
         $categories = ArrayHelper::getColumn($decoded->category_list->categories, 'name');
         if (!in_array($this->name, $categories)) {
             // Add default group category
             $response = $client->post('/categories.json', [
-                'headers' => $headers,
+                'headers' => $this->headers,
                 'form_params' => [
                     'name' => $this->name,
                     'color' => 'green',
@@ -386,7 +409,7 @@ class Group extends ActiveRecord
             ]); 
 
             // Save default category id
-            $response = $client->get('/categories.json', ['headers' => $headers]); 
+            $response = $client->get('/categories.json', ['headers' => $this->headers]); 
             $json = $response->getBody()->getContents();
             $decoded = json_decode($json);
             $cids = ArrayHelper::getColumn($decoded->category_list->categories, 'id');
@@ -395,7 +418,7 @@ class Group extends ActiveRecord
 
         // Set default category permissions (assign to group)
         $response = $client->put('/categories/' . $this->discourse_category_id, [
-            'headers' => $headers,
+            'headers' => $this->headers,
             'form_params' => [
                 'name' => $this->name,
                 'color' => 'green',
@@ -407,7 +430,7 @@ class Group extends ActiveRecord
         // Create and/or add users to group
         $members = $this->getGroupMembers()->with('user')->all();
         // Get all discourse users
-        $response = $client->get('/admin/users/list/active.json', ['headers' => $headers]);
+        $response = $client->get('/admin/users/list/active.json', ['headers' => $this->headers]);
         $json = $response->getBody()->getContents();
         $decoded = json_decode($json); 
         $discourseUsers = ArrayHelper::getColumn($decoded, 'username');
@@ -422,7 +445,7 @@ class Group extends ActiveRecord
         if ($current) {
             $current = implode(',', $current);
             $response = $client->put('/groups/' . $this->discourse_group_id . '/members.json', [
-                'headers' => $headers,
+                'headers' => $this->headers,
                 'form_params' => ['usernames' => $current]
             ]);
         }
@@ -438,7 +461,7 @@ class Group extends ActiveRecord
                 $ssoPayload = base64_encode(http_build_query($ssoParams));
                 $sig = hash_hmac('sha256', $ssoPayload, Yii::$app->params['apiKey.discourse-secret']);
                 $response = $client->post('/admin/users/sync_sso', [
-                    'headers' => $headers,
+                    'headers' => $this->headers,
                     'form_params' => [
                         'sso' => $ssoPayload,
                         'sig' => $sig,
@@ -459,18 +482,14 @@ class Group extends ActiveRecord
     public function removeForumGroup()
     {   
         $client = new Client(['base_uri' => Yii::getAlias('@discourse')]);
+    
         // Check if group exists; if so, remove it
-        $response = $client->get('/groups.json', [
-            'headers' => [
-                'Api-Key' => Yii::$app->params['apiKey.discourse'],
-                'Api-Username' => Yii::$app->params['apiKey.discourse-username'],
-            ]
-        ]);
+        $response = $client->get('/groups.json', ['headers' => $this->headers]);
         $json = $response->getBody()->getContents();
         $decoded = json_decode($json);
         $ids = ArrayHelper::getColumn($decoded->groups, 'id');
         if (in_array($this->discourse_group_id, $ids)) {
-            $response = $client->delete('/admin/groups/' . $this->discourse_group_id . '.json', ['headers' => $headers]);
+            $response = $client->delete('/admin/groups/' . $this->discourse_group_id . '.json', ['headers' => $this->headers]);
         }
     }
 
@@ -481,12 +500,7 @@ class Group extends ActiveRecord
     public function getParentCategory()
     {   
         $client = new Client(['base_uri' => Yii::getAlias('@discourse')]);
-        $response = $client->get('/categories.json', [
-            'headers' => [
-                'Api-Key' => Yii::$app->params['apiKey.discourse'],
-                'Api-Username' => Yii::$app->params['apiKey.discourse-username'],
-            ]
-        ]);
+        $response = $client->get('/categories.json', ['headers' => $this->headers]);
         $json = $response->getBody()->getContents();
         $decoded = json_decode($json);
         foreach ($decoded->category_list->categories as $cat) {
@@ -498,18 +512,13 @@ class Group extends ActiveRecord
     }
 
     /**
-     * Get all group categories in the Discourse forum
+     * Get all group child categories in the Discourse forum
      * @return boolean;
      */
     public function getChildCategories()
     {   
         $client = new Client(['base_uri' => Yii::getAlias('@discourse')]);
-        $response = $client->get('/site.json', [
-            'headers' => [
-                'Api-Key' => Yii::$app->params['apiKey.discourse'],
-                'Api-Username' => Yii::$app->params['apiKey.discourse-username'],
-            ]
-        ]);
+        $response = $client->get('/site.json', ['headers' => $this->headers]);
         $json = $response->getBody()->getContents();
         $decoded = json_decode($json);
         $childCategories = [];
@@ -524,7 +533,8 @@ class Group extends ActiveRecord
 
     /**
      * Get a single group child category in the Discourse forum
-     * @return boolean;
+     * @param  integer $cid Child categegory id
+     * @return object;
      */
     public function getChildCategory($cid)
     {
@@ -538,38 +548,136 @@ class Group extends ActiveRecord
     }
 
     /**
+     * Get all category topics
+     * return array indexed by category id
+     * @return array;
+     */
+    public function getAllCategoryTopics()
+    {   
+        $client = new Client(['base_uri' => Yii::getAlias('@discourse')]);
+        $response = $client->get('/c/' . $this->discourse_category_id . '.json', ['headers' => $this->headers]);
+        $json = $response->getBody()->getContents();
+        $decoded = json_decode($json); 
+        $array = $decoded->topic_list->topics;
+        // Sort $array by id asc
+        usort($array, [$this, 'topic_sort']);
+        // reindex array and group by category id
+        return ArrayHelper::index($array, NULL, 'category_id');
+    }
+
+    /**
+     * Custom sort function for usort of category topics
+     * @param array $a
+     * @param array $b
+     * @return array
+     */
+    private function topic_sort($a,$b) {
+       return $a->id > $b->id;
+    }
+
+    /**
+     * Get a single category topic
+     * @param  integer $tid Topic id
+     * @return array;
+     */
+    public function getTopic($tid)
+    {   
+        $client = new Client(['base_uri' => Yii::getAlias('@discourse')]);
+        $response = $client->get('/t/' . $tid . '.json', ['headers' => $this->headers]);
+        $json = $response->getBody()->getContents();
+        return json_decode($json);
+    }
+
+    /**
+     * Close or open a topic
+     * @param  integer $tid Topic id
+     * @param  string $status Whether or not the topic should be closed
+     * @return boolean;
+     */
+    public function closeTopic($tid, $enabled)
+    {
+        $client = new Client(['base_uri' => Yii::getAlias('@discourse')]);
+        $response = $client->put('/t/' . $tid . '/status', [
+            'headers' => $this->headers,
+            'form_params' => [
+                'status' => 'closed',
+                'enabled' => $enabled,
+            ]
+        ]);
+        return true;
+    }
+
+    /**
+     * Pin or unpin a topic
+     * @param  integer $tid Topic id
+     * @param  string $enabled Whether or not the topic should be pinned
+     * @return boolean;
+     */
+    public function pinTopic($tid, $enabled)
+    {
+        $client = new Client(['base_uri' => Yii::getAlias('@discourse')]);
+        $response = $client->put('/t/' . $tid . '/status', [
+            'headers' => $this->headers,
+            'form_params' => [
+                'status' => 'pinned',
+                'enabled' => $enabled,
+                'until' => '3019-07-09' // Forever
+            ]
+        ]);
+        return true;
+    }
+
+    /**
+     * Remove topic
+     * @param  integer $tid Topic id
+     * @return boolean;
+     */
+    public function removeTopic($tid)
+    {
+        $client = new Client(['base_uri' => Yii::getAlias('@discourse')]);
+        $response = $client->delete('/t/' . $tid . '.json', ['headers' => $this->headers]);
+        return true;
+    }
+
+    /**
      * Update a group category in the Discourse forum
      * @return boolean;
      */
     public function updateCategory()
     {
+        // Check if name has been updated to already in-use category name
+        if (strcmp($this->categoryName, $this->oldCategoryName) != 0) {
+            $categories = $this->childCategories;
+            $categoryNames = ArrayHelper::getColumn($categories, 'name');
+            if (in_array($this->categoryName, $categoryNames)) {
+                return false;
+            }
+        }
+
         // Update banner and text colors
         $client = new Client(['base_uri' => Yii::getAlias('@discourse')]);
-        $headers = [
-            'Api-Key' => Yii::$app->params['apiKey.discourse'],
-            'Api-Username' => Yii::$app->params['apiKey.discourse-username'],
-        ];
         $response = $client->put('/categories/' . $this->cid, [
-            'headers' => $headers,
+            'headers' => $this->headers,
             'form_params' => [
                 'name' => $this->categoryName,
                 'color' => Utility::colorToHex($this->categoryBannerColor, ''),
                 'text_color' => Utility::colorToHex($this->categoryTitleColor, ''),
-            ],
+            ]
         ]);
+
         // Update description
         //      get topic id
         $json = $response->getBody()->getContents();
         $decoded = json_decode($json);
         $topicUrl = $decoded->category->topic_url;
         list(,,, $tid) = explode('/', $topicUrl);
-        $response = $client->get('/t/-/' . $tid . '.json', ['headers' => $headers]);
+        $response = $client->get('/t/-/' . $tid . '.json', ['headers' => $this->headers]);
         //      get first post id in topic
         $json = $response->getBody()->getContents();
         $decoded = json_decode($json);
         $pid = $decoded->post_stream->posts[0]->id; 
         $response = $client->put('/posts/' . $pid . '.json', [
-            'headers' => $headers,
+            'headers' => $this->headers,
             'form_params' => ['post[raw]' => $this->_categoryDescription]
         ]);
         return true;
@@ -583,19 +691,16 @@ class Group extends ActiveRecord
     {
 
         $client = new Client(['base_uri' => Yii::getAlias('@discourse')]);
-        $headers = [
-            'Api-Key' => Yii::$app->params['apiKey.discourse'],
-            'Api-Username' => Yii::$app->params['apiKey.discourse-username'],
-        ];
+        
         // Get topic
         list(,,, $tid) = explode('/', $categoryUrl);
-        $response = $client->get('/t/-/' . $tid . '.json', ['headers' => $headers]);
+        $response = $client->get('/t/-/' . $tid . '.json', ['headers' => $this->headers]);
         // Get first post id in topic
         $json = $response->getBody()->getContents();
         $decoded = json_decode($json);
         $pid = $decoded->post_stream->posts[0]->id;
         // Get post description
-        $response = $client->get('/posts/' . $pid . '.json', ['headers' => $headers]);
+        $response = $client->get('/posts/' . $pid . '.json', ['headers' => $this->headers]);
         $json = $response->getBody()->getContents();
         $decoded = json_decode($json); 
         return $decoded->raw;
@@ -609,47 +714,37 @@ class Group extends ActiveRecord
     public function addChildCategory()
     {   
         $client = new Client(['base_uri' => Yii::getAlias('@discourse')]);
-        $headers = [
-            'Api-Key' => Yii::$app->params['apiKey.discourse'],
-            'Api-Username' => Yii::$app->params['apiKey.discourse-username'],
-        ];
+        
+        // Add group category
+        $this->categoryBannerColor = $this->categoryBannerColor ?? 'blue';
+        $this->categoryTitleColor = $this->categoryTitleColor ?? 'white';
+        $response = $client->post('/categories', [
+            'headers' => $this->headers,
+            'form_params' => [
+                'name' => $this->categoryName,
+                'color' => Utility::colorToHex($this->categoryBannerColor, ''),
+                'text_color' => Utility::colorToHex($this->categoryTitleColor, ''),
+                'permissions[' . $this->discourse_group_name . ']' => 1,
+                'parent_category_id' => $this->discourse_category_id,
+            ]
+        ]);
 
-        // Check if category exists; if not, add new
-        $response = $client->get('/categories.json', ['headers' => $headers]); 
+        // Add category description to default topic
+        //      get topic id
         $json = $response->getBody()->getContents();
         $decoded = json_decode($json);
-        $categories = ArrayHelper::getColumn($decoded->category_list->categories, 'name');
-        if (!in_array($this->categoryName, $categories)) {
-            // Add group category
-            $this->categoryBannerColor = $this->categoryBannerColor ?? 'blue';
-            $this->categoryTitleColor = $this->categoryTitleColor ?? 'white';
-            $response = $client->post('/categories', [
-                'headers' => $headers,
-                'form_params' => [
-                    'name' => $this->categoryName,
-                    'color' => Utility::colorToHex($this->categoryBannerColor, ''),
-                    'text_color' => Utility::colorToHex($this->categoryTitleColor, ''),
-                    'permissions[' . $this->discourse_group_name . ']' => 1,
-                    'parent_category_id' => $this->discourse_category_id,
-                ]
-            ]);
-
-            // Add category description to default topic
-            //      get topic id
-            $json = $response->getBody()->getContents();
-            $decoded = json_decode($json);
-            $topicUrl = $decoded->category->topic_url;
-            list(,,, $tid) = explode('/', $topicUrl);
-            $response = $client->get('/t/-/' . $tid . '.json', ['headers' => $headers]);
-            //      get first post id in topic
-            $json = $response->getBody()->getContents();
-            $decoded = json_decode($json);
-            $pid = $decoded->post_stream->posts[0]->id; 
-            $response = $client->put('/posts/' . $pid . '.json', [
-                'headers' => $headers,
-                'form_params' => ['post[raw]' => $this->_categoryDescription]
-            ]);
-        } 
+        $topicUrl = $decoded->category->topic_url;
+        list(,,, $tid) = explode('/', $topicUrl);
+        $response = $client->get('/t/-/' . $tid . '.json', ['headers' => $this->headers]);
+        //      get first post id in topic
+        $json = $response->getBody()->getContents();
+        $decoded = json_decode($json);
+        $pid = $decoded->post_stream->posts[0]->id; 
+        $response = $client->put('/posts/' . $pid . '.json', [
+            'headers' => $this->headers,
+            'form_params' => ['post[raw]' => $this->_categoryDescription]
+        ]);
+        return true;
     }
 
     /**
@@ -659,12 +754,7 @@ class Group extends ActiveRecord
     public function removeCategory()
     {   
         $client = new Client(['base_uri' => Yii::getAlias('@discourse')]);
-        $response = $client->delete('/categories/' . $this->cid, [
-            'headers' => [
-                'Api-Key' => Yii::$app->params['apiKey.discourse'],
-                'Api-Username' => Yii::$app->params['apiKey.discourse-username'],
-            ],
-        ]); 
+        $response = $client->delete('/categories/' . $this->cid, ['headers' => $this->headers]);
         return true;
     }
 
@@ -677,13 +767,9 @@ class Group extends ActiveRecord
         $user = User::findOne($uid);
 
         $client = new Client(['base_uri' => Yii::getAlias('@discourse')]);
-        $headers = [
-            'Api-Key' => Yii::$app->params['apiKey.discourse'],
-            'Api-Username' => Yii::$app->params['apiKey.discourse-username'],
-        ];
-
+        
         // Get all discourse users
-        $response = $client->get('/admin/users/list/active.json', ['headers' => $headers]);
+        $response = $client->get('/admin/users/list/active.json', ['headers' => $this->headers]);
         $json = $response->getBody()->getContents();
         $decoded = json_decode($json); 
         $discourseUsers = ArrayHelper::getColumn($decoded, 'username');
@@ -691,7 +777,7 @@ class Group extends ActiveRecord
         // Add user to group
         if (in_array($user->username, $discourseUsers)) {
             $response = $client->put('/groups/' . $this->discourse_group_id . '/members.json', [
-                'headers' => $headers,
+                'headers' => $this->headers,
                 'form_params' => ['usernames' => $user->username]
             ]);
 
@@ -706,7 +792,7 @@ class Group extends ActiveRecord
             $ssoPayload = base64_encode(http_build_query($ssoParams));
             $sig = hash_hmac('sha256', $ssoPayload, Yii::$app->params['apiKey.discourse-secret']);
             $response = $client->post('/admin/users/sync_sso', [
-                'headers' => $headers,
+                'headers' => $this->headers,
                 'form_params' => [
                     'sso' => $ssoPayload,
                     'sig' => $sig,
@@ -726,13 +812,9 @@ class Group extends ActiveRecord
         $user = User::findOne($uid);
 
         $client = new Client(['base_uri' => Yii::getAlias('@discourse')]);
-        $headers = [
-            'Api-Key' => Yii::$app->params['apiKey.discourse'],
-            'Api-Username' => Yii::$app->params['apiKey.discourse-username'],
-        ];
-
+        
         // Get all discourse users
-        $response = $client->get('/admin/users/list/active.json', ['headers' => $headers]);
+        $response = $client->get('/admin/users/list/active.json', ['headers' => $this->headers]);
         $json = $response->getBody()->getContents();
         $decoded = json_decode($json); 
         $discourseUsers = ArrayHelper::getColumn($decoded, 'username');
@@ -740,7 +822,7 @@ class Group extends ActiveRecord
         // Remove from group if current discourse user
         if (in_array($user->username, $discourseUsers)) {
             $response = $client->delete('/groups/' . $this->discourse_group_id . '/members.json', [
-                'headers' => $headers,
+                'headers' => $this->headers,
                 'form_params' => ['username' => $user->username]
             ]);
         }
@@ -896,6 +978,18 @@ class Group extends ActiveRecord
     }
 
     /**
+     * Discourse api header params
+     * @return boolean
+     */
+    public function getHeaders()
+    {
+        return [
+            'Api-Key' => Yii::$app->params['apiKey.discourse'],
+            'Api-Username' => Yii::$app->params['apiKey.discourse-username'],
+        ];
+    }
+
+    /**
      * @return \yii\db\ActiveQuery
      */
     public function getActiveGroupIds()
@@ -1003,6 +1097,15 @@ class Group extends ActiveRecord
     public function getOwner()
     {
         return $this->hasOne(User::className(), ['id' => 'user_id']);
+    }
+
+    /**
+     * User model of group owner
+     * @return \yii\db\ActiveQuery
+     */
+    public function getOwnerMember()
+    {
+        return $this->hasOne(GroupMember::className(), ['user_id' => 'user_id']);
     }
 
     /**
@@ -1138,7 +1241,7 @@ class Group extends ActiveRecord
      */
     public function getUpdateListNames()
     {
-        $updateList = MissionaryUpdate::find()->joinWith('groupMember')->where(['group_id' => $this->id])->all();
+        $updateList = MissionaryUpdate::find()->joinWith('groupMemberSharingUpdates')->where(['group_id' => $this->id])->all();
         $nameList = [];
         foreach ($updateList as $update) {
             array_push($nameList, $update->realName);
@@ -1187,5 +1290,21 @@ class Group extends ActiveRecord
             }
         }
         return $icalList;
+    }
+
+    /**
+     * Ensure unique category name
+     * @param string $attribute the attribute currently being validated
+     * @param array $params the additional name-value pairs given in the rule
+     */
+    public function validateUniqueCategoryName($attribute, $params)
+    {
+        $categories = $this->childCategories;
+        $categoryNames = ArrayHelper::getColumn($categories, 'name');
+        if (in_array($this->$attribute, $categoryNames)) {
+            $this->addError($attribute, 'This category name already exists.');
+            return false;
+        }
+        return $this->$attribute;
     }
 }

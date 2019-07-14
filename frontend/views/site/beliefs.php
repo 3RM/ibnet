@@ -6,7 +6,6 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 
 $this->title = 'Beliefs';
-Url::remember();
 ?>
     <div class="site-about">
         <div class="row">

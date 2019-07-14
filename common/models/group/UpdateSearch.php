@@ -2,7 +2,7 @@
 
 namespace common\models\group;
 
-use common\models\missionary\MissionaryUpdate; use common\models\Utility;
+use common\models\missionary\MissionaryUpdate;
 use Yii;
 use yii\base\Model;
 use yii\helpers\ArrayHelper;

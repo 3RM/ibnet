@@ -71,6 +71,7 @@ class MissionaryController extends Controller
     public function actionUpdateRepository($a = NULL) // $a stores link anchor
     {
         $user = Yii::$app->user->identity;
+        $role = array_keys(Yii::$app->authManager->getRolesByUser(Yii::$app->user->identity->id))[0];
         if (!$user->isMissionary) {
             $this->redirect('/site/settings');
         }
@@ -154,6 +155,7 @@ class MissionaryController extends Controller
 
         $joinedGroups = $user->joinedGroups;
 
+        Url::Remember();
         return $this->render('repositoryAdmin', [
             'profileActive' => $profileActive,
             'missionary' => $missionary,
@@ -161,6 +163,7 @@ class MissionaryController extends Controller
             'updates' => $updates, 
             'newUpdate' => $newUpdate,
             'joinedGroups' => $joinedGroups,
+            'role' => $role,
             'active' => $active,
             'mcSynced' => $mcSynced,
             'displayNone' => $displayNone,

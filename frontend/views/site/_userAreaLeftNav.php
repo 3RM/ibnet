@@ -1,8 +1,6 @@
 <?php
 use common\models\User;
 use yii\bootstrap\Html;
-$id = $_GET['id'] ?? NULL;
-$role = array_keys(Yii::$app->authManager->getRolesByUser(Yii::$app->user->identity->id))[0];
 ?>
     <div class="left-nav">
         <ul class="main-links">
@@ -39,25 +37,25 @@ $role = array_keys(Yii::$app->authManager->getRolesByUser(Yii::$app->user->ident
                 <h3>Groups</h3>
                 <?php foreach ($joinedGroups as $group) { ?>
                     <p <?= 'id="group-' . $group->id . '"' ?>><?= $group->name ?></p>
-                    <ul <?= 'id="list-' . $group->id . '"' ?> <?= $id == $group->id ? NULL : 'class="group-list"' ?>>
+                    <ul <?= 'id="list-' . $group->id . '"' ?> <?= $gid == $group->id ? NULL : 'class="group-list"' ?>>
                         <?= $group->feature_prayer ? 
-                            Html::a('<li class="' . (($active == "prayer" && $id == $group->id) ? "active-page" : NULL) . '"><i class="fas fa-praying-hands"></i> &nbsp;&nbsp;Prayer List</li>', [
+                            Html::a('<li class="' . (($active == "prayer" && $gid == $group->id) ? "active-page" : NULL) . '"><i class="fas fa-praying-hands"></i> &nbsp;&nbsp;Prayer List</li>', [
                                 '/group/prayer', 'id' => $group->id]) : NULL 
                         ?>
                         <?= $group->feature_calendar ? 
-                            Html::a('<li class="' . (($active == "calendar" && $id == $group->id) ? "active-page" : NULL) . '">' . Html::icon('calendar') . ' &nbsp;&nbsp;Calendar</li>', [
+                            Html::a('<li class="' . (($active == "calendar" && $gid == $group->id) ? "active-page" : NULL) . '">' . Html::icon('calendar') . ' &nbsp;&nbsp;Calendar</li>', [
                                 '/group/calendar', 'id' => $group->id]) : NULL 
                         ?>
                         <?= $group->feature_forum ? 
-                            Html::a('<li class="' . (($active == "forum" && $id == $group->id) ? "active-page" : NULL) . '"><i class="fa fa-comments"></i> &nbsp;&nbsp;Forum</li>', [
+                            Html::a('<li class="' . (($active == "forum" && $gid == $group->id) ? "active-page" : NULL) . '"><i class="fa fa-comments"></i> &nbsp;&nbsp;Forum</li>', [
                                 '/group/forum', 'id' => $group->id]) : NULL 
                         ?>
                         <?= $group->feature_update ? 
-                            Html::a('<li class="' . (($active == "update" && $id == $group->id) ? "active-page" : NULL) . '">' . Html::icon('send') . ' &nbsp;&nbsp;Updates</li>', [
+                            Html::a('<li class="' . (($active == "update" && $gid == $group->id) ? "active-page" : NULL) . '">' . Html::icon('send') . ' &nbsp;&nbsp;Updates</li>', [
                                 '/group/update', 'id' => $group->id]) : NULL 
                         ?>
                         <?= $group->feature_notification ? 
-                            Html::a('<li class="' . (($active == "notification" && $id == $group->id) ? "active-page" : NULL) . '"><i class="far fa-envelope"></i> &nbsp;&nbsp;Notification</li>', [
+                            Html::a('<li class="' . (($active == "notification" && $gid == $group->id) ? "active-page" : NULL) . '"><i class="far fa-envelope"></i> &nbsp;&nbsp;Notification</li>', [
                                 '/group/notification', 'id' => $group->id]) : NULL 
                         ?>
                     </ul>

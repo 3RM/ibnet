@@ -15,7 +15,7 @@ Url::Remember();
 ?>
 <?= $this->render('_userAreaHeader', ['active' => 'settings']) ?>
 <div class="container">
-    <?= $this->render('../site/_userAreaLeftNav', ['active' => 'settings', 'joinedGroups' => $joinedGroups]) ?>
+    <?= $this->render('../site/_userAreaLeftNav', ['active' => 'settings', 'gid' => NULL, 'role' => $role, 'joinedGroups' => $joinedGroups]) ?>
 
     <div class="right-content">
         <h2>Personal Profile Settings</h2>
