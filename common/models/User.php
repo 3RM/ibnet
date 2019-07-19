@@ -783,7 +783,7 @@ class User extends ActiveRecord implements
      */
     public static function getAllSubscribedFeature()
     {
-        return User::find()->joinWith('subscription')->where('email IS NOT NULL')->andWhere(['status' => User::STATUS_ACTIVE])->andWhere(['subscription.feature' => 1])->all();
+        return User::find()->joinWith('subscription')->where('user.email IS NOT NULL')->andWhere(['status' => User::STATUS_ACTIVE])->andWhere(['subscription.feature' => 1])->all();
     }
 
     /**
@@ -791,7 +791,7 @@ class User extends ActiveRecord implements
      */
     public static function getAllSubscribedBlog()
     {
-        return User::find()->joinWith('subscription')->where('email IS NOT NULL')->andWhere(['status' => User::STATUS_ACTIVE])->andWhere(['subscription.blog' => 1])->all();
+        return User::find()->joinWith('subscription')->where('user.email IS NOT NULL')->andWhere(['status' => User::STATUS_ACTIVE])->andWhere(['subscription.blog' => 1])->all();
     }
 
     /**

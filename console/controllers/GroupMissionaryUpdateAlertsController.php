@@ -6,7 +6,7 @@ use console\models\GroupMail;
 use fedemotta\cronjob\models\CronJob;
 use yii\console\Controller;
 
-class GroupMailController extends Controller
+class GroupMissionaryUpdateAlertsController extends Controller
 {
     
     /**
@@ -24,20 +24,8 @@ class GroupMailController extends Controller
         } else {
             foreach ($dates as $date) {
                 
-                // Process email prayer requests and send alerts
-                $groups = Group::getActivePrayerGroups();
-                foreach ($groups as $group) {
-                    GroupMail::processPrayer($group);
-                }
-
                 // Send missionary update alerts
                 GroupMail::sendUpdateAlerts();
-
-                // Process email notifications and send to group
-                $groups = Group::getActiveNotificationGroups();
-                foreach ($groups as $group) {
-                    GroupMail::processNotice($group);
-                }
 
             }
             $command->finish();

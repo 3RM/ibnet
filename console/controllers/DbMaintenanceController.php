@@ -11,7 +11,7 @@ use yii\helpers\ArrayHelper;
 use yii\db\Expression;
 // use yii\db\ActiveRecord;
 
-class DateController extends Controller
+class DbMaintenanceController extends Controller
 {
     
     public function actionInit() {
@@ -44,25 +44,35 @@ class DateController extends Controller
         // }
          
         // Move all user subscriptions from user table to subcriptions table
-        $users = User::find()->all();         
-        $subs = Subscription::find()->all();
-        $subEmails = ArrayHelper::getColumn($subs, 'email');
-        foreach ($users as $user) {
-            if (!in_array($user->email, $subEmails)) {
-                $sub = new Subscription();
-                $sub->scenario = 'add';
-                $sub->email = $user->email;
-                $sub->token = Yii::$app->security->generateRandomString(32);
-                $sub->save();
-                $sub->updateAttributes([
-                    'profile' => $user->emailPrefProfile,
-                    'links' => $user->emailPrefLinks,
-                    'comments' => $user->emailPrefComments,
-                    'features' => $user->emailPrefFeatures,
-                    'blog' => $user->emailPrefBlog,
-                ]);
-            }
+        // $users = User::find()->all();         
+        // $subs = Subscription::find()->all();
+        // $subEmails = ArrayHelper::getColumn($subs, 'email');
+        // foreach ($users as $user) {
+        //     if (!in_array($user->email, $subEmails)) {
+        //         $sub = new Subscription();
+        //         $sub->scenario = 'add';
+        //         $sub->email = $user->email;
+        //         $sub->token = Yii::$app->security->generateRandomString(32);
+        //         $sub->save();
+        //         $sub->updateAttributes([
+        //             'profile' => $user->emailPrefProfile,
+        //             'links' => $user->emailPrefLinks,
+        //             'comments' => $user->emailPrefComments,
+        //             'features' => $user->emailPrefFeatures,
+        //             'blog' => $user->emailPrefBlog,
+        //         ]);
+        //     }
 
+        // }
+         
+        // Convert user last_login timestamp to unix time
+        $users = User::find()->all();
+        foreach ($users as $user) {
+            if ($user->last_login) {
+                $last = strtotime($user->last_login);
+                $user->updateAttributes(['last' => $last]);
+                echo $user->id . PHP_EOL;
+            }
         }
     }
 }

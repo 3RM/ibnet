@@ -31,7 +31,6 @@ $this->title = $profile->mainName;
 		<?= !empty($otherMinistryArray) ? $this->render('cards/_card-otherministries', ['otherMinistryArray' => $otherMinistryArray]) : NULL ?>
 		<?= !empty($schoolsAttended) ? $this->render('cards/_card-school', ['schoolsAttended' => $schoolsAttended]) : NULL ?>
 		<?= !empty($flwshipArray) ? $this->render('cards/_card-fellowships', ['flwshipArray' => $flwshipArray]) : NULL ?>
-		<?= $this->render('cards/_card-distinctives', ['profile' => $profile]) ?>
 		<?= $this->render('cards/_card-contact-ind', ['profile' => $profile]) ?>
 		<?= !empty($social) ? $this->render('cards/_card-social', ['social' => $social]) : NULL ?>
 

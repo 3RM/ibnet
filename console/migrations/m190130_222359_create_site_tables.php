@@ -41,6 +41,7 @@ class m190130_222359_create_site_tables extends Migration
             'display_name' => $this->string(60),
             'home_church' => $this->integer(),
             'primary_role' => $this->string(20),
+            'viewed_group' => $this->tinyInteger(1),   
             'reviewed' => $this->tinyInteger(1),   
         ], $tableOptions);
 

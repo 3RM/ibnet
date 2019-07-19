@@ -20,7 +20,7 @@ class WebUserBehavior extends \yii\base\Behavior
         $user = $event->sender;
         $ip = Yii::$app->request->userIP;
         $user->identity->updateAttributes([
-            'last_login' => new Expression('NOW()'),
+            'last_login' => time(),
             // TODO this should probably go into DB session storage to list all active sessions
             'ip' => $ip,
             // 'login_attempts' => 0,

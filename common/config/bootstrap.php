@@ -12,6 +12,3 @@ Yii::setAlias('@img.profile', '/images/profile');
 Yii::setAlias('@img.group', '/images/group');
 Yii::setAlias('@img.site', '/images/site');
 Yii::setAlias('@img.user-area', '/images/user-area');
-
-// Applications
-Yii::setAlias('@discourse', 'http://localhost:9292');

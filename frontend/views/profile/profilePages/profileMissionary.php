@@ -42,7 +42,6 @@ $this->title = $profile->coupleName;
 		<?= !empty($updates) ? $this->render('cards/_card-missionary-updates', ['updates' => $updates]) : NULL ?>
 		<?= !empty($otherMinistries) ? $this->render('cards/_card-otherministries', ['otherMinistries' => $otherMinistries]) : NULL ?>
 		<?= !empty($schoolsAttended) ? $this->render('cards/_card-school', ['schoolsAttended' => $schoolsAttended]) : NULL ?>
-		<?= $this->render('cards/_card-distinctives', ['profile' => $profile]) ?>
 		<?= $this->render('cards/_card-contact-ind', ['profile' => $profile]) ?>
 		<?= !empty($social) ? $this->render('cards/_card-social', ['social' => $social]) : NULL ?>
 

@@ -170,6 +170,7 @@ class m190311_132910_create_profile_tables extends Migration
             'user_id' => $this->integer(),
             'profile_id' => $this->integer(),
             'created_at' => $this->integer()->notNULL(),
+            'profile_previous_status' => $this->smallInteger(6)->notNULL(),
             'description' => $this->text()->notNULL(),
             'action' => $this->integer()->notNULL(),
         ], $tableOptions);

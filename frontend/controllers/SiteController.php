@@ -254,7 +254,7 @@ class SiteController extends Controller
         $q = $sso->buildLoginString($userparams);
         
         // Redirect back
-        $this->redirect(Yii::getAlias('@discourse') . '/session/sso_login?' . $q);
+        $this->redirect(Yii::$app->params['url.forum'] . '/session/sso_login?' . $q);
     }
 
     public function actionTestVerification()

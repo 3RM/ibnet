@@ -921,7 +921,7 @@ class GroupController extends Controller
             throw new NotFoundHttpException;
         } 
     
-        return $this->redirect(Yii::getAlias('@discourse'));
+        return $this->redirect(Yii::$app->params['url.forum']);
     }
 
     /**

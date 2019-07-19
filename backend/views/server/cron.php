@@ -23,7 +23,9 @@ $this->title = 'Cron Jobs';
 		<p><b>blog</b>: Send email blog-digest (weekly)</p>
 		<p><b>video-accessible</b>: Check that remote video links are accessible (weekly)</p>
 		<p><b>calendar</b>: Import ics calendars into db (daily)</p>
-		<p><b>group-mail</b>: Process incoming request and notification mail, send alerts (every 15 mins)</p>
+		<p><b>group-missionary-update-alerts</b>: Process group missionary update alerts (every 15 mins)</p>
+		<p><b>group-prayer-mail</b>: Process incoming request, send alerts (every 15 mins)</p>
+		<p><b>group-notification-mail</b>: Process incoming notification mail, send alerts (every 15 mins)</p>
 		<p><b>group-weekly-prayer</b>: Send weekly alert digests (weekly)</p>
 	</div>
 

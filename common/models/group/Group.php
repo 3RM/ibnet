@@ -361,7 +361,7 @@ class Group extends ActiveRecord
      */
     public function createForumGroup()
     {
-        $client = new Client(['base_uri' => Yii::getAlias('@discourse')]);
+        $client = new Client(['base_uri' => Yii::$app->params['url.forum']]);
 
         // Generate unique group name
         $this->discourse_group_name = Utility::generateUniqueRandomString($this, 'discourse_group_name', 20, true);
@@ -481,7 +481,7 @@ class Group extends ActiveRecord
      */
     public function removeForumGroup()
     {   
-        $client = new Client(['base_uri' => Yii::getAlias('@discourse')]);
+        $client = new Client(['base_uri' => Yii::$app->params['url.forum']]);
     
         // Check if group exists; if so, remove it
         $response = $client->get('/groups.json', ['headers' => $this->headers]);
@@ -499,7 +499,7 @@ class Group extends ActiveRecord
      */
     public function getParentCategory()
     {   
-        $client = new Client(['base_uri' => Yii::getAlias('@discourse')]);
+        $client = new Client(['base_uri' => Yii::$app->params['url.forum']]);
         $response = $client->get('/categories.json', ['headers' => $this->headers]);
         $json = $response->getBody()->getContents();
         $decoded = json_decode($json);
@@ -517,7 +517,7 @@ class Group extends ActiveRecord
      */
     public function getChildCategories()
     {   
-        $client = new Client(['base_uri' => Yii::getAlias('@discourse')]);
+        $client = new Client(['base_uri' => Yii::$app->params['url.forum']]);
         $response = $client->get('/site.json', ['headers' => $this->headers]);
         $json = $response->getBody()->getContents();
         $decoded = json_decode($json);
@@ -554,7 +554,7 @@ class Group extends ActiveRecord
      */
     public function getAllCategoryTopics()
     {   
-        $client = new Client(['base_uri' => Yii::getAlias('@discourse')]);
+        $client = new Client(['base_uri' => Yii::$app->params['url.forum']]);
         $response = $client->get('/c/' . $this->discourse_category_id . '.json', ['headers' => $this->headers]);
         $json = $response->getBody()->getContents();
         $decoded = json_decode($json); 
@@ -582,7 +582,7 @@ class Group extends ActiveRecord
      */
     public function getTopic($tid)
     {   
-        $client = new Client(['base_uri' => Yii::getAlias('@discourse')]);
+        $client = new Client(['base_uri' => Yii::$app->params['url.forum']]);
         $response = $client->get('/t/' . $tid . '.json', ['headers' => $this->headers]);
         $json = $response->getBody()->getContents();
         return json_decode($json);
@@ -596,7 +596,7 @@ class Group extends ActiveRecord
      */
     public function closeTopic($tid, $enabled)
     {
-        $client = new Client(['base_uri' => Yii::getAlias('@discourse')]);
+        $client = new Client(['base_uri' => Yii::$app->params['url.forum']]);
         $response = $client->put('/t/' . $tid . '/status', [
             'headers' => $this->headers,
             'form_params' => [
@@ -615,7 +615,7 @@ class Group extends ActiveRecord
      */
     public function pinTopic($tid, $enabled)
     {
-        $client = new Client(['base_uri' => Yii::getAlias('@discourse')]);
+        $client = new Client(['base_uri' => Yii::$app->params['url.forum']]);
         $response = $client->put('/t/' . $tid . '/status', [
             'headers' => $this->headers,
             'form_params' => [
@@ -634,7 +634,7 @@ class Group extends ActiveRecord
      */
     public function removeTopic($tid)
     {
-        $client = new Client(['base_uri' => Yii::getAlias('@discourse')]);
+        $client = new Client(['base_uri' => Yii::$app->params['url.forum']]);
         $response = $client->delete('/t/' . $tid . '.json', ['headers' => $this->headers]);
         return true;
     }
@@ -655,7 +655,7 @@ class Group extends ActiveRecord
         }
 
         // Update banner and text colors
-        $client = new Client(['base_uri' => Yii::getAlias('@discourse')]);
+        $client = new Client(['base_uri' => Yii::$app->params['url.forum']]);
         $response = $client->put('/categories/' . $this->cid, [
             'headers' => $this->headers,
             'form_params' => [
@@ -690,7 +690,7 @@ class Group extends ActiveRecord
     public function getCategoryDescription($categoryUrl)
     {
 
-        $client = new Client(['base_uri' => Yii::getAlias('@discourse')]);
+        $client = new Client(['base_uri' => Yii::$app->params['url.forum']]);
         
         // Get topic
         list(,,, $tid) = explode('/', $categoryUrl);
@@ -713,7 +713,7 @@ class Group extends ActiveRecord
      */
     public function addChildCategory()
     {   
-        $client = new Client(['base_uri' => Yii::getAlias('@discourse')]);
+        $client = new Client(['base_uri' => Yii::$app->params['url.forum']]);
         
         // Add group category
         $this->categoryBannerColor = $this->categoryBannerColor ?? 'blue';
@@ -753,7 +753,7 @@ class Group extends ActiveRecord
      */
     public function removeCategory()
     {   
-        $client = new Client(['base_uri' => Yii::getAlias('@discourse')]);
+        $client = new Client(['base_uri' => Yii::$app->params['url.forum']]);
         $response = $client->delete('/categories/' . $this->cid, ['headers' => $this->headers]);
         return true;
     }
@@ -766,7 +766,7 @@ class Group extends ActiveRecord
     {
         $user = User::findOne($uid);
 
-        $client = new Client(['base_uri' => Yii::getAlias('@discourse')]);
+        $client = new Client(['base_uri' => Yii::$app->params['url.forum']]);
         
         // Get all discourse users
         $response = $client->get('/admin/users/list/active.json', ['headers' => $this->headers]);
@@ -811,7 +811,7 @@ class Group extends ActiveRecord
     {
         $user = User::findOne($uid);
 
-        $client = new Client(['base_uri' => Yii::getAlias('@discourse')]);
+        $client = new Client(['base_uri' => Yii::$app->params['url.forum']]);
         
         // Get all discourse users
         $response = $client->get('/admin/users/list/active.json', ['headers' => $this->headers]);
