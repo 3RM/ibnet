@@ -10,7 +10,7 @@ $new = $model->created_at > $group->last_visit;
 ?>
 
 <div class="member-card">
-    <?= $model->user->usr_image ? Html::img($model->user->usr_image) : Html::img('@img.site/user.jpg'); ?>
+    <?= $model->user->usr_image ? Html::img($model->user->usr_image) : Html::img('@img.site/user.png'); ?>
     <div class="member-name">
         <p class="title"><?= $model->user->fullName ?> <?= $new ? '<span class="badge" style="background-color:#05aa36">New</span>' : NULL ?><?= $model->status == GroupMember::STATUS_BANNED ? '<span class="badge" style="background-color:#f00">Banned</span>' : NULL ?></p>
         <p class="subtitle"><?= $model->user->primary_role ?? NULL ?></p> 

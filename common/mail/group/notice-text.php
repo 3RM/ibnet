@@ -11,6 +11,8 @@ use yii\helpers\Html;
 <?= $notification->subject ?>
 
 <?= $notification->message ?>
+
+Note: For best results, please ensure your email client is set to format emails as html and text.
     
 For assistance, contact <?= Yii::$app->params['email.admin'] ?> or visit the forum at <?= Yii::$app->params['url.forum'] ?> 
 to ask a question, leave feedback, or make new feature requests.

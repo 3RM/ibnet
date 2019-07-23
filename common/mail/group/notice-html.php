@@ -39,6 +39,9 @@ use yii\helpers\Html;
 		<td colspan="2">
 			<div style="margin:20px; font-size:0.9em; background-color:#f6f6f6; color:gray; padding:15px;">
 				<p>      
+					Note: For best results, please ensure your email client is set to format emails as html <em>and</em> text.
+				</p>
+				<p>      
 					For assistance, contact <?= Yii::$app->params['email.admin'] ?> or visit the <?= Html::a('forum', Yii::$app->params['url.forum']) ?> 
 					to ask a question, leave feedback, or make new feature requests.
 				</p>

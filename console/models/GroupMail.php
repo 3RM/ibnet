@@ -425,9 +425,9 @@ class GroupMail extends Model
                 // Assemble messages
                 foreach ($members as $member) {
                     // Don't send notification to self
-                    if ($notification->user_id == $member->user_id) {
-                        continue;
-                    }
+                    // if ($notification->user_id == $member->id) {
+                    //     continue;
+                    // }
                     $notification->toEmail = $member->email;
                     $notification->toName = $member->fullName;
                     // Check for unsubscribed members (returns false if unsubscribed)

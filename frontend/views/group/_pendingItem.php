@@ -10,7 +10,7 @@ use yii\widgets\ActiveField;
 ?>
 
 <div class="member-card">
-    <?= $model->user->usr_image ? Html::img($model->user->usr_image) : Html::img('@img.site/user.jpg'); ?>
+    <?= $model->user->usr_image ? Html::img($model->user->usr_image) : Html::img('@img.site/user.png'); ?>
     <div class="member-name">
         <p class="title">
             <?= $model->user->fullName ?> <?= $model->status == GroupMember::STATUS_BANNED ? '<span class="badge" style="background-color:#05aa36">Banned</span>' : NULL ?>

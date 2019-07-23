@@ -16,7 +16,7 @@ $this->title = 'Cron Jobs';
 	    'columns'=>$gridColumns,
 	]); ?>
 
-	<h3>Description</h3>
+	<h3>Job Descriptions</h3>
 	<div class="schedule">
 		<p><b>profile-expirations</b>: Check for upcoming or expired profiles (daily)</p>
 		<p><b>profile-tracking</b>: Log number of users and profiles (weekly)</p>

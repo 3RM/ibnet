@@ -569,8 +569,8 @@ class m190327_234414_create_group_tables extends Migration
          * Table group_notification_message_id
          **/
         $this->createTable('{{%group_notification_message_id}}', [
-            'message_id' => $this->primaryKey(),
             'notification_id' => $this->integer(),
+            'message_id' => $this->string()->notNULL(),
         ], $tableOptions);
 
         $this->addCommentOnColumn(
