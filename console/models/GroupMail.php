@@ -6,7 +6,7 @@ use common\models\Subscription;
 use common\models\group\Group;
 use common\models\group\GroupMember;
 use common\models\group\GroupNotification;
-use common\models\group\GroupNotificationMessageId;
+use common\models\group\GroupNotificationMessageID;
 use common\models\group\Prayer;
 use common\models\group\GroupAlertQueue;
 use common\models\group\PrayerTag;
@@ -442,7 +442,7 @@ class GroupMail extends Model
 
                 // Find replied to notification
                 $mid = rtrim(ltrim($email->header->in_reply_to, '<'), '>');                  
-                if ($gnmid = GroupNotificationMessageId::findOne($mid)) {
+                if ($gnmid = GroupNotificationMessageID::findOne($mid)) {
                     $parent = $gnmid->notification;
                     $parent = $parent->topParent;
 
