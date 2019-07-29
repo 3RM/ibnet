@@ -305,14 +305,12 @@ class Group extends ActiveRecord
             $mail->to = Yii::$app->params['email.admin'];
             $mail->subject = 'New Group';
             $mail->title = 'New Group';
-            $mail->message = 'Group ' . $group->name . ' was just created by ' . $group->owner->fullName;
+            $mail->message = 'Group ' . $this->name . ' was just created by ' . $this->owner->fullName;
             $mail->sendNotification();
         }
 
-        $this->save();
-
         // Create a new group member for group owner
-        if (!$this->owner) {
+        if (!$this->ownerMember) {
             $user = Yii::$app->user->identity;
             $groupMember = new GroupMember();
             $groupMember->group_id = $this->id;
@@ -1105,7 +1103,7 @@ class Group extends ActiveRecord
      */
     public function getOwnerMember()
     {
-        return $this->hasOne(GroupMember::className(), ['user_id' => 'user_id']);
+        return $this->hasOne(GroupMember::className(), ['user_id' => 'user_id'])->andWhere(['group_id' => $this->id]);
     }
 
     /**
