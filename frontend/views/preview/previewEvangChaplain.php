@@ -41,8 +41,7 @@ $this->title = $profile->mainName;
 		<div class="header-text-wrap">
 			<h1><?= $this->title ?></h1>
 			<p class="tagline"><?= $profile->tagline ? $profile->tagline : NULL ?></p>
-			<p class="type"><?= Profile::$icon[$profile->type] . ' ' . $profile->type ?>
-			</p>
+			<p class="type"><?= Profile::$icon[$profile->type] . ' ' . $profile->type ?></p>
 		</div>
 
 		<div class="description">
@@ -51,7 +50,13 @@ $this->title = $profile->mainName;
 
 		<?= $profile->type == 'Evangelist' ? 
 			$this->render('../profile/profilePages/cards/_card-evangelist', ['church' => $church, 'parentMinistry' => $parentMinistry]) :
-			$this->render('../profile/profilePages/cards/_card-chaplain', ['church' => $church, 'missionAgcyProfile' => $missionAgcyProfile]) ?>
+			$this->render('../profile/profilePages/cards/_card-chaplain', [
+				'church' => $church, 
+				'profile' => $profile, 
+				'missionary' => $missionary, 
+				'missionAgcy' => $missionAgcy, 
+				'missionAgcyProfile' => $missionAgcyProfile
+			]) ?>
 		<?= $otherMinistries ? $this->render('../profile/profilePages/cards/_card-otherministries', ['otherMinistries' => $otherMinistries]) : NULL ?>
         <?= $schoolsAttended ? $this->render('../profile/profilePages/cards/_card-school', ['schoolsAttended' => $schoolsAttended]) : NULL ?>
 		<?= $fellowships ? $this->render('../profile/profilePages/cards/_card-fellowships', ['fellowships' => $fellowships]) : NULL ?>

@@ -405,7 +405,7 @@ class SiteController extends Controller
     }
 
     /**
-     * Displays about page.
+     * Shows "already registered" message.
      *
      * @return mixed
      */
@@ -469,6 +469,16 @@ class SiteController extends Controller
                 return $this->redirect('settings');
             }
         }
+        return $this->rendirect('invalid-token');
+    }
+
+    /**
+     * Displays invalid registration token message.
+     *
+     * @return mixed
+     */
+    public function actionInvalidToken()
+    {
         return $this->render('invalidToken');
     }
 

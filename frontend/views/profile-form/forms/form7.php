@@ -16,7 +16,7 @@ use yii\widgets\ActiveForm;
 /* @var $model app\models\Profile */
 /* @var $form yii\widgets\ActiveForm */
 
-$this->title = 'Missionary Field';
+$this->title = 'Field Information';
 ?>
 
 <?= $this->render('_profileFormHeader', ['profile' => $profile, 'pp' => $pp]) ?>

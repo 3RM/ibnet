@@ -274,6 +274,8 @@ class ProfileMgmtController extends ProfileController
 
     /**
      * Initiate a profile transfer to another user
+     * @param string $id
+     * @param string $email new owner email
      * @return 
      */
     public function actionTransferInitiate($id, $email)
@@ -294,7 +296,6 @@ class ProfileMgmtController extends ProfileController
 
     /**
      * Transfer has been initiated
-     * @param string $id
      * @return mixed
      */
     public function actionTransferSent() 

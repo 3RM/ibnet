@@ -345,7 +345,7 @@ class Profile extends yii\db\ActiveRecord
     public function scenarios() {
         return[
     // create a new profile
-            'create' => ['profile_name', 'type', 'ptype', 'mtype'],
+            'create' => ['profile_name', 'type', 'ptype', 'mtype', 'ctype'],
     // transfer a profile
             'transfer' => ['select'],
     // nd-org: Name & Description Organization
@@ -431,6 +431,11 @@ class Profile extends yii\db\ActiveRecord
             }, 'whenClient' => "function (attribute, value) {
                 return $('#profile-type').val() == '" . self::TYPE_MISSIONARY . "';
             }", 'message' => 'Missionary type is required.', 'on' => 'create'],
+            ['ctype', 'required', 'when' => function($profile) {
+                return $profile->type == self::TYPE_CHAPLAIN;
+            }, 'whenClient' => "function (attribute, value) {
+                return $('#profile-type').val() == '" . self::TYPE_CHAPLAIN . "';
+            }", 'message' => 'Chaplain type is required.', 'on' => 'create'],
             ['profile_name', 'string', 'max' => 60, 'on' =>'create'],
             ['profile_name', 'filter', 'filter' => 'strip_tags', 'on' => 'create'],
 
@@ -2101,7 +2106,7 @@ class Profile extends yii\db\ActiveRecord
             ProfileMail::sendAdminActiveProfile($this->id);
         }
 
-        if ($this->type == self::TYPE_MISSIONARY) {
+        if (($this->type == self::TYPE_MISSIONARY) || ($this->type == self::TYPE_CHAPLAIN)) {
             $missionary = $this->missionary;
             $missionary->generateRepositoryKey();
             $missionary->addToGroupMembers();

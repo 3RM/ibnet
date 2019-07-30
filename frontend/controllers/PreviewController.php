@@ -204,6 +204,7 @@ class PreviewController extends ProfileFormController
             }
 
             $church = $profile->homeChurch;
+            $missionary = $profile->missionary;
             $fellowships = $profile->fellowships;
             $missionAgcy = $missionary->missionAgcy;
             $missionAgcyProfile = $missionAgcy ? $missionAgcy->linkedProfile : NULL;
@@ -224,6 +225,7 @@ class PreviewController extends ProfileFormController
             return $this->render('previewEvangChaplain', [
                 'profile' => $profile,
                 'church' => $church,
+                'missionary' => $missionary,
                 'missionAgcy' => $missionAgcy,
                 'missionAgcyProfile' => $missionAgcyProfile,
                 'otherMinistries' => $otherMinistries,

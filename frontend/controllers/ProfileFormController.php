@@ -49,7 +49,7 @@ class ProfileFormController extends ProfileController
         Profile::TYPE_PASTOR        => [1,  1,  1,  1,  1,  0,  0,  0,  1,  0,  1,  0,  1,  0,  0,  0,  0,  1,  0],  
         Profile::TYPE_EVANGELIST    => [1,  1,  1,  1,  1,  0,  0,  0,  1,  0,  1,  0,  1,  0,  0,  0,  0,  1,  0],
         Profile::TYPE_MISSIONARY    => [1,  1,  1,  1,  1,  0,  0,  1,  1,  1,  1,  0,  1,  0,  0,  1,  0,  0,  0],
-        Profile::TYPE_CHAPLAIN      => [1,  1,  1,  1,  1,  0,  0,  0,  1,  0,  1,  0,  1,  0,  0,  1,  0,  0,  0],
+        Profile::TYPE_CHAPLAIN      => [1,  1,  1,  1,  1,  0,  0,  1,  1,  0,  1,  0,  1,  0,  0,  1,  0,  0,  0],
         Profile::TYPE_STAFF         => [1,  1,  1,  1,  1,  0,  0,  0,  1,  0,  1,  0,  1,  0,  0,  0,  0,  0,  0],
         Profile::TYPE_CHURCH        => [1,  1,  1,  1,  1,  1,  1,  0,  0,  0,  0,  1,  0,  0,  1,  1,  1,  1,  0],
         Profile::TYPE_MISSION_AGCY  => [1,  1,  1,  1,  1,  1,  0,  0,  0,  0,  1,  0,  0,  0,  0,  0,  0,  0,  0],
@@ -93,7 +93,7 @@ class ProfileFormController extends ProfileController
         'Contact',
         'Staff',
         'Service Times',
-        'Missionary Field Information',
+        'Field Information',
         'Home Church',
         'Church Plant',
         'Ministry or Organization',
@@ -130,6 +130,7 @@ class ProfileFormController extends ProfileController
     /**
      * Render Forms list.  
      * User confirms agreement by clicking the "I Agree" button
+     * @param integer $id
      * @return 
      */
     public function actionFormsMenu($id)
@@ -150,7 +151,9 @@ class ProfileFormController extends ProfileController
      * FORM SEQUENCE
      * Redirect to the next form action, given a profile type and form number
      * Pass the profile id
-     *
+     * @param integer $type Profile type
+     * @param integer $fmNum Form number
+     * @param integer $id
      * @return mixed
      */
     public function actionFormRoute($type, $fmNum, $id)
@@ -190,7 +193,7 @@ class ProfileFormController extends ProfileController
      *     - form#-school
      *     - form#-org
      *     - form#-ind
-     *
+     * @param integer $id
      * @return mixed
      */
     public function actionForm0($id)
@@ -415,7 +418,7 @@ class ProfileFormController extends ProfileController
     /**
      * Image1 (i1)
      * Render: form#
-     *
+     * @param integer $id
      * @return mixed
      */
     public function actionForm1($id)
@@ -486,7 +489,7 @@ class ProfileFormController extends ProfileController
     /**
      * Image2 (i2)
      * Render: Form#
-     *
+     * @param integer $id
      * @return mixed
      */
     public function actionForm2($id)
@@ -553,7 +556,7 @@ class ProfileFormController extends ProfileController
      * Render:
      *     - form#-ind
      *     - form#-org
-     *
+     * @param integer $id
      * @return mixed
      */
     public function actionForm3($id)
@@ -616,7 +619,7 @@ class ProfileFormController extends ProfileController
     /**
      * Contact (co)
      * Render: Form#
-     *
+     * @param integer $id
      * @return mixed
      */
     public function actionForm4($id)
@@ -682,7 +685,7 @@ class ProfileFormController extends ProfileController
     /**
      * Staff (sf)
      * Render: Form#
-     *
+     * @param integer $id
      * @return mixed
      */
     public function actionForm5($id)
@@ -782,7 +785,7 @@ class ProfileFormController extends ProfileController
     /**
      * Church Service Times (st)
      * Render: Form#
-     *
+     * @param integer $id
      * @return mixed
      */
     public function actionForm6($id)
@@ -873,7 +876,7 @@ class ProfileFormController extends ProfileController
     /**
      * Missionary Field Information (fi)
      * Render: Form#
-     *
+     * @param integer $id
      * @return mixed
      */
     public function actionForm7($id)
@@ -908,6 +911,8 @@ class ProfileFormController extends ProfileController
             if (!$profile->missionary) {
                 // Link new missionary record to profile
                 $profile->link('missionary', $missionary);
+                // Link profile to new missionary record
+                $missionary->link('profile', $profile);
             }
             $profile->updateAttributes(['url_loc' =>  $missionary->field]);
 
@@ -926,7 +931,7 @@ class ProfileFormController extends ProfileController
     /**
      * Home Church (hc)
      * Render: Form#
-     *
+     * @param integer $id
      * @return mixed
      */
     public function actionForm8($id)
@@ -986,7 +991,7 @@ class ProfileFormController extends ProfileController
      /**
      * Church Plant (cp)
      * Render: Form#
-     *
+     * @param integer $id
      * @return mixed
      */
     public function actionForm9($id)
@@ -1052,7 +1057,7 @@ class ProfileFormController extends ProfileController
     /**
      * Parent Ministry (pm)
      * Render: Form#
-     *
+     * @param integer $id
      * @return mixed
      */
     public function actionForm10($id)
@@ -1150,7 +1155,7 @@ class ProfileFormController extends ProfileController
     /**
      * Programs (pg)
      * Render: Form#
-     *
+     * @param integer $id
      * @return mixed
      */
     public function actionForm11($id)
@@ -1192,7 +1197,7 @@ class ProfileFormController extends ProfileController
     /**
      * Schools Attended (sa)
      * Render: Form#
-     *
+     * @param integer $id
      * @return mixed
      */
     public function actionForm12($id)
@@ -1249,7 +1254,7 @@ class ProfileFormController extends ProfileController
     /**
      * School Levels (sl)
      * Render: Form#
-     *
+     * @param integer $id
      * @return mixed
      */
     public function actionForm13($id)
@@ -1292,7 +1297,7 @@ class ProfileFormController extends ProfileController
     /**
      * Distinctives (di)
      * Render: form#
-     *
+     * @param integer $id
      * @return mixed
      */
     public function actionForm14($id)
@@ -1337,7 +1342,7 @@ class ProfileFormController extends ProfileController
      * Render:
      *     - form#-church
      *     - form#-missionary
-     *
+     * @param integer $id
      * @return mixed
      */
     public function actionForm15($id)
@@ -1354,11 +1359,9 @@ class ProfileFormController extends ProfileController
             return $this->redirect(['form-route', 'type' => $profile->type, 'fmNum' => $fmNum, 'id' => $id]);
         }
 
-        if ($profile->type == Profile::TYPE_MISSIONARY || $profile->type == Profile::TYPE_CHAPLAIN) {
+        if (($profile->type == Profile::TYPE_MISSIONARY) || ($profile->type == Profile::TYPE_CHAPLAIN)) {
             $missionary = $profile->missionary ?? new Missionary();
-            $profile->type == Profile::TYPE_MISSIONARY ?
-                $missionary->scenario = 'ma-missionary' :
-                $missionary->scenario = 'ma-chaplain';
+            $missionary->scenario = $profile->type == Profile::TYPE_MISSIONARY ? 'ma-missionary' : 'ma-chaplain';
         }
 
     // ************************* Remove Packet *********************************
@@ -1433,7 +1436,7 @@ class ProfileFormController extends ProfileController
     /**
      * Missions Housing (mh)
      * Render: form#
-     *
+     * @param integer $id
      * @return mixed
      */
     public function actionForm16($id)
@@ -1482,7 +1485,7 @@ class ProfileFormController extends ProfileController
      *     form#-church
      *     form#-ind
      *     form#-school
-     *
+     * @param integer $id
      * @return mixed
      */
     public function actionForm17($id)
@@ -1550,7 +1553,7 @@ class ProfileFormController extends ProfileController
     /**
      * Tag (ta)
      * Render: form#
-     *
+     * @param integer $id
      * @return mixed
      */
     public function actionForm18($id)
@@ -1602,7 +1605,7 @@ class ProfileFormController extends ProfileController
 
     /**
      * Renders missing-fields if required form data is missing from the profile
-     * @param string $id
+     * @param integer $id
      * @param array $missing
      * @return mixed
      */
@@ -1614,8 +1617,8 @@ class ProfileFormController extends ProfileController
 
     /**
      * Renders duplicate-profile if a duplicate profile is found
-     * @param string $id
-     * @param array $missing
+     * @param integer $id
+     * @param integer $dupId
      * @return mixed
      */
     public function actionDuplicateProfile($id, $dupId) 
