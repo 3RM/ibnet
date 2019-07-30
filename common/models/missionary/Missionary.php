@@ -77,6 +77,8 @@ class Missionary extends \yii\db\ActiveRecord
     {
         return [
             [['field', 'status'], 'required', 'on' => 'fi'],
+            [['profile'], 'safe', 'on' => 'fi'],
+            
             [['cp_pastor_at', 'showMap'], 'safe', 'on' => 'cp'],
             [['mission_agcy_id'], 'required', 'on' => 'ma-missionary'],
             [['packet'], 'file', 'extensions' => 'pdf', 'mimeTypes' => 'application/pdf', 'maxFiles' => 1, 'maxSize' => 1024 * 4000, 'skipOnEmpty' => true, 'on' => 'ma-missionary'],

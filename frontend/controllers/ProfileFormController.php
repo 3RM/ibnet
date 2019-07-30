@@ -888,6 +888,7 @@ class ProfileFormController extends ProfileController
         if (!$missionary = $profile->missionary) {
             $missionary = new Missionary();
             $missionary->user_id = Yii::$app->user->identity->id;
+            $missionary->profile_id = $profile->id;
         }
         $missionary->scenario = 'fi';
 
