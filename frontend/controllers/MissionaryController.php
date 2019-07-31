@@ -37,7 +37,7 @@ class MissionaryController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'except' => ['update', 'chimp-request', 'new-feature'],
+                'except' => ['update', 'chimp-request'],
                 'rules' => [
                     [
                         'allow' => false,

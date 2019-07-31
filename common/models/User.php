@@ -671,7 +671,11 @@ class User extends ActiveRecord implements
      */
     public function getIsMissionary()
     {
-        return Profile::find()->where(['user_id' => $this->id, 'type' => Profile::TYPE_MISSIONARY])->andWhere(['!=', 'status', Profile::STATUS_NEW])->exists();
+        return Profile::find()->where(['user_id' => $this->id])
+            ->andWhere(['or', 
+                ['type' => Profile::TYPE_MISSIONARY],
+                ['type' => Profile::TYPE_CHAPLAIN]
+            ])->andWhere(['!=', 'status', Profile::STATUS_NEW])->exists();
     }
 
     /**

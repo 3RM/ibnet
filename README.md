@@ -46,9 +46,9 @@ Verified working with Composer v.1.8.4; fxp/composer-asset-plugin v1.4.4
 * Navigate to your Yii project directory
 * Run:
 ```
-composer update 	// Or as needed: php composer.phar update
+composer install 	// Or as needed: php composer.phar install
 ```
-This will create a vendor directory and install all third-party extensions (including the Yii framework) into vendor.
+This will create a vendor directory and install all third-party extensions (including the Yii framework) into /vendor.
 
 
 ### Run Database Migrations
@@ -58,11 +58,10 @@ php yii migrate/up --migrationPath=@vendor/rmrevin/yii2-comments/migrations/
 php yii migrate --migrationPath=@vendor/uguranyum/yii2-icalender/migration --interactive=0
 php yii migrate
 ```
-A future update of this repository will include instructions for using fake data using yiisoft/yii2-faker.
 
 Access the application at frontend/web
 
-### Send a pull request
+### Pull Request
 Make your updates and send a pull request.  All contributors are invited to review and discuss.
 
 
