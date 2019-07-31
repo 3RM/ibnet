@@ -28,7 +28,13 @@ $this->title = $profile->mainName;
 
 		<?= $profile->type == Profile::TYPE_EVANGELIST ? 
 			$this->render('cards/_card-evangelist', ['church' => $church, 'parentMinistry' => $parentMinistry]) :
-			$this->render('cards/_card-chaplain', ['church' => $church, 'missionAgcyProfile' => $missionAgcyProfile]) ?>
+			$this->render('../profile/profilePages/cards/_card-chaplain', [
+				'church' => $church, 
+				'profile' => $profile, 
+				'missionary' => $missionary, 
+				'missionAgcy' => $missionAgcy, 
+				'missionAgcyProfile' => $missionAgcyProfile
+			]) ?>
 		<?= !empty($otherMinistries) ? $this->render('cards/_card-otherministries', ['otherMinistries' => $otherMinistries]) : NULL ?>
 		<?= !empty($schoolsAttended) ? $this->render('cards/_card-school', ['schoolsAttended' => $schoolsAttended]) : NULL ?>
 		<?= !empty($fellowships) ? $this->render('cards/_card-fellowships', ['fellowships' => $fellowships]) : NULL ?>

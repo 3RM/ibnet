@@ -537,6 +537,7 @@ class ProfileController extends Controller
                 'profile' => $profile,
                 'church' => $church,
                 'fellowships' => $fellowships,
+                'missionary' => $missionary,
                 'missionAgcy' => $missionAgcy,
                 'missionAgcyProfile' => $missionAgcyProfile,
                 'otherMinistries' => $otherMinistries,

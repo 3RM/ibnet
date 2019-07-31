@@ -79,10 +79,14 @@ class MissionaryController extends Controller
         if (!$profile = Profile::find()
             ->where(['and', 
                 ['user_id' => $user->id],
-                ['type' => Profile::TYPE_MISSIONARY],
                 ['!=', 'status', Profile::STATUS_TRASH],
                 ['!=', 'status', Profile::STATUS_NEW]
-            ])->one()) 
+            ])
+            ->andWhere(['or',
+                ['type' => Profile::TYPE_MISSIONARY],
+                ['type' => Profile::TYPE_CHAPLAIN],
+            ])
+            ->one()) 
         {
             throw new NotFoundHttpException;
         }
