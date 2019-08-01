@@ -28,7 +28,7 @@ $this->title = $profile->mainName;
 
 		<?= $profile->type == Profile::TYPE_EVANGELIST ? 
 			$this->render('cards/_card-evangelist', ['church' => $church, 'parentMinistry' => $parentMinistry]) :
-			$this->render('../profile/profilePages/cards/_card-chaplain', [
+			$this->render('cards/_card-chaplain', [
 				'church' => $church, 
 				'profile' => $profile, 
 				'missionary' => $missionary, 
