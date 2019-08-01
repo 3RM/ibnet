@@ -292,7 +292,10 @@ class MissionaryController extends Controller
         // Store token-datacenter to db
         $profile = Profile::find()
             ->where(['user_id' => Yii::$app->user->identity->id])
-            ->andWhere(['type' => 'Missionary'])
+            ->andWhere(['or',
+                ['type' => Profile::TYPE_MISSIONARY],
+                ['type' => Profile::TYPE_CHAPLAIN]
+            ])
             ->one();
         $missionary = $profile->missionary;
         $missionary->updateAttributes(['mc_token' => $token . '-' . $dc]);
