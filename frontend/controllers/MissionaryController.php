@@ -317,7 +317,10 @@ class MissionaryController extends Controller
 
         $profile = Profile::find()
             ->where(['user_id' => Yii::$app->user->identity->id])
-            ->andWhere(['type' => 'Missionary'])
+            ->andWhere(['or',
+                ['type' => Profile::TYPE_MISSIONARY],
+                ['type' => Profile::TYPE_CHAPLAIN]
+            ])
             ->one();
         $missionary = $profile->missionary;
         // Generic model for capturing user input
