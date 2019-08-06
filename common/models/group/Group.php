@@ -19,8 +19,8 @@ use common\models\missionary\MissionaryUpdate;
 use common\models\Subscription;
 use common\models\Utility;
 use common\models\User;
-use common\rbac\PermissionGroup;
 use common\models\group\PrayerTag;
+use common\rbac\PermissionGroup;
 use GuzzleHttp\Client;
 use sadovojav\cutter\behaviors\CutterBehavior;
 use Yii;
@@ -174,6 +174,11 @@ class Group extends ActiveRecord
             'category-new' => ['categoryName', '_categoryDescription', 'categoryBannerColor', 'categoryTitleColor'],
             'category-edit' => ['cid', 'categoryName', 'oldCategoryName', '_categoryDescription', 'categoryBannerColor', 'categoryTitleColor'],
             'send-notice' => ['subject', 'message'],
+            'backend' => ['id', 'user_id', 'transfer_token', 'reviewed', 'url_name', 'created_at', 'status', 'last_visit', 'name', 'description', 'image', 'private', 
+                            'hide_on_profiles', 'not_searchable', 'group_level', 'ministry_id', 'discourse_group_name', 'discourse_group_id', 'discourse_category_id', 
+                            'feature_prayer', 'feature_calendar', 'feature_forum', 'feature_update', 'feature_document', 'feature_donation', 'prayer_email', 
+                            'prayer_email_pwd', 'notice_email', 'notice_email_pwd'],
+            'backend-emails-pending' => ['prayer_email', 'prayer_email_pwd', 'notice_email', 'notice_email_pwd'],
         ];
     }
 
@@ -237,6 +242,16 @@ class Group extends ActiveRecord
 
             [['subject', 'message'], 'required', 'on' => 'send-notice'],
             [['subject', 'message'], 'string', 'on' => 'send-notice'],
+
+            [['id', 'user_id', 'transfer_token', 'reviewed', 'url_name', 'created_at', 'status', 'last_visit', 'name', 'description', 'image', 'private', 
+                'hide_on_profiles', 'not_searchable', 'group_level', 'ministry_id', 'discourse_group_name', 'discourse_group_id', 'discourse_category_id', 
+                'feature_prayer', 'feature_calendar', 'feature_forum', 'feature_update', 'feature_document', 'feature_donation', 'prayer_email', 
+                'prayer_email_pwd', 'notice_email', 'notice_email_pwd'
+            ], 'safe', 'on' => 'backend'],
+
+            [['prayer_email', 'notice_email'], 'email', 'message' => 'Enter a valid email', 'on' => 'backend-emails-pending'],
+            [['prayer_email', 'notice_email'], 'unique', 'message' => 'Enter a unique email', 'on' => 'backend-emails-pending'],
+            [['prayer_email_pwd', 'notice_email_pwd'], 'string', 'on' => 'backend-emails-pending'],
         ];
     }
 
@@ -266,7 +281,7 @@ class Group extends ActiveRecord
             'feature_donation' => '',
             'newUserEmail' => '',
             'categoryName' => 'Category Name',
-            '_categoryDescription' => 'Description'
+            '_categoryDescription' => 'Description',
         ];
     }
 
@@ -308,6 +323,7 @@ class Group extends ActiveRecord
             $mail->message = 'Group ' . $this->name . ' was just created by ' . $this->owner->fullName;
             $mail->sendNotification();
         }
+        $this->save();
 
         // Create a new group member for group owner
         if (!$this->ownerMember) {
@@ -933,20 +949,113 @@ class Group extends ActiveRecord
     }
 
     /**
+     * Inactivate group
+     * @param bool $admin Whether the inactivation was an action taken by admin
      * @return \yii\db\ActiveQuery
      */
-    public function inactivate()
+    public function inactivate($admin=false)
     {
+        // Remove group from forum
+        $this->removeForumGroup();
+        
+        if ($admin) {
+            // Notify group owner
+            $mail = Subscription::getSubscriptionByEmail($this->owner->email) ?? new Subscription();
+            $mail->headerColor = Subscription::COLOR_GROUP;
+            $mail->headerImage = Subscription::IMAGE_GROUP;
+            $mail->headerText = 'Group Inactivated';
+            $mail->to = $this->owner->email;
+            $mail->subject = 'Group Inactivated';
+            $mail->title = $this->name . ' Inactivated';
+            $mail->message = 'Your IBNet group ' . $this->name . ' has been inactivated.  Please direct any questions to admin@ibnet.org.';
+            $mail->extMessage = $this->message;
+            $mail->sendNotification();
+        }
+
         return $this->updateAttributes(['status' => self::STATUS_INACTIVE]);
     }
 
     /**
+     * Delete a group
+     *   - Hard delete queued alerts
+     *   - Hard delete prayer tags and requests
+     *   - Hard delete calendars and events
+     *   - Hard delete categories and topics
+     *   - Hard delete group members
+     *   - Set group status to trash and name to DELETE-ID-* 
+     * @param bool $admin Whether the inactivation was an action taken by admin
      * @return \yii\db\ActiveQuery
      */
-    public function trash()
+    public function trash($admin=false)
     {
-        // delete group members? / delete prayer lists?  et. al. / update name to '' so others can use it
-        return $this->updateAttributes(['status' => self::STATUS_TRASH]);
+        // Delete any queued alerts
+        GroupAlertQueue::deleteAll(['group_id' => $this->id]);
+
+        // Delete prayer tags and requests
+        PrayerTag::deleteAll(['group_id' => $this->id]);
+        
+        if ($prayers = Prayer::find()->where(['group_id' => $this->id])->all()) {
+            foreach ($prayers as $prayer) {
+                PrayerUpdate::deleteAll(['prayer_id' => $prayer->id]);
+            }
+        }
+        Prayer::deleteAll(['group_id' => $this->id]);
+
+        // Delete calendars/events
+        GroupCalendarEvent::deleteAll(['group_id' => $this->id]);
+        GroupIcalendarUrl::deleteAll(['group_id' => $this->id]);
+
+        // Delete forum categories and topics
+        $parentCategory = $this->parentCategory;
+        $categories = $this->childCategories;
+        $topics = $this->allCategoryTopics;
+        // Remove parent catecory topics
+        if (isset($topics[$parentCategory->id])) { //Utility::pp($topics);
+            foreach ($topics[$parentCategory->id] as $i => $topic) {
+                if ($i > 0) {
+                    $this->removeTopic($topic->id);
+                }
+            }
+        }
+        // Remove child category topics
+        if ($categories) {
+            foreach ($categories as $category) {
+                if (isset($topics[$category->id])) {
+                    foreach ($topics[$category->id] as $topic) {
+                        $this->removeTopic($topic->id);
+                    }
+                }
+                // Remove child category
+                $this->cid = $category->id;
+                $this->removeCategory();
+            }
+        }
+        // Remove parent category
+        $this->cid = $this->discourse_category_id;
+        $this->removeCategory();        
+        
+        // delete group members
+        GroupMember::deleteAll(['group_id' => $this->id]);
+
+        if ($admin) {
+            // Notify group owner
+            $mail = Subscription::getSubscriptionByEmail($this->owner->email) ?? new Subscription();
+            $mail->headerColor = Subscription::COLOR_GROUP;
+            $mail->headerImage = Subscription::IMAGE_GROUP;
+            $mail->headerText = 'Group Deleted';
+            $mail->to = $this->owner->email;
+            $mail->subject = 'Group Deleted';
+            $mail->title = $this->name . ' Deleted';
+            $mail->message = 'Your IBNet group ' . $this->name . ' has been deleted.  Please direct any questions to admin@ibnet.org.';
+            $mail->extMessage = $this->message;
+            $mail->sendNotification();
+        }
+
+        // Change status and name to free it for other groups
+        return $this->updateAttributes([
+            'name' => 'DELETED-' . $this->id . '-' . $this->name,
+            'status' => self::STATUS_TRASH
+        ]);
     }
 
     /**

@@ -109,6 +109,15 @@ p.col-300 {
     padding: 0 10px;
     border: 1px solid gray;
 }
+.pending-group-emails {
+    border-radius: 6px;
+    width: 300px;
+    height: 40px;
+    padding: 0 10px;
+    margin: 0 5px;
+    border: 1px solid gray;
+    width: 240px;
+}
 .list-row a.action,
 .list-row button.action {
     font-size: 1.4em;
@@ -286,6 +295,9 @@ a.desc:after {
 .grid-view .filters select {
     min-width: 50px;
 }
+form[id^="group-emails-form-"] {
+    display: flex;
+}
 
 /*Cron schedule*/
 .schedule {
@@ -376,6 +388,11 @@ button.link-btn:hover {
     color: #aeaeae;
     font-style: italic;
     font-size: 0.9em;
+}
+.danger {
+    background-color: #ff8c8c !important;
+    color: #730404;
+    font-weight: bold;
 }
 
 

@@ -1,5 +1,6 @@
 <?php
 use common\models\Utility;
+use common\models\group\Group;
 use common\models\profile\Profile;
 use yii\helpers\Html;
 
@@ -156,6 +157,15 @@ use yii\helpers\Html;
                     <?= ($cntF = Profile::find()->where(['inappropriate' => 1])->count()) ?
                         Html::a('<i class="fa fa-flag-o"></i><span class="label label-danger">' . $cntF . '</span>', '/directory/flagged') :
                         Html::a('<i class="fa fa-flag-o"></i>', '/directory/flagged') ?>
+                </li>
+                <!-- Pending Group Emails: style can be found in dropdown.less -->
+                <li class="dropdown tasks-menu">
+                    <?= ($cntP = Group::find()
+                            ->where(['or', ['prayer_email' => NULL],['prayer_email_pwd' => NULL],['notice_email' => NULL],['notice_email_pwd' => NULL]])
+                            ->andWhere(['status' => Group::STATUS_ACTIVE])
+                            ->count()) ?
+                        Html::a('<i class="fa fa-send"></i><span class="label label-danger">' . $cntP . '</span>', '/groups/pending-emails') :
+                        Html::a('<i class="fa fa-send"></i>', '/groups/pending-emails') ?>
                 </li>
                 <!-- User Account: style can be found in dropdown.less -->
 

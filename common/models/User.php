@@ -80,6 +80,11 @@ class User extends ActiveRecord implements
     public $emailMaintenance = 1;
 
     /**
+     * @var string $select Selection from dropdown list
+     */
+    public $select;
+
+    /**
      * @var string $subscriptionProfile Profile page view stats
      */
     public $subscriptionProfile;
@@ -559,17 +564,11 @@ class User extends ActiveRecord implements
         $this->updateAttributes(['status' => User::STATUS_BANNED]);
 
         // Notify account owner
-        Yii::$app->mailer
-            ->compose(
-                ['html' => 'site/notification-html', 'text' => 'site/notification-text'],
-                [
-                    'title' => 'Change to your IBNet account', 
-                    'message' => 'Your account at ibnet.org has been disabled.  If you feel this is in error, please contact us at admin@ibnet.org.',
-                ])
-            ->setFrom(Yii::$app->params['email.admin'])
-            ->setTo($this->email)
-            ->setSubject(Yii::$app->params['email.systemSubject'])
-            ->send();
+        $mail = Subscription::getSubscriptionByEmail($this->email) ?? new Subscription();
+        $mail->to = $this->email;
+        $mail->title = 'Change to your IBNet account';
+        $mail->message = 'Your account at ibnet.org has been disabled.  Please direct any questions to admin@ibnet.org.';
+        $mail->sendNotification();
 
         return TRUE;
     }
@@ -603,18 +602,12 @@ class User extends ActiveRecord implements
         $this->updateAttributes(['status' => User::STATUS_ACTIVE]); 
 
         // Notify account owner
-        Yii::$app->mailer
-            ->compose(
-                ['html' => 'site/notification-html', 'text' => 'site/notification-text'],
-                [
-                    'title' => 'Change to your IBNet account', 
-                    'message' => 'Your account at ibnet.org has been reenabled.  If you any questions, please contact us at admin@ibnet.org.',
-                ])
-            ->setFrom(Yii::$app->params['email.admin'])
-            ->setTo($this->email)
-            ->setSubject(Yii::$app->params['email.systemSubject'])
-            ->send();
-
+        $mail = Subscription::getSubscriptionByEmail($this->email) ?? new Subscription();
+        $mail->to = $this->email;
+        $mail->title = 'Change to your IBNet account';
+        $mail->message = 'Your account at ibnet.org has been reenabled.  Please direct any questions to admin@ibnet.org.';
+        $mail->sendNotification();
+        
         return TRUE;
     }
 
