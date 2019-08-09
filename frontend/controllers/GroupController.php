@@ -280,14 +280,18 @@ class GroupController extends Controller
                 }
 
                 // If forum is selected, create forum group
-                if ((($group->feature_forum == 1) && ($group->getOldAttribute('feature_forum') == 0)) 
-                    || (($group->status == Group::STATUS_ACTIVE) && ($group->getOldAttribute('status') != GROUP::STATUS_ACTIVE))) {
+                if (($group->feature_forum == 1) && ($group->getOldAttribute('feature_forum') == 0)) {
                     $group->createForumGroup();
-                }
-
+                
                 // If forum is unselected, remove forum group
-                if (($group->feature_forum == 0) && ($group->getOldAttribute('feature_forum') == 1)) {
+                } elseif (($group->feature_forum == 0) && ($group->getOldAttribute('feature_forum') == 1)) {
                     $group->removeForumGroup();
+
+                // If forum is reactivated, create forum group
+                } elseif (($group->feature_forum == 1) 
+                    && ($group->status == Group::STATUS_ACTIVE) 
+                    && ($group->getOldAttribute('status') != GROUP::STATUS_ACTIVE)) {
+                    $group->createForumGroup();
                 }
 
                 // Save

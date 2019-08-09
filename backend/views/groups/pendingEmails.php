@@ -15,8 +15,10 @@ $this->title = 'Pending Group Emails';
 	<div class="header-row">
 		<p class="col-60">ID</p>
 		<p class="col-60">UID</p>
-		<p class="col-300">Name</p>
-		<p class="col-240">Prayer Email</p>
+		<p class="col-240">Name</p>
+        <p class="col-60">Prayer</p>
+        <p class="col-60">Notice</p>
+        <p class="col-240">Prayer Email</p>
 		<p class="col-240">Prayer Email Pwd</p>
         <p class="col-240">Notification Email</p>
         <p class="col-240">Notification Email Pwd</p>
@@ -26,15 +28,32 @@ $this->title = 'Pending Group Emails';
 		<div class="list-row group">
 			<p class="col-60 button" id=<?= '"group-' . $group->id . '"' ?>><?= Html::button($group->id, ['class' => 'btn-link']) ?></p>
             <p class="col-60 button" id=<?= '"user-' . $group->id . '-' . $group->user_id . '"' ?>><?= Html::button($group->user_id, ['class' => 'btn-link']) ?></p>
-    		<p class="col-300"><?= $group->name ?></p>
+    		<p class="col-240"><?= $group->name ?></p>
+            <p class="col-60"><?= $group->feature_prayer ?></p>
+            <p class="col-60"><?= $group->feature_notification ?></p>
             <?php $form = ActiveForm::begin([
                 'id' => 'group-emails-form-' . $group->id, 
                 'enableAjaxValidation' => true,
             ]); ?>
-    		<?= $form->field($group, 'prayer_email')->textInput(['class' => 'pending-group-emails'])->label(false) ?>
-            <?= $form->field($group, 'prayer_email_pwd')->textInput(['class' => 'pending-group-emails'])->label(false) ?>
-            <?= $form->field($group, 'notice_email')->textInput(['class' => 'pending-group-emails'])->label(false) ?>
-            <?= $form->field($group, 'notice_email_pwd')->textInput(['class' => 'pending-group-emails'])->label(false) ?>
+            <?php if ($group->feature_prayer && $group->feature_notification) { ?>
+                <?php if (!$group->prayerIsSet) { ?>
+                    <?= $form->field($group, 'prayer_email')->textInput(['class' => 'pending-group-emails'])->label(false) ?>
+                    <?= $form->field($group, 'prayer_email_pwd')->textInput(['class' => 'pending-group-emails'])->label(false) ?>
+                <?php } else { ?>
+                    <span style="width:500px;"></span>
+                <?php } ?>    
+                <?php if (!$group->noticeIsSet) { ?>
+                    <?= $form->field($group, 'notice_email')->textInput(['class' => 'pending-group-emails'])->label(false) ?>
+                    <?= $form->field($group, 'notice_email_pwd')->textInput(['class' => 'pending-group-emails'])->label(false) ?>
+                <?php } ?>    
+            <?php } elseif ($group->feature_prayer) { ?>
+                <?= $form->field($group, 'prayer_email')->textInput(['class' => 'pending-group-emails'])->label(false) ?>
+                <?= $form->field($group, 'prayer_email_pwd')->textInput(['class' => 'pending-group-emails'])->label(false) ?>
+            <?php } elseif ($group->feature_notification) { ?>
+                <span style="width:500px;"></span>
+                <?= $form->field($group, 'notice_email')->textInput(['class' => 'pending-group-emails'])->label(false) ?>
+                <?= $form->field($group, 'notice_email_pwd')->textInput(['class' => 'pending-group-emails'])->label(false) ?>
+            <?php } ?>
             <?= Html::submitButton(Html::icon('save'), [
                 'name' => 'save',
                 'value' => $group->id,

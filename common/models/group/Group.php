@@ -119,6 +119,16 @@ class Group extends ActiveRecord
     public $cid;
 
     /**
+     * @var boolean $prayerIsSet Backend status of pending prayer email
+     */
+    public $prayerIsSet = NULL;
+
+    /**
+     * @var boolean $notificationIsSet Backend status of notificaion email
+     */
+    public $noticeIsSet = NULL;
+
+    /**
      * @const int $STATUS_* The status of the group.
      */
     const STATUS_NEW = 0;
@@ -174,10 +184,12 @@ class Group extends ActiveRecord
             'category-new' => ['categoryName', '_categoryDescription', 'categoryBannerColor', 'categoryTitleColor'],
             'category-edit' => ['cid', 'categoryName', 'oldCategoryName', '_categoryDescription', 'categoryBannerColor', 'categoryTitleColor'],
             'send-notice' => ['subject', 'message'],
-            'backend' => ['id', 'user_id', 'transfer_token', 'reviewed', 'url_name', 'created_at', 'status', 'last_visit', 'name', 'description', 'image', 'private', 
-                            'hide_on_profiles', 'not_searchable', 'group_level', 'ministry_id', 'discourse_group_name', 'discourse_group_id', 'discourse_category_id', 
-                            'feature_prayer', 'feature_calendar', 'feature_forum', 'feature_update', 'feature_document', 'feature_donation', 'prayer_email', 
-                            'prayer_email_pwd', 'notice_email', 'notice_email_pwd'],
+            'backend' => [
+                'id', 'user_id', 'transfer_token', 'reviewed', 'url_name', 'created_at', 'status', 'last_visit', 'name', 'description', 'image', 'private', 
+                'hide_on_profiles', 'not_searchable', 'group_level', 'ministry_id', 'discourse_group_name', 'discourse_group_id', 'discourse_category_id', 
+                'feature_prayer', 'feature_calendar', 'feature_forum', 'feature_update', 'feature_document', 'feature_donation', 'prayer_email', 
+                'prayer_email_pwd', 'notice_email', 'notice_email_pwd'
+            ],
             'backend-emails-pending' => ['prayer_email', 'prayer_email_pwd', 'notice_email', 'notice_email_pwd'],
         ];
     }
@@ -418,9 +430,9 @@ class Group extends ActiveRecord
                 'form_params' => [
                     'name' => $this->name,
                     'color' => 'green',
-                    'text_color' => 'black'
+                    'text_color' => 'white'
                 ]
-            ]); 
+            ]);
 
             // Save default category id
             $response = $client->get('/categories.json', ['headers' => $this->headers]); 
@@ -435,8 +447,8 @@ class Group extends ActiveRecord
             'headers' => $this->headers,
             'form_params' => [
                 'name' => $this->name,
-                'color' => 'green',
-                'text_color' => 'black',
+                'color' => $this->discourse_category_header_color ?? 'green',
+                    'text_color' => $this->discourse_category_title_color ?? 'white',
                 'permissions[' . $this->discourse_group_name . ']' => 1,
             ]
         ]);
@@ -678,6 +690,13 @@ class Group extends ActiveRecord
                 'text_color' => Utility::colorToHex($this->categoryTitleColor, ''),
             ]
         ]);
+        // Save colors to group model for use in recreating the parent category when group is reactivated
+        if ($this->cid == $this->discourse_category_id) {
+            $this->updateAttributes([
+                'discourse_category_header_color' => Utility::colorToHex($this->categoryBannerColor, ''),
+                'discourse_category_title_color' => Utility::colorToHex($this->categoryTitleColor, ''),
+            ]);
+        }
 
         // Update description
         //      get topic id

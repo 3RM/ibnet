@@ -41,6 +41,8 @@ class m190327_234414_create_group_tables extends Migration
             'discourse_group_name' => $this->string(),
             'discourse_group_id' => $this->integer(),
             'discourse_category_id' => $this->integer(),
+            'discourse_category_header_color' => $this->string(12),
+            'discourse_category_title_color' => $this->string(12),
             'feature_prayer' => $this->tinyInteger(1),
             'feature_calendar' => $this->tinyInteger(1),
             'feature_notification' => $this->tinyInteger(1),

@@ -12,6 +12,7 @@ use backend\models\GroupNotificationSearch;
 use backend\models\PrayerSearch;
 use backend\models\PrayerUpdateSearch;
 use backend\models\PrayerTagSearch;
+use common\models\Subscription;
 use common\models\Utility;
 use common\models\group\Group;
 use Yii;
@@ -200,10 +201,19 @@ class GroupsController extends Controller
             'status', 
             'approval_date', 
             'inactivate_date', 
-            'show_updates', 
-            'email_prayer_alert', 
-            'email_prayer_summary', 
-            'email_update_alert',
+            'show_updates',
+            [ 
+                'attribute' => 'email_prayer_alert',
+                'label' => 'Prayer Alert',
+            ],
+            [
+                'attribute' => 'email_prayer_summary', 
+                'label' => 'Prayer Weekly Summary',
+            ],
+            [
+                'attribute' => 'email_update_alert',
+                'label' => 'Update Alert',
+            ],
         ];
 
         return $this->render('groupMember', [
@@ -486,17 +496,50 @@ class GroupsController extends Controller
 
         if (isset($_POST['save']) && $group = Group::findOne($_POST['save'])) {
             $group->scenario = 'backend-emails-pending';
-            if ($group->load(Yii::$app->request->post()) && $group->save()) { 
+            if ($group->load(Yii::$app->request->post())) { 
                 // Notify group owner
-                
+                $mail = Subscription::getSubscriptionByEmail($group->owner->email) ?? new Subscription();
+                $mail->headerColor = Subscription::COLOR_GROUP;
+                $mail->headerImage = Subscription::IMAGE_GROUP;
+                $mail->headerText = 'Email Setup Complete';
+                $mail->to = $group->owner->email;
+                $mail->subject = 'IBNet Group Emails';
+                $mail->title = 'Group Email Setup Complete';
+                if (($group->prayer_email != $group->getOldAttribute('prayer_email'))
+                    && ($group->prayer_email_pwd != $group->getOldAttribute('prayer_email_pwd'))
+                    && ($group->notice_email != $group->getOldAttribute('notice_email'))
+                    && ($group->notice_email_pwd != $group->getOldAttribute('notice_email_pwd'))) {
+                    $mail->message = 'Two new emails have been setup for your group ' . $group->name . '. ' . 
+                        'Group members can email prayer requests, updates, and answers to ' . $group->prayer_email . '. 
+                        This is a quick way to add or update requests on the group prayer list without logging into the 
+                        IBNet website. Also, group members can email ' . $group->notice_email . ' to send a notification
+                        to the group without logging into IBNet.';
+                } elseif (($group->prayer_email != $group->getOldAttribute('prayer_email'))
+                    && ($group->prayer_email_pwd != $group->getOldAttribute('prayer_email_pwd'))) {
+                    $mail->message = 'A new email has been setup for your group ' . $group->name . '. ' . 
+                        'Group members can email prayer requests, updates, and answers to ' . $group->prayer_email . '. 
+                        This is a quick way to add or update requests on the group prayer list without logging into the 
+                        IBNet website.';
+                } elseif (($group->notice_email != $group->getOldAttribute('notice_email'))
+                    && ($group->notice_email_pwd != $group->getOldAttribute('notice_email_pwd'))) {
+                    $mail->message = 'A new email has been setup for your group ' . $group->name . '. ' . 
+                        'Group members can email ' . $group->notice_email . ' to send a notification
+                        to the group without logging into IBNet.';
+                }
+                $mail->sendNotification();
+                $group->save();
                 Yii::$app->session->setFlash('success', 'The data was saved and the group owner has been notified of the new email addresses.');
             }
         }
 
         $groups = Group::find()
-            ->where(['or',
+            ->where(['and',
+                ['feature_prayer' => 1],
                 ['prayer_email' => NULL],
                 ['prayer_email_pwd' => NULL],
+            ])
+            ->orWhere(['and',
+                ['feature_notification' => 1],
                 ['notice_email' => NULL],
                 ['notice_email_pwd' => NULL],
             ])
@@ -504,10 +547,22 @@ class GroupsController extends Controller
             ->all();
         foreach($groups as $group) {
             $group->scenario = 'backend-emails-pending';
-            $group->prayer_email = $group->prayer_email ?? 'prayer.' . $group->url_name . '@ibnet.org';
-            $group->prayer_email_pwd = $group->prayer_email_pwd ?? Utility::generateUniqueRandomString($group, 'prayer_email_pwd', 20);
-            $group->notice_email = $group->notice_email ?? 'notice.' . $group->url_name  . '@ibnet.org';
-            $group->notice_email_pwd = $group->prayer_email_pwd ?? Utility::generateUniqueRandomString($group, 'notice_email_pwd', 20);
+            if ($group->feature_prayer) {
+                if (empty($group->prayer_email) || empty($group->prayer_email_pwd)) {
+                    $group->prayer_email = 'prayer.' . $group->url_name . '@ibnet.org';
+                    $group->prayer_email_pwd = Utility::generateUniqueRandomString($group, 'prayer_email_pwd', 20);
+                } else {
+                    $group->prayerIsSet = 1;
+                }
+            }
+            if ($group->feature_notification) {
+                if (empty($group->notice_email) || empty($group->notice_email_pwd)) {
+                    $group->notice_email = 'notice.' . $group->url_name  . '@ibnet.org';
+                    $group->notice_email_pwd = Utility::generateUniqueRandomString($group, 'notice_email_pwd', 20);
+                } else {
+                    $group->noticeIsSet = 1;
+                }
+            }
         }
 
         return $this->render('pendingEmails', ['groups' => $groups]);

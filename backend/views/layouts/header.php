@@ -161,7 +161,16 @@ use yii\helpers\Html;
                 <!-- Pending Group Emails: style can be found in dropdown.less -->
                 <li class="dropdown tasks-menu">
                     <?= ($cntP = Group::find()
-                            ->where(['or', ['prayer_email' => NULL],['prayer_email_pwd' => NULL],['notice_email' => NULL],['notice_email_pwd' => NULL]])
+                            ->where(['and',
+                                ['feature_prayer' => 1],
+                                ['prayer_email' => NULL],
+                                ['prayer_email_pwd' => NULL],
+                            ])
+                            ->orWhere(['and',
+                                ['feature_notification' => 1],
+                                ['notice_email' => NULL],
+                                ['notice_email_pwd' => NULL],
+                            ])
                             ->andWhere(['status' => Group::STATUS_ACTIVE])
                             ->count()) ?
                         Html::a('<i class="fa fa-send"></i><span class="label label-danger">' . $cntP . '</span>', '/groups/pending-emails') :
