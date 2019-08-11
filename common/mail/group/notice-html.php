@@ -38,6 +38,9 @@ use yii\helpers\Html;
 	<tr>
 		<td colspan="2">
 			<div style="margin:20px; font-size:0.9em; background-color:#f6f6f6; color:gray; padding:15px;">
+				<p>
+					To reply to the entire group, reply to this email. To email the sender, click the name above.
+				</p>
 				<p>      
 					Note: For best results, please ensure your email client is set to format emails as html <em>and</em> text.
 				</p>

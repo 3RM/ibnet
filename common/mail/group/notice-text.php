@@ -12,6 +12,8 @@ use yii\helpers\Html;
 
 <?= $notification->message ?>
 
+To reply to the entire group, reply to this email. To email the sender, click the name above.
+
 Note: For best results, please ensure your email client is set to format emails as html and text.
     
 For assistance, contact <?= Yii::$app->params['email.admin'] ?> or visit the forum at <?= Yii::$app->params['url.forum'] ?> 

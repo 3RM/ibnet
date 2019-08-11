@@ -31,6 +31,10 @@ class Utility
 
     /**
      * Generate a unique random string
+     * @param  object $model Model of attribute to check uniqueness against
+     * @param  string $attribute Model attribute
+     * @param  integer $length Length of returned string
+     * @param  boolean $alphaNum Whether to restrict string to alphanumeric characters
      * @return string
      */
     public static function generateUniqueRandomString($model, $attribute, $length=12, $alphaNum=false) 

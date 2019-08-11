@@ -448,7 +448,7 @@ class Group extends ActiveRecord
             'form_params' => [
                 'name' => $this->name,
                 'color' => $this->discourse_category_header_color ?? 'green',
-                    'text_color' => $this->discourse_category_title_color ?? 'white',
+                'text_color' => $this->discourse_category_title_color ?? 'white',
                 'permissions[' . $this->discourse_group_name . ']' => 1,
             ]
         ]);

@@ -72,7 +72,7 @@ class Box3Content extends Model
             
             $desc = preg_replace("/[^a-zA-Z0-9\s\.\,\?\!\"\-]/", "", $profile->description);
 
-            $content =     Html::img('@images/content/new.png');
+            $content =     Html::img('@img.site/new.png');
 
             switch ($profile->type) {
 
@@ -108,7 +108,7 @@ class Box3Content extends Model
 
                 case Profile::TYPE_CHAPLAIN :
                     $content .= '<h3>';
-                    $content .=     Html::a($profile->mainName, ['profile' . ProfileController::$profilePageArray[$profile->type],
+                    $content .=     Html::a($profile->mainName, ['profile/' . ProfileController::$profilePageArray[$profile->type],
                                         'urlLoc' => $profile->url_loc, 
                                         'urlName' => $profile->url_name, 
                                         'id' => $profile->id]);
@@ -125,7 +125,7 @@ class Box3Content extends Model
 
                 case Profile::TYPE_CHURCH :
                     $content .= '<h3>';
-                    $content .=     Html::a($profile->org_name, ['profile' . ProfileController::$profilePageArray[$profile->type],
+                    $content .=     Html::a($profile->org_name, ['profile/' . ProfileController::$profilePageArray[$profile->type],
                                         'urlLoc' => $profile->url_loc, 
                                         'urlName' => $profile->url_name, 
                                         'id' => $profile->id]);

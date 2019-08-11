@@ -460,7 +460,7 @@ class ProfileController extends Controller
         }
 
         if (Yii::$app->user->isGuest) {
-            throw new NotFoundHttpException;
+            $this->redirect('/site/login');
         }
 
         if (($profile->type == Profile::TYPE_CHAPLAIN) && ($missionary = $profile->missionary)) {
@@ -657,7 +657,7 @@ class ProfileController extends Controller
         }
 
         if (Yii::$app->user->isGuest) {
-            throw new NotFoundHttpException;
+            $this->redirect('/site/login');
         }
 
         if ($profile->type == Profile::TYPE_EVANGELIST) {
@@ -861,7 +861,7 @@ class ProfileController extends Controller
         }
 
         if (Yii::$app->user->isGuest) {
-            throw new NotFoundHttpException;
+            $this->redirect('/site/login');
         }
 
         if (($profile->type == Profile::TYPE_MISSIONARY) && ($missionary = $profile->missionary)) {
@@ -1078,7 +1078,7 @@ class ProfileController extends Controller
         }
 
         if (Yii::$app->user->isGuest) {
-            throw new NotFoundHttpException;
+            $this->redirect('/site/login');
         }
 
         if ($profile->type == Profile::TYPE_PASTOR) {
@@ -1427,7 +1427,7 @@ class ProfileController extends Controller
         }
 
         if (Yii::$app->user->isGuest) {
-            throw new NotFoundHttpException;
+            $this->redirect('/site/login');
         }
 
         if ($profile->type == Profile::TYPE_STAFF) {

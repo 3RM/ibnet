@@ -89,6 +89,7 @@ use yii\helpers\Html;
                                     ['label' => 'Group Place', 'icon' => 'sitemap', 'url' => ['/groups/group-place'],],
                                     ['label' => 'Group Keyword', 'icon' => 'sitemap', 'url' => ['/groups/group-keyword'],],
                                     ['label' => 'Group Invite', 'icon' => 'sitemap', 'url' => ['/groups/group-invite'],],
+                                    ['label' => 'Group Alert Queue', 'icon' => 'sitemap', 'url' => ['/groups/group-alert-queue'],],
                                 ],
                             ],
                             ['label' => 'Pending New Emails', 'icon' => 'send', 'url' => ['/groups/pending-emails'],],

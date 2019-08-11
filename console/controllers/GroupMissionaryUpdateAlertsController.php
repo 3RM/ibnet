@@ -38,7 +38,7 @@ class GroupMissionaryUpdateAlertsController extends Controller
      * @return int exit code
      */
     public function actionIndex() {
-        return $this->actionInit(date("Y-m-d"), date("Y-m-d"));                     // php yii group-mail/index
+        return $this->actionInit(date("Y-m-d"), date("Y-m-d"));                     // php yii group-missionary-update-alerts/index
     }
 
 }

@@ -1,6 +1,7 @@
 <?php
 namespace backend\controllers;
 
+use backend\models\GroupAlertQueueSearch;
 use backend\models\GroupCalendarEventSearch;
 use backend\models\GroupIcalendarUrlSearch;
 use backend\models\GroupInviteSearch;
@@ -472,6 +473,32 @@ class GroupsController extends Controller
         ];
 
         return $this->render('groupInvite', [
+            'searchModel' => $searchModel, 
+            'dataProvider' => $dataProvider,
+            'gridColumns' => $gridColumns,
+        ]);
+    }
+
+    /**
+     * Displays group_alert_queue table
+     *
+     * @return mixed
+     */
+    public function actionGroupAlertQueue()
+    {
+        $searchModel = new GroupAlertQueueSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->get());
+        $gridColumns = [
+            'id', 
+            'created_at',
+            'group_id',
+            'prayer_id',
+            'prayer_status',
+            'update_id', 
+            'alerted',
+        ];
+
+        return $this->render('groupAlertQueue', [
             'searchModel' => $searchModel, 
             'dataProvider' => $dataProvider,
             'gridColumns' => $gridColumns,

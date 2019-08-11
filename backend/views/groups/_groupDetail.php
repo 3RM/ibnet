@@ -71,6 +71,8 @@ use yii\widgets\ActiveField;
     <p>Discourse Group Name: <?= $group->discourse_group_name ?></p>
     <p>Discourse Group Id: <?= $group->discourse_group_id ?></p>
     <p>Discourse Category Id: <?= $group->discourse_category_id ?></p>
+    <p>Discourse Category Header Color: <?= $group->discourse_category_header_color ?></p>
+    <p>Discourse Category Ttile Color: <?= $group->discourse_category_title_color ?></p>
     <p>Prayer Feature: <?= $group->feature_prayer ? 'Yes' : 'No' ?></p>
     <p>Calendar Feature: <?= $group->feature_calendar ? 'Yes' : 'No' ?></p>
     <p>Forum Feature: <?= $group->feature_forum ? 'Yes' : 'No' ?></p>
