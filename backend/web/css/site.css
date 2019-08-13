@@ -159,6 +159,7 @@ p.indent {
 }
 .image1 {
     width: 100%;
+    max-height: 195px;
 }
 .detail-head {
     overflow: auto;

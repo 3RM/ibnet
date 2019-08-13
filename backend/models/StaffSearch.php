@@ -13,7 +13,7 @@ class StaffSearch extends \common\models\profile\Staff
     { 
         // only fields in rules() are searchable
         return [
-            [['id', 'staff_id', 'staff_type', 'staff_title', 'ministry_id'], 'safe'],
+            [['id', 'staff_id', 'staff_type', 'staff_title', 'ministry_id', 'confirmed'], 'safe'],
         ];
     }
 
@@ -77,6 +77,11 @@ class StaffSearch extends \common\models\profile\Staff
                     'asc' => ['sr_pastor' => SORT_ASC],
                     'desc' => ['sr_pastor' => SORT_DESC],
                 ],
+                'confirmed' => [
+                    'asc' => ['confirmed' => SORT_ASC],
+                    'desc' => ['confirmed' => SORT_DESC],
+                ],
+
             ]
         ]);
 

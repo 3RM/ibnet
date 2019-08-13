@@ -262,29 +262,28 @@ class DirectoryController extends Controller
         $dataProvider = $searchModel->search(Yii::$app->request->get());
         $gridColumns = [
             'id',
-            'staff_id',
-            // [
-            //     'attribute' => 'staff_id',
-            //     'format' => 'raw',
-            //     'value' => function ($model) {                      
-            //         return Html::a($model->staff_id, ['view', 'id' => $model->staff_id]);
-            //     },
-            // ],
+            [
+                'attribute' => 'staff_id',
+                'format' => 'raw',
+                'value' => function ($model) {                      
+                    return Html::button($model->staff_id, ['id' => 'profile-' . $model->id . '-' . $model->staff_id, 'class' => 'btn-link']);
+                },
+            ],
             'staff_type',
             'staff_title',
-            'ministry_id',
-            // [
-            //     'attribute' => 'ministry_id',
-            //     'format' => 'raw',
-            //     'value' => function ($model) {                      
-            //         return Html::a($model->ministry_id, ['view', 'id' => $model->ministry_id]);
-            //     },
-            // ],
+            [
+                'attribute' => 'ministry_id',
+                'format' => 'raw',
+                'value' => function ($model) {                      
+                    return Html::button($model->ministry_id, ['id' => 'profile-' . $model->id . '-' . $model->ministry_id, 'class' => 'btn-link']);
+                },
+            ],
             'home_church', 
             'church_pastor', 
             'ministry_of',
             'ministry_other', 
             'sr_pastor', 
+            'confirmed',
         ];
 
         return $this->render('staff', [
@@ -304,6 +303,7 @@ class DirectoryController extends Controller
         $searchModel = new MissionarySearch();
         $dataProvider = $searchModel->search(Yii::$app->request->get());
         $gridColumns = [
+            'id',
             [
                 'attribute' => 'profile_id',
                 'format' => 'raw',
@@ -311,7 +311,6 @@ class DirectoryController extends Controller
                      return Html::a($model->profile->id, ['/directory/view', 'id' => $model->profile->id]);
                 },
             ],
-            'id',
             'mission_agcy_id',
             'field',
             'status',

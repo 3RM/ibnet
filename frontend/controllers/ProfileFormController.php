@@ -693,9 +693,9 @@ class ProfileFormController extends ProfileController
         $fmNum = Self::$form['sf'];
         $fm = 'forms/form' . $fmNum;
         $profile = Profile::findProfile($id);
-        $profile->type == Profile::TYPE_CHURCH ?
-            $profile->scenario = 'sf-church' :
-            $profile->scenario = 'sf-org';
+        $profile->scenario = $profile->type == Profile::TYPE_CHURCH ?
+            'sf-church' :
+            'sf-org';
 
         if (!\Yii::$app->user->can(PermissionProfile::UPDATE, ['profile' => $profile]) || !$profile->validType()) {
             throw new NotFoundHttpException;

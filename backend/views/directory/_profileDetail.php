@@ -11,7 +11,7 @@ use yii\widgets\ActiveField;
 <?= $profile->image1 ? Html::img(Yii::$app->params['url.frontend'] . $profile->image1, ['class' => 'image1']) : NULL ?>
 <div class="detail-head">
 	<div class="picture">
-		<?= $profile->image2 ? Html::img(Yii::$app->params['url.frontend'] . $profile->image2) : Html::img('@img.profile/profile-logo.png') ?>
+		<?= $profile->image2 ? Html::img(Yii::$app->params['url.frontend'] . $profile->image2) : Html::img(Yii::$app->params['url.frontend'] . 'profile/profile-logo.png') ?>
 	</div>
 	<div class="name">
 		<h2><?= $profile->formatName ?></h2>

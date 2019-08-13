@@ -1403,7 +1403,15 @@ class Profile extends yii\db\ActiveRecord
         ]);
         // Only add pastors to staff table on home church form; other staff will be added on staff form
         if ($this->type == self::TYPE_PASTOR) { 
-            $staff->updateAttributes(['church_pastor' => 1]); 
+            $staff->updateAttributes(['church_pastor' => 1]);
+
+            // Confirm Sr Pastor if church profile and pastor profile are owned by same user
+            if (($this->sub_type == self::SUBTYPE_PASTOR_PASTOR) 
+                || ($this->sub_type == self::SUBTYPE_PASTOR_SENIOR)) {
+                if ($staff->profile->user_id == $staff->ministry->user_id) {
+                    $staff->updateAttributes(['sr_pastor' => 1, 'confirmed' => 1]);
+                }
+            }
         }
 
         // Notify church profile owners of link changes
@@ -1412,7 +1420,6 @@ class Profile extends yii\db\ActiveRecord
         $hcProfileOwner = $hcProfile->user;
         if ($oldHc === NULL) {
             ProfileMail::initSendLink($this, $hcProfile, $hcProfileOwner, 'PM', 'L');
-
 
         // Changed home church
         } elseif ($oldHc != $this->home_church) {
@@ -2992,7 +2999,7 @@ class Profile extends yii\db\ActiveRecord
     {
         return $this->hasMany(Staff::className(), ['ministry_id' => 'id'])
             ->joinWith('profile')
-            ->where(['staff.sr_pastor' => NULL, 'staff.home_church' => NULL, 'profile.status' => Profile::STATUS_ACTIVE])
+            ->where(['staff.sr_pastor' => NULL, 'profile.status' => Profile::STATUS_ACTIVE])
             ->andWhere(['IS NOT', 'staff.staff_title', NULL])
             ->orderBy('staff.staff_id Asc');
     }
