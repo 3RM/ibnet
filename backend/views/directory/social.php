@@ -11,9 +11,9 @@ $this->title = 'Social Table';
 <div class="site-index"> 
 
 	<?= GridView::widget([
-	    'dataProvider'=>$dataProvider,
+	    'dataProvider' => $dataProvider,
 	    //'filterModel'=>$searchModel,
-	    'columns'=>$gridColumns,
+	    'columns' => $gridColumns,
 	]); ?>
 
 </div>

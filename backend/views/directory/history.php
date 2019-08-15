@@ -11,9 +11,9 @@ $this->title = 'History Table';
 <div class="site-index">
 
 	<?= GridView::widget([
-	    'dataProvider'=>$dataProvider,
-	    'filterModel'=>$searchModel,
-	    'columns'=>$gridColumns,
+	    'dataProvider' => $dataProvider,
+	    'filterModel' => $searchModel,
+	    'columns' => $gridColumns,
 	    'options' => [ 'style' => 'table-layout:fixed;' ],
 	]); ?>
 

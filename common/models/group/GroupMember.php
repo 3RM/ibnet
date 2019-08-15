@@ -334,6 +334,30 @@ class GroupMember extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
+    public function getFullName()
+    {
+        return $this->user->fullName;
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getImage()
+    {
+        return $this->user->usr_image;
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPrimaryRole()
+    {
+        return $this->user->primary_role;
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
     public function getPrayers()
     {
         return $this->hasMany(Prayer::className(), ['group_member_id' => 'id']);

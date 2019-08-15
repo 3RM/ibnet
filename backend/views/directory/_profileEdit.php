@@ -1,8 +1,13 @@
 <?php
 
+use common\models\profile\Bible;
 use common\models\profile\Profile;
+use common\models\profile\Polity;
+use common\models\profile\WorshipStyle; 
+use kartik\select2\Select2;
 use yii\widgets\ActiveForm;
 use yii\widgets\ActiveField;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 ?>
     <p>Profile <?= $profile->id ?></p>
@@ -122,10 +127,24 @@ use yii\helpers\Html;
     ]) ?>      
     <?= $form->field($profile, 'website')->textInput(['maxlength' => true]) ?>      
     <?= $form->field($profile, 'pastor_interim')->checkbox() ?>      
-    <?= $form->field($profile, 'cp_pastor')->checkbox() ?>      
-    <?= $form->field($profile, 'bible')->textInput(['maxlength' => true]) ?>      
-    <?= $form->field($profile, 'worship_style')->textInput(['maxlength' => true]) ?>      
-    <?= $form->field($profile, 'polity')->textInput(['maxlength' => true]) ?>      
+    <?= $form->field($profile, 'cp_pastor')->checkbox() ?>
+    <?php if ($profile->category == Profile::CATEGORY_ORG) {
+        echo $form->field($profile, 'bible')->widget(Select2::classname(), [
+            'data' => ArrayHelper::map(Bible::find()->orderBy('id')->all(), 'bible', 'bible'),
+            'hideSearch' => true,
+            'pluginOptions' => ['allowClear' => false],
+        ])->label('Bible');
+        echo $form->field($profile, 'worship_style')->widget(Select2::classname(), [
+            'data' => ArrayHelper::map(WorshipStyle::find()->orderBy('id')->all(), 'style', 'style'),
+            'hideSearch' => true,
+            'pluginOptions' => ['allowClear' => false],
+        ])->label('Worship');
+        echo $form->field($profile, 'polity')->widget(Select2::classname(), [                 
+            'data' => ArrayHelper::map(Polity::find()->orderBy('id')->all(), 'polity', 'polity'),
+            'hideSearch' => true,
+            'pluginOptions' => ['allowClear' => false],
+        ])->label('Church Government'); 
+    } ?> 
     
     <?= Html::submitButton('Save', [
         'name' => 'save',

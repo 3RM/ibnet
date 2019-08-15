@@ -308,7 +308,7 @@ class DirectoryController extends Controller
                 'attribute' => 'profile_id',
                 'format' => 'raw',
                 'value' => function ($model) {                      
-                     return Html::a($model->profile->id, ['/directory/view', 'id' => $model->profile->id]);
+                    return Html::button($model->profile_id, ['id' => 'missionary-' . $model->id, 'class' => 'btn-link']);
                 },
             ],
             'mission_agcy_id',

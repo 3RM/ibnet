@@ -68,7 +68,7 @@ $this->title = 'Ministry Profiles';
 <?php Modal::begin([
     'header' => '<h3><i class="fa fa-address-card"></i></h3>',
     'id' => 'profile-detail-modal',
-    'headerOptions' => ['class' => 'modal-header'],
+    'headerOptions' => ['class' => 'modal-header-profile'],
     'bodyOptions' => ['class' => 'modal-body'],
 ]);
     echo '<div id="profile-detail-content"></div>';

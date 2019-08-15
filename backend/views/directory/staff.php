@@ -4,7 +4,7 @@
 
 use yii\grid\GridView;
 use yii\bootstrap\Html;
-use yii\bootstrap\Modal; use common\models\Utility;
+use yii\bootstrap\Modal;
 
 $this->title = 'Staff Table';
 ?>
@@ -12,9 +12,9 @@ $this->title = 'Staff Table';
 <div class="site-index">
 
 	<?= GridView::widget([
-	    'dataProvider'=>$dataProvider,
-	    'filterModel'=>$searchModel,
-	    'columns'=>$gridColumns,
+	    'dataProvider' => $dataProvider,
+	    'filterModel' => $searchModel,
+	    'columns' => $gridColumns,
 	]); ?>
 
 </div>
@@ -36,7 +36,7 @@ $this->title = 'Staff Table';
 <?php Modal::begin([
     'header' => '<h3><i class="fa fa-address-card"></i></h3>',
     'id' => 'profile-detail-modal',
-    'headerOptions' => ['class' => 'modal-header'],
+    'headerOptions' => ['class' => 'modal-header-profile'],
     'bodyOptions' => ['class' => 'modal-body'],
 ]);
     echo '<div id="profile-detail-content"></div>';

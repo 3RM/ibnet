@@ -145,6 +145,14 @@ p.indent {
     background-color: gray;
     color: #a1a1a1;
 }
+.modal-header-profile {
+    background-color: #3b007b;
+    color: #a1a1a1;
+}
+.modal-header-group {
+    background-color: #003169;
+    color: #a1a1a1;
+}
 .modal-body {
     padding: 20px 40px;
 }

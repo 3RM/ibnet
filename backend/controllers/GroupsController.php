@@ -16,11 +16,13 @@ use backend\models\PrayerTagSearch;
 use common\models\Subscription;
 use common\models\Utility;
 use common\models\group\Group;
+use common\models\group\GroupMember;
 use Yii;
-use yii\web\Controller;
+use yii\bootstrap\Html;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use yii\helpers\Url;
+use yii\web\Controller;
 use yii\web\Response;
 use yii\widgets\ActiveForm;
 
@@ -193,9 +195,36 @@ class GroupsController extends Controller
         $dataProvider = $searchModel->search(Yii::$app->request->get());
         $gridColumns = [
             'id', 
-            'group_id', 
-            'user_id', 
-            'profile_id', 
+            [
+                'attribute' => 'group_id',
+                'format' => 'raw',
+                'value' => function ($model) {                      
+                    return Html::button($model->group_id, [
+                        'id' => 'groupmember-' . $model->id . '-' . $model->group_id, 
+                        'class' => 'btn-link'
+                    ]);
+                },
+            ], 
+            [
+                'attribute' => 'user_id',
+                'format' => 'raw',
+                'value' => function ($model) {                      
+                    return Html::button($model->user_id, [
+                        'id' => 'groupmember-' . $model->id . '-' . $model->user_id, 
+                        'class' => 'btn-link'
+                    ]);
+                },
+            ],
+            [
+                'attribute' => 'profile_id',
+                'format' => 'raw',
+                'value' => function ($model) {                      
+                    return Html::button($model->profile_id, [
+                        'id' => 'groupmember-profile-' . $model->id, 
+                        'class' => 'btn-link'
+                    ]);
+                },
+            ], 
             'missionary_id', 
             'group_owner', 
             'created_at', 
@@ -225,6 +254,19 @@ class GroupsController extends Controller
     }
 
     /**
+     * Render content for group member detail modal
+     * @param integer $id Group member id
+     * @return mixed
+     */
+    public function actionViewMemberDetail($id)
+    {
+        $member = GroupMember::findOne($id);
+        return $this->renderAjax('_memberDetail', [
+            'member' => $member,
+        ]);
+    }
+
+    /**
      * Displays prayer table
      *
      * @return mixed
@@ -235,8 +277,26 @@ class GroupsController extends Controller
         $dataProvider = $searchModel->search(Yii::$app->request->get());
         $gridColumns = [
             'id', 
-            'group_id', 
-            'group_member_id', 
+            [
+                'attribute' => 'group_id',
+                'format' => 'raw',
+                'value' => function ($model) {                      
+                    return Html::button($model->group_id, [
+                        'id' => 'prayer-group-' . $model->id . '-' . $model->group_id, 
+                        'class' => 'btn-link'
+                    ]);
+                },
+            ], 
+            [
+                'attribute' => 'group_member_id',
+                'format' => 'raw',
+                'value' => function ($model) {                      
+                    return Html::button($model->group_member_id, [
+                        'id' => 'prayer-member-' . $model->id . '-' . $model->group_member_id, 
+                        'class' => 'btn-link'
+                    ]);
+                },
+            ], 
             [
                 'attribute' => 'request',
                 'contentOptions' => ['style' => 'width:10%;'],
@@ -326,10 +386,34 @@ class GroupsController extends Controller
         $dataProvider = $searchModel->search(Yii::$app->request->get());
         $gridColumns = [
             'id', 
-            'group_id', 
-            'group_member_id', 
-            'title', 
-            'color', 
+            [
+                'attribute' => 'group_id',
+                'format' => 'raw',
+                'value' => function ($model) {                      
+                    return Html::button($model->group_id, [
+                        'id' => 'event-group-' . $model->id . '-' . $model->group_id,
+                        'class' => 'btn-link'
+                    ]);
+                },
+            ], 
+            [
+                'attribute' => 'group_member_id',
+                'format' => 'raw',
+                'value' => function ($model) {                      
+                    return Html::button($model->group_member_id, [
+                        'id' => 'prayer-member-' . $model->id . '-' . $model->group_member_id, 
+                        'class' => 'btn-link'
+                    ]);
+                },
+            ], 
+            'title',
+            [
+                'attribute' => 'color',
+                'format' => 'raw',
+                'value' => function ($model) {
+                    return '<span style="background-color:' . $model->color . ';">' . $model->color . '</span>';
+                },
+            ],
             [
                 'attribute' => 'description',
                 'contentOptions' => ['style' => 'width:25%;'],
@@ -359,11 +443,35 @@ class GroupsController extends Controller
         $dataProvider = $searchModel->search(Yii::$app->request->get());
         $gridColumns = [
             'id', 
-            'group_id', 
-            'group_member_id', 
+            [
+                'attribute' => 'group_id',
+                'format' => 'raw',
+                'value' => function ($model) {                      
+                    return Html::button($model->group_id, [
+                        'id' => 'url-group-' . $model->id . '-' . $model->group_id, 
+                        'class' => 'btn-link'
+                    ]);
+                },
+            ], 
+            [
+                'attribute' => 'group_member_id',
+                'format' => 'raw',
+                'value' => function ($model) {                      
+                    return Html::button($model->group_member_id, [
+                        'id' => 'prayer-member-' . $model->id . '-' . $model->group_member_id, 
+                        'class' => 'btn-link'
+                    ]);
+                },
+            ], 
             'ical_id', 
             'url', 
-            'color', 
+            [
+                'attribute' => 'color',
+                'format' => 'raw',
+                'value' => function ($model) {
+                    return '<span style="background-color:' . $model->color . ';">' . $model->color . '</span>';
+                },
+            ], 
             'error_on_import', 
             'deleted',
         ];
@@ -386,8 +494,26 @@ class GroupsController extends Controller
         $dataProvider = $searchModel->search(Yii::$app->request->get());
         $gridColumns = [
             'id', 
-            'group_id', 
-            'user_id', 
+            [
+                'attribute' => 'group_id',
+                'format' => 'raw',
+                'value' => function ($model) {                      
+                    return Html::button($model->group_id, [
+                        'id' => 'notice-group-' . $model->id . '-' . $model->group_id, 
+                        'class' => 'btn-link'
+                    ]);
+                },
+            ], 
+            [
+                'attribute' => 'user_id',
+                'format' => 'raw',
+                'value' => function ($model) {                      
+                    return Html::button($model->user_id, [
+                        'id' => 'notice-' . $model->id . '-' . $model->user_id, 
+                        'class' => 'btn-link'
+                    ]);
+                },
+            ], 
             'created_at', 
             'reply_to',
             [
@@ -418,7 +544,16 @@ class GroupsController extends Controller
         $dataProvider = $searchModel->search(Yii::$app->request->get());
         $gridColumns = [
             'id', 
-            'group_id', 
+            [
+                'attribute' => 'group_id',
+                'format' => 'raw',
+                'value' => function ($model) {                      
+                    return Html::button($model->group_id, [
+                        'id' => 'place-group-' . $model->id . '-' . $model->group_id, 
+                        'class' => 'btn-link'
+                    ]);
+                },
+            ], 
             'city', 
             'state', 
             'country',
@@ -443,7 +578,16 @@ class GroupsController extends Controller
         $dataProvider = $searchModel->search(Yii::$app->request->get());
         $gridColumns = [
             'id', 
-            'group_id', 
+            [
+                'attribute' => 'group_id',
+                'format' => 'raw',
+                'value' => function ($model) {                      
+                    return Html::button($model->group_id, [
+                        'id' => 'keyword-group-' . $model->id . '-' . $model->group_id, 
+                        'class' => 'btn-link'
+                    ]);
+                },
+            ], 
             'keyword', 
             'deleted',
         ];
@@ -466,7 +610,16 @@ class GroupsController extends Controller
         $dataProvider = $searchModel->search(Yii::$app->request->get());
         $gridColumns = [
             'id', 
-            'group_id',
+            [
+                'attribute' => 'group_id',
+                'format' => 'raw',
+                'value' => function ($model) {                      
+                    return Html::button($model->group_id, [
+                        'id' => 'invite-group-' . $model->id . '-' . $model->group_id, 
+                        'class' => 'btn-link'
+                    ]);
+                },
+            ],
             'email', 
             'created_at', 
             'token',
@@ -491,7 +644,16 @@ class GroupsController extends Controller
         $gridColumns = [
             'id', 
             'created_at',
-            'group_id',
+            [
+                'attribute' => 'group_id',
+                'format' => 'raw',
+                'value' => function ($model) {                      
+                    return Html::button($model->group_id, [
+                        'id' => 'alert-group-' . $model->id . '-' . $model->group_id, 
+                        'class' => 'btn-link'
+                    ]);
+                },
+            ],
             'prayer_id',
             'prayer_status',
             'update_id', 
