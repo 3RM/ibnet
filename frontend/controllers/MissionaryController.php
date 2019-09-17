@@ -379,9 +379,20 @@ class MissionaryController extends Controller
             if ($update->validate()) {
                 $update->save();
             }
-            // email user  
             $user = $profile->user;
-            ProfileMail::sendMailchimp($user->email, $missionary->repository_key, $missionary->id);     
+            // email user
+            ProfileMail::sendMailchimp($user->email, $missionary->repository_key, $missionary->id);
+            // Add to group alert queue
+            if ($members = $user->groupMembers) {
+                // If sharing updates with at least one group, add to queue
+                foreach ($members as $member) {
+                    if ($member->show_updates == 1) {
+                        MissionaryUpdate::addToAlertQueue();
+                        $update->updateAttributes(['alert_status' => self::ALERT_ENABLED]);
+                        break;
+                    }
+                }
+            }     
         }       
         die;
     }

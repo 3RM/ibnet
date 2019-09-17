@@ -56,9 +56,7 @@ class ServerController extends Controller
      */
     public function actionCron()
     {
-        //$searchModel = new CSearch();
-
-        $query = CronJob::find()->orderBy(['id_cron_job' => SORT_DESC]);
+        $query = CronJob::find()->limit(63)->orderBy(['id_cron_job' => SORT_DESC]);
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [

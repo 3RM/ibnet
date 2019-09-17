@@ -13,7 +13,7 @@ use yii\widgets\ActiveField;
 
 <div class="detail-head">
 	<div class="picture">
-		<?= $user->usr_image ? Html::img(Yii::$app->params['url.frontend'] . $user->usr_image) : Html::img('@images/user.png') ?>
+		<?= $user->usr_image ? Html::img(Yii::$app->params['url.frontend'] . $user->usr_image) : Html::img('@fimages/user.png') ?>
 	</div>
 	<div class="name">
 		<h2><?= $user->fullName ?></h2>

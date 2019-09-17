@@ -1,2 +1,3 @@
 <?php
-Yii::setAlias('@images', 'https://ibnet.org/images');
+Yii::setAlias('@fimages', 'https://ibnet.org/images');
+Yii::setAlias('@bimages', '/images');

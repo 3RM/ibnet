@@ -93,7 +93,7 @@ $this->title = 'Groups';
 <?php Modal::begin([
     'header' => '<h3><i class="fa fa-users"></i></h3>',
     'id' => 'group-detail-modal',
-    'headerOptions' => ['class' => 'modal-header'],
+    'headerOptions' => ['class' => 'modal-header-group'],
     'bodyOptions' => ['class' => 'modal-body'],
 ]);
     echo '<div id="group-detail-content"></div>';

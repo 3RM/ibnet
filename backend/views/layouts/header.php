@@ -10,7 +10,7 @@ use yii\helpers\Html;
 
 <header class="main-header">
 
-    <?= Html::a('<span class="logo-mini">' . html::img('@images/ibnet-header-sm.png') . '</span><span class="logo-lg">' . html::img('@images/ibnet-header.png') . '</span>', Yii::$app->homeUrl, ['class' => 'logo']) ?>
+    <?= Html::a('<span class="logo-mini">' . html::img('@bimages/ibnet-header-sm.png') . '</span><span class="logo-lg">' . html::img('@bimages/ibnet-header.png') . '</span>', Yii::$app->homeUrl, ['class' => 'logo']) ?>
 
     <nav class="navbar navbar-static-top" role="navigation">
 

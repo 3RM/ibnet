@@ -26,7 +26,7 @@ $this->title = 'My Account';
     For group <span class="lead">"<?= $group->name ?>"</span>
     <br><br>
 	
-	<?php if ($group->private && count($pendingDataProvider->getModels()) > 0) { ?>
+	<?php if ($group->private && $pendingDataProvider->getTotalCount() > 0) { ?>
 		<h3>Pending Approval</h3>
     	<div class="member-list">
     	    <?= ListView::widget([
