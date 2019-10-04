@@ -74,14 +74,24 @@ class WpPosts extends Model
 			    post.id AS post_id,
 			    post.post_author AS post_author,
 			    post.post_date AS post_date,
-			    post.post_title,
+			    post.post_title, 
 			    post.post_content AS post_content,
 			    post.guid AS post_url,
-			    user.display_name AS author_name');
+			    user.display_name AS author_name, 
+			    image_detail.id AS image_id, 
+			    image_detail.guid AS image_url');
 		$query->from(['post' => 'wp_posts']);
 		$query->join('LEFT JOIN', 'wp_users user', 'user.id=post.post_author');		
+		$query->join('LEFT JOIN', "(
+			    SELECT post_parent, MIN( id ) AS first_image_id
+			    FROM wp_posts
+			    WHERE post_type='attachment'
+			        AND post_mime_type LIKE 'image/%'
+			    GROUP BY post_parent
+			    ) image_latest", 'post.id=image_latest.post_parent');
+		$query->join('LEFT JOIN', 'wp_posts image_detail', 'image_detail.id=image_latest.first_image_id');
 		$query->where(['post.post_status' => 'publish', 'post.post_type' => 'post']);
-		$query->andWhere('post_date>DATE_SUB(NOW(), INTERVAL 7 DAY)');
+		$query->andWhere('post.post_date BETWEEN DATE_SUB(NOW(), INTERVAL 7 DAY) AND NOW()');
 		$query->orderBy('post_date DESC');
 		return $query->all(\Yii::$app->dbblog);
 	}

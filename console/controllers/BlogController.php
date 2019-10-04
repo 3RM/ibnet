@@ -5,8 +5,9 @@ use common\models\blog\WpPosts;
 use common\models\Mail;
 use common\models\User;
 use fedemotta\cronjob\models\CronJob;
+use yii;
 use yii\console\Controller;
-use yii\helpers\ArrayHelper;
+use yii\helpers\ArrayHelper; use common\models\Utility;
 
 class BlogController extends Controller
 {
@@ -29,7 +30,10 @@ class BlogController extends Controller
                     $users = User::getAllSubscribedBlog();
              
                     foreach ($users as $user) {
-
+                        if ($user->subscription->blog == 0) {
+                            continue;
+                        }
+          
                         Yii::$app
                             ->mailer
                             ->compose(

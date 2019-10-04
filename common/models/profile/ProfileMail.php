@@ -438,7 +438,7 @@ class ProfileMail extends \yii\db\ActiveRecord
     public static function sendComment($id, $createdBy)
     {
         $user = $profile->user;
-        if ($user->subscription->blog == 0) {
+        if ($user->subscription->comments == 0) {
             return true;
         }
         $commenter = User::findOne($createdBy);
