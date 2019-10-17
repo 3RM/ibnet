@@ -208,6 +208,7 @@ class PreviewController extends ProfileFormController
             $fellowships = $profile->fellowships;
             $missionAgcy = $missionary->missionAgcy;
             $missionAgcyProfile = $missionAgcy ? $missionAgcy->linkedProfile : NULL;
+            $updates = $missionary->publicUpdates;
             $otherMinistries = $profile->otherMinistriesConfirmed;
             $schoolsAttended = $profile->schoolsAttended;
             $social = $profile->hasSocial;
@@ -228,6 +229,7 @@ class PreviewController extends ProfileFormController
                 'missionary' => $missionary,
                 'missionAgcy' => $missionAgcy,
                 'missionAgcyProfile' => $missionAgcyProfile,
+                'updates' => $updates,
                 'otherMinistries' => $otherMinistries,
                 'schoolsAttended' => $schoolsAttended,
                 'fellowships' => $fellowships,

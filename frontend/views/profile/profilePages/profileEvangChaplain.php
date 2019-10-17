@@ -35,6 +35,7 @@ $this->title = $profile->mainName;
 				'missionAgcy' => $missionAgcy, 
 				'missionAgcyProfile' => $missionAgcyProfile
 			]) ?>
+		<?= !empty($updates) ? $this->render('cards/_card-missionary-updates', ['updates' => $updates]) : NULL ?>
 		<?= !empty($otherMinistries) ? $this->render('cards/_card-otherministries', ['otherMinistries' => $otherMinistries]) : NULL ?>
 		<?= !empty($schoolsAttended) ? $this->render('cards/_card-school', ['schoolsAttended' => $schoolsAttended]) : NULL ?>
 		<?= !empty($fellowships) ? $this->render('cards/_card-fellowships', ['fellowships' => $fellowships]) : NULL ?>

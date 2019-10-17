@@ -468,6 +468,7 @@ class ProfileController extends Controller
             $fellowships = $profile->fellowships;
             $missionAgcy = $missionary->missionAgcy;
             $missionAgcyProfile = $missionAgcy ? $missionAgcy->linkedProfile : NULL;
+            $updates = $missionary->publicUpdates;
             $otherMinistries = $profile->otherMinistriesConfirmed;
             $schoolsAttended = $profile->schoolsAttended;
             $social = $profile->hasSocial;
@@ -540,6 +541,7 @@ class ProfileController extends Controller
                 'missionary' => $missionary,
                 'missionAgcy' => $missionAgcy,
                 'missionAgcyProfile' => $missionAgcyProfile,
+                'updates' => $updates,
                 'otherMinistries' => $otherMinistries,
                 'schoolsAttended' => $schoolsAttended,
                 'social' => $social,
