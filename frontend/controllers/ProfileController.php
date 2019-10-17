@@ -1260,7 +1260,7 @@ class ProfileController extends Controller
 
         if ($profile->type == Profile::TYPE_SCHOOL) {
             $parentMinistry = $profile->parentMinistry;
-            $schoolLevels = $profile->schoolLevels ? $profile->schoolLevels : NULL;
+            $schoolLevels = $profile->schoolLevels;
             // Sort the multidimensional array
             usort($schoolLevels, [$this, 'level_sort']);
             $accreditations = $profile->accreditations;

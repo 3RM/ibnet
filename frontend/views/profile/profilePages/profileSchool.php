@@ -29,7 +29,7 @@ $this->title = $profile->org_name;
 		</div>
 
 		<?= !empty($parentMinistry) ? $this->render('cards/_card-parentministry', ['profile' => $profile, 'parentMinistry' => $parentMinistry]) : NULL ?>
-		<?= !empty($schoolLevel) ? $this->render('cards/_card-schoollevels', ['schoolLevel' => $schoolLevel]) : NULL ?>
+		<?= !empty($schoolLevels) ? $this->render('cards/_card-schoollevels', ['schoolLevels' => $schoolLevels]) : NULL ?>
 		<?= !empty($accreditations) ? $this->render('cards/_card-accreditations', ['accreditations' => $accreditations]) : NULL ?>
 		<?= $this->render('cards/_card-contact-org', ['profile' => $profile]) ?>
 		<?= !empty($social) ? $this->render('cards/_card-social', ['social' => $social]) : NULL ?>
