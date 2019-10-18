@@ -401,8 +401,8 @@ class m190327_234414_create_group_tables extends Migration
             'title' => $this->string(60),
             'color' => $this->string(20)->defaultValue('#3d85c6'),
             'description' => $this->text(),
-            'start' => $this->timeStamp(),
-            'end' => $this->timeStamp(),
+            'start' => $this->integer(13),
+            'end' => $this->integer(13),
             'all_day' => $this->boolean(),
             'deleted' => $this->tinyInteger(1)->defaultValue(0),
         ], $tableOptions);
@@ -492,15 +492,16 @@ class m190327_234414_create_group_tables extends Migration
             'NO ACTION'
         );
 
-        $this->addForeignKey(
-            'fk-group_icalendar_url-ical_id',
-            'group_icalendar_url',
-            'ical_id',
-            'icalender_main',
-            'id',
-            'NO ACTION',
-            'NO ACTION'
-        );
+        // Remove
+        // $this->addForeignKey(
+        //     'fk-group_icalendar_url-ical_id',
+        //     'group_icalendar_url',
+        //     'ical_id',
+        //     'icalender_main',
+        //     'id',
+        //     'NO ACTION',
+        //     'NO ACTION'
+        // );
 
 
 
