@@ -18,6 +18,15 @@ use yii\widgets\ActiveForm;
         ['label' => 'Browse', 'url' => ['/profile/browse']],
         ['label' => 'Blog', 'url' => 'https://blog.ibnet.org'],
     ];
+
+    $menuItems[] =
+    '<li class="dropdown" id="menuLogin">'.
+        Html::beginForm('/ajax/nav-search', 'post', ['id' => 'navbar-search-form', 'data-on-done' => "searchDone"]) .
+            Html::textInput('term', null, ['id' => 'term', 'placeholder' => 'Search']) .
+            Html::submitButton('Search', ['class' => 'btn btn-default']) .
+        Html::endForm() .
+    '</li>';
+    $this->registerJs("$('#navbar-search-form').submit(handleSearchForm);", \yii\web\View::POS_READY);
     
     if (Yii::$app->user->isGuest) {
         $menuItems[] = 

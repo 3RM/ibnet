@@ -248,7 +248,7 @@ class GroupMember extends \yii\db\ActiveRecord
         $mail->extMessage = $extMessage ?? NULL;
         $mail->sendNotification(); 
 
-        $this->delete();
+        $this->updateAttributes(['status' => self::STATUS_REMOVED, 'inactivate_date' => time()]);
         
         return true;
     }

@@ -55,6 +55,22 @@ class AjaxController extends Controller
     // ************************** Site *******************************
 
     /**
+     * Process search string
+     * @return array
+     */
+    public function actionNavSearch()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        if ($term = $_POST['term']) {
+            return $this->redirect(['/profile/search', 'term' => $term]);
+
+        } else {
+            return ['body' => '', 'success' => false];
+        }
+    }
+
+    /**
      * Logs in a user from the Nav bar.
      * @return array
      */

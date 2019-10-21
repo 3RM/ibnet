@@ -26,6 +26,28 @@ function handleAjaxForm(e) {
     }
 }
 
+function handleSearchForm(e) {
+
+    var
+        $link = $(e.target),
+        callUrl = $link.attr('action');
+        onDone = $link.data('onDone'),
+        postData = { _csrf: $('_csrf').val(), term: $('#term').val() };
+ 
+    ajaxRequest = $.ajax({
+        type: "post",
+        dataType: 'json',
+        url: callUrl,
+        data: postData
+    });
+    e.preventDefault();
+ 
+    // Assign done handler
+    if (typeof onDone === "string" && ajaxCallbacks.hasOwnProperty(onDone)) {
+        ajaxRequest.done(ajaxCallbacks[onDone]);
+    } 
+}
+
 function handleLoginForm(e) {
 
     var
