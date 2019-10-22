@@ -2560,7 +2560,7 @@ class Profile extends yii\db\ActiveRecord
      * Active profile by id
      * @return \yii\db\ActiveRecord
      */
-    public function getActiveProfile($id)
+    public static function getActiveProfile($id)
     {
         return static::find()->where(['id' => $id, 'status' => self::STATUS_ACTIVE])->one();
     }
