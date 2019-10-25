@@ -9,6 +9,7 @@ use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\helpers\Html;
 use yii\helpers\Url;
+use yii\widgets\ActiveForm;
 
 AppAsset::register($this);
 AjaxAsset::register($this);
@@ -46,7 +47,21 @@ $title="IBNet | Independent Baptist Network";
 </script>
 
 <div class="index-wrap crop" id="main-wrap">
-    <?= $this->render('_navbar') ?>
+    <?php $searchModel = Yii::$app->view->params['searchModel']; ?>
+    <?php $form = ActiveForm::begin(['action' => '/profile/search']); ?>
+    <?= $form->field($searchModel, 'term')->textInput([
+        'maxlength' => true, 
+          'class' => 'form-control',
+        'placeholder' => 'Search',
+        'autocomplete' => 'off',
+    ])->label(''); ?>
+    <?= Html::submitButton('', [
+        'method' => 'POST',
+        'class' => 'btn btn-default search-icon',
+        'name' => 'search',
+    ]); ?>
+    <?php $form = ActiveForm::end(); ?>
+    <?= $this->render('_navbar', ['searchModel' => $searchModel]) ?>
     <div class="clearfix"></div>
     <div class="container">
         <?= $content ?>

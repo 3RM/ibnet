@@ -104,54 +104,42 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {   
-        $searchModel = Yii::$app->user->isGuest ? new ProfileGuestSearch() : new ProfileSearch();
 
-        if ($searchModel->load(Yii::$app->request->Post()) &&
-            $searchModel->term != '') {
-            $term = $searchModel->term; 
-            return $this->redirect(['/profile/search', 'term' => $term]);
-        } else {
+        // Get new profiles for box 3 and add to session
+        $profiles = Profile::find()
+            ->select('*')
+            ->where(['status' => PROFILE::STATUS_ACTIVE])
+            ->andwhere('created_at>DATE_SUB(NOW(), INTERVAL 14 DAY)')
+            ->orderBy('created_at DESC')
+            ->all();
+        $count = count($profiles);
+        $i = 0;
+
+        $session = Yii::$app->session;
+        $session->open('profiles');
+        $session->open('count'); // Total number of profiles
+        $session->open('i'); // Profile number to show
+        $session->set('profiles', $profiles);
+        $session->set('count', $count);
+        $session->set('i', $i);
+
+        $content = new Box3Content();
+        $box3Content = $content->getBox3Content();
+
+        // Get Blog posts
+        $posts = NULL;
+        $comments = NULL;
+        $posts = WpPosts::getPosts();
+        $postIds = ArrayHelper::getColumn($posts, 'post_id');
+        $comments = WpPosts::getComments($postIds);
         
-            $term = '';
-
-            // Get new profiles for box 3 and add to session
-            $profiles = Profile::find()
-                ->select('*')
-                ->where(['status' => PROFILE::STATUS_ACTIVE])
-                ->andwhere('created_at>DATE_SUB(NOW(), INTERVAL 14 DAY)')
-                ->orderBy('created_at DESC')
-                ->all();
-            $count = count($profiles);
-            $i = 0;
-
-            $session = Yii::$app->session;
-            $session->open('profiles');
-            $session->open('count'); // Total number of profiles
-            $session->open('i'); // Profile number to show
-            $session->set('profiles', $profiles);
-            $session->set('count', $count);
-            $session->set('i', $i);
-
-            $content = new Box3Content();
-            $box3Content = $content->getBox3Content();
-
-            // Get Blog posts
-            $posts = NULL;
-            $comments = NULL;
-            $posts = WpPosts::getPosts();
-            $postIds = ArrayHelper::getColumn($posts, 'post_id');
-            $comments = WpPosts::getComments($postIds);
-        
-            $this->layout = 'bg-gray';
-            return $this->render('/site/index', [
-                'searchModel' => $searchModel, 
-                'term' => $term,
-                'box3Content' => $box3Content,
-                'posts' => $posts,
-                'comments' => $comments,
-                'count' => $count
-            ]);
-        }
+        $this->layout = 'bg-gray';
+        return $this->render('/site/index', [
+            'box3Content' => $box3Content,
+            'posts' => $posts,
+            'comments' => $comments,
+            'count' => $count
+        ]);
     }
 
     /**

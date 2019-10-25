@@ -80,7 +80,7 @@ class ProfileController extends Controller
      * @param string $term The search term
      * @return mixed
      */
-    public function actionSearch($term)
+    public function actionSearch($term=NULL)
     {
         $this->layout="main";
         $searchModel = Yii::$app->user->isGuest ? new ProfileGuestSearch() : new ProfileSearch();
@@ -89,17 +89,15 @@ class ProfileController extends Controller
             if ($searchModel->term == '') {
                 return $this->redirect(['/site/index']);
             }
-            $term = $searchModel->term;
             // Redirecting here to retain the search string in the urls and facilitate
             // returning to the same search results when the "Return" link is clicked
-            return $this->redirect(['/profile/search', 'term' => $term]);
+            return $this->redirect(['/profile/search', 'term' => $searchModel->term]);
         } else {                                                                                   
-            $searchModel->term = $term;
             $dataProvider = $searchModel->query($term);
 
             Url::remember();
             return $this->render('search', [
-                'searchModel' => $searchModel, 
+                'term' => $term, 
                 'dataProvider' => $dataProvider
             ]);
         }

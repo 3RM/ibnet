@@ -12,20 +12,6 @@ $this->title = 'IBNet Search';
     <div class="header-container">
         <div class="header-img">
             <?= Html::img('@img.site/ibnet-large.png') ?>
-            <div id="search-box" class="input-group">
-                <?php $form = ActiveForm::begin(['id' => 'search-form']); ?>
-                <?= $form->field($searchModel, 'term')->textInput([
-                    'maxlength' => true, 
-                    'class' => 'form-control',
-                    'autocomplete' => 'off',
-                ])->label('') ?>
-                <?= Html::submitButton('', [
-                    'method' => 'POST',
-                    'class' => 'btn btn-default search-icon',
-                    'name' => 'search',
-                ]) ?>
-                <?php $form = ActiveForm::end(); ?>
-            </div>
         </div>
     </div>
 </div>
@@ -38,7 +24,7 @@ $this->title = 'IBNet Search';
                 'dataProvider' => $dataProvider,
                 'showOnEmpty' => false,
                 'emptyText' => '
-                    <p>Your search - <b>' . $searchModel->term . '</b> - did not return any results.</p>
+                    <p>Your search - <b>' . $term . '</b> - did not return any results.</p>
                     <ul>
                         <li>Make sure all words are spelled correctly.</li>
                         <li>Try different keywords.</li>

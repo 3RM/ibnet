@@ -16,21 +16,6 @@ $this->title = '';
 <div class="header-container">
     <div class="header-img">
         <?= Html::img('@img.site/ibnet-large.png') ?>
-        <div id="search-box" class="input-group">
-            <?php $form = ActiveForm::begin(['id' => 'search-form']); ?>
-            <?= $form->field($searchModel, 'term')->textInput([
-                'maxlength' => true, 
-                  'class' => 'form-control',
-                'placeholder' => Yii::$app->user->isGuest ? 'Find churches and organizations ...' : 'Find churches, organizations and individuals ...',
-                'autocomplete' => 'off',
-            ])->label('') ?>
-            <?= Html::submitButton('', [
-                'method' => 'POST',
-                'class' => 'btn btn-default search-icon',
-                'name' => 'search',
-            ]) ?>
-            <?php $form = ActiveForm::end(); ?>
-        </div>
     </div>
 </div>
 <div class="header-wh">
